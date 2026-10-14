@@ -6,22 +6,24 @@ Jogos e materiais que o GamificaPampa leva para as escolas públicas de Alegrete
 
 Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celular, no tablet e no projetor.
 
-| Jogo                                                   | Idade | Pasta                                      |
-| ------------------------------------------------------ | ----- | ------------------------------------------ |
-| Robô pega a estrela                                    | 6+    | [criancas/robo](criancas/robo)             |
-| Ninja dos Bugs                                         | 6+    | [criancas/ninja](criancas/ninja)           |
-| Programação em Dupla, com os mapas para imprimir       | 7+    | [criancas/dupla](criancas/dupla)           |
-| Conecta o Sistema                                      | 8+    | [criancas/conecta](criancas/conecta)       |
-| Arcade do Código, três jogos com placar                | Todas | [criancas/arcade](criancas/arcade)         |
-| Caça aos Bugs!, com tela de estande                    | Não informada | [criancas/caca-bugs](criancas/caca-bugs)   |
-| Missão Dev, com tela de estande para feira de ciências | Não informada | [criancas/missao-dev](criancas/missao-dev) |
+| Jogo | Idade | Abrir no navegador | Código |
+| --- | --- | --- | --- |
+| Robô pega a estrela | 6+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/robo/) | [criancas/robo](criancas/robo) |
+| Ninja dos Bugs | 6+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/ninja/) | [criancas/ninja](criancas/ninja) |
+| Programação em Dupla | 7+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/) | [criancas/dupla](criancas/dupla) |
+| Conecta o Sistema | 8+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/conecta/) | [criancas/conecta](criancas/conecta) |
+| Arcade do Código, três jogos com placar | Todas | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/) | [criancas/arcade](criancas/arcade) |
+| Caça aos Bugs! | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/) | [criancas/caca-bugs](criancas/caca-bugs) |
+| Missão Dev, para feira de ciências | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/) | [criancas/missao-dev](criancas/missao-dev) |
+
+Material de apoio: [mapas da Programação em Dupla](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.html) ([PDF](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.pdf)) e as telas de estande do [Arcade](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/estande.html), do [Caça aos Bugs](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/estande.html) e da [Missão Dev](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/estande.html).
 
 ## Para professores
 
-| Material                                                                                                 | Pasta                                                                              |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Aula de 50 minutos com os jogos, com roteiro, slides e folha de atividades                               | [professores/aula-engenharia-de-software](professores/aula-engenharia-de-software) |
-| Oficina de Prompts, a formação em quatro encontros para criar atividades, histórias e jogos com o Gemini | [professores/oficina-prompts](professores/oficina-prompts)                         |
+| Material | Abrir no navegador | Código |
+| --- | --- | --- |
+| Aula de 50 minutos com os jogos | [roteiro](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.html), [slides](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/slides.html), [folha de atividades](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.html) | [professores/aula-engenharia-de-software](professores/aula-engenharia-de-software) |
+| Oficina de Prompts, quatro encontros para criar atividades, histórias e jogos com o Gemini | [página da oficina](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/), [curso online](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/curso.html), [construtor de prompts](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/construtor.html) | [professores/oficina-prompts](professores/oficina-prompts) |
 
 ## Como adicionar um recurso
 

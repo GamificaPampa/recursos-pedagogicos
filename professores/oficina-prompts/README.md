@@ -1,6 +1,6 @@
 # Oficina de Prompts para professores
 
-Formação em quatro encontros para professores da Educação Básica criarem atividades, histórias e jogos com o Gemini. A página inicial é [index.html](index.html).
+Formação em quatro encontros para professores da Educação Básica criarem atividades, histórias e jogos com o Gemini. Abra a oficina no navegador em [gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/). Cada arquivo abaixo abre no mesmo endereço, trocando o nome no fim.
 
 | Para              | Arquivos                                                                                                                                                                                     |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

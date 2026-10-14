@@ -4,8 +4,8 @@ Aula de 45 a 50 minutos para turmas de 6 a 14 anos, com notebook e projetor. As 
 
 | Arquivo                                                               | Para quê                                                    |
 | --------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [roteiro.html](roteiro.html) e [roteiro.pdf](roteiro.pdf)             | Passo a passo da aula, com os cartões de seta para imprimir |
-| [slides.html](slides.html)                                            | Dez telas para o projetor                                   |
-| [atividades.html](atividades.html) e [atividades.pdf](atividades.pdf) | Três folhas por criança                                     |
+| [roteiro.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.html) e [roteiro.pdf](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.pdf)             | Passo a passo da aula, com os cartões de seta para imprimir |
+| [slides.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/slides.html)                                            | Dez telas para o projetor                                   |
+| [atividades.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.html) e [atividades.pdf](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.pdf) | Três folhas por criança                                     |
 
 O menu com os jogos para projetar está em [gamificapampa.github.io/turma](https://gamificapampa.github.io/turma/). Os mapas da Programação em Dupla ficam em [criancas/dupla](../../criancas/dupla).
