@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- TROCAR: nome do recurso e uma frase sobre ele -->
+  <title>Nome do recurso · GamificaPampa</title>
+  <meta name="description" content="Uma frase que diz o que a criança ou o professor faz neste recurso.">
+  <meta property="og:title" content="Nome do recurso · GamificaPampa">
+  <meta property="og:description" content="Uma frase que diz o que a criança ou o professor faz neste recurso.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <style>
+    /* Arrumando a página em uma coluna central que cabe no celular e no projetor */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px clamp(16px, 4vw, 40px); }
+    main { display: grid; gap: 28px; width: min(900px, 100% - 32px); margin: 24px auto 64px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 22px; text-align: left; }
+    .bit svg { flex: none; }
+    .rodape { padding: 24px; text-align: center; font-size: 15px; }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body>
+  <header class="topo">
+    <!-- TROCAR: recurso para professores volta para https://gamificapampa.github.io/ -->
+    <a class="btn" href="https://gamificapampa.github.io/turma/">Voltar aos jogos</a>
+    <img src="/identidade-visual/logos/gamificapampa-horizontal.svg" alt="GamificaPampa" width="200" height="44">
+  </header>
+
+  <main>
+    <h1 class="loud"><span class="yellow">Nome do</span> <span class="pink">recurso</span></h1>
+    <p><span class="pill" style="--c: var(--mint)">A partir de 6 anos</span></p>
+
+    <div class="bit">
+      <svg width="96" height="96" viewBox="0 0 100 100" aria-hidden="true"><line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/><circle cx="50" cy="8" r="6" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="2"/><rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/><circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/><path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/></svg>
+      <p class="bubble">Oi! Eu sou o Bit. Aqui vai a instrução do recurso, em uma ou duas frases curtas.</p>
+    </div>
+
+    <section class="card" aria-label="Área do recurso">
+      <!-- TROCAR: o jogo ou o material entra aqui -->
+      <p>O jogo ou o material entra aqui.</p>
+    </section>
+
+    <p><button class="btn btn--yellow" type="button">Começar</button></p>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+</body>
+</html>

@@ -27,7 +27,11 @@ Material de apoio: [mapas da Programação em Dupla](https://gamificapampa.githu
 
 ## Como adicionar um recurso
 
-Cada jogo ou material ganha uma pasta própria dentro de `criancas/` ou `professores/`, com um `index.html` e um `README.md` que diz o que é, para quem é e de qual projeto veio. Logos, fontes e cores vêm do repositório [identidade-visual](https://github.com/GamificaPampa/identidade-visual), pelo caminho `/identidade-visual/`.
+Copie `modelos/recurso/` para `criancas/<nome>/` ou `professores/<nome>/`. O modelo já traz a fonte, as cores, os botões e o mascote Bit, e cada recurso abre em `https://gamificapampa.github.io/recursos-pedagogicos/<publico>/<nome>/`. As regras completas estão em [AGENTS.md](AGENTS.md).
+
+### Com um assistente de IA
+
+Clone este repositório, abra o Claude Code (ou outro assistente que leia `AGENTS.md`) dentro da pasta e peça, por exemplo, "quero criar um jogo de memória sobre algoritmos para crianças de 8 anos". O assistente segue o passo a passo de [`.claude/skills/novo-recurso`](.claude/skills/novo-recurso/SKILL.md), que cobre a ficha do recurso, a pasta, a identidade visual, o teste no celular, o registro neste README e o pull request.
 
 ## Créditos
 
