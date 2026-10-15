@@ -130,8 +130,6 @@
   .solo .btn { flex: none }
   .solo-tag { display: inline-block; padding: 2px 12px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 999px; font-size: 15px; font-weight: 700 }
   @media (max-width: 700px) { .solo { flex-direction: column; text-align: center } .solo svg { width: 90px } }
-  .tool.kit { align-items: flex-start }
-  .tool.kit svg { width: 54px; height: 54px }
   .mini.n { justify-content: center; min-width: 46px; padding: 4px 0 }
   .gem-shine { animation: gem-shine 3s ease-in-out infinite }
   @keyframes gem-shine { 0%, 70%, 100% { opacity: 0 } 80% { opacity: 1 } }
@@ -253,7 +251,7 @@
         <li>Privacidade: o que nunca colocar no Gemini.</li>
       </ul>
       <div class="out"><b>Você sai com:</b> uma atividade para a sua turma, criada e revisada por você.</div>
-      <div class="go"><a class="mini" href="encontro-1.html" style="--c: var(--light)"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="13" rx="2" fill="#fff" stroke="#2f2a4a" stroke-width="2.2"/><path d="M6 8 H15 M6 11.5 H12" stroke="#4da3ff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 21 L12 16 L16 21" fill="none" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides do encontro</a><a class="mini" href="jogo.html">Jogo do Prompt</a></div>
+      <div class="go"><a class="mini" href="jogo.html">Jogo do Prompt</a></div>
     </div>
     <div class="meeting" style="--c: var(--pink); --light: #ffd6e3">
       <div class="n">2</div>
@@ -265,7 +263,7 @@
         <li>BNCC: como pedir sem deixar o Gemini inventar códigos.</li>
       </ul>
       <div class="out"><b>Você sai com:</b> uma sequência didática curta sobre um tema seu.</div>
-      <div class="go"><a class="mini" href="encontro-2.html" style="--c: var(--light)"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="13" rx="2" fill="#fff" stroke="#2f2a4a" stroke-width="2.2"/><path d="M6 8 H15 M6 11.5 H12" stroke="#4da3ff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 21 L12 16 L16 21" fill="none" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides do encontro</a><a class="mini" href="biblioteca.html">Biblioteca de prompts</a></div>
+      <div class="go"><a class="mini" href="biblioteca.html">Biblioteca de prompts</a></div>
     </div>
     <div class="meeting" style="--c: var(--mint); --light: #c9f5e3">
       <div class="n">3</div>
@@ -276,7 +274,7 @@
         <li>Compartilhar o jogo com a turma por link ou pelo Google Classroom.</li>
       </ul>
       <div class="out"><b>Você sai com:</b> um jogo funcionando, sobre um conteúdo seu.</div>
-      <div class="go"><a class="mini" href="encontro-3.html" style="--c: var(--light)"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="13" rx="2" fill="#fff" stroke="#2f2a4a" stroke-width="2.2"/><path d="M6 8 H15 M6 11.5 H12" stroke="#4da3ff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 21 L12 16 L16 21" fill="none" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides do encontro</a><a class="mini" href="galeria.html">Galeria de jogos</a><a class="mini" href="passo-a-passo.html#canvas">Passo a passo do Canvas</a></div>
+      <div class="go"><a class="mini" href="galeria.html">Galeria de jogos</a><a class="mini" href="passo-a-passo.html#canvas">Passo a passo do Canvas</a></div>
     </div>
     <div class="meeting" style="--c: var(--purple); --light: #e2dbff">
       <div class="n">4</div>
@@ -287,7 +285,7 @@
         <li>Apresentação dos projetos e certificado.</li>
       </ul>
       <div class="out"><b>Você sai com:</b> um Gem seu e o certificado da oficina.</div>
-      <div class="go"><a class="mini" href="encontro-4.html" style="--c: var(--light)"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="13" rx="2" fill="#fff" stroke="#2f2a4a" stroke-width="2.2"/><path d="M6 8 H15 M6 11.5 H12" stroke="#4da3ff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 21 L12 16 L16 21" fill="none" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides do encontro</a><a class="mini" href="gems.html">Gems prontos</a><a class="mini" href="passo-a-passo.html#gem">Passo a passo do Gem</a></div>
+      <div class="go"><a class="mini" href="gems.html">Gems prontos</a><a class="mini" href="passo-a-passo.html#gem">Passo a passo do Gem</a></div>
     </div>
   </div>
 </section>
@@ -351,38 +349,18 @@
 </section>
 
 <section>
-  <h2 style="--c: var(--yellow)">Para quem dá a oficina</h2>
-  <p class="lead">Tudo para conduzir os quatro encontros: o passo a passo, os slides e o que imprimir.</p>
-  <div class="grid tools">
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="8" width="44" height="52" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="22" y="3" width="20" height="11" rx="3" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M18 26 l4 4 l7 -8 M18 44 l4 4 l7 -8" stroke="#4fd6a6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 27 H46 M34 45 H46" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/></svg>
-      <div><h3>Roteiro do formador</h3><p>Cada encontro com tempos, o que fazer, o que perguntar e o que fazer se der problema.</p><div class="go"><a class="mini" href="roteiro-formador.html">Ver na tela</a><a class="mini" href="roteiro-formador.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="12" width="56" height="36" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M12 22 H40 M12 31 H32" stroke="#4da3ff" stroke-width="4" stroke-linecap="round"/><g class="g wiggle"><rect x="44" y="22" width="10" height="16" rx="2" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5"/></g><path d="M22 60 L32 48 L42 60" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><h3>Slides dos encontros</h3><p>Um para cada encontro, para o projetor. Passe com as setas e aperte F para tela cheia.</p><div class="go"><a class="mini n" href="encontro-1.html" aria-label="Slides do Encontro 1">1</a><a class="mini n" href="encontro-2.html" aria-label="Slides do Encontro 2">2</a><a class="mini n" href="encontro-3.html" aria-label="Slides do Encontro 3">3</a><a class="mini n" href="encontro-4.html" aria-label="Slides do Encontro 4">4</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="6" width="42" height="54" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M12 14 H6 M12 26 H6 M12 38 H6 M12 50 H6" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/><path d="M21 20 H45 M21 30 H45 M21 40 H37" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/></svg>
-      <div><h3>Caderno do participante</h3><p>Cinco folhas de prática, uma cópia por professor. Cada encontro usa uma parte.</p><div class="go"><a class="mini" href="caderno.html">Ver na tela</a><a class="mini" href="caderno.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="6" width="44" height="54" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><circle cx="22" cy="22" r="6" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="42" cy="22" r="6" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="2.5"/><path d="M39 23 q3 3 6 0" stroke="#2f2a4a" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M19 25 q3 -3 6 0" stroke="#2f2a4a" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M18 38 H46 M18 48 H38" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/></svg>
-      <div><h3>Avaliação do encontro</h3><p>Folha anônima para o fim de cada encontro. Também dá para copiar as perguntas para o Google Forms.</p><div class="go"><a class="mini" href="avaliacao.html">Ver na tela</a><a class="mini" href="avaliacao.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 40 L16 60 L24 56 L28 62 L32 44 M42 40 L48 60 L40 56 L36 62 L32 44" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="18" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><path class="gem-shine" d="M32 15 L35 23 L43 24 L37 29 L39 37 L32 33 L25 37 L27 29 L21 24 L29 23 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2" stroke-linejoin="round"/></svg>
-      <div><h3>Certificado da oficina</h3><p>Escreva os nomes e imprima um por professor, ou baixe em branco para preencher à mão.</p><div class="go"><a class="mini" href="certificado.html">Preencher</a><a class="mini" href="certificado.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="4" width="44" height="56" rx="5" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="4"/><path d="M10 40 Q22 32 32 40 T54 40 V55 a5 5 0 0 1 -5 5 H15 a5 5 0 0 1 -5 -5 Z" fill="#8ddf6a"/><rect x="10" y="4" width="44" height="56" rx="5" fill="none" stroke="#2f2a4a" stroke-width="4"/><g class="g wiggle"><rect x="18" y="12" width="28" height="12" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/></g><rect x="22" y="30" width="20" height="16" rx="2" fill="#fff" stroke="#2f2a4a" stroke-width="3"/></svg>
-      <div><h3>Cartaz-convite</h3><p>Para pendurar na escola. Escreva data, horário, local e contato na tela ou à mão.</p><div class="go"><a class="mini" href="convite.html">Ver na tela</a><a class="mini" href="convite.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-    <div class="tool kit">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="4" width="40" height="56" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M20 16 H44 M20 25 H44 M20 34 H36" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><g class="g wiggle"><path d="M36 50 l4 4 l9 -10" stroke="#4fd6a6" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
-      <div><h3>Proposta para a escola</h3><p>Uma página para a direção ou a Secretaria: o que é, formato, o que a escola precisa e privacidade.</p><div class="go"><a class="mini" href="proposta.html">Ver na tela</a><a class="mini" href="proposta.pdf" style="--c: var(--yellow)">PDF</a></div></div>
-    </div>
-  </div>
+  <a class="solo" href="https://gamificapampa.github.io/#contato">
+    <svg viewBox="0 0 96 80" aria-hidden="true">
+      <path d="M10 34 L48 10 L86 34" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="16" y="32" width="64" height="40" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+      <rect x="40" y="48" width="16" height="24" rx="2" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3"/>
+      <rect x="23" y="42" width="11" height="10" rx="2" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="3"/>
+      <rect x="62" y="42" width="11" height="10" rx="2" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="3"/>
+      <g class="g wiggle"><path d="M48 10 V0 M48 0 H62 L58 5 L62 10 H48" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></g>
+    </svg>
+    <div><span class="solo-tag">Para escolas e secretarias</span><h3>Leve a oficina para a sua escola</h3><p>A equipe do GamificaPampa conduz os encontros e leva o roteiro, os slides, o caderno para imprimir e o certificado. Fale com a gente para combinar as datas.</p></div>
+    <span class="btn loud" style="--c: var(--orange)">Falar com a equipe</span>
+  </a>
 </section>
 
 <section>
