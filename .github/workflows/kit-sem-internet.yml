@@ -1,0 +1,41 @@
+# Monta o kit sem internet (menu da turma, jogos e aula com as crianças) e publica o zip na release "kit-sem-internet".
+# Roda a cada mudança na main e uma vez por dia, porque o menu da turma e a fonte vêm de outros repositórios.
+name: Kit sem internet
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kit-sem-internet
+  cancel-in-progress: true
+
+jobs:
+  kit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: GamificaPampa/gamificapampa.github.io
+          path: _hub
+      - uses: actions/checkout@v4
+        with:
+          repository: GamificaPampa/identidade-visual
+          path: _identidade
+      - name: Montar o kit
+        run: python3 .github/scripts/kit_sem_internet.py _hub _identidade _saida
+      - name: Publicar na release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view kit-sem-internet > /dev/null 2>&1; then
+            gh release create kit-sem-internet --title "Kit sem internet" --notes "Menu da turma, jogos e aula com as crianças para abrir sem internet. Baixe o kit-sem-internet.zip, descompacte num notebook ou pendrive e dê dois cliques em index.html. Este arquivo é montado de novo a cada mudança no repositório."
+          fi
+          gh release upload kit-sem-internet _saida/kit-sem-internet.zip --clobber
