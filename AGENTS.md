@@ -13,7 +13,7 @@ O recurso em `criancas/robo/` abre em `https://gamificapampa.github.io/recursos-
 
 ## Identidade visual
 
-Os recursos carregam fonte, cores e componentes do repositório [identidade-visual](https://github.com/GamificaPampa/identidade-visual) pelo caminho absoluto `/identidade-visual/`, que funciona porque os dois repositórios são publicados no mesmo domínio. Para mudar uma cor ou um componente, mude lá.
+Os recursos carregam fonte, cores, componentes, cenário e animações do repositório [identidade-visual](https://github.com/GamificaPampa/identidade-visual) pelo caminho absoluto `/identidade-visual/`, que funciona porque os dois repositórios são publicados no mesmo domínio. Para mudar uma cor ou um componente, mude lá.
 
 ## Testar no computador
 

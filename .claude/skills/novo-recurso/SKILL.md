@@ -18,7 +18,8 @@ Cada recurso nasce de `modelos/recurso/`, vive numa pasta própria e abre direto
 
 ## Visual
 
-- Carregue `fontes.css`, `cores.css` e `componentes.css` de `/identidade-visual/css/`, como o modelo já faz. Use as variáveis de cor (`--ink`, `--blue`, `--pink`, `--mint`, `--yellow`, `--orange`, `--purple`) e os componentes `.loud`, `.card`, `.btn`, `.pill` e `.bubble`.
+- Carregue `fontes.css`, `cores.css`, `componentes.css`, `cenario.css` e `animacoes.css` de `/identidade-visual/css/`, como o modelo já faz. Use as variáveis de cor (`--ink`, `--blue`, `--pink`, `--mint`, `--yellow`, `--orange`, `--purple`) e os componentes `.loud`, `.card`, `.btn`, `.pill` e `.bubble`.
+- O céu, as nuvens, os símbolos de código e os morros vêm do cenário do modelo (`.cenario`, `.nuvem`, `.simbolo`, `.morros`), e o movimento vem das classes `.anima-*`. Mude posição e tamanho pelos atributos `style`, sem desenhar outro céu nem escrever `@keyframes` que já existem. A vitrine em `https://gamificapampa.github.io/identidade-visual/` mostra cada peça com o código.
 - Escreva o CSS e o JavaScript próprios do recurso no próprio `index.html`. Imagens e sons ficam na pasta do recurso.
 - O Bit, o robô do modelo, é o guia. Ele fala em primeira pessoa, no balão, para dar instruções e comemorar acertos.
 - Alvos de toque têm pelo menos 48 px. O texto tem contraste alto sobre o fundo. Imagens têm `alt`, e o recurso funciona só com teclado.
