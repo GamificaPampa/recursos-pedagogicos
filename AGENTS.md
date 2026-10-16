@@ -7,7 +7,7 @@ Jogos para crianças e materiais para professores da Educação Básica, publica
 - `criancas/<nome>/` guarda jogos e atividades que as crianças usam.
 - `professores/<nome>/` guarda aulas, oficinas e materiais de formação.
 - `modelos/recurso/` é o ponto de partida de todo recurso novo.
-- Cada pasta de recurso tem um `index.html` e um `README.md`. O `README.md` da raiz lista todos os recursos.
+- Cada pasta de recurso tem um `index.html` e um `README.md`. O `README.md` da raiz lista todos os recursos, e o `index.html` da raiz, a página inicial publicada, tem um cartão para cada um.
 
 O recurso em `criancas/robo/` abre em `https://gamificapampa.github.io/recursos-pedagogicos/criancas/robo/`. Toda pasta segue esse padrão.
 
