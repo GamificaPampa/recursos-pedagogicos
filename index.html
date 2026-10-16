@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recursos pedagógicos · GamificaPampa</title>
+<meta name="description" content="Oficina de Prompts para professores criarem com o Gemini, aula de Engenharia de Software e sete jogos para crianças. Tudo gratuito, no celular, no tablet e no projetor.">
+<meta property="og:title" content="Recursos pedagógicos · GamificaPampa">
+<meta property="og:description" content="Oficina de Prompts para professores criarem com o Gemini, aula de Engenharia de Software e sete jogos para crianças.">
+<meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<style>
+  :root {
+    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
+    --ink: #2f2a4a; --soft: #5d5880;
+    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
+    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { scroll-behavior: smooth }
+  body { margin: 0; min-height: 100vh; background: var(--sky2); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.45 }
+  a { color: inherit }
+  .g { transform-box: fill-box; transform-origin: center }
+  :focus-visible { outline: 4px solid var(--purple); outline-offset: 3px }
+
+  /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
+  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
+  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
+  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
+  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
+  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
+  .c2 { width: 92px; height: 26px; top: 34%; animation-duration: 60s; animation-delay: -30s }
+  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
+  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
+  .code { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
+  .k1 { left: 5%; top: 20% } .k2 { right: 7%; top: 13%; animation-delay: -2s } .k3 { left: 10%; top: 62%; animation-delay: -4s } .k4 { right: 12%; top: 48%; animation-delay: -1s }
+  @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
+  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
+  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
+  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
+  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
+  .page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 40px }
+
+  /* Title and Bit the robot talking */
+  header { text-align: center }
+  .brand { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 10px; padding: 3px 16px 3px 8px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-size: clamp(16px, 4.4vw, 21px); font-weight: 700; text-decoration: none; transform: rotate(-2deg); transition: transform .15s }
+  .brand:hover { transform: rotate(0) translateY(-2px) }
+  .brand svg { width: 1.6em; height: 1.6em; flex: none }
+  .brand .b1 { color: #2470c4 } .brand .b2 { color: #c92a62 }
+  h1 { margin: 6px 0 0; font-size: clamp(40px, 10vw, 74px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink) }
+  h1 span { display: inline-block; animation: hop 3.4s ease-in-out infinite }
+  h1 .w1 { color: var(--yellow) } h1 .w2 { color: var(--pink); animation-delay: .3s }
+  @keyframes hop { 0%, 78%, 100% { transform: translateY(0) } 86% { transform: translateY(-9px) rotate(-3deg) } 93% { transform: translateY(0) rotate(1deg) } }
+  .sub { margin: 14px auto 0; max-width: 700px; font-size: clamp(18px, 4.6vw, 22px); font-weight: 600 }
+  .hello { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 20px auto 0; max-width: 760px }
+  .bot { width: clamp(84px, 22vw, 116px); flex: none; overflow: visible; cursor: pointer }
+  .bot-body { animation: bob 2.6s ease-in-out infinite }
+  .bot.jump .bot-body { animation: jump .7s cubic-bezier(.3, 1.4, .6, 1) }
+  @keyframes bob { 50% { transform: translateY(-5px) } }
+  @keyframes jump { 40% { transform: translateY(-26px) rotate(-10deg) } 70% { transform: translateY(2px) rotate(4deg) } }
+  .bubble { position: relative; max-width: 460px; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font: 600 clamp(17px, 4.4vw, 21px) var(--font); color: var(--ink); text-align: left; cursor: pointer }
+  .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
+  .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
+  .bubble.pop { animation: pop .35s cubic-bezier(.3, 1.6, .6, 1) }
+  @keyframes pop { from { transform: scale(.85); opacity: .3 } }
+  .jump-to { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 24px 0 0 }
+
+  /* Buttons with a thick outline and a hard shadow */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 6px 22px; background: var(--c, var(--yellow)); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; font-size: 21px; font-weight: 700; text-decoration: none; transition: transform .1s }
+  .btn.white { background: #fff; color: var(--ink); -webkit-text-stroke: 0 }
+  .btn:hover { transform: translateY(-2px) }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
+  .btn svg { width: 22px; height: 22px; flex: none; overflow: visible }
+
+  /* Section titles as stickers */
+  section { scroll-margin-top: 16px }
+  h2 { display: table; margin: 52px auto 22px; padding: 4px 24px; background: var(--c, var(--yellow)); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: clamp(26px, 6.4vw, 34px); font-weight: 700; text-align: center; transform: rotate(-1.5deg) }
+
+  /* Cards with a little scene on top */
+  .card { display: flex; flex-direction: column; overflow: hidden; background: #fff; border: 4px solid var(--ink); border-radius: 28px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28) }
+  .stage { position: relative; height: 150px; overflow: hidden; background-color: var(--c); background-image: radial-gradient(rgba(255, 255, 255, .3) 2px, transparent 2.5px); background-size: 18px 18px; border-bottom: 4px solid var(--ink) }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100% }
+  .body { display: flex; flex: 1; flex-direction: column; gap: 8px; padding: 16px 20px 20px }
+  .card h3 { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.1 }
+  .card p { margin: 0; font-weight: 500; color: var(--soft) }
+  .meta { display: flex; align-items: center; gap: 8px; font-weight: 600 !important; color: var(--ink) !important }
+  .dot { width: 14px; height: 14px; flex: none; background: var(--c); border: 3px solid var(--ink); border-radius: 50% }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: auto; padding-top: 8px }
+  .actions .btn { flex: 1 1 auto }
+  .actions.first { margin: 4px 0 6px; padding-top: 0 }
+
+  /* For teachers: the workshop with its tools, and the class with the games */
+  .teach { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px }
+  @media (min-width: 900px) { .teach { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start } }
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin: 8px 0 4px; padding: 0; list-style: none }
+  .tools a { display: flex; flex-direction: column; gap: 2px; height: 100%; min-height: 48px; padding: 10px 14px; background: var(--c); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 4px 0 var(--ink); text-decoration: none; line-height: 1.3; transition: transform .1s }
+  .tools a:hover { transform: translateY(-2px) }
+  .tools a:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink) }
+  .tools b { font-size: 19px }
+  .tools span { font-size: 15.5px; font-weight: 500 }
+  .note { margin-top: 18px; padding: 14px 18px; background: #fff; border: 3px dashed var(--ink); border-radius: 20px; font-weight: 600; text-align: center }
+  .note a { font-weight: 700 }
+
+  /* For children: one card per game, the whole card is the button */
+  .games { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 24px }
+  .games h3 { font-size: 26px }
+  .game { text-decoration: none; transition: transform .25s cubic-bezier(.3, 1.5, .6, 1) }
+  .game:hover { transform: translateY(-6px) rotate(-1deg) }
+  .game:nth-child(even):hover { transform: translateY(-6px) rotate(1deg) }
+  .game:active { transform: translateY(3px) scale(.98) }
+  .play { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto; min-height: 54px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; font-size: 23px; font-weight: 700 }
+  .play svg { width: 22px; height: 22px; overflow: visible }
+  .menu-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 22px; margin-bottom: 26px; padding: 18px 22px; background: var(--yellow); border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28) }
+  .menu-banner p { margin: 0; flex: 1 1 320px; font-weight: 600 }
+  .menu-banner b { display: block; font-size: 26px; line-height: 1.15 }
+
+  /* Without internet */
+  .offline { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 20px 24px }
+  .offline svg { width: 72px; height: 72px; flex: none }
+  .offline p { flex: 1 1 300px; color: var(--ink) !important }
+  .offline b { display: block; font-size: 24px }
+
+  footer { margin-top: 48px; text-align: center; font-weight: 600 }
+  footer a { font-weight: 700 }
+
+  /* The scenes inside the cards */
+  .r-walk { animation: r-walk 4.6s ease-in-out infinite }
+  @keyframes r-walk {
+    0%, 8% { transform: translate(14px, 8px); opacity: 1 }
+    28% { transform: translate(84px, 8px) }
+    48% { transform: translate(84px, 60px) }
+    70%, 88% { transform: translate(110px, 60px); opacity: 1 }
+    93% { transform: translate(110px, 60px); opacity: 0 }
+    94% { transform: translate(14px, 8px); opacity: 0 }
+    100% { transform: translate(14px, 8px); opacity: 1 }
+  }
+  .r-star { animation: r-star 4.6s ease-in-out infinite }
+  @keyframes r-star { 0%, 68%, 92%, 100% { transform: scale(1) rotate(0) } 76% { transform: scale(1.4) rotate(25deg) } 84% { transform: scale(.95) rotate(-8deg) } }
+  .n1 { animation: n-arc 2.6s infinite }
+  .n2 { animation: n-arc2 2.6s infinite; animation-delay: -1.3s }
+  @keyframes n-arc {
+    0% { transform: translate(30px, 130px) rotate(0); animation-timing-function: cubic-bezier(.2, .6, .4, 1) }
+    50% { transform: translate(64px, 18px) rotate(160deg); animation-timing-function: cubic-bezier(.6, 0, .8, .4) }
+    100% { transform: translate(98px, 130px) rotate(320deg) }
+  }
+  @keyframes n-arc2 {
+    0% { transform: translate(160px, 130px) rotate(0); animation-timing-function: cubic-bezier(.2, .6, .4, 1) }
+    50% { transform: translate(126px, 26px) rotate(-160deg); animation-timing-function: cubic-bezier(.6, 0, .8, .4) }
+    100% { transform: translate(92px, 130px) rotate(-320deg) }
+  }
+  .n-slash { stroke-dasharray: 140; animation: n-slash 2.6s infinite }
+  @keyframes n-slash { 0%, 44% { stroke-dashoffset: 140; opacity: 1 } 52% { stroke-dashoffset: 0; opacity: 1 } 70%, 100% { stroke-dashoffset: 0; opacity: 0 } }
+  .d-hop { animation: d-hop 1s ease-in-out infinite }
+  @keyframes d-hop { 0%, 60%, 100% { transform: translateY(0) } 30% { transform: translateY(-12px) } }
+  .d-arrow { animation: d-arrow 4s steps(1, end) infinite }
+  @keyframes d-arrow { 0% { transform: rotate(0) } 25% { transform: rotate(90deg) } 50% { transform: rotate(0) } 75% { transform: rotate(-90deg) } }
+  .c-flow { stroke-dasharray: 5 7; animation: c-flow .7s linear infinite }
+  @keyframes c-flow { to { stroke-dashoffset: -12 } }
+  .a-hop { animation: d-hop 1.4s ease-in-out infinite }
+  .a-tw { animation: twinkle 1.8s ease-in-out infinite }
+  .a-tw2 { animation: twinkle 1.8s ease-in-out infinite; animation-delay: -.9s }
+  @keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+  .k-pop { animation: k-pop 2.4s ease-in-out infinite }
+  .k-pop2 { animation: k-pop 2.4s ease-in-out infinite; animation-delay: -1.2s }
+  @keyframes k-pop { 0%, 10% { transform: scale(0) } 25%, 55% { transform: scale(1) } 62% { transform: scale(1.25) rotate(20deg) } 70%, 100% { transform: scale(0) } }
+  .k-tap { animation: k-tap 2.4s ease-out infinite }
+  @keyframes k-tap { 0%, 55% { transform: scale(.4); opacity: 0 } 60% { opacity: 1 } 80%, 100% { transform: scale(1.5); opacity: 0 } }
+  .m-fly { animation: m-fly 2.2s ease-in-out infinite }
+  @keyframes m-fly { 50% { transform: translateY(-8px) } }
+  .m-flame { transform-box: fill-box; transform-origin: 50% 0; animation: m-flame .25s ease-in-out infinite alternate }
+  @keyframes m-flame { to { transform: scaleY(.65) } }
+  .p-piece { animation: p-piece 3.2s cubic-bezier(.3, 1.5, .6, 1) infinite backwards }
+  .p2 { animation-delay: .2s } .p3 { animation-delay: .4s } .p4 { animation-delay: .6s }
+  @keyframes p-piece { 0% { transform: translateY(-40px); opacity: 0 } 15%, 85% { transform: translateY(0); opacity: 1 } 100% { transform: translateY(0); opacity: 0 } }
+  .s-bar { animation: s-bar 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 50% }
+  .s-bar2 { animation-delay: .3s } .s-bar3 { animation-delay: .6s }
+  @keyframes s-bar { 0% { transform: scaleX(0) } 30%, 100% { transform: scaleX(1) } }
+
+  @media (max-width: 480px) {
+    .hello { flex-direction: column }
+    .bubble::before, .bubble::after { display: none }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto }
+    *, *::before, *::after { animation: none !important; transition: none !important }
+  }
+</style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body>
+
+<div class="sky" aria-hidden="true">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <span class="code k1">&lt;/&gt;</span><span class="code k2">{ }</span><span class="code k3">01</span><span class="code k4">if</span>
+  <div class="hills"></div>
+</div>
+
+<div class="page">
+<header>
+  <a class="brand" href="https://gamificapampa.github.io/" aria-label="GamificaPampa: abrir o site do hub"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="7" width="34" height="26" rx="8" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3"/><path d="M15 14 L10 20 L15 26 M25 14 L30 20 L25 26" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="b1">Gamifica</span><span class="b2">Pampa</span></span></a>
+  <h1><span class="w1">Recursos</span> <span class="w2">pedagógicos</span></h1>
+  <p class="sub">Para o professor criar atividades, histórias e jogos com o Gemini, e para a turma aprender Engenharia de Software jogando.</p>
+  <div class="hello">
+    <svg class="bot" id="bot" viewBox="0 0 100 100" role="button" tabindex="0" aria-label="Bit, o robô. Toque nele para outra dica.">
+      <g class="bot-body"><use href="#bot-art"/></g>
+    </svg>
+    <button class="bubble" type="button" id="bubble" aria-live="polite">Oi! Eu sou o Bit. Professor, comece pela Oficina de Prompts!</button>
+  </div>
+  <nav class="jump-to" aria-label="Ir para">
+    <a class="btn" style="--c: var(--mint)" href="#professores">Para professores</a>
+    <a class="btn" style="--c: var(--blue)" href="#criancas">Para crianças</a>
+  </nav>
+</header>
+
+<main>
+  <section id="professores" aria-labelledby="titulo-professores">
+    <h2 id="titulo-professores" style="--c: var(--mint)">Para professores</h2>
+    <div class="teach">
+      <article class="card" style="--c: var(--mint)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet">
+          <use href="#bot-art" x="14" y="26" width="84" height="84"/>
+          <rect x="112" y="18" width="196" height="70" rx="18" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <path d="M114 62 L98 74 L118 72" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+          <rect x="115" y="60" width="8" height="10" fill="#fff"/>
+          <g class="p-piece"><rect x="124" y="36" width="40" height="34" rx="9" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3.5"/></g>
+          <g class="p-piece p2"><rect x="170" y="36" width="40" height="34" rx="9" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3.5"/></g>
+          <g class="p-piece p3"><rect x="216" y="36" width="40" height="34" rx="9" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3.5"/></g>
+          <g class="p-piece p4"><rect x="262" y="36" width="36" height="34" rx="9" fill="#a08bff" stroke="#2f2a4a" stroke-width="3.5"/></g>
+        </svg></div>
+        <div class="body">
+          <h3>Oficina de Prompts</h3>
+          <p class="meta"><span class="dot"></span>Quatro encontros · Gemini</p>
+          <p>Como pedir ao Gemini atividades, histórias e jogos para a sua turma. Dá para fazer nos encontros com a equipe ou sozinho, pelo curso online.</p>
+          <div class="actions first"><a class="btn" style="--c: var(--mint)" href="professores/oficina-prompts/">Abrir a oficina</a></div>
+          <ul class="tools">
+            <li><a href="professores/oficina-prompts/curso.html" style="--c: #c9f5e3"><b>Curso online</b><span>Quatro módulos com prática, teste final e comprovante.</span></a></li>
+            <li><a href="professores/oficina-prompts/jogo.html" style="--c: #fff1a8"><b>Jogo do Prompt</b><span>Monte o pedido com quatro peças e veja o que o Gemini faria.</span></a></li>
+            <li><a href="professores/oficina-prompts/construtor.html" style="--c: #e6dfff"><b>Construtor de prompts</b><span>Responda algumas perguntas e saia com um prompt pronto.</span></a></li>
+            <li><a href="professores/oficina-prompts/biblioteca.html" style="--c: #cfe6ff"><b>Biblioteca de prompts</b><span>Prompts de partida por etapa e tipo de material.</span></a></li>
+            <li><a href="professores/oficina-prompts/gems.html" style="--c: #ffdcc4"><b>Gems prontos</b><span>Seis assistentes para copiar e usar o ano todo.</span></a></li>
+            <li><a href="professores/oficina-prompts/guia.html" style="--c: #ffd6e2"><b>Guia do professor</b><span>O método, a BNCC, a privacidade e o checklist de revisão.</span></a></li>
+            <li><a href="professores/oficina-prompts/passo-a-passo.html" style="--c: #c9f5e3"><b>Passo a passo animado</b><span>Abrir o Canvas, compartilhar o jogo e criar um Gem.</span></a></li>
+            <li><a href="professores/oficina-prompts/galeria.html" style="--c: #fff1a8"><b>Galeria de jogos</b><span>Os jogos que os professores criam na oficina.</span></a></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="card" style="--c: var(--yellow)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <rect x="52" y="12" width="132" height="78" rx="8" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <rect class="s-bar" x="66" y="28" width="56" height="10" rx="5" fill="#ff5f8f"/>
+          <rect class="s-bar s-bar2" x="66" y="46" width="90" height="9" rx="4.5" fill="#4da3ff"/>
+          <rect class="s-bar s-bar3" x="66" y="62" width="70" height="9" rx="4.5" fill="#4fd6a6"/>
+          <path d="M118 90 V104 M100 114 L118 102 L136 114" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g class="g d-hop"><use href="#bot-art" x="4" y="56" width="58" height="58"/></g>
+        </svg></div>
+        <div class="body">
+          <h3>Aula com os jogos</h3>
+          <p class="meta"><span class="dot"></span>6 a 14 anos · 50 minutos</p>
+          <p>Uma aula de Engenharia de Software pronta, com os jogos no projetor: roteiro, slides, folha de atividades e certificado de Programador(a) Mirim.</p>
+          <div class="actions"><a class="btn" style="--c: var(--orange)" href="professores/aula-engenharia-de-software/">Ver a aula</a></div>
+        </div>
+      </article>
+    </div>
+    <p class="note">Quer levar a oficina para a sua escola? <a href="https://gamificapampa.github.io/#contato">Fale com a equipe</a>.</p>
+  </section>
+
+  <section id="criancas" aria-labelledby="titulo-criancas">
+    <h2 id="titulo-criancas" style="--c: #8cc4ff">Para crianças</h2>
+    <div class="menu-banner">
+      <p><b>A turma toda no celular</b>Os quatro jogos da aula num menu só. Projete e cada criança escaneia o QR code e escolhe o seu jogo.</p>
+      <a class="btn" style="--c: var(--blue)" href="https://gamificapampa.github.io/turma/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Abrir o menu</a>
+    </div>
+    <div class="games">
+      <a class="card game" href="criancas/robo/" style="--c: var(--blue)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <path d="M37 31 H107 V83 H133" stroke="#fff" stroke-width="5" stroke-dasharray="1 10" stroke-linecap="round" fill="none" opacity=".85"/>
+          <g class="g r-star"><use href="#star" x="134" y="58" width="48" height="48"/></g>
+          <g class="r-walk"><use href="#bot-art" width="46" height="46"/></g></svg></div>
+        <div class="body">
+          <h3>Robô pega a estrela</h3>
+          <p>Com setas, monte o caminho do robô até a estrela.</p>
+          <p class="meta"><span class="dot"></span>A partir de 6 anos · Algoritmo</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/ninja/" style="--c: var(--pink)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <g class="g n1"><use href="#bug" width="42" height="42"/></g>
+          <g class="g n2"><use href="#bug" width="34" height="34"/></g>
+          <path class="n-slash" d="M34 78 L140 -7" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg></div>
+        <div class="body">
+          <h3>Ninja dos Bugs</h3>
+          <p>Deslize o dedo para cortar os bugs, sem cortar o robô.</p>
+          <p class="meta"><span class="dot"></span>A partir de 6 anos · Depuração</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/dupla/" style="--c: var(--mint)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <g class="g d-hop"><use href="#bot-art" x="20" y="58" width="58" height="58"/></g>
+          <use href="#bot-art" x="120" y="58" width="58" height="58"/>
+          <rect x="92" y="4" width="76" height="44" rx="12" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <path d="M138 46 L150 62 L154 46" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+          <rect x="137" y="40" width="19" height="6" fill="#fff"/>
+          <g class="g d-arrow"><path d="M119 26 H141 M133 18 L141 26 L133 34" stroke="#2f2a4a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
+        <div class="body">
+          <h3>Programação em Dupla</h3>
+          <p>Um pilota o robô e o outro, que vê os bugs escondidos, mostra o caminho.</p>
+          <p class="meta"><span class="dot"></span>A partir de 7 anos · Trabalho em equipe</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/conecta/" style="--c: var(--orange)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <path d="M36 70 H86 M114 70 H162" stroke="#2f2a4a" stroke-width="10" stroke-linecap="round"/>
+          <path class="c-flow" d="M162 70 H114 M86 70 H36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <rect x="-8" y="-7" width="16" height="13" rx="3" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite" path="M172 70 H24"/></rect>
+          <use href="#cellphone" x="2" y="34" width="46" height="70"/>
+          <use href="#server" x="72" y="20" width="56" height="88"/>
+          <use href="#database" x="146" y="40" width="50" height="58"/></svg></div>
+        <div class="body">
+          <h3>Conecta o Sistema</h3>
+          <p>Ligue os cabos e faça a foto chegar do banco de dados até o celular.</p>
+          <p class="meta"><span class="dot"></span>A partir de 8 anos · Sistemas</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/arcade/" style="--c: var(--purple)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <rect x="32" y="76" width="44" height="40" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <rect x="78" y="58" width="44" height="58" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/>
+          <rect x="124" y="88" width="44" height="28" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <text x="54" y="104" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="22" fill="#2f2a4a">2</text>
+          <text x="100" y="94" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="24" fill="#2f2a4a">1</text>
+          <text x="146" y="110" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#2f2a4a">3</text>
+          <g class="g a-hop"><use href="#bot-art" x="78" y="10" width="44" height="44"/></g>
+          <g class="g a-tw"><use href="#star" x="36" y="40" width="24" height="24"/></g>
+          <g class="g a-tw2"><use href="#star" x="142" y="52" width="22" height="22"/></g></svg></div>
+        <div class="body">
+          <h3>Arcade do Código</h3>
+          <p>Três jogos rápidos com o robô Bit e um placar para a turma.</p>
+          <p class="meta"><span class="dot"></span>Todas as idades · Testes e depuração</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/caca-bugs/" style="--c: var(--yellow)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <use href="#cellphone" x="64" y="4" width="72" height="112"/>
+          <circle class="g k-tap" cx="44" cy="46" r="20" fill="none" stroke="#fff" stroke-width="5"/>
+          <g class="g k-pop"><use href="#bug" x="26" y="28" width="36" height="36"/></g>
+          <g class="g k-pop2"><use href="#bug" x="140" y="56" width="32" height="32"/></g></svg></div>
+        <div class="body">
+          <h3>Caça aos Bugs!</h3>
+          <p>Toque nos insetos para consertar o app da escola em 30 segundos.</p>
+          <p class="meta"><span class="dot"></span>Feira de ciências · Testes</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+      <a class="card game" href="criancas/missao-dev/" style="--c: #8cc4ff">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <g class="g a-tw"><use href="#star" x="30" y="18" width="20" height="20"/></g>
+          <g class="g a-tw2"><use href="#star" x="152" y="72" width="18" height="18"/></g>
+          <text x="150" y="38" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="22" fill="#fff">{ }</text>
+          <text x="46" y="96" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#fff">if</text>
+          <g class="m-fly">
+            <path class="m-flame" d="M91 86 Q100 116 109 86 Z" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M88 64 L72 88 L90 84 Z M112 64 L128 88 L110 84 Z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M100 10 C120 28 122 62 113 86 H87 C78 62 80 28 100 10 Z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+            <circle cx="100" cy="44" r="10" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/>
+          </g></svg></div>
+        <div class="body">
+          <h3>Missão Dev</h3>
+          <p>Cinco desafios rápidos: montar os passos do robô, achar o bug e executar um laço.</p>
+          <p class="meta"><span class="dot"></span>Feira de ciências · Algoritmo e laços</p>
+          <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar</span>
+        </div>
+      </a>
+    </div>
+    <p class="note">Para feira de ciências: a tela de estande do <a href="criancas/arcade/estande.html">Arcade</a>, do <a href="criancas/caca-bugs/estande.html">Caça aos Bugs</a> e da <a href="criancas/missao-dev/estande.html">Missão Dev</a> mostra o QR code para entrar e, nos dois primeiros, o placar ao vivo.</p>
+  </section>
+
+  <section id="sem-internet" aria-label="Sem internet">
+    <h2 style="--c: var(--orange)">Sem internet?</h2>
+    <div class="card offline">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="10" width="48" height="32" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M4 50 H60 L55 56 H9 Z" fill="#cfcbe6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M32 17 V33 M25 27 L32 34 L39 27" stroke="#4da3ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p><b>Kit para pendrive</b>O menu da turma, os sete jogos e a aula, para abrir com dois cliques num notebook, mesmo sem Wi-Fi na escola. Também em gamificapampa.github.io/kit.</p>
+      <a class="btn" style="--c: var(--orange)" href="https://github.com/GamificaPampa/recursos-pedagogicos/releases/download/kit-sem-internet/kit-sem-internet.zip">Baixar o kit</a>
+    </div>
+  </section>
+</main>
+
+<footer>GamificaPampa · UNIPAMPA, Campus Alegrete · <a href="https://github.com/GamificaPampa/recursos-pedagogicos">Quer criar um recurso? Veja como no GitHub</a></footer>
+</div>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="bot-art" viewBox="0 0 100 100">
+    <line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
+    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
+    <circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/>
+    <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
+    <path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/>
+  </symbol>
+  <symbol id="star" viewBox="0 0 100 100">
+    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="bug" viewBox="0 0 100 100">
+    <path d="M26 54 10 46M24 67 8 70M29 81 17 93M74 54 90 46M76 67 92 70M71 81 83 93M43 18 35 6M57 18 65 6" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <circle cx="35" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/><circle cx="65" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/>
+    <ellipse cx="50" cy="64" rx="30" ry="29" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="5"/>
+    <path d="M50 40V91" stroke="#b52a2a" stroke-width="4"/>
+    <circle cx="38" cy="58" r="6" fill="#b52a2a"/><circle cx="63" cy="56" r="5" fill="#b52a2a"/><circle cx="62" cy="78" r="6" fill="#b52a2a"/><circle cx="38" cy="79" r="4" fill="#b52a2a"/>
+    <circle cx="50" cy="30" r="17" fill="#2f2a4a"/>
+    <circle cx="43" cy="29" r="6.5" fill="#fff"/><circle cx="57" cy="29" r="6.5" fill="#fff"/>
+    <circle cx="44" cy="30" r="3" fill="#2f2a4a"/><circle cx="58" cy="30" r="3" fill="#2f2a4a"/>
+    <path d="M45 39q5 4 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="cellphone" viewBox="0 0 100 100">
+    <rect x="26" y="6" width="48" height="88" rx="10" fill="#fff" stroke="#2f2a4a" stroke-width="5"/>
+    <rect x="33" y="16" width="34" height="58" rx="4" fill="#8cc4ff"/>
+    <circle cx="57" cy="30" r="7" fill="#ffd84d"/>
+    <path d="M33 74 V58 Q42 46 50 56 Q58 48 67 58 V74 Z" fill="#3cc26b"/>
+    <circle cx="50" cy="84" r="4" fill="#2f2a4a"/>
+  </symbol>
+  <symbol id="server" viewBox="0 0 100 100">
+    <rect x="18" y="8" width="64" height="84" rx="10" fill="#ff9a3c" stroke="#2f2a4a" stroke-width="5"/>
+    <rect x="28" y="20" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <rect x="28" y="43" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <rect x="28" y="66" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="62" cy="27.5" r="4" fill="#3cc26b"/><circle cx="62" cy="50.5" r="4" fill="#3cc26b"/><circle cx="62" cy="73.5" r="4" fill="#3cc26b"/>
+  </symbol>
+  <symbol id="database" viewBox="0 0 100 100">
+    <path d="M20 22 V78 A30 12 0 0 0 80 78 V22" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5"/>
+    <path d="M20 41 A30 12 0 0 0 80 41 M20 60 A30 12 0 0 0 80 60" fill="none" stroke="#2f2a4a" stroke-width="4"/>
+    <ellipse cx="50" cy="22" rx="30" ry="12" fill="#ffe88a" stroke="#2f2a4a" stroke-width="5"/>
+  </symbol>
+</svg>
+
+<script>
+  // Bit gives a new tip every time someone taps him
+  const LINES = [
+    "Oi! Eu sou o Bit. Professor, comece pela Oficina de Prompts!",
+    "No Jogo do Prompt, você monta um pedido para o Gemini com quatro peças.",
+    "Vai dar a aula com os jogos? O roteiro diz o que fazer em cada parte.",
+    "Os jogos ensinam o que é um algoritmo, um bug e um sistema.",
+    "Sem internet na escola? Baixe o kit e abra tudo do notebook.",
+  ]
+  let line = 0
+  function talk() {
+    line = (line + 1) % LINES.length
+    const bubble = document.getElementById("bubble"), bot = document.getElementById("bot")
+    bubble.textContent = LINES[line]
+    bubble.classList.remove("pop")
+    bot.classList.remove("jump")
+    void bubble.offsetWidth
+    bubble.classList.add("pop")
+    bot.classList.add("jump")
+  }
+  document.getElementById("bot").onclick = document.getElementById("bubble").onclick = talk
+  document.getElementById("bot").onkeydown = event => (event.key === "Enter" || event.key === " ") && (event.preventDefault(), talk())
+</script>
+</body>
+</html>
