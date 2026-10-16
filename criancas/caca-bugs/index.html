@@ -564,7 +564,7 @@
       card.classList.add('done');
       $('send-form').hidden = true;
       card.querySelector('.send-title').textContent = '✅ ' + nick + ', você está no placar!';
-      note.textContent = 'Olhe o telão do estande 👀';
+      note.textContent = 'Olhe o telão da sala 👀';
       sfx.gold();
       try{
         var p = null;
@@ -574,7 +574,7 @@
         }
         if(p){
           card.querySelector('.send-title').textContent = (p.pos <= 3 ? ['🥇', '🥈', '🥉'][p.pos - 1] + ' ' : '✅ ') + nick + ', você ficou em ' + ordinal(p.pos) + ' lugar!';
-          note.textContent = p.total + (p.total === 1 ? ' jogador' : ' jogadores') + ' no placar de hoje. Olhe o telão do estande 👀';
+          note.textContent = p.total + (p.total === 1 ? ' jogador' : ' jogadores') + ' no placar de hoje. Olhe o telão da sala 👀';
         }
       }catch(e3){}
     }catch(err){
