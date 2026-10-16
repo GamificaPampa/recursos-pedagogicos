@@ -18,6 +18,8 @@ Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celu
 
 Material de apoio: [mapas da Programação em Dupla](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.html) ([PDF](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.pdf)) e as telas de estande do [Arcade](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/estande.html), do [Caça aos Bugs](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/estande.html) e da [Missão Dev](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/estande.html).
 
+Sem internet: o [kit sem internet](https://github.com/GamificaPampa/recursos-pedagogicos/releases/download/kit-sem-internet/kit-sem-internet.zip) traz o menu da turma, os jogos e a aula para abrir com dois cliques num notebook ou pendrive. Ele é montado sozinho a cada mudança na `main`, pelo `.github/workflows/kit-sem-internet.yml`.
+
 ## Para professores
 
 | Material | Abrir no navegador | Código |
