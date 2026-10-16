@@ -4,6 +4,7 @@ Aula de 45 a 50 minutos para turmas de 6 a 14 anos, com notebook e projetor. As 
 
 | Arquivo                                                               | Para quê                                                    |
 | --------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [index.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/) | Página da aula, com todos os materiais, a aula em 50 minutos e o que fazer antes |
 | [roteiro.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.html) e [roteiro.pdf](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.pdf)             | Passo a passo da aula, com os cartões de seta para imprimir |
 | [slides.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/slides.html)                                            | Dez telas para o projetor                                   |
 | [atividades.html](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.html) e [atividades.pdf](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.pdf) | Três folhas por criança                                     |
