@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula com os jogos · GamificaPampa</title>
+<meta name="description" content="Tudo para uma aula de Engenharia de Software de 50 minutos com os jogos: roteiro, slides, folha de atividades, certificado e mapas.">
+<meta property="og:title" content="Aula com os jogos · GamificaPampa">
+<meta property="og:description" content="Tudo para uma aula de Engenharia de Software de 50 minutos com os jogos: roteiro, slides, folha de atividades, certificado e mapas.">
+<meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<style>
+  :root {
+    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
+    --ink: #2f2a4a; --soft: #5d5880;
+    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
+    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  body { margin: 0; min-height: 100vh; background: var(--sky2); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.45 }
+  a { color: inherit }
+
+  /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
+  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
+  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
+  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
+  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
+  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
+  .c2 { width: 92px; height: 26px; top: 34%; animation-duration: 60s; animation-delay: -30s }
+  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
+  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
+  .code { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
+  .k1 { left: 5%; top: 20% } .k2 { right: 7%; top: 13%; animation-delay: -2s } .k3 { left: 10%; top: 62%; animation-delay: -4s } .k4 { right: 12%; top: 48%; animation-delay: -1s }
+  @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
+  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
+  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
+  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
+  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
+  .page { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 40px }
+
+  /* Title, the facts of the class and Bit the robot talking */
+  header { text-align: center }
+  .brand { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 10px; padding: 3px 16px 3px 8px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-size: clamp(16px, 4.4vw, 21px); font-weight: 700; text-decoration: none; transform: rotate(-2deg); transition: transform .15s }
+  .brand:hover { transform: rotate(0) translateY(-2px) }
+  .brand svg { width: 1.6em; height: 1.6em; flex: none }
+  .brand .b1 { color: #2470c4 } .brand .b2 { color: #c92a62 }
+  h1 { margin: 6px 0 0; font-size: clamp(40px, 10vw, 72px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink) }
+  h1 span { display: inline-block; animation: hop 3.4s ease-in-out infinite }
+  h1 .w1 { color: var(--yellow) } h1 .w2 { animation-delay: .2s } h1 .w3 { color: var(--pink); animation-delay: .4s }
+  @keyframes hop { 0%, 78%, 100% { transform: translateY(0) } 86% { transform: translateY(-9px) rotate(-3deg) } 93% { transform: translateY(0) rotate(1deg) } }
+  .sub { margin: 14px auto 0; max-width: 640px; font-size: clamp(18px, 4.6vw, 22px); font-weight: 600 }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none }
+  .chips li { padding: 3px 14px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font-size: 16px; font-weight: 600 }
+  .hello { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 22px auto 0; max-width: 760px }
+  .bot { width: clamp(84px, 22vw, 116px); flex: none; overflow: visible; cursor: pointer }
+  .bot-body { animation: bob 2.6s ease-in-out infinite }
+  .bot.jump .bot-body { animation: jump .7s cubic-bezier(.3, 1.4, .6, 1) }
+  @keyframes bob { 50% { transform: translateY(-5px) } }
+  @keyframes jump { 40% { transform: translateY(-26px) rotate(-10deg) } 70% { transform: translateY(2px) rotate(4deg) } }
+  .bubble { position: relative; max-width: 440px; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font: 600 clamp(17px, 4.4vw, 21px) var(--font); color: var(--ink); text-align: left; cursor: pointer }
+  .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
+  .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
+  .bubble.pop { animation: pop .35s cubic-bezier(.3, 1.6, .6, 1) }
+  @keyframes pop { from { transform: scale(.85); opacity: .3 } }
+
+  /* Section titles as stickers */
+  h2 { display: table; margin: 44px auto 18px; padding: 4px 22px; background: var(--c, var(--yellow)); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: clamp(24px, 6vw, 30px); font-weight: 700; text-align: center; transform: rotate(-1.5deg) }
+
+  /* One card per material, with its buttons */
+  .materials { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 22px; margin: 0; padding: 0; list-style: none }
+  .item { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28); animation: rise .6s cubic-bezier(.3, 1.4, .6, 1) backwards }
+  .item:nth-child(2) { animation-delay: .08s } .item:nth-child(3) { animation-delay: .16s } .item:nth-child(4) { animation-delay: .24s } .item:nth-child(5) { animation-delay: .32s } .item:nth-child(6) { animation-delay: .4s }
+  @keyframes rise { from { opacity: 0; transform: translateY(34px) scale(.94) } }
+  .item h3 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 25px; font-weight: 700; line-height: 1.1 }
+  .item h3 svg { width: 54px; height: 54px; flex: none; padding: 4px; background: var(--c); border: 3px solid var(--ink); border-radius: 16px }
+  .item p { margin: 0; font-weight: 500; color: var(--soft) }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 8px }
+  .btn { display: inline-flex; flex: 1 1 auto; align-items: center; justify-content: center; min-height: 52px; padding: 6px 20px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; font-size: 21px; font-weight: 700; text-decoration: none; transition: transform .1s }
+  .btn.white { background: #fff; color: var(--ink); -webkit-text-stroke: 0 }
+  .btn:hover { transform: translateY(-2px) }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
+  .item.games { background: var(--yellow) }
+  .item.games p { color: var(--ink) }
+  :focus-visible { outline: 4px solid var(--purple); outline-offset: 3px }
+
+  /* The 50 minutes as a path of stops */
+  .card { padding: 22px clamp(16px, 4vw, 30px); background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28) }
+  .steps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none }
+  .steps li { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 4px 16px; padding: 12px 0; border-top: 3px dashed #cfcbe6 }
+  .steps li:first-child { border-top: none; padding-top: 0 }
+  .steps li:last-child { padding-bottom: 0 }
+  .time { padding: 6px 0; background: var(--c); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 3px 0 var(--ink); color: var(--ink); text-align: center; font-size: 19px; font-weight: 700; line-height: 1.1; white-space: nowrap }
+  .steps b { display: block; font-size: 21px; line-height: 1.2 }
+  .steps span { font-weight: 500; color: var(--soft) }
+
+  /* Before class: a checklist */
+  .check { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none }
+  .check li { position: relative; padding-left: 42px; font-weight: 500 }
+  .check li::before { content: ""; position: absolute; left: 0; top: 1px; width: 26px; height: 26px; background: #c9f5e3; border: 3px solid var(--ink); border-radius: 8px }
+  .check li::after { content: ""; position: absolute; left: 9px; top: 5px; width: 8px; height: 14px; border: solid var(--ink); border-width: 0 4px 4px 0; transform: rotate(45deg) }
+  .check a { font-weight: 700 }
+
+  footer { margin-top: 44px; text-align: center; font-weight: 600 }
+  footer a { font-weight: 700 }
+
+  @media (max-width: 480px) {
+    .hello { flex-direction: column }
+    .bubble::before, .bubble::after { display: none }
+    .steps li { grid-template-columns: 78px minmax(0, 1fr); gap: 4px 12px }
+    .time { font-size: 17px }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important }
+  }
+</style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body>
+
+<div class="sky" aria-hidden="true">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <span class="code k1">&lt;/&gt;</span><span class="code k2">{ }</span><span class="code k3">01</span><span class="code k4">if</span>
+  <div class="hills"></div>
+</div>
+
+<div class="page">
+<header>
+  <a class="brand" href="https://gamificapampa.github.io/" aria-label="GamificaPampa: abrir o site do hub"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="7" width="34" height="26" rx="8" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3"/><path d="M15 14 L10 20 L15 26 M25 14 L30 20 L25 26" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="b1">Gamifica</span><span class="b2">Pampa</span></span></a>
+  <h1><span class="w1">Aula</span> <span class="w2">com os</span> <span class="w3">jogos</span></h1>
+  <p class="sub">Engenharia de Software para crianças, com os jogos no projetor.</p>
+  <ul class="chips">
+    <li style="--c: var(--mint)">6 a 14 anos</li>
+    <li style="--c: var(--yellow)">50 minutos</li>
+    <li style="--c: #8cc4ff">Notebook e projetor</li>
+  </ul>
+  <div class="hello">
+    <svg class="bot" id="bot" viewBox="0 0 100 100" role="button" tabindex="0" aria-label="Bit, o robô. Toque nele para outra dica.">
+      <g class="bot-body"><use href="#robot"/></g>
+    </svg>
+    <button class="bubble" type="button" id="bubble" aria-live="polite">Oi! Eu sou o Bit. Aqui está tudo para a sua aula. Comece pelo roteiro!</button>
+  </div>
+</header>
+
+<main>
+  <h2 style="--c: var(--yellow)">Materiais</h2>
+  <ul class="materials">
+    <li class="item" style="--c: #fff1a8">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 L22 8 L42 14 L58 8 V50 L42 56 L22 50 L6 56 Z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M12 46 Q20 30 29 37 T47 22" stroke="#ff5f8f" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round" fill="none"/><path d="M45 15 l8 8 m0 -8 l-8 8" stroke="#ff5f8f" stroke-width="4" stroke-linecap="round"/></svg>Roteiro da aula</h3>
+      <p>O que fazer e o que perguntar em cada parte da aula, dicas por idade e os cartões de seta para imprimir.</p>
+      <p class="links"><a class="btn" style="--c: var(--orange)" href="roteiro.html">Ver na tela</a><a class="btn white" href="roteiro.pdf">PDF</a></p>
+    </li>
+    <li class="item" style="--c: #cfe6ff">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="8" width="52" height="36" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="14" y="16" width="22" height="6" rx="3" fill="#ff5f8f"/><rect x="14" y="26" width="34" height="5" rx="2.5" fill="#4da3ff"/><rect x="14" y="34" width="26" height="5" rx="2.5" fill="#4fd6a6"/><path d="M32 44 V54 M21 59 L32 52 L43 59" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides</h3>
+      <p>Dez telas para o projetor, da abertura ao fechamento. Passe com as setas e use F para tela cheia.</p>
+      <p class="links"><a class="btn" style="--c: var(--blue)" href="slides.html">Abrir os slides</a></p>
+    </li>
+    <li class="item" style="--c: #c9f5e3">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="6" width="38" height="52" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M16 19 H38 M16 28 H38 M16 37 H30" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><g transform="rotate(32 48 36)"><rect x="43" y="14" width="11" height="34" rx="2" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M43 48 L48.5 59 L54 48 Z" fill="#ffe1b0" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></g></svg>Folha de atividades</h3>
+      <p>Labirinto, ache o bug, caça-palavras e invente um app. Três folhas por criança.</p>
+      <p class="links"><a class="btn" style="--c: var(--mint)" href="atividades.html">Ver na tela</a><a class="btn white" href="atividades.pdf">PDF</a></p>
+    </li>
+    <li class="item" style="--c: #ffe9a8">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="5" y="9" width="54" height="40" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M14 20 H38 M14 28 H32" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><path d="M40 40 L36 58 L43 53 L47 60 L51 42" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><circle cx="46" cy="36" r="10" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3.5"/><path d="M46 30.5 L47.8 34.2 L51.8 34.6 L48.8 37.2 L49.7 41.2 L46 39.1 L42.3 41.2 L43.2 37.2 L40.2 34.6 L44.2 34.2 Z" fill="#fff"/></svg>Certificado</h3>
+      <p>Programador(a) Mirim. Escreva os nomes da turma, um por linha, e imprima um por criança. O PDF sai em branco, para preencher à mão.</p>
+      <p class="links"><a class="btn" style="--c: var(--pink)" href="certificado.html">Escrever os nomes</a><a class="btn white" href="certificado.pdf">PDF em branco</a></p>
+    </li>
+    <li class="item" style="--c: #ffdcc4">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="6" width="52" height="52" rx="7" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M23.3 6 V58 M40.6 6 V58 M6 23.3 H58 M6 40.6 H58" stroke="#b9d3ee" stroke-width="3"/><path d="M15 49 V32 H32 V15 H46" stroke="#4da3ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 9 L48 15 L41 21" stroke="#4da3ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Mapas do navegador</h3>
+      <p>As 15 fases da Programação em Dupla em 8 folhas, para jogar sem celular.</p>
+      <p class="links"><a class="btn" style="--c: var(--purple)" href="https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.html">Ver na tela</a><a class="btn white" href="https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.pdf">PDF</a></p>
+    </li>
+    <li class="item games" style="--c: #fff">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#robot" x="2" y="10" width="40" height="40"/><use href="#star" x="36" y="30" width="24" height="24"/><path d="M18 56 H52" stroke="#2f2a4a" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round"/></svg>Jogos para a turma</h3>
+      <p>O menu com os quatro jogos da aula. Projete e deixe as crianças escanearem o QR code para jogar no celular.</p>
+      <p class="links"><a class="btn" style="--c: var(--blue)" href="https://gamificapampa.github.io/turma/">Abrir o menu</a></p>
+    </li>
+  </ul>
+
+  <h2 style="--c: var(--mint)">A aula em 50 minutos</h2>
+  <section class="card" aria-label="A aula em 50 minutos">
+    <ol class="steps">
+      <li><span class="time" style="--c: var(--blue)">0–5</span><p><b>Abertura</b><span>Slides 1 a 4: quem fez o app que você usa?</span></p></li>
+      <li><span class="time" style="--c: var(--orange)">5–10</span><p><b>Robô humano, sem tela</b><span>Com os cartões de seta, a turma programa um colega.</span></p></li>
+      <li><span class="time" style="--c: var(--blue)">10–18</span><p><b>Robô pega a estrela</b><span>Algoritmo: a ordem dos passos importa.</span></p></li>
+      <li><span class="time" style="--c: var(--pink)">18–25</span><p><b>Ninja dos Bugs</b><span>Depuração: tirar o erro sem estragar o que funciona.</span></p></li>
+      <li><span class="time" style="--c: var(--mint)">25–35</span><p><b>Programação em Dupla</b><span>Trabalho em equipe: um pilota, o outro navega.</span></p></li>
+      <li><span class="time" style="--c: var(--purple)">35–42</span><p><b>Conecta o Sistema</b><span>Sistemas: celular, servidor e banco de dados.</span></p></li>
+      <li><span class="time" style="--c: var(--yellow)">42–50</span><p><b>Fechamento</b><span>Slides 9 e 10, certificados e a folha para casa.</span></p></li>
+    </ol>
+  </section>
+
+  <h2 style="--c: #8cc4ff">Antes da aula</h2>
+  <section class="card" aria-label="Antes da aula">
+    <ul class="check">
+      <li>Ligue o notebook no projetor e no som, abra o <a href="https://gamificapampa.github.io/turma/">menu dos jogos</a> e deixe os slides na primeira tela.</li>
+      <li>Imprima uma folha de atividades por criança, os cartões de seta do fim do roteiro e os certificados com os nomes.</li>
+      <li>As crianças vão jogar no celular? Confira a internet. Se não forem, imprima os mapas do navegador.</li>
+      <li>Sem internet na escola? Baixe o <a href="https://github.com/GamificaPampa/recursos-pedagogicos/releases/download/kit-sem-internet/kit-sem-internet.zip">kit sem internet</a> (gamificapampa.github.io/kit) e abra tudo do notebook ou de um pendrive.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>GamificaPampa · UNIPAMPA, Campus Alegrete · <a href="https://gamificapampa.github.io/">gamificapampa.github.io</a></footer>
+</div>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="robot" viewBox="0 0 100 100">
+    <line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
+    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
+    <circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/>
+    <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
+    <path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/>
+  </symbol>
+  <symbol id="star" viewBox="0 0 100 100">
+    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<script>
+  // Bit gives a new tip every time the teacher taps him
+  const LINES = [
+    "Oi! Eu sou o Bit. Aqui está tudo para a sua aula. Comece pelo roteiro!",
+    "No roteiro, cada parte da aula diz o que fazer e o que perguntar para a turma.",
+    "Escolha o nível dos jogos pela idade: Fácil, Normal ou Desafio.",
+    "Os certificados saem com o nome de cada criança. Escreva a lista da turma e imprima.",
+    "Sem internet na escola? Baixe o kit e abra tudo do notebook.",
+  ]
+  let line = 0
+  function talk() {
+    line = (line + 1) % LINES.length
+    const bubble = document.getElementById("bubble"), bot = document.getElementById("bot")
+    bubble.textContent = LINES[line]
+    bubble.classList.remove("pop")
+    bot.classList.remove("jump")
+    void bubble.offsetWidth
+    bubble.classList.add("pop")
+    bot.classList.add("jump")
+  }
+  document.getElementById("bot").onclick = document.getElementById("bubble").onclick = talk
+  document.getElementById("bot").onkeydown = event => (event.key === "Enter" || event.key === " ") && (event.preventDefault(), talk())
+</script>
+</body>
+</html>
