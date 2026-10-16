@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
   <link rel="stylesheet" href="/identidade-visual/css/cores.css">
   <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
   <style>
     /* Arrumando a página em uma coluna central que cabe no celular e no projetor */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px clamp(16px, 4vw, 40px); }
@@ -31,6 +33,17 @@ p, li, blockquote {
 </style>
 </head>
 <body>
+  <!-- O degradê do céu vem do componentes.css. O cenário fica fixo atrás da página, com nuvens, símbolos de código e morros -->
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 22%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 48%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 5%; top: 30%">&lt;/&gt;</span>
+    <span class="simbolo" style="right: 6%; top: 16%; --d: -2s">{ }</span>
+    <span class="simbolo" style="right: 8%; top: 58%; --d: -4s">01</span>
+    <span class="morros"></span>
+  </div>
+
   <header class="topo">
     <!-- TROCAR: recurso para professores volta para https://gamificapampa.github.io/ -->
     <a class="btn" href="https://gamificapampa.github.io/turma/">Voltar aos jogos</a>
@@ -38,12 +51,12 @@ p, li, blockquote {
   </header>
 
   <main>
-    <h1 class="loud"><span class="yellow">Nome do</span> <span class="pink">recurso</span></h1>
+    <h1 class="loud anima-letras"><span class="yellow">Nome do</span> <span class="pink">recurso</span></h1>
     <p><span class="pill" style="--c: var(--mint)">A partir de 6 anos</span></p>
 
     <div class="bit">
-      <svg width="96" height="96" viewBox="0 0 100 100" aria-hidden="true"><line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/><circle cx="50" cy="8" r="6" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="2"/><rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/><circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/><path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/></svg>
-      <p class="bubble">Oi! Eu sou o Bit. Aqui vai a instrução do recurso, em uma ou duas frases curtas.</p>
+      <svg class="anima-flutuar" width="96" height="96" viewBox="0 0 100 100" aria-hidden="true"><line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/><circle cx="50" cy="8" r="6" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="2"/><rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/><circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/><path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/></svg>
+      <p class="bubble anima-balao" style="--d: .5s">Oi! Eu sou o Bit. Aqui vai a instrução do recurso, em uma ou duas frases curtas.</p>
     </div>
 
     <section class="card" aria-label="Área do recurso">

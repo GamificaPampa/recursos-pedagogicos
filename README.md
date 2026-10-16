@@ -29,7 +29,7 @@ Sem internet: o [kit sem internet](https://github.com/GamificaPampa/recursos-ped
 
 ## Como adicionar um recurso
 
-Copie `modelos/recurso/` para `criancas/<nome>/` ou `professores/<nome>/`. O modelo já traz a fonte, as cores, os botões e o mascote Bit, e cada recurso abre em `https://gamificapampa.github.io/recursos-pedagogicos/<publico>/<nome>/`. As regras completas estão em [AGENTS.md](AGENTS.md).
+Copie `modelos/recurso/` para `criancas/<nome>/` ou `professores/<nome>/`. O modelo já traz a fonte, as cores, os botões, o céu com nuvens e morros e o mascote Bit, e cada recurso abre em `https://gamificapampa.github.io/recursos-pedagogicos/<publico>/<nome>/`. As regras completas estão em [AGENTS.md](AGENTS.md).
 
 ### Com um assistente de IA
 
