@@ -19,6 +19,7 @@ Cada recurso nasce de `modelos/recurso/`, vive numa pasta própria e abre direto
 ## Visual
 
 - Carregue `fontes.css`, `cores.css`, `componentes.css`, `cenario.css` e `animacoes.css` de `/identidade-visual/css/`, como o modelo já faz. Use as variáveis de cor (`--ink`, `--blue`, `--pink`, `--mint`, `--yellow`, `--orange`, `--purple`) e os componentes `.loud`, `.card`, `.btn`, `.pill` e `.bubble`.
+- A cor do botão diz a ação, igual em toda a org: `.btn--jogar` (verde) para jogar, `.btn--conhecer` (amarelo) para ler ou ver, `.btn--falar` (rosa) para falar com a equipe, `.btn--compartilhar` (roxo) para mandar o link, `.btn--baixar` (laranja) para baixar, e só `.btn` (branco, sem ícone) para a ação secundária, como voltar. Cada cor tem o seu ícone, e o código dele está na vitrine.
 - O céu, as nuvens, os símbolos de código e os morros vêm do cenário do modelo (`.cenario`, `.nuvem`, `.simbolo`, `.morros`), e o movimento vem das classes `.anima-*`. Mude posição e tamanho pelos atributos `style`, sem desenhar outro céu nem escrever `@keyframes` que já existem. A vitrine em `https://gamificapampa.github.io/identidade-visual/` mostra cada peça com o código.
 - Escreva o CSS e o JavaScript próprios do recurso no próprio `index.html`. Imagens e sons ficam na pasta do recurso.
 - O Bit, o robô do modelo, é o guia. Ele fala em primeira pessoa, no balão, para dar instruções e comemorar acertos.
