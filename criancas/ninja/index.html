@@ -448,6 +448,7 @@ async function startRound(chosen) {
   running = true
   roundStart = performance.now()
   launchTimer = setTimeout(wave, 300)
+  window.Bit?.diz("acenando", "Corte os bugs, mas não me corte! Eu sou o código que já funciona.")
 }
 
 // Throwing one to three things at a time, faster and in bigger groups as the round goes on
@@ -547,6 +548,10 @@ function loseLife() {
   field.classList.remove("shake")
   void field.offsetWidth
   field.classList.add("shake")
+  // Bit explains why cutting the robot is a mistake: fixing a bug must not break what already works
+  window.Bit?.diz("ops", lives > 0
+    ? "Ai! Esse era eu. Quem conserta bug cuida para não estragar o que já funciona."
+    : "Acabaram as vidas! Na próxima rodada, olhe antes de cortar.")
   if (lives <= 0) finish()
 }
 
@@ -567,6 +572,7 @@ function endSwipe() {
     labels.push({ text: `COMBO ×${strokeHits}! +${bonus}`, x: strokeEnd.x, y: strokeEnd.y - 40, life: 1.2, combo: true })
     log(`combo(${strokeHits})`)
     beep([880, 1175, 1568, 2093], { volume: 0.12, spacing: 0.06, length: 0.15 })
+    window.Bit?.diz("feliz", "Combo! Vários bugs de uma vez.", 2500)
   }
   bestCombo = Math.max(bestCombo, strokeHits)
   strokeHits = 0
@@ -619,6 +625,7 @@ function showWin() {
   for (let index = 0; index < stars; index++) setTimeout(() => beep([1047 + index * 262]), 600 + index * 300)
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
+  window.Bit?.diz("comemorando", `Fim da rodada! Você consertou ${bugsCut} ${bugsCut === 1 ? "bug" : "bugs"}. Depurar é achar e tirar os erros do programa.`, 6000)
   document.getElementById("result").innerHTML = `<li>${LEVEL_ICONS[icon]} ${name}</li><li><svg viewBox="0 0 100 100">${bugMarkup(BUG_COLORS[0])}</svg> ${bugsCut}</li>${bestCombo >= 3 ? `<li>${LEVEL_ICONS.hard} ${bestCombo}</li>` : ""}<li><svg viewBox="0 0 100 100"><use href="#star"/></svg> ${score}</li>`
   showOverlay("win")
 }
@@ -880,5 +887,6 @@ resize()
 drawHud()
 requestAnimationFrame(frame)
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
 </html>

@@ -20,6 +20,8 @@ RAIZ = Path(__file__).resolve().parents[2]
 RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conecta", "criancas/arcade",
             "criancas/caca-bugs", "criancas/missao-dev", "professores/aula-engenharia-de-software"]
 FONTE = "identidade-visual/fontes/fredoka/fredoka.woff2"
+# Pastas do identidade-visual que os jogos carregam: o script do Bit que fala e as poses dele
+PASTAS_IDENTIDADE = ["js", "mascote"]
 FONTE_GOOGLE = re.compile(r'(?:<link rel="preconnect" href="https://fonts\.(?:googleapis|gstatic)\.com"(?: crossorigin)?>\s*)*'
                           r'<link href="https://fonts\.googleapis\.com/css2\?family=Fredoka[^"]*" rel="stylesheet">')
 LEIA_ME = """Kit sem internet do GamificaPampa
@@ -57,6 +59,15 @@ def ajustar(arquivo, kit):
     texto = texto.replace('url("/identidade-visual/fontes/fredoka/fredoka.woff2")', f'url("{fonte}")')
     texto = FONTE_GOOGLE.sub(f'<style>@font-face {{ font-family: "Fredoka"; src: url("{fonte}") format("woff2"); '
                              'font-weight: 300 700; font-display: swap }</style>', texto)
+
+    def identidade(encontrado):
+        # /identidade-visual/js/bit.js vira um caminho relativo para a cópia que veio no kit
+        alvo = kit / "identidade-visual" / encontrado.group(2)
+        if not alvo.is_file():
+            return encontrado.group(0)
+        return f"{encontrado.group(1)}{relativo(alvo, arquivo)}{encontrado.group(3)}"
+
+    texto = re.sub(r'((?:src|href)="|url\(")/identidade-visual/([^"]+)(")', identidade, texto)
 
     def link(encontrado):
         endereco = encontrado.group(2)
@@ -102,6 +113,8 @@ def montar(hub, identidade, saida):
     (kit / FONTE).parent.mkdir(parents=True)
     for nome in ("fredoka.woff2", "OFL.txt"):
         shutil.copy2(identidade / "fontes" / "fredoka" / nome, (kit / FONTE).parent / nome)
+    for pasta in PASTAS_IDENTIDADE:
+        shutil.copytree(identidade / pasta, kit / "identidade-visual" / pasta)
     shutil.copy2(hub / "turma" / "index.html", kit / "index.html")
     (kit / "LEIA-ME.txt").write_text(LEIA_ME, encoding="utf-8", newline="\r\n")
     for pagina in kit.rglob("*.html"):

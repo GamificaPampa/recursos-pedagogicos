@@ -420,6 +420,8 @@ const QUEUE_LIMIT = 12
 
 // Opening the page with ?navegador turns it into the navigator's map, which shows the bugs and has no controls
 const NAVIGATOR = new URLSearchParams(location.search).has("navegador")
+// Bit, in the corner, talks to the pair on the pilot's screen only, never on the navigator's phone
+const bitSays = (...args) => { if (!NAVIGATOR) window.Bit?.diz(...args) }
 
 // Looping a cheerful melody in the background, where 0 is a rest
 const MELODY = [523, 0, 659, 784, 659, 0, 523, 587, 659, 0, 587, 523, 440, 0, 392, 0]
@@ -498,6 +500,9 @@ function loadLevel(number) {
   document.getElementById("role").innerHTML = `${LEVEL_ICONS[DIFFICULTIES[difficulty].icon]} Fase ${level + 1}: diga o caminho ao piloto e avise onde estão os bugs!`
   document.querySelectorAll("#difficulties button, #pick button").forEach(button => button.classList.toggle("chosen", Number(button.dataset.difficulty) === difficulty))
   draw()
+  setTimeout(() => bitSays(level === 0 ? "acenando" : "pensando", level === 0
+    ? "Um pilota e o outro navega. O navegador vê os bugs e diz o caminho. Conversem antes de apertar play!"
+    : `Fase ${level + 1}! Navegador, conte ao piloto onde estão os bugs.`, level === 0 ? 6000 : 3500), 600)
 }
 
 // Redrawing the level dots, the tries left, the command queue and its code version, marking the current and the wrong step
@@ -523,12 +528,14 @@ async function play() {
   culprit = -1
   runs++
   let position = start
+  let crash = ""
   for (const [index, key] of queue.entries()) {
     draw(index)
     const [row, column] = [position[0] + MOVES[key][0], position[1] + MOVES[key][1]]
     const symbol = rows[row]?.[column]
     if (symbol === undefined) {
       culprit = index
+      crash = "edge"
       break
     }
     position = [row, column]
@@ -539,6 +546,7 @@ async function play() {
       await wait(400)
       board.children[row * rows[0].length + column].querySelector(".bug").classList.add("found")
       culprit = index
+      crash = "bug"
       break
     }
     beep([MOVES[key][4] / 2], { type: "square", volume: 0.08, length: 0.1 })
@@ -546,7 +554,12 @@ async function play() {
     if (symbol === "*") return win()
   }
 
-  // Shaking the robot and sending it back to the start, keeping the queue so the pair fixes only the wrong step
+  // Shaking the robot and sending it back to the start, keeping the queue so the pair fixes only the wrong step.
+  // Bit tells the pair what went wrong, so the navigator knows what to check
+  bitSays(crash ? "ops" : "pensando", crash === "bug"
+    ? "Pisei num bug escondido! O navegador precisa avisar antes de rodar."
+    : crash === "edge" ? "Saí do tabuleiro! Navegador, confira as setas com o piloto."
+    : "As setas acabaram antes da estrela. Continuem o caminho!")
   beep([300, 200, 120], { type: "sawtooth", volume: 0.15, spacing: 0.15, length: 0.3 })
   robot.classList.add("shake")
   draw()
@@ -559,6 +572,7 @@ async function play() {
   if (runs >= DIFFICULTIES[difficulty].tries) {
     beep([392, 330, 262, 196], { type: "sawtooth", volume: 0.12, spacing: 0.18, length: 0.3 })
     document.getElementById("lost").classList.add("show")
+    bitSays("pensando", "Acabaram as tentativas. Planejem juntos o caminho inteiro e tentem de novo.", 6000)
   }
 }
 
@@ -586,6 +600,9 @@ function win() {
   swap.innerHTML = `Troquem de lugar! ${LEVEL_ICONS[DIFFICULTIES[difficulty].icon]} Fase ${level + 2}`
   swap.hidden = level + 1 >= levels.length
   overlay.classList.add("show")
+  bitSays(stars === 3 ? "comemorando" : "feliz", stars === 3
+    ? "De primeira! Isso é programação em dupla: um escreve e o outro revisa."
+    : "Chegamos! Agora troquem de lugar: quem pilotou vira navegador.", 5000)
   level++
   draw()
   running = false
@@ -641,6 +658,7 @@ function press(key) {
   if (isShown("win")) {
     if (key !== "Enter" && key !== " ") return
     if (level < levels.length) return loadLevel(level)
+    bitSays("comemorando", "Vocês terminaram todas as fases! Software se faz em equipe.", 7000)
     return document.getElementById("final").classList.add("show")
   }
   if (MOVES[key] && queue.length < QUEUE_LIMIT) {
@@ -723,5 +741,6 @@ if (NAVIGATOR) {
 }
 loadLevel(0)
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>
 </html>

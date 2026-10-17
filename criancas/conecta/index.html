@@ -444,6 +444,11 @@ function loadLevel(number) {
   document.querySelectorAll("#win, #final").forEach(overlay => overlay.classList.remove("show"))
   document.querySelectorAll("#difficulties button").forEach(button => button.classList.toggle("chosen", Number(button.dataset.difficulty) === difficulty))
   draw()
+
+  // Bit, in the corner, explains the system on the first level and asks for short cables on the next ones
+  setTimeout(() => window.Bit?.diz(level === 0 ? "acenando" : "pensando", level === 0
+    ? "Ligue cada celular ao servidor e o servidor ao banco de dados. Depois aperte play para ver a foto viajar!"
+    : `Fase ${level + 1}! Tente gastar o mínimo de cabo.`, level === 0 ? 6000 : 3500), 600)
 }
 
 // Switching to the five levels of a difficulty, starting from the first
@@ -506,6 +511,7 @@ function draw() {
 // Showing a red line in the code panel for a few seconds
 function warn(text) {
   warning = text
+  window.Bit?.diz("ops", text, 3500)
   beep([300, 200], { type: "sawtooth", volume: 0.12, spacing: 0.12, length: 0.2 })
   draw()
   clearTimeout(warningTimer)
@@ -717,6 +723,9 @@ function win() {
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   overlay.classList.add("show")
+  window.Bit?.diz(stars === 3 ? "comemorando" : "feliz", stars === 3
+    ? "Funcionou, e com o cabo mais curto! O celular pediu, o servidor buscou no banco e a foto chegou."
+    : "Funcionou! O celular pediu, o servidor buscou no banco de dados e a foto chegou.", 5000)
   level++
   draw()
   running = false
@@ -746,6 +755,7 @@ function press(key) {
   if (isShown("win")) {
     if (key !== "Enter" && key !== " ") return
     if (level < levels.length) return loadLevel(level)
+    window.Bit?.diz("comemorando", "Você montou todos os sistemas! É assim que um app conversa com o servidor.", 7000)
     return document.getElementById("final").classList.add("show")
   }
   if (key === "Backspace") {
@@ -790,5 +800,6 @@ document.querySelector("#final .also").addEventListener("click", event => event.
 addEventListener("resize", resize)
 loadLevel(0)
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>
 </html>

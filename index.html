@@ -93,7 +93,7 @@
 
   /* For teachers: the workshop with its tools, and the class with the games */
   .teach { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px }
-  @media (min-width: 900px) { .teach { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start } }
+  @media (min-width: 900px) { .teach { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start } .teach > :first-child { grid-row: span 2 } }
   .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin: 8px 0 4px; padding: 0; list-style: none }
   .tools a { display: flex; flex-direction: column; gap: 2px; height: 100%; min-height: 48px; padding: 10px 14px; background: var(--c); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 4px 0 var(--ink); text-decoration: none; line-height: 1.3; transition: transform .1s }
   .tools a:hover { transform: translateY(-2px) }
@@ -246,7 +246,7 @@ p, li, blockquote {
             <li><a href="professores/oficina-prompts/jogo.html" style="--c: #fff1a8"><b>Jogo do Prompt</b><span>Monte o pedido com quatro peças e veja o que o Gemini faria.</span></a></li>
             <li><a href="professores/oficina-prompts/construtor.html" style="--c: #e6dfff"><b>Construtor de prompts</b><span>Responda algumas perguntas e saia com um prompt pronto.</span></a></li>
             <li><a href="professores/oficina-prompts/biblioteca.html" style="--c: #cfe6ff"><b>Biblioteca de prompts</b><span>Prompts de partida por etapa e tipo de material.</span></a></li>
-            <li><a href="professores/oficina-prompts/gems.html" style="--c: #ffdcc4"><b>Gems prontos</b><span>Seis assistentes para copiar e usar o ano todo.</span></a></li>
+            <li><a href="professores/oficina-prompts/gems.html" style="--c: #ffdcc4"><b>Gems prontos</b><span>Sete assistentes para copiar e usar o ano todo, com o Gem do Bit.</span></a></li>
             <li><a href="professores/oficina-prompts/guia.html" style="--c: #ffd6e2"><b>Guia do professor</b><span>O método, a BNCC, a privacidade e o checklist de revisão.</span></a></li>
             <li><a href="professores/oficina-prompts/passo-a-passo.html" style="--c: #c9f5e3"><b>Passo a passo animado</b><span>Abrir o Canvas, compartilhar o jogo e criar um Gem.</span></a></li>
             <li><a href="professores/oficina-prompts/galeria.html" style="--c: #fff1a8"><b>Galeria de jogos</b><span>Os jogos que os professores criam na oficina.</span></a></li>
@@ -268,6 +268,21 @@ p, li, blockquote {
           <p class="meta"><span class="dot"></span>6 a 14 anos · 50 minutos</p>
           <p>Uma aula de Engenharia de Software pronta, com os jogos no projetor: roteiro, slides, folha de atividades e certificado de Programador(a) Mirim.</p>
           <div class="actions"><a class="btn" style="--c: var(--orange)" href="professores/aula-engenharia-de-software/">Ver a aula</a></div>
+        </div>
+      </article>
+
+      <article class="card" style="--c: var(--orange)">
+        <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
+          <circle cx="100" cy="60" r="46" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="5"/>
+          <circle cx="100" cy="60" r="33" fill="#fff" stroke="#2f2a4a" stroke-width="3"/>
+          <g class="g d-hop"><use href="#bot-art" x="78" y="34" width="44" height="44"/></g>
+          <path d="M34 26 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z M168 78 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg></div>
+        <div class="body">
+          <h3>Medalhas do Bit</h3>
+          <p class="meta"><span class="dot"></span>Para imprimir · 12 por folha</p>
+          <p>Medalhas para recortar e entregar na hora da conquista, como Caçador(a) de bugs e Não desistiu. Coloridas ou em preto e branco.</p>
+          <div class="actions"><a class="btn" style="--c: var(--yellow)" href="professores/medalhas/">Ver as medalhas</a></div>
         </div>
       </article>
     </div>

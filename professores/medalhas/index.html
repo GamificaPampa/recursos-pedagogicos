@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Medalhas do Bit · GamificaPampa</title>
+  <meta name="description" content="Medalhas para imprimir, recortar e entregar na hora da conquista, com o robô Bit. Doze por folha A4, coloridas ou em preto e branco.">
+  <meta property="og:title" content="Medalhas do Bit · GamificaPampa">
+  <meta property="og:description" content="Medalhas para imprimir e entregar na hora da conquista, com o robô Bit.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Arrumando a página em uma coluna central que cabe no celular e no projetor */
+    p, ul, ol, h3 { margin: 0; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px clamp(16px, 4vw, 40px); }
+    main { display: grid; gap: 32px; width: min(1100px, 100% - 32px); margin: 16px auto 64px; }
+    .abertura { display: grid; justify-items: center; gap: 18px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 22px; max-width: 720px; text-align: left; }
+    .bit img { flex: none; width: clamp(80px, 12vw, 110px); height: auto; }
+    .bit .bubble { min-width: 0; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.35; box-shadow: 0 6px 0 rgb(47 42 74 / .3); }
+    h2 { font-size: clamp(30px, 4.4vw, 46px); }
+
+    /* Escolha das medalhas: uma linha por medalha, com menos e mais */
+    .montar { display: grid; gap: 20px; }
+    .montar__topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+    .total { font-weight: 700; font-size: 18px; }
+    .escolhas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 14px; padding: 0; list-style: none; }
+    .escolha { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; box-shadow: inset 10px 0 0 var(--c), 0 5px 0 var(--ink); padding-left: 22px; }
+    .escolha img { width: 56px; height: 56px; }
+    .escolha b { display: block; font-size: 17px; line-height: 1.2; }
+    .escolha small { display: block; color: var(--soft); font-size: 14px; line-height: 1.25; }
+    .passo { display: flex; align-items: center; gap: 6px; }
+    .passo button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--white); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 4px 0 var(--ink); font: 700 24px/1 var(--font); cursor: pointer; transition: transform .1s ease, box-shadow .1s ease; }
+    .passo button:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+    .passo button:active { transform: translateY(4px); box-shadow: none; }
+    .passo button:disabled { opacity: .4; cursor: not-allowed; }
+    .passo output { min-width: 26px; font-weight: 700; font-size: 20px; text-align: center; }
+    .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+    .troca { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 16px; background: var(--white); border: 3px solid var(--ink); border-radius: 999px; font-weight: 600; cursor: pointer; }
+    .troca input { width: 22px; height: 22px; accent-color: var(--ink); }
+
+    /* A folha A4: 3 colunas e 4 linhas de medalhas de 6 cm, medidas em % para valer na tela e no papel */
+    .folhas { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 24px; }
+    .folha { container-type: inline-size; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); align-content: start; column-gap: 2.38%; row-gap: 5.2%; width: min(100%, 620px); aspect-ratio: 210 / 297; padding: 5.7% 4.76%; background: var(--white); border: 4px solid var(--ink); border-radius: 8px; box-shadow: var(--drop); }
+    .medalha { --c: var(--yellow); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; padding: 9% 10% 8%; background: radial-gradient(circle, #fff 0 64%, var(--c) 64.5%); border: .7cqw solid var(--ink); border-radius: 50%; outline: 1px dashed #9a96b3; outline-offset: 1.2cqw; text-align: center; }
+    .medalha img { width: 44%; height: auto; }
+    .medalha b { margin-top: 2%; font-size: 2.15cqw; line-height: 1.05; }
+    .medalha span { margin-top: 1.5%; color: var(--soft); font-size: 1.45cqw; line-height: 1.15; }
+    .medalha .linha { width: 70%; margin-top: 5%; border-top: .25cqw solid var(--ink); }
+    .medalha .linha::after { content: "nome"; display: block; margin-top: 1%; color: #9a96b3; font-size: 1.1cqw; }
+    .folhas.pb .medalha { background: radial-gradient(circle, #fff 0 64%, #fff 64.5%); box-shadow: inset 0 0 0 2.6cqw #fff, inset 0 0 0 2.85cqw var(--ink); }
+    .folhas.pb .medalha img { filter: grayscale(1) contrast(1.25); }
+
+    /* Dicas para usar as medalhas na aula */
+    .dicas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; padding: 0; list-style: none; }
+    .dicas li { padding: 18px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; box-shadow: inset 0 10px 0 var(--c), 0 5px 0 var(--ink); padding-top: 24px; }
+    .dicas b { display: block; margin-bottom: 4px; font-size: 19px; }
+    .dicas p { color: var(--soft); font-size: 16px; }
+    .rodape { position: relative; padding: 24px; text-align: center; font-size: 15px; }
+
+    /* Na impressão sai só a folha, em A4, sem a moldura da tela */
+    @page { size: A4; margin: 0; }
+    @media print {
+      body { background: #fff; }
+      body > :not(main), main > :not(.folhas), .cenario { display: none !important; }
+      main { display: block; width: auto; margin: 0; }
+      .folhas { display: block; }
+      .folha { width: 210mm; max-width: none; height: 297mm; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; break-after: page; }
+      .folha:last-child { break-after: auto; }
+      .medalha { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 22%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 48%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 5%; top: 30%">&lt;/&gt;</span>
+    <span class="simbolo" style="right: 6%; top: 16%; --d: -2s">{ }</span>
+    <span class="simbolo" style="right: 8%; top: 58%; --d: -4s">01</span>
+    <span class="morros"></span>
+  </div>
+
+  <header class="topo">
+    <a class="btn" href="https://gamificapampa.github.io/">Voltar ao site</a>
+    <img src="/identidade-visual/logos/gamificapampa-horizontal.svg" alt="GamificaPampa" width="200" height="44">
+  </header>
+
+  <main>
+    <section class="abertura">
+      <p class="pill" style="--c: var(--orange)">PARA IMPRIMIR</p>
+      <h1 class="loud anima-letras"><span>Medalhas</span> <span>do</span> <span class="yellow">Bit</span></h1>
+      <div class="bit">
+        <img class="anima-flutuar" src="/identidade-visual/mascote/bit-comemorando.svg" width="100" height="100" alt="Bit comemorando">
+        <p class="bubble anima-balao" style="--d: .5s">Imprima, recorte e entregue na hora da conquista. Cada medalha conta o que a criança aprendeu, até quando ela errou e tentou de novo.</p>
+      </div>
+    </section>
+
+    <section class="card montar" aria-labelledby="titulo-montar">
+      <div class="montar__topo">
+        <h2 class="loud" id="titulo-montar">Monte a <span class="yellow">folha</span></h2>
+        <p class="total" id="total" role="status"></p>
+      </div>
+      <ul class="escolhas" id="escolhas"></ul>
+      <div class="acoes">
+        <button class="btn btn--baixar" type="button" id="imprimir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Imprimir</button>
+        <button class="btn" type="button" id="sugestao">Voltar à sugestão</button>
+        <label class="troca"><input type="checkbox" id="pb">Preto e branco, gasta menos tinta</label>
+      </div>
+    </section>
+
+    <section class="folhas" id="folhas" aria-label="Prévia das folhas para imprimir"></section>
+
+    <section aria-labelledby="titulo-dicas">
+      <h2 class="loud" id="titulo-dicas" style="margin-bottom: 18px">Como usar na <span class="yellow">aula</span></h2>
+      <ul class="dicas">
+        <li style="--c: var(--mint)"><b>Combine antes</b><p>Mostre as medalhas no começo e diga o que vale cada uma. A turma sabe o que buscar.</p></li>
+        <li style="--c: var(--yellow)"><b>Entregue na hora</b><p>A medalha vale mais quando chega logo depois da conquista, com uma frase sobre o que a criança fez.</p></li>
+        <li style="--c: var(--orange)"><b>Valorize o erro</b><p>A medalha "Não desistiu" mostra que errar faz parte. É assim que quem programa trabalha.</p></li>
+        <li style="--c: var(--pink)"><b>Sem ranking</b><p>Todo mundo pode ganhar. A ideia é celebrar o aprendizado, não comparar as crianças.</p></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+
+    // Cada medalha conta uma conquista de quem aprende a programar, com a pose do Bit que combina com ela.
+    const medalhas = [
+      { id: 'programador', nome: 'Programador(a) Mirim', conta: 'Montou o programa passo a passo', pose: 'bit-formatura', cor: '#4da3ff', sugestao: 2 },
+      { id: 'bugs', nome: 'Caçador(a) de bugs', conta: 'Achou e consertou um erro', pose: 'bit-feliz', cor: '#ff5f8f', sugestao: 2 },
+      { id: 'pensou', nome: 'Pensou antes de rodar', conta: 'Planejou antes de testar', pose: 'bit-pensando', cor: '#ffd23f', sugestao: 2 },
+      { id: 'persistente', nome: 'Não desistiu', conta: 'Errou, tentou de novo e conseguiu', pose: 'bit-ops', cor: '#ff8a3d', sugestao: 2 },
+      { id: 'dupla', nome: 'Parceria de código', conta: 'Trabalhou em dupla e trocou de papel', pose: 'bit-acenando', cor: '#4fd6a6', sugestao: 1 },
+      { id: 'missao', nome: 'Missão cumprida', conta: 'Terminou todas as fases', pose: 'bit-comemorando', cor: '#a08bff', sugestao: 1 },
+      { id: 'ideia', nome: 'Ideia brilhante', conta: 'Inventou um jeito novo de resolver', pose: 'bit-pensando', cor: '#8cc4ff', sugestao: 1 },
+      { id: 'ajudante', nome: 'Ajudante do dia', conta: 'Ajudou a turma a aprender', pose: 'bit', cor: '#ffdcc4', sugestao: 1 },
+    ];
+    const porFolha = 12;
+    const maximo = 48;
+    const quantas = Object.fromEntries(medalhas.map((m) => [m.id, m.sugestao]));
+    const imagem = (pose) => `/identidade-visual/mascote/${pose}.svg`;
+
+    const total = () => Object.values(quantas).reduce((soma, n) => soma + n, 0);
+
+    const desenharFolhas = () => {
+      const lista = medalhas.flatMap((m) => Array(quantas[m.id]).fill(m));
+      const folhas = [];
+      for (let i = 0; i < lista.length; i += porFolha) folhas.push(lista.slice(i, i + porFolha));
+      $('#folhas').replaceChildren(...folhas.map((itens, indice) => {
+        const folha = Object.assign(document.createElement('div'), { className: 'folha' });
+        folha.setAttribute('aria-label', `Folha ${indice + 1}`);
+        for (const m of itens) {
+          const medalha = Object.assign(document.createElement('div'), { className: 'medalha' });
+          medalha.style.setProperty('--c', m.cor);
+          medalha.append(
+            Object.assign(document.createElement('img'), { src: imagem(m.pose), alt: '' }),
+            Object.assign(document.createElement('b'), { textContent: m.nome }),
+            Object.assign(document.createElement('span'), { textContent: m.conta }),
+            Object.assign(document.createElement('i'), { className: 'linha' }),
+          );
+          folha.append(medalha);
+        }
+        return folha;
+      }));
+      const n = total();
+      const paginas = Math.ceil(n / porFolha);
+      $('#total').textContent = n === 0 ? 'Escolha ao menos uma medalha' : `${n} ${n === 1 ? 'medalha' : 'medalhas'} em ${paginas} ${paginas === 1 ? 'folha' : 'folhas'}`;
+      $('#imprimir').disabled = n === 0;
+      document.querySelectorAll('[data-menos]').forEach((b) => { b.disabled = quantas[b.dataset.menos] === 0; });
+      document.querySelectorAll('[data-mais]').forEach((b) => { b.disabled = n >= maximo; });
+      medalhas.forEach((m) => { $(`#n-${m.id}`).value = quantas[m.id]; });
+    };
+
+    // Uma linha por medalha, com o desenho, o nome e os botões de menos e mais.
+    $('#escolhas').replaceChildren(...medalhas.map((m) => {
+      const item = Object.assign(document.createElement('li'), { className: 'escolha' });
+      item.style.setProperty('--c', m.cor);
+      item.innerHTML = `<img src="${imagem(m.pose)}" alt=""><div><b></b><small></small></div>
+        <div class="passo"><button type="button" data-menos="${m.id}">−</button><output id="n-${m.id}"></output><button type="button" data-mais="${m.id}">+</button></div>`;
+      item.querySelector('b').textContent = m.nome;
+      item.querySelector('small').textContent = m.conta;
+      item.querySelector('[data-menos]').setAttribute('aria-label', `Uma medalha ${m.nome} a menos`);
+      item.querySelector('[data-mais]').setAttribute('aria-label', `Uma medalha ${m.nome} a mais`);
+      item.querySelector('[data-menos]').addEventListener('click', () => { quantas[m.id] = Math.max(0, quantas[m.id] - 1); desenharFolhas(); });
+      item.querySelector('[data-mais]').addEventListener('click', () => { if (total() < maximo) quantas[m.id] += 1; desenharFolhas(); });
+      return item;
+    }));
+
+    $('#sugestao').addEventListener('click', () => { medalhas.forEach((m) => { quantas[m.id] = m.sugestao; }); desenharFolhas(); });
+    $('#pb').addEventListener('change', (event) => $('#folhas').classList.toggle('pb', event.target.checked));
+    $('#imprimir').addEventListener('click', () => print());
+    desenharFolhas();
+  </script>
+</body>
+</html>

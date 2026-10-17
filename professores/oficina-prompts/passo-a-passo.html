@@ -394,7 +394,7 @@
 <div class="page">
   <a class="back" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 L7.5 12 L15 19.5" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Oficina de Prompts</a>
 
-  <header>
+  <header data-bit-pose="acenando" data-bit-dica="Oi! Escolha um vídeo e toque em Tocar. Dá para pausar e voltar um passo quando quiser.">
     <svg class="tv" viewBox="0 0 100 100" aria-hidden="true">
       <path d="M36 8 L50 22 L64 8" fill="none" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
       <rect x="6" y="22" width="84" height="60" rx="14" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="5"/>
@@ -424,7 +424,7 @@
     </a>
   </nav>
 
-  <section class="player" id="player" aria-labelledby="player-title">
+  <section class="player" id="player" aria-labelledby="player-title" data-bit-dica="">
     <h2 id="player-title"><i id="player-n">1</i><span id="player-name"></span></h2>
     <div class="live" id="live-box">
       <div class="stage" id="stage" aria-hidden="true"><div class="scene" id="scene"></div><span class="poster" id="poster"></span></div>
@@ -445,7 +445,7 @@
   <p class="note"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3"/><path d="M18 16 V26" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="18" cy="10.5" r="2.4" fill="#fff"/></svg>O nome dos botões pode mudar um pouco com as atualizações do Gemini, mas o caminho é parecido.</p>
   <details class="list" id="list-box"><summary>Ler os passos deste vídeo</summary><ol id="list"></ol></details>
 
-  <div class="more">
+  <div class="more" data-bit-pose="feliz" data-bit-dica="Agora é praticar! O guia, os Gems e o Construtor estão aqui embaixo.">
     <a class="btn" href="guia.html" style="--c: var(--mint)">Guia do professor</a>
     <a class="btn" href="gems.html" style="--c: var(--purple)">Gems prontos</a>
     <a class="btn calm" href="construtor.html">Construtor de prompts</a>
@@ -896,5 +896,24 @@ if (params.has("passo") && !still) {
 if (VIDEOS[location.hash.slice(1)] && $("player").getBoundingClientRect().bottom > innerHeight) document.querySelector(".tabs").scrollIntoView()
 document.fonts?.ready.then(() => still ? paintStill() : draw())
 </script>
+<script>
+// Bit's tip for the player follows the chosen video, and changes on screen when the teacher switches videos
+(() => {
+  const tips = {
+    canvas: "Se o Canvas recusar o jogo, mande primeiro só a ideia curta e depois as fases, o som e as estrelas. O Refazer também ajuda.",
+    compartilhar: "Antes de mandar para a turma, abra o link numa janela anônima. Se abrir lá, abre no celular das crianças.",
+    gem: "Quer um Gem pronto? O Gem do Bit faz perguntas e monta o prompt com você. Ele está na página Gems prontos.",
+  }
+  const player = document.getElementById("player")
+  const update = (say) => {
+    const tip = tips[location.hash.slice(1)] || tips.canvas
+    player.dataset.bitDica = tip
+    if (say) window.Bit?.diz("pensando", tip, 9000)
+  }
+  update(false)
+  addEventListener("hashchange", () => update(true))
+})()
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
 </html>

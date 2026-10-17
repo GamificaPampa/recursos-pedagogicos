@@ -341,7 +341,9 @@
     }
     cd.hidden = true;
     S.running = true;
+    S.bitWarned = false;
     S.t0 = performance.now();
+    if(window.Bit) Bit.diz('acenando', 'Toque nos bugs antes que eles quebrem o app da escola!', 3500);
     spawnLoop();
     S.raf = requestAnimationFrame(frame);
   }
@@ -419,6 +421,11 @@
     var target = ok[Math.floor(Math.random() * ok.length)];
     if(target){ target.classList.add('broken'); toast('🐛 Um bug escapou! ' + target.dataset.msg); }
     else toast('🐛 Mais um bug escapou!');
+    // Bit explains, on the first escape of the round, why a bug that gets away breaks the app
+    if(window.Bit && !S.bitWarned && S.hearts > 0){
+      S.bitWarned = true;
+      Bit.diz('ops', 'Quando um bug escapa, uma parte do app quebra. Por isso quem programa testa antes de entregar.', 5000);
+    }
     var ph = $('phone'); ph.classList.remove('glitch'); void ph.offsetWidth; ph.classList.add('glitch');
     sfx.miss(); vibrate([40, 40, 40]);
     if(S.hearts <= 0) endRound('crash');
@@ -476,6 +483,9 @@
     cancelAnimationFrame(S.raf);
     Array.prototype.forEach.call(bugsEl.children, function(b){ clearTimeout(b.timer); b.done = true; b.classList.add('flee'); });
     if(reason === 'crash'){ sfx.crash(); toast('💥 O app travou!'); }
+    if(window.Bit) Bit.diz(reason === 'crash' ? 'ops' : 'comemorando', reason === 'crash'
+      ? 'O app travou! Quanto antes a gente acha um bug, mais fácil é consertar.'
+      : 'Tempo! Você achou ' + S.hit + (S.hit === 1 ? ' bug' : ' bugs') + '. Testar é procurar os erros antes de quem usa o app.', 6000);
     await wait(1100);
     var best = readBest(), isRecord = S.score > best;
     if(isRecord) saveBest(S.score);
@@ -616,5 +626,6 @@
   }
 })();
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>
 </html>

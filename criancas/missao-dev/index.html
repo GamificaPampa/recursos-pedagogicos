@@ -130,6 +130,10 @@
   .feedback.show{display:block;}
   .feedback.ok{background:rgba(51,226,160,0.12); color:var(--accent);}
   .feedback.bad{background:rgba(255,107,107,0.12); color:var(--bad);}
+  /* Bit appears in the feedback box: happy when it is right, worried when it is not */
+  .feedback.ok, .feedback.bad{padding-left:54px; background-repeat:no-repeat; background-position:10px 50%; background-size:36px;}
+  .feedback.ok{background-image:url("/identidade-visual/mascote/bit-feliz.svg");}
+  .feedback.bad{background-image:url("/identidade-visual/mascote/bit-ops.svg");}
 
   /* game 2: bug hunt */
   .code-block{
@@ -501,6 +505,11 @@
     clearTimeout(loopState.timer);
     var exact = loopState.taps === loopState.target;
     var pts = timedOut ? 0 : (exact ? 20 : 8);
+    // The loop challenge has no feedback box, so Bit explains the result in the corner
+    if(window.Bit) Bit.diz(timedOut ? 'ops' : exact ? 'feliz' : 'pensando', timedOut
+      ? 'O tempo acabou! Um laço repete o mesmo passo várias vezes. Conte junto e tente de novo na próxima.'
+      : exact ? 'Exato! Um laço repete um passo o número certo de vezes.'
+      : 'Você tocou ' + loopState.taps + ' vezes, mas o laço pedia ' + loopState.target + '. Na programação, a conta precisa ser exata.', 4500);
     addScore(pts);
     vibrate(exact ? 30 : [20,40,20]);
     setTimeout(nextStep, 500);
@@ -540,6 +549,7 @@
     else { emoji='🔍'; title='Estagiário(a) Curioso(a)'; }
     document.getElementById('result-badge-emoji').textContent = emoji;
     document.getElementById('result-title').textContent = title;
+    if(window.Bit) Bit.diz('comemorando', 'Missão cumprida! Você ordenou passos, achou bugs e usou laços, como quem faz software.', 7000);
   }
 
   function restart(){
@@ -559,4 +569,4 @@
   updateDots();
 })();
 </script>
-
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
