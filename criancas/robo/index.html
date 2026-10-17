@@ -340,6 +340,11 @@ function loadLevel(number) {
   resize()
   document.querySelectorAll("#win, #final").forEach(overlay => overlay.classList.remove("show"))
   draw()
+
+  // Bit, in the corner, says hello on the first level and asks for a plan on the next ones
+  setTimeout(() => window.Bit?.diz(level === 0 ? "acenando" : "pensando", level === 0
+    ? "Oi! Eu sou o Bit. Monte as setas e aperte play. Eu faço exatamente o que você mandar!"
+    : `Fase ${level + 1}! Planeje o caminho antes de apertar play.`, level === 0 ? 6000 : 3500), 600)
 }
 
 // Redrawing the level dots, the command queue and its code version, marking the current and the wrong step
@@ -361,12 +366,14 @@ async function play() {
   running = true
   culprit = -1
   let position = start
+  let crash = ""
   for (const [index, key] of queue.entries()) {
     draw(index)
     const [row, column] = [position[0] + MOVES[key][0], position[1] + MOVES[key][1]]
     const symbol = rows[row]?.[column]
     if (symbol === undefined || symbol === "#") {
       culprit = index
+      crash = symbol === "#" ? "numa pedra" : "na borda"
       break
     }
     position = [row, column]
@@ -376,7 +383,11 @@ async function play() {
     if (symbol === "*") return win()
   }
 
-  // Shaking the robot and sending it back to the start, keeping the queue so the child fixes only the wrong step
+  // Shaking the robot and sending it back to the start, keeping the queue so the child fixes only the wrong step.
+  // Bit says which step went wrong, or that the arrows ended before the star
+  window.Bit?.diz(culprit >= 0 ? "ops" : "pensando", culprit >= 0
+    ? `Ai! Bati ${crash} no passo ${culprit + 1}. Troque essa seta e tente de novo.`
+    : "As setas acabaram antes da estrela. Continue o caminho!")
   beep([300, 200, 120], { type: "sawtooth", volume: 0.15, spacing: 0.15, length: 0.3 })
   robot.classList.add("shake")
   draw()
@@ -407,6 +418,9 @@ function win() {
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   overlay.classList.add("show")
+  window.Bit?.diz(stars === 3 ? "comemorando" : "feliz", stars === 3
+    ? "Caminho mais curto! Isso é um algoritmo: os passos certos, na ordem certa."
+    : "Cheguei na estrela! Será que dá para chegar com menos setas?", 5000)
   level++
   draw()
   running = false
@@ -425,6 +439,7 @@ function press(key) {
   if (document.getElementById("win").classList.contains("show")) {
     if (key !== "Enter" && key !== " ") return
     if (level < LEVELS.length) return loadLevel(level)
+    window.Bit?.diz("comemorando", "Você me programou em todas as fases! Agora você sabe o que é um algoritmo.", 7000)
     return document.getElementById("final").classList.add("show")
   }
   if (MOVES[key] && queue.length < QUEUE_LIMIT) {
@@ -473,5 +488,6 @@ document.getElementById("queue").addEventListener("click", event => {
 addEventListener("resize", resize)
 loadLevel(0)
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>
 </html>

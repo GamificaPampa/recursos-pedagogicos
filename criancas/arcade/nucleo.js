@@ -307,6 +307,17 @@
     setTimeout(function(){ e.remove(); }, 1150);
   }
 
+  // Bit, in the corner of the screen, turns the first mistake of each round into a short lesson
+  var BIT_LESSONS = {
+    ninja: 'Ai! Esse arquivo funcionava. Quem debuga tira o erro sem apagar o que está certo.',
+    robo: 'Um bug entrou no app! Cada versão nova precisa ser testada para os bugs ficarem de fora.'
+  };
+  function bitExplains(msg){
+    if(!window.Bit) return;
+    if(current.id === 'esteira' && msg) return Bit.diz('ops', msg, 4500);
+    if(run.lives === run.maxLives - 1 && BIT_LESSONS[current.id]) Bit.diz('ops', BIT_LESSONS[current.id], 4500);
+  }
+
   var api = {
     get running(){ return !!(run && run.running); },
     progress: function(){ return api.running ? Math.min(1, (performance.now() - run.t0) / current.duration) : 0; },
@@ -322,6 +333,7 @@
       if(!api.running) return;
       run.lives--; renderHearts();
       if(msg) toast(msg, 'bad');
+      bitExplains(msg);
       var st = $('stage'); st.classList.remove('hurt'); void st.offsetWidth; st.classList.add('hurt');
       A.sfx.bad(); A.vibrate([40, 40, 40]);
       if(run.lives <= 0) finish('lives');

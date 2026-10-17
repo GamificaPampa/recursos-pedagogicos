@@ -64,6 +64,7 @@
   .gems { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 24px }
   .gem-card { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px 20px; background: #fff; border: 4px solid var(--ink); border-top: 16px solid var(--c); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
   .gem-card .top { display: flex; align-items: center; gap: 12px }
+  .gem-card--wide { grid-column: 1 / -1; scroll-margin-top: 16px }
   .gem-card .top svg { width: 56px; height: 56px; flex: none }
   .gem-card h3 { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.1 }
   .gem-card .for { margin: 0; font-weight: 500; color: var(--soft) }
@@ -95,16 +96,16 @@
 <div class="page">
   <a class="back" href="index.html"><svg viewBox="0 0 24 24"><path d="M15 4.5 L7.5 12 L15 19.5" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Oficina de Prompts</a>
 
-  <header>
+  <header data-bit-pose="acenando" data-bit-dica="Oi! Um Gem é um Gemini que lembra das suas instruções. Você cria uma vez e usa o ano todo.">
     <svg class="gem" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 24 L20 8 H44 L56 24 L32 58 Z" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M8 24 H56 M20 8 L26 24 L32 58 L38 24 L44 8" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><path d="M26 24 L32 8 L38 24" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><path d="M18 18 L22 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
     <div>
       <h1><span class="y">Gems</span> <span class="p">prontos</span></h1>
-      <p>Um Gem é um Gemini com as suas instruções fixas. Você explica uma vez como é a sua turma e o que precisa, e usa o ano todo.</p>
+      <p>Um Gem é um Gemini com as suas instruções fixas. Você explica uma vez como é a sua turma e o que precisa, e usa o ano todo. Comece pelo Gem do Bit, que monta o prompt com você.</p>
     </div>
   </header>
 
   <section class="how">
-    <div class="card">
+    <div class="card" data-bit-dica="O caminho no Gemini: a engrenagem Configurações, embaixo à esquerda, depois Gems e Novo Gem.">
       <h2>Como criar o seu Gem</h2>
       <ol class="steps">
         <li><span>No Gemini, toque na engrenagem <b>Configurações</b>, embaixo à esquerda, depois em <b>Gems</b> e em <b>Novo Gem</b>.</span></li>
@@ -114,7 +115,7 @@
       </ol>
       <p class="small">O nome dos botões pode mudar um pouco com as atualizações do Gemini, mas o caminho é parecido. Se a conta da escola não mostrar os Gems, guarde as instruções num documento e cole no começo de cada conversa.</p>
     </div>
-    <div class="care">
+    <div class="care" data-bit-pose="ops" data-bit-dica="Nas instruções vão a etapa e o jeito da turma. Nome, foto ou dado de criança nunca vai.">
       <h3><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="16" width="22" height="17" rx="4" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg>Nas instruções, nunca</h3>
       <ul>
         <li>nomes, fotos ou dados das crianças;</li>
@@ -125,7 +126,7 @@
     </div>
   </section>
 
-  <section class="gems" id="gems"></section>
+  <section class="gems" id="gems" data-bit-pose="feliz" data-bit-dica="Comece pelo meu Gem: eu faço uma pergunta por vez e monto o prompt com você. Depois teste com o pedido que está no cartão."></section>
 
   <div class="more">
     <a class="btn" href="construtor.html" style="--c: var(--blue)">Construtor de prompts</a>
@@ -139,6 +140,31 @@
 <script>
 // The ready-made Gems: what each one is for, its instructions to copy and a first request to test it
 const GEMS = [
+  {
+    id: "bit", wide: true,
+    name: "Bit, ajudante de prompts", tag: "Todas as etapas", color: ["#4da3ff", "#cfe6ff"], icon: "bit",
+    for: "O robô do GamificaPampa dentro do Gemini. Ele faz uma pergunta por vez, monta o prompt com Papel, Tarefa, Contexto e Formato e, quando você aprovar, cria o material.",
+    try: "Quero criar uma atividade para o 3º ano.",
+    text: `Você é o Bit, o robô ajudante do GamificaPampa, um projeto da UNIPAMPA para professores da Educação Básica de escolas públicas de Alegrete/RS.
+
+Seu trabalho é ajudar o professor a montar um bom pedido (prompt) e, depois, criar o material da aula. Um bom pedido tem quatro peças: Papel (quem você deve ser), Tarefa (o que fazer), Contexto (para quem e com quais limites) e Formato (como o resultado deve sair).
+
+Como conversar:
+1. Cumprimente em uma frase e pergunte o que o professor quer criar: história, quiz, jogo, atividade para imprimir, plano de aula ou outra coisa.
+2. Faça uma pergunta por vez, curta, para completar as peças que faltam: o ano ou a idade da turma, a matéria, o tema e como o resultado deve sair. Se o professor já disse uma peça, não pergunte de novo.
+3. Quando tiver as quatro peças, mostre o prompt completo, uma linha por peça, começando por "Papel:", "Tarefa:", "Contexto:" e "Formato:".
+4. Pergunte se ele quer mudar alguma peça ou se você já pode criar o material. Se ele disser que pode, crie o material seguindo o prompt.
+
+Regras:
+- Escreva sempre em português do Brasil, com frases curtas e simples.
+- Nunca peça nem use o nome ou dados das crianças. Se o professor escrever um nome, lembre com gentileza que não precisa e use só a descrição da turma.
+- Não cite códigos da BNCC e não invente letras de música.
+- Não desenhe com letras e símbolos. Quando precisar de imagem, descreva entre parênteses.
+- Escreva as atividades como texto comum, fora de bloco de código.
+- Em quiz, não use o teste interativo: escreva as perguntas e o gabarito no texto.
+- Para jogo, lembre o professor de ligar o Canvas e mande primeiro a ideia curta; as fases, o som e as estrelas vêm numa segunda mensagem.
+- Use exemplos do dia a dia das crianças brasileiras e do Rio Grande do Sul.`,
+  },
   {
     name: "Assistente de planos de aula", tag: "Ensino Fundamental", color: ["#4da3ff", "#cfe6ff"], icon: "plan",
     for: "Monta planos de aula com objetivos, BNCC, passo a passo e avaliação.",
@@ -228,6 +254,7 @@ Responda em tópicos curtos. Não reescreva o material inteiro: só aponte e sug
 ]
 
 const ICONS = {
+  bit: '<line x1="32" y1="5" x2="32" y2="14" stroke="#2f2a4a" stroke-width="3"/><circle cx="32" cy="5" r="4" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="2"/><rect x="10" y="14" width="44" height="33" rx="10" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3.5"/><circle cx="24" cy="29" r="6" fill="#fff"/><circle cx="40" cy="29" r="6" fill="#fff"/><circle cx="25.5" cy="30" r="2.8" fill="#2f2a4a"/><circle cx="41.5" cy="30" r="2.8" fill="#2f2a4a"/><path d="M26 39 q6 5 12 0" stroke="#2f2a4a" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="20" y="48" width="24" height="12" rx="4" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3.5"/>',
   plan: '<rect x="12" y="10" width="40" height="50" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="22" y="4" width="20" height="11" rx="3" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M19 27 l4 4 l7 -8 M19 43 l4 4 l7 -8" stroke="#4fd6a6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 28 H45 M35 44 H45" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/>',
   sheet: '<rect x="8" y="6" width="38" height="52" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M16 19 H38 M16 28 H38 M16 37 H30" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><g transform="rotate(32 48 36)"><rect x="43" y="14" width="11" height="34" rx="2" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M43 48 L48.5 59 L54 48 Z" fill="#ffe1b0" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></g>',
   game: '<rect x="4" y="18" width="56" height="30" rx="15" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4"/><path d="M18 26 V40 M11 33 H25" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="42" cy="28" r="4.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="50" cy="37" r="4.5" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5"/>',
@@ -239,7 +266,7 @@ const COPY = '<svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5
 const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character])
 
 document.getElementById("gems").innerHTML = GEMS.map((gem, index) => `
-  <article class="gem-card" style="--c: ${gem.color[0]}; --light: ${gem.color[1]}">
+  <article class="gem-card${gem.wide ? " gem-card--wide" : ""}"${gem.id ? ` id="${gem.id}"` : ""} style="--c: ${gem.color[0]}; --light: ${gem.color[1]}">
     <div class="top"><svg viewBox="0 0 64 64" aria-hidden="true">${ICONS[gem.icon]}</svg><h3>${gem.name}</h3></div>
     <span class="tag">${gem.tag}</span>
     <p class="for">${gem.for}</p>
@@ -271,5 +298,6 @@ document.getElementById("gems").addEventListener("click", async event => {
   setTimeout(() => { done.textContent = "" }, 4000)
 })
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
 </html>

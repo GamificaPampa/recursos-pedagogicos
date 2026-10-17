@@ -26,6 +26,7 @@ Sem internet: o [kit sem internet](https://github.com/GamificaPampa/recursos-ped
 | --- | --- | --- |
 | Aula de 50 minutos com os jogos | [página da aula](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/), [roteiro](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/roteiro.html), [slides](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/slides.html), [folha de atividades](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/atividades.html), [certificado](https://gamificapampa.github.io/recursos-pedagogicos/professores/aula-engenharia-de-software/certificado.html) | [professores/aula-engenharia-de-software](professores/aula-engenharia-de-software) |
 | Oficina de Prompts, quatro encontros para criar atividades, histórias e jogos com o Gemini | [página da oficina](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/), [curso online](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/curso.html), [construtor de prompts](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/construtor.html) | [professores/oficina-prompts](professores/oficina-prompts) |
+| Medalhas do Bit, para imprimir e entregar na hora da conquista | [medalhas](https://gamificapampa.github.io/recursos-pedagogicos/professores/medalhas/) | [professores/medalhas](professores/medalhas) |
 
 ## Como adicionar um recurso
 
