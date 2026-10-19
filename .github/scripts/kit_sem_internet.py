@@ -20,8 +20,8 @@ RAIZ = Path(__file__).resolve().parents[2]
 RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conecta", "criancas/arcade",
             "criancas/caca-bugs", "criancas/missao-dev", "professores/aula-engenharia-de-software"]
 FONTE = "identidade-visual/fontes/fredoka/fredoka.woff2"
-# Pastas do identidade-visual que os jogos carregam: o script do Bit que fala e as poses dele
-PASTAS_IDENTIDADE = ["js", "mascote"]
+# Pastas do identidade-visual que os jogos carregam: o CSS do estilo de jogo, os scripts (Bit que fala e ícones) e as poses do Bit
+PASTAS_IDENTIDADE = ["css", "js", "mascote"]
 FONTE_GOOGLE = re.compile(r'(?:<link rel="preconnect" href="https://fonts\.(?:googleapis|gstatic)\.com"(?: crossorigin)?>\s*)*'
                           r'<link href="https://fonts\.googleapis\.com/css2\?family=Fredoka[^"]*" rel="stylesheet">')
 LEIA_ME = """Kit sem internet do GamificaPampa

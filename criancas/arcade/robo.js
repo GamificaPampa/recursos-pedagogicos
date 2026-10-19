@@ -4,9 +4,9 @@
   var A = window.Arcade;
   var PER_VERSION = 8;
   var POWERS = {
-    coffee:{ e:'☕', msg:'☕ Café do dev: tudo mais devagar!' },
-    shield:{ e:'🛡️', msg:'🛡️ Revisão de código: o próximo bug não passa!' },
-    test:{ e:'🧪', msg:'🧪 Teste automático: bugs eliminados!' }
+    coffee:{ e:'cafe', msg:'Café do dev: tudo mais devagar!' },
+    shield:{ e:'escudo', msg:'Revisão de código: o próximo bug não passa!' },
+    test:{ e:'teste', msg:'Teste automático: bugs eliminados!' }
   };
   var PIECE_COLORS = ['#3fb4ff', '#4fd6a6', '#8c73ff', '#ff8a3d'];
 
@@ -91,7 +91,12 @@
     fillEl.style.width = ((pieces % PER_VERSION) / PER_VERSION * 100) + '%';
     var pw = stage.querySelector('#rb-pow');
     var now = performance.now();
-    pw.textContent = (now < slowUntil ? '☕' : '') + (shield ? '🛡️' : '');
+    // Só troca os ícones dos poderes quando eles mudam, porque o HUD é atualizado várias vezes por segundo
+    var powers = (now < slowUntil ? 'cafe ' : '') + (shield ? 'escudo' : '');
+    if(pw.dataset.on !== powers){
+      pw.dataset.on = powers;
+      pw.innerHTML = powers.split(' ').filter(Boolean).map(A.iconHtml).join('');
+    }
   }
 
   function catchItem(it, now){
@@ -107,8 +112,8 @@
       A.vibrate(10);
       if(pieces % PER_VERSION === 0){
         version++;
-        api.add(50, rob.x, y - 50, '🚀 +50');
-        api.banner('🚀 App v' + version + '.0 lançado!');
+        api.add(50, rob.x, y - 50, '+50');
+        api.banner('App v' + version + '.0 lançado!');
         A.sfx.win();
         burst(rob.x, y, '#ffd23f', 24);
       }
@@ -116,13 +121,13 @@
       if(shield){
         shield = false;
         burst(it.x, it.y, '#4fd6a6', 14);
-        api.toast('🛡️ A revisão de código bloqueou o bug!', 'good');
+        api.toast('A revisão de código bloqueou o bug!', 'good');
         A.sfx.power();
       } else {
         st.hits++;
         hurtUntil = now + 700;
         burst(it.x, it.y, it.color, 12);
-        api.loseLife('Um bug entrou no app! 👾');
+        api.loseLife('Um bug entrou no app!');
       }
     } else if(it.type === 'power'){
       st.powers++;
@@ -132,7 +137,7 @@
       if(it.power === 'test'){
         var n = 0;
         items.forEach(function(o){ if(o.type === 'bug' && !o.done){ o.done = true; n++; burst(o.x, o.y, o.color, 10); } });
-        if(n) api.add(n * 5, C.W / 2, C.H * 0.35, '🧪 +' + (n * 5));
+        if(n) api.add(n * 5, C.W / 2, C.H * 0.35, '+' + (n * 5));
       }
       api.toast(POWERS[it.power].msg, 'good');
     }
@@ -192,7 +197,7 @@
         ctx.save();
         ctx.fillStyle = '#fff'; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 4;
         A.circle(ctx, it.x, it.y, it.s * 0.55 + Math.sin(now * 0.01) * 2); ctx.fill(); ctx.stroke();
-        A.emoji(ctx, POWERS[it.power].e, it.x, it.y + 2, it.s * 0.6);
+        A.icon(ctx, POWERS[it.power].e, it.x, it.y + 2, it.s * 0.6);
         ctx.restore();
       } else {
         A.drawPiece(ctx, it.x, it.y, it.s, it.color, it.rot + Math.sin(now * 0.003 + it.ph) * 0.15);
@@ -251,26 +256,26 @@
   }
 
   A.register({
-    id:'robo', drawPreview:drawPreview, title:'Robô Construtor', emoji:'🤖', color:'#2fbf8a', colorDark:'#229268',
-    tagline:'Pegue peças de código e monte o app!', gesture:'👆 Arrastar o robô',
-    concept:'CONSTRUÇÃO EM VERSÕES', hint:'drag', demoTarget:'🤖',
+    id:'robo', drawPreview:drawPreview, title:'Robô Construtor', icon:'bit', color:'#2fbf8a', colorDark:'#229268',
+    tagline:'Pegue peças de código e monte o app!', gesture:'Arrastar o robô', gestureIcon:'toque',
+    concept:'CONSTRUÇÃO EM VERSÕES', hint:'drag', demoTarget:'bit',
     howto:[
-      ['👆', 'Arraste o dedo para os lados para mover o robô'],
-      ['🧩', 'Pegue as peças de código para lançar versões do app 🚀'],
-      ['👾', 'Fuja dos bugs! Os poderes ☕ 🛡️ 🧪 ajudam']
+      ['toque', 'Arraste o dedo para os lados para mover o robô'],
+      ['peca', 'Pegue as peças de código para lançar versões do app'],
+      ['bug', 'Fuja dos bugs! Os poderes café, escudo e teste ajudam']
     ],
-    duration:40000, lives:3, failText:'Bugs demais no app! 👾',
+    duration:40000, lives:3, failText:'Bugs demais no app!',
     learn:'Software é construído peça por peça e lançado em versões (1.0, 2.0, 3.0...). Cada versão nova traz melhorias, e o time precisa manter os bugs longe!',
     real:'O código fica guardado no Git, e cada mudança passa por testes automáticos antes de virar uma versão nova. Isso se chama CI/CD. É assim que seus apps recebem atualizações quase toda semana.',
-    ranks:[[520, '🏆', 'Arquiteto(a) de Software'], [340, '🥇', 'Engenheiro(a) Sênior'], [170, '💻', 'Engenheiro(a) Júnior'], [0, '🌱', 'Aprendiz de Robótica']],
+    ranks:[[520, 'trofeu', 'Arquiteto(a) de Software'], [340, 'ouro', 'Engenheiro(a) Sênior'], [170, 'computador', 'Engenheiro(a) Júnior'], [0, 'broto', 'Aprendiz de Robótica']],
     setup:setup, start:start, stop:stop, destroy:destroy,
     resize:function(){ if(C) C.resize(); },
     drawIcon:drawIcon,
     stats:function(){
       return [
-        '🧩 ' + st.pieces + (st.pieces === 1 ? ' peça de código' : ' peças de código'),
-        '🚀 Chegou na versão ' + version + '.0',
-        '👾 ' + st.hits + (st.hits === 1 ? ' bug bateu' : ' bugs bateram')
+        ['peca', st.pieces + (st.pieces === 1 ? ' peça de código' : ' peças de código')],
+        ['foguete', 'Chegou na versão ' + version + '.0'],
+        ['bug', st.hits + (st.hits === 1 ? ' bug bateu' : ' bugs bateram')]
       ];
     }
   });

@@ -6,9 +6,10 @@
     { c:'#3fb4ff', n:'azul' }, { c:'#ff5f8f', n:'rosa' }, { c:'#4fd6a6', n:'verde' },
     { c:'#ffd23f', n:'amarelo' }, { c:'#8c73ff', n:'roxo' }
   ];
-  var PETS = ['🐱', '🐶', '🐸', '🦊', '🐼', '🐙'];
-  var BTNS = [{ i:'▶', n:'Jogar' }, { i:'♥', n:'Curtir' }, { i:'★', n:'Favoritar' }, { i:'♪', n:'Música' }];
-  var CLIENTS = ['👧', '👦', '🧑‍🚀', '👵', '🧑‍🍳', '🧙'];
+  var PETS = ['gato', 'cachorro', 'sapo', 'raposa', 'panda', 'polvo'];
+  var PET_NAMES = ['o gato', 'o cachorro', 'o sapo', 'a raposa', 'o panda', 'o polvo'];
+  var BTNS = [{ i:'play', n:'Jogar' }, { i:'coracao', n:'Curtir' }, { i:'estrela', n:'Favoritar' }, { i:'nota', n:'Música' }];
+  var CLIENTS = ['menina', 'menino', 'astronauta', 'vovo', 'chef', 'mago'];
   var PER_CLIENT = 6;
 
   var api, stage, el = {}, order, cur, curEl, decided = true, cardT = 0, nextT = 0, shownAt = 0, windowMs = 4000;
@@ -28,19 +29,19 @@
     stage.insertAdjacentHTML('beforeend',
       '<div class="es">' +
         '<div class="es-order">' +
-          '<div class="es-client" id="es-client">👧</div>' +
+          '<div class="es-client" id="es-client"></div>' +
           '<div class="es-bubble"><small>PEDIDO DO CLIENTE</small><div class="es-req" id="es-req"></div></div>' +
         '</div>' +
         '<div class="es-lane" id="es-lane">' +
-          '<div class="es-bin left">🔧<span>Consertar</span></div>' +
-          '<div class="es-bin right">🏪<span>Loja</span></div>' +
+          '<div class="es-bin left">' + A.iconHtml('chave') + '<span>Consertar</span></div>' +
+          '<div class="es-bin right">' + A.iconHtml('loja') + '<span>Loja</span></div>' +
           '<div class="es-belt" id="es-belt"></div>' +
           '<div class="es-slot" id="es-slot"></div>' +
         '</div>' +
         '<div class="es-timer"><div id="es-timefill"></div></div>' +
         '<div class="es-actions">' +
-          '<button type="button" id="es-fix">⬅ 🔧 Consertar</button>' +
-          '<button type="button" id="es-ok">Aprovar ✅ ➡</button>' +
+          '<button type="button" id="es-fix">' + A.iconHtml('seta-esquerda') + A.iconHtml('chave') + ' Consertar</button>' +
+          '<button type="button" id="es-ok">Aprovar ' + A.iconHtml('certo') + A.iconHtml('seta-direita') + '</button>' +
         '</div>' +
       '</div>');
     el.req = $('#es-req'); el.client = $('#es-client'); el.slot = $('#es-slot');
@@ -83,14 +84,14 @@
       btn:pick(BTNS.length, prev ? prev.btn : -1)
     };
     client = pick(CLIENTS.length, client);
-    el.client.textContent = CLIENTS[client];
+    el.client.innerHTML = A.iconHtml(CLIENTS[client]);
     el.client.classList.remove('pop'); void el.client.offsetWidth; el.client.classList.add('pop');
     var c = COLORS[order.color];
     el.req.innerHTML =
       '<span class="es-sw" style="--sw:' + c.c + '"><i></i>' + c.n + '</span>' +
-      '<span class="pet">' + PETS[order.pet] + '</span>' +
-      '<span class="bt">' + BTNS[order.btn].i + ' ' + BTNS[order.btn].n + '</span>';
-    if(announce){ api.banner('👋 Novo cliente!'); A.sfx.power(); }
+      '<span class="pet">' + A.iconHtml(PETS[order.pet]) + '</span>' +
+      '<span class="bt">' + A.iconHtml(BTNS[order.btn].i) + ' ' + BTNS[order.btn].n + '</span>';
+    if(announce){ api.banner('Novo cliente!'); A.sfx.power(); }
   }
 
   function makeApp(){
@@ -116,11 +117,11 @@
     card.innerHTML =
       '<div class="es-phone" style="background:' + tint(col, 0.78) + '">' +
         '<div class="es-bar"></div>' +
-        '<div class="es-pet">' + PETS[cur.pet] + '</div>' +
-        '<div class="es-btn">' + BTNS[cur.btn].i + ' ' + BTNS[cur.btn].n + '</div>' +
+        '<div class="es-pet">' + A.iconHtml(PETS[cur.pet]) + '</div>' +
+        '<div class="es-btn">' + A.iconHtml(BTNS[cur.btn].i) + ' ' + BTNS[cur.btn].n + '</div>' +
         (cur.bug ? '<div class="es-bug ' + (Math.random() < 0.5 ? 'l' : 'r') + '">' + A.monsterSVG('#ff8a3d') + '</div>' : '') +
       '</div>' +
-      '<div class="es-stamp ok">✅</div><div class="es-stamp fix">🔧</div>';
+      '<div class="es-stamp ok">' + A.iconHtml('certo') + '</div><div class="es-stamp fix">' + A.iconHtml('chave') + '</div>';
     el.slot.innerHTML = '';
     el.slot.appendChild(card);
     curEl = card;
@@ -173,9 +174,9 @@
 
   function explain(choice){
     if(choice === 'timeout') return '⏰ O app passou sem ser testado!';
-    if(choice === 'fix') return 'Esse app estava certinho! Era só aprovar ✅';
-    if(cur.bug) return 'Tinha um bug escondido no app! 👾';
-    if(cur.pet !== order.pet) return 'O cliente pediu ' + PETS[order.pet] + ', mas o app tinha ' + PETS[cur.pet] + '!';
+    if(choice === 'fix') return 'Esse app estava certinho! Era só aprovar.';
+    if(cur.bug) return 'Tinha um bug escondido no app!';
+    if(cur.pet !== order.pet) return 'O cliente pediu ' + PET_NAMES[order.pet] + ', mas o app tinha ' + PET_NAMES[cur.pet] + '!';
     if(cur.color !== order.color) return 'O cliente pediu app ' + COLORS[order.color].n + ', não ' + COLORS[cur.color].n + '!';
     return 'O botão devia ser "' + BTNS[order.btn].n + '"!';
   }
@@ -202,10 +203,10 @@
       if(cur.bug) st.bugs++;
       var fast = performance.now() - shownAt < windowMs * 0.45;
       var pts = 10 + (fast ? 5 : 0) + (streak >= 5 ? 5 : 0);
-      api.add(pts, cx, cy, '+' + pts + (fast ? ' ⚡' : ''));
-      if(cur.bug) api.toast('Bug encontrado! Muito bem, testador(a)! 👾', 'good');
+      api.add(pts, cx, cy, '+' + pts + (fast ? ' rápido!' : ''));
+      if(cur.bug) api.toast('Bug encontrado! Muito bem, testador(a)!', 'good');
       A.sfx.good(); A.vibrate(15);
-      if(streak === 5 || streak === 10 || streak === 15) api.banner('🔥 ' + streak + ' seguidos!');
+      if(streak === 5 || streak === 10 || streak === 15) api.banner(streak + ' seguidos!');
       nextT = setTimeout(nextCard, 420);
     } else {
       streak = 0; st.wrong++;
@@ -227,9 +228,9 @@
     ctx.fillStyle = '#d4efff'; ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = A.INK; ctx.stroke();
     ctx.fillStyle = '#3fb4ff'; A.rr(ctx, -w * 0.14, -h * 0.26, w * 0.28, h * 0.07, 3); ctx.fill();
-    A.emoji(ctx, '🐱', 0, 0, w * 0.22);
+    A.icon(ctx, 'gato', 0, 0, w * 0.22);
     ctx.restore();
-    A.emoji(ctx, '✅', w * 0.82, h * 0.2 + Math.sin(t * 0.006) * 3, w * 0.2);
+    A.icon(ctx, 'certo', w * 0.82, h * 0.2 + Math.sin(t * 0.006) * 3, w * 0.2);
   }
 
   function drawPreview(ctx, w, h, t){
@@ -241,7 +242,7 @@
     ctx.fillStyle = A.INK; ctx.fillRect(0, beltY - 3, w, 4); ctx.fillRect(0, beltY + beltH - 1, w, 4);
 
     var ph = h * 0.5, pw = ph * 0.6, span = w + pw * 2, speed = 0.05;
-    var apps = [['#3fb4ff', '🐱', true], ['#ff5f8f', '🐶', false], ['#4fd6a6', '🐱', true], ['#ffd23f', '🐸', false]];
+    var apps = [['#3fb4ff', 'gato', true], ['#ff5f8f', 'cachorro', false], ['#4fd6a6', 'gato', true], ['#ffd23f', 'sapo', false]];
     for(var i = 0; i < apps.length; i++){
       var px = ((t * speed + i * span / apps.length) % span) - pw;
       var py = beltY - ph * 0.5 - 2;
@@ -250,41 +251,41 @@
       A.rr(ctx, -pw / 2, -ph / 2, pw, ph, 10);
       ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = A.INK; ctx.stroke();
       A.rr(ctx, -pw * 0.36, -ph * 0.38, pw * 0.72, ph * 0.12, 4); ctx.fillStyle = apps[i][0]; ctx.fill();
-      A.emoji(ctx, apps[i][1], 0, ph * 0.04, pw * 0.48);
+      A.icon(ctx, apps[i][1], 0, ph * 0.04, pw * 0.48);
       A.rr(ctx, -pw * 0.3, ph * 0.26, pw * 0.6, ph * 0.11, 6); ctx.fillStyle = apps[i][0]; ctx.fill();
       ctx.restore();
       if(Math.abs(px - w / 2) < pw * 0.7){
-        A.emoji(ctx, apps[i][2] ? '✅' : '🔧', px, py - ph * 0.62 + Math.sin(t * 0.02) * 3, pw * 0.42);
+        A.icon(ctx, apps[i][2] ? 'certo' : 'chave', px, py - ph * 0.62 + Math.sin(t * 0.02) * 3, pw * 0.42);
       }
     }
     var bx = w * 0.3, bw = w * 0.4, by = h * 0.06, bh = h * 0.17, my = by + bh / 2;
     A.rr(ctx, bx, by, bw, bh, 12);
     ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = A.INK; ctx.stroke();
-    A.emoji(ctx, '👧', bx + bw * 0.18, my, bh * 0.7);
+    A.icon(ctx, 'menina', bx + bw * 0.18, my, bh * 0.7);
     ctx.fillStyle = '#3fb4ff'; A.circle(ctx, bx + bw * 0.48, my, bh * 0.22); ctx.fill(); ctx.stroke();
-    A.emoji(ctx, '🐱', bx + bw * 0.78, my, bh * 0.6);
+    A.icon(ctx, 'gato', bx + bw * 0.78, my, bh * 0.6);
   }
 
   A.register({
-    id:'esteira', drawPreview:drawPreview, title:'Esteira de Testes', emoji:'🏭', color:'#ff8a3d', colorDark:'#e0661c',
-    tagline:'Aprove só os apps que o cliente pediu!', gesture:'↔️ Arrastar pro lado',
-    concept:'REQUISITOS E TESTES', hint:'lr', demoTarget:'📱',
+    id:'esteira', drawPreview:drawPreview, title:'Esteira de Testes', icon:'esteira', color:'#ff8a3d', colorDark:'#e0661c',
+    tagline:'Aprove só os apps que o cliente pediu!', gesture:'Arrastar pro lado', gestureIcon:'toque',
+    concept:'REQUISITOS E TESTES', hint:'lr', demoTarget:'celular',
     howto:[
-      ['📋', 'Veja o pedido do cliente: cor, bichinho e botão'],
-      ['➡️', 'Arraste o app para a DIREITA se ele estiver certinho'],
-      ['⬅️', 'Arraste para a ESQUERDA se estiver diferente ou com bug 👾']
+      ['prancheta', 'Veja o pedido do cliente: cor, bichinho e botão'],
+      ['seta-direita', 'Arraste o app para a DIREITA se ele estiver certinho'],
+      ['seta-esquerda', 'Arraste para a ESQUERDA se estiver diferente ou com bug']
     ],
-    duration:40000, lives:3, failText:'O cliente ficou bravo! 😤',
+    duration:40000, lives:3, failText:'O cliente ficou bravo!',
     learn:'Antes de entregar um app, engenheiros de software conferem se ele faz exatamente o que o cliente pediu. O pedido se chama requisito, e conferir se chama testar!',
     real:'Times de QA (qualidade) escrevem testes de aceitação baseados nos requisitos do cliente. Muitos são testes automatizados, que rodam sozinhos toda vez que alguém muda o código.',
-    ranks:[[380, '🏆', 'Chefe de Qualidade'], [240, '🥇', 'Testador(a) Expert'], [120, '🔍', 'Testador(a)'], [0, '🌱', 'Estagiário(a) de Testes']],
+    ranks:[[380, 'trofeu', 'Chefe de Qualidade'], [240, 'ouro', 'Testador(a) Expert'], [120, 'lupa', 'Testador(a)'], [0, 'broto', 'Estagiário(a) de Testes']],
     setup:setup, start:start, stop:stop, destroy:destroy,
     drawIcon:drawIcon,
     stats:function(){
       return [
-        '✅ ' + st.right + (st.right === 1 ? ' acerto' : ' acertos'),
-        '❌ ' + st.wrong + (st.wrong === 1 ? ' erro' : ' erros'),
-        '👾 ' + st.bugs + (st.bugs === 1 ? ' bug escondido achado' : ' bugs escondidos achados')
+        ['certo', st.right + (st.right === 1 ? ' acerto' : ' acertos')],
+        ['errado', st.wrong + (st.wrong === 1 ? ' erro' : ' erros')],
+        ['bug', st.bugs + (st.bugs === 1 ? ' bug escondido achado' : ' bugs escondidos achados')]
       ];
     }
   });

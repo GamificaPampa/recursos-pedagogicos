@@ -98,7 +98,7 @@
     if(stroke.hits >= 3 && api.running){
       var bonus = stroke.hits * 5;
       api.add(bonus, stroke.x, stroke.y - 40, 'COMBO x' + stroke.hits + '! +' + bonus);
-      api.banner('🔥 Combo x' + stroke.hits + '!');
+      api.banner('Combo x' + stroke.hits + '!');
       A.sfx.gold();
     }
     if(stroke.hits > st.best) st.best = stroke.hits;
@@ -127,7 +127,7 @@
       o.dead = true; st.files++;
       split(o, ang);
       burst(o.x, o.y, '#ff5f8f', 16);
-      api.loseLife('Você cortou um arquivo importante! 💾');
+      api.loseLife('Você cortou um arquivo importante!');
       return;
     }
     if(o.type === 'mega' && o.hp > 1){
@@ -208,7 +208,7 @@
         ctx.setLineDash([]);
         ctx.fillStyle = 'rgba(255,255,255,0.75)'; A.circle(ctx, o.x, o.y, o.r * 0.95); ctx.fill();
         ctx.translate(o.x, o.y); ctx.rotate(o.rot * 0.3);
-        A.emoji(ctx, '💾', 0, 2, o.r * 1.25);
+        A.icon(ctx, 'disquete', 0, 2, o.r * 1.25);
         ctx.restore();
       } else {
         A.drawMonster(ctx, o.x, o.y, o.r, o.color, now, { rot:o.rot * 0.25, gold:o.type === 'gold', angry:o.type === 'mega' });
@@ -229,7 +229,7 @@
       if(h.side > 0) ctx.rect(-h.r * 2, 0, h.r * 4, h.r * 2); else ctx.rect(-h.r * 2, -h.r * 2, h.r * 4, h.r * 2);
       ctx.clip();
       ctx.rotate(-h.ang);
-      if(h.kind === 'file') A.emoji(ctx, '💾', 0, 2, h.r * 1.25);
+      if(h.kind === 'file') A.icon(ctx, 'disquete', 0, 2, h.r * 1.25);
       else A.drawMonster(ctx, 0, 0, h.r, h.color, now, { calm:true, dizzy:true });
       ctx.restore();
     });
@@ -307,30 +307,30 @@
     var fy = h * 0.55 + Math.sin(t * 0.003) * 8;
     ctx.setLineDash([6, 5]); ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 3;
     A.circle(ctx, w * 0.88, fy, r * 0.75); ctx.stroke(); ctx.setLineDash([]);
-    A.emoji(ctx, '💾', w * 0.88, fy + 2, r);
+    A.icon(ctx, 'disquete', w * 0.88, fy + 2, r);
   }
 
   A.register({
-    id:'ninja', drawPreview:drawPreview, title:'Ninja dos Glitches', emoji:'⚔️', color:'#8c73ff', colorDark:'#6a52e0',
-    tagline:'Corte os erros que voam pela tela!', gesture:'👉 Deslizar o dedo',
-    concept:'DEBUG', hint:'swipe', demoTarget:'👾',
+    id:'ninja', drawPreview:drawPreview, title:'Ninja dos Glitches', icon:'espada', color:'#8c73ff', colorDark:'#6a52e0',
+    tagline:'Corte os erros que voam pela tela!', gesture:'Deslizar o dedo', gestureIcon:'toque',
+    concept:'DEBUG', hint:'swipe', demoTarget:'glitch',
     howto:[
-      ['👉', 'Deslize o dedo pela tela para cortar os glitches 👾'],
-      ['💾', 'Não corte os disquetes: são arquivos importantes!'],
-      ['🔥', 'Corte 3 ou mais de uma vez só para fazer combo']
+      ['toque', 'Deslize o dedo pela tela para cortar os glitches'],
+      ['disquete', 'Não corte os disquetes: são arquivos importantes!'],
+      ['fogo', 'Corte 3 ou mais de uma vez só para fazer combo']
     ],
-    duration:30000, lives:3, failText:'Arquivos demais apagados! 💾',
+    duration:30000, lives:3, failText:'Arquivos demais apagados!',
     learn:'Debugar é encontrar e eliminar erros, tomando cuidado para não apagar o que já funciona. Quem programa faz isso todos os dias!',
     real:'Programadores usam depuradores (debuggers), breakpoints e logs para pausar o programa e achar a linha exata do erro. E antes de apagar código, conferem se nada importante vai quebrar junto.',
-    ranks:[[450, '🏆', 'Ninja Lendário(a) do Debug'], [280, '🥇', 'Mestre(a) do Debug'], [140, '⚔️', 'Caçador(a) de Glitches'], [0, '🌱', 'Aprendiz de Ninja']],
+    ranks:[[450, 'trofeu', 'Ninja Lendário(a) do Debug'], [280, 'ouro', 'Mestre(a) do Debug'], [140, 'espada', 'Caçador(a) de Glitches'], [0, 'broto', 'Aprendiz de Ninja']],
     setup:setup, start:start, stop:stop, destroy:destroy,
     resize:function(){ if(C) C.resize(); },
     drawIcon:drawIcon,
     stats:function(){
       return [
-        '👾 ' + st.cut + (st.cut === 1 ? ' glitch cortado' : ' glitches cortados'),
-        '🔥 Maior combo: ' + st.best,
-        '💾 ' + st.files + (st.files === 1 ? ' arquivo cortado' : ' arquivos cortados')
+        ['glitch', st.cut + (st.cut === 1 ? ' glitch cortado' : ' glitches cortados')],
+        ['fogo', 'Maior combo: ' + st.best],
+        ['disquete', st.files + (st.files === 1 ? ' arquivo cortado' : ' arquivos cortados')]
       ];
     }
   });

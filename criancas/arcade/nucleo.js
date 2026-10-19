@@ -10,9 +10,9 @@
   A.wait = wait;
 
   var MODES = {
-    facil:{ label:'🌱 Fácil', icon:'🌱', hint:'Mais devagar e com 5 vidas. Pontos ×0,6', speed:0.75, lives:2, mult:0.6 },
-    normal:{ label:'⚡ Normal', icon:'⚡', hint:'O jogo como ele é. Pontos ×1', speed:1, lives:0, mult:1 },
-    dificil:{ label:'🔥 Desafio', icon:'🔥', hint:'Rápido, 2 vidas e pontos ×1,5. Para quem manda bem!', speed:1.35, lives:-1, mult:1.5 }
+    facil:{ label:'Fácil', icon:'broto', hint:'Mais devagar e com 5 vidas. Pontos ×0,6', speed:0.75, lives:2, mult:0.6 },
+    normal:{ label:'Normal', icon:'raio', hint:'O jogo como ele é. Pontos ×1', speed:1, lives:0, mult:1 },
+    dificil:{ label:'Desafio', icon:'fogo', hint:'Rápido, 2 vidas e pontos ×1,5. Para quem manda bem!', speed:1.35, lives:-1, mult:1.5 }
   };
   var mode = 'normal';
   try{ if(MODES[localStorage.getItem('arcade-mode')]) mode = localStorage.getItem('arcade-mode'); }catch(e){}
@@ -51,8 +51,8 @@
   A.vibrate = function(p){ try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} };
   function setMuted(m){
     muted = m;
-    $('mute').textContent = m ? '🔇' : '🔊';
-    $('mute-menu').textContent = m ? '🔇 Som desligado' : '🔊 Som ligado';
+    $('mute').innerHTML = A.iconHtml(m ? 'mudo' : 'som');
+    A.iconText($('mute-menu'), m ? 'mudo' : 'som', m ? 'Som desligado' : 'Som ligado');
   }
 
   // ---------- desenhos ----------
@@ -69,10 +69,12 @@
   A.rr = rr;
   A.circle = circle;
 
-  A.emoji = function(ctx, ch, x, y, size){
-    ctx.font = Math.round(size) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(ch, x, y);
+  // Ícones desenhados do identidade-visual (js/icones.js) no lugar dos emojis: no canvas, no HTML e com texto ao lado
+  A.icon = function(ctx, name, x, y, size){ if(window.Icones) Icones.desenhar(ctx, name, x, y, size); };
+  A.iconHtml = function(name){ return window.Icones ? Icones.svg(name) : ''; };
+  A.iconText = function(el, name, text){
+    el.innerHTML = A.iconHtml(name);
+    el.appendChild(document.createTextNode(' ' + text));
   };
 
   A.drawMonster = function(ctx, x, y, r, color, t, o){
@@ -145,60 +147,59 @@
     ctx.restore();
   };
 
+  // O Bit oficial do GamificaPampa (identidade-visual/mascote), desenhado no canvas na mesma medida do robô antigo.
+  // mood 'happy' comemora de braços para cima, 'sad' faz a cara de ops e o normal pisca e olha para o dedo (look)
   A.drawRobot = function(ctx, x, y, s, mood, t, lean, look){
+    var k = s / 60;
     ctx.save();
     ctx.translate(x, y + Math.sin(t * 0.006) * s * 0.03);
     if(lean) ctx.rotate(lean);
-    var lw = Math.max(2, s * 0.055);
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = INK;
-
-    ctx.fillStyle = INK;
-    circle(ctx, -s * 0.24, s * 0.62, s * 0.11); ctx.fill();
-    circle(ctx, s * 0.24, s * 0.62, s * 0.11); ctx.fill();
-
-    var armY = mood === 'happy' ? -s * 0.18 : s * 0.38;
-    ctx.lineWidth = s * 0.09;
-    ctx.beginPath(); ctx.moveTo(-s * 0.34, s * 0.26); ctx.lineTo(-s * 0.6, armY);
-    ctx.moveTo(s * 0.34, s * 0.26); ctx.lineTo(s * 0.6, armY); ctx.stroke();
-    ctx.fillStyle = '#8c73ff'; ctx.lineWidth = lw;
-    circle(ctx, -s * 0.6, armY, s * 0.09); ctx.fill(); ctx.stroke();
-    circle(ctx, s * 0.6, armY, s * 0.09); ctx.fill(); ctx.stroke();
-
-    rr(ctx, -s * 0.38, s * 0.1, s * 0.76, s * 0.5, s * 0.14);
-    ctx.fillStyle = '#ffd23f'; ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#ff5f8f';
-    circle(ctx, 0, s * 0.34, s * 0.08); ctx.fill();
-
-    ctx.beginPath(); ctx.moveTo(0, -s * 0.5); ctx.lineTo(0, -s * 0.72); ctx.stroke();
-    ctx.fillStyle = (Math.floor(t / 400) % 2) ? '#ffd23f' : '#ff8a3d';
-    circle(ctx, 0, -s * 0.77, s * 0.08); ctx.fill(); ctx.stroke();
-
-    rr(ctx, -s * 0.5, -s * 0.52, s, s * 0.66, s * 0.2);
-    ctx.fillStyle = '#8c73ff'; ctx.fill(); ctx.stroke();
-    rr(ctx, -s * 0.38, -s * 0.42, s * 0.76, s * 0.46, s * 0.13);
-    ctx.fillStyle = INK; ctx.fill();
-
-    if(look) ctx.translate(look.x * s * 0.07, look.y * s * 0.05);
-    var eye = mood === 'sad' ? '#ff5f8f' : '#4fd6a6';
-    ctx.fillStyle = eye; ctx.strokeStyle = eye; ctx.lineWidth = s * 0.065;
+    ctx.scale(k, k);
+    ctx.translate(-50, -47);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 4;
     if(mood === 'happy'){
-      ctx.beginPath(); ctx.arc(-s * 0.16, -s * 0.17, s * 0.08, Math.PI, 0); ctx.stroke();
-      ctx.beginPath(); ctx.arc(s * 0.16, -s * 0.17, s * 0.08, Math.PI, 0); ctx.stroke();
-    } else if(mood === 'sad'){
-      ctx.beginPath();
-      ctx.moveTo(-s * 0.24, -s * 0.28); ctx.lineTo(-s * 0.1, -s * 0.2); ctx.lineTo(-s * 0.24, -s * 0.12);
-      ctx.moveTo(s * 0.24, -s * 0.28); ctx.lineTo(s * 0.1, -s * 0.2); ctx.lineTo(s * 0.24, -s * 0.12);
-      ctx.stroke();
-    } else {
-      var blink = (t % 3200) < 140;
-      var eh = blink ? s * 0.03 : s * 0.15;
-      rr(ctx, -s * 0.22, -s * 0.2 - eh / 2, s * 0.12, eh, s * 0.04); ctx.fill();
-      rr(ctx, s * 0.1, -s * 0.2 - eh / 2, s * 0.12, eh, s * 0.04); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(31, 80); ctx.lineTo(18, 70); ctx.lineTo(14, 59); ctx.moveTo(69, 80); ctx.lineTo(82, 70); ctx.lineTo(86, 59); ctx.stroke();
+      ctx.fillStyle = '#8cc4ff'; ctx.lineWidth = 3;
+      circle(ctx, 14, 56, 5); ctx.fill(); ctx.stroke();
+      circle(ctx, 86, 56, 5); ctx.fill(); ctx.stroke();
+      ctx.lineWidth = 4;
     }
-    ctx.beginPath();
-    if(mood === 'sad') ctx.arc(0, -s * 0.02, s * 0.08, Math.PI * 1.15, Math.PI * 1.85);
-    else ctx.arc(0, -s * 0.1, s * 0.08, Math.PI * 0.15, Math.PI * 0.85);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(50, 8); ctx.lineTo(50, 22); ctx.stroke();
+    ctx.fillStyle = '#ff4d4d'; ctx.lineWidth = 2;
+    circle(ctx, 50, 8, 6); ctx.fill(); ctx.stroke();
+    ctx.lineWidth = 4;
+    rr(ctx, 30, 72, 40, 20, 6); ctx.fillStyle = '#8cc4ff'; ctx.fill(); ctx.stroke();
+    rr(ctx, 18, 22, 64, 48, 14); ctx.fillStyle = '#4da3ff'; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ff8fb0';
+    circle(ctx, 27, 57, 4); ctx.fill();
+    circle(ctx, 73, 57, 4); ctx.fill();
+    if(mood === 'happy'){
+      ctx.beginPath(); ctx.moveTo(31, 46); ctx.quadraticCurveTo(38, 38, 45, 46); ctx.moveTo(55, 46); ctx.quadraticCurveTo(62, 38, 69, 46); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(38, 57); ctx.lineTo(62, 57); ctx.quadraticCurveTo(61, 70, 50, 70); ctx.quadraticCurveTo(39, 70, 38, 57); ctx.closePath();
+      ctx.fillStyle = INK; ctx.fill();
+    } else {
+      if(mood !== 'sad' && (t % 3200) < 140){
+        ctx.beginPath(); ctx.moveTo(30, 44); ctx.lineTo(46, 44); ctx.moveTo(54, 44); ctx.lineTo(70, 44); ctx.stroke();
+      } else {
+        ctx.fillStyle = '#fff';
+        circle(ctx, 38, 44, 9); ctx.fill();
+        circle(ctx, 62, 44, 9); ctx.fill();
+        var lx = mood === 'sad' ? -1 : look ? look.x * 3 : 2, ly = mood === 'sad' ? 3 : look ? look.y * 3 : 1;
+        ctx.fillStyle = INK;
+        circle(ctx, 38 + lx, 44 + ly, 4); ctx.fill();
+        circle(ctx, 62 + lx, 44 + ly, 4); ctx.fill();
+      }
+      ctx.beginPath();
+      if(mood === 'sad'){
+        ctx.lineWidth = 3.5;
+        ctx.moveTo(30, 33); ctx.lineTo(43, 30); ctx.moveTo(70, 33); ctx.lineTo(57, 30); ctx.stroke();
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(40, 63); ctx.quadraticCurveTo(45, 58, 50, 63); ctx.quadraticCurveTo(55, 68, 60, 63);
+      } else {
+        ctx.moveTo(40, 60); ctx.quadraticCurveTo(50, 67, 60, 60);
+      }
+      ctx.stroke();
+    }
     ctx.restore();
   };
 
@@ -277,7 +278,7 @@
   }
   function renderHearts(){
     var h = '';
-    for(var i = 0; i < run.maxLives; i++) h += '<span class="' + (i < run.lives ? '' : 'lost') + '">❤️</span>';
+    for(var i = 0; i < run.maxLives; i++) h += '<span class="' + (i < run.lives ? '' : 'lost') + '">' + A.iconHtml('coracao') + '</span>';
     $('hearts').innerHTML = h;
   }
 
@@ -348,18 +349,18 @@
     var card = $('ht-card');
     card.style.setProperty('--c', current.color);
     card.style.setProperty('--cd', current.colorDark);
-    $('ht-title').textContent = current.emoji + ' ' + current.title;
+    A.iconText($('ht-title'), current.icon, current.title);
     $('ht-concept').textContent = current.concept;
     $('ht-steps').innerHTML = '';
     current.howto.forEach(function(s){
       var li = document.createElement('li');
-      var a = document.createElement('span'); a.textContent = s[0];
+      var a = document.createElement('span'); a.innerHTML = A.iconHtml(s[0]);
       var b = document.createElement('span'); b.textContent = s[1];
       li.appendChild(a); li.appendChild(b);
       $('ht-steps').appendChild(li);
     });
     $('ht-demo').className = 'ht-demo hint-' + current.hint;
-    $('ht-target').textContent = current.demoTarget;
+    $('ht-target').innerHTML = A.iconHtml(current.demoTarget);
     setupPractice(current.hint);
     renderModes();
     $('howto').hidden = false;
@@ -375,7 +376,7 @@
       b.className = 'mode' + (k === mode ? ' on' : '') + ' mode-' + k;
       b.setAttribute('role', 'radio');
       b.setAttribute('aria-checked', k === mode ? 'true' : 'false');
-      b.textContent = MODES[k].label;
+      A.iconText(b, MODES[k].icon, MODES[k].label);
       b.addEventListener('click', function(){
         mode = k;
         try{ localStorage.setItem('arcade-mode', k); }catch(e){}
@@ -389,7 +390,7 @@
 
   // ---------- treino no "como jogar" ----------
   var pr = { kind:'', down:false, x0:0, last:null, moved:0, done:false };
-  var PRACTICE_OK = { swipe:'✂️ Cortou! Você é rápido(a)!', drag:'🤖 Isso! O robô segue seu dedo!' };
+  var PRACTICE_OK = { swipe:'Cortou! Você é rápido(a)!', drag:'Isso! O robô segue seu dedo!' };
 
   function setupPractice(kind){
     pr = { kind:kind, down:false, x0:0, last:null, moved:0, done:false };
@@ -397,7 +398,7 @@
     tgt.className = 'ht-target';
     tgt.style.transition = ''; tgt.style.transform = ''; tgt.style.left = '50%';
     $('ht-demo').classList.remove('touched', 'success');
-    $('ht-say').textContent = 'Experimente aqui! 👆';
+    $('ht-say').textContent = 'Experimente aqui!';
     $('ht-go').classList.remove('ready');
   }
 
@@ -458,7 +459,7 @@
         var dir = d > 0 ? 1 : -1;
         tgt.style.transition = 'transform .3s ease-in';
         tgt.style.transform = 'translate(calc(-50% + ' + (dir * 220) + 'px), -50%) rotate(' + (dir * 25) + 'deg)';
-        practiceSuccess(dir > 0 ? '✅ Aprovado! Assim mesmo!' : '🔧 Mandou consertar! Isso!');
+        practiceSuccess(dir > 0 ? 'Aprovado! Assim mesmo!' : 'Mandou consertar! Isso!');
         setTimeout(function(){ tgt.style.transition = 'none'; tgt.style.transform = ''; void tgt.offsetWidth; tgt.style.transition = ''; }, 420);
       } else {
         tgt.style.transform = '';
@@ -479,7 +480,7 @@
     stopMenuLoop();
     document.body.style.setProperty('--theme', current.color);
     document.body.style.setProperty('--theme-d', current.colorDark);
-    $('hud-title').textContent = current.emoji + ' ' + current.title;
+    A.iconText($('hud-title'), current.icon, current.title);
     var stage = $('stage');
     stage.innerHTML = '';
     stage.className = 'stage stage-' + current.id;
@@ -530,7 +531,7 @@
     run.running = false;
     cancelAnimationFrame(run.raf);
     current.stop();
-    banner(reason === 'lives' ? current.failText : 'Tempo! ⏱️');
+    banner(reason === 'lives' ? current.failText : 'Tempo!');
     var mine = run;
     await wait(1300);
     if(run !== mine) return;
@@ -561,7 +562,7 @@
     return score >= r[0][0] ? 3 : score >= r[1][0] ? 2 : score >= r[2][0] ? 1 : 0;
   }
   function totalStars(){ return A.order.reduce(function(sum, id){ return sum + readStars(id); }, 0); }
-  function devTitle(n){ return n >= 9 ? 'Dev Lendário(a) 🏆' : n >= 6 ? 'Dev Sênior 🚀' : n >= 3 ? 'Dev Júnior 💻' : 'Dev Iniciante 🌱'; }
+  function devTitle(n){ return n >= 9 ? ['trofeu', 'Dev Lendário(a)'] : n >= 6 ? ['foguete', 'Dev Sênior'] : n >= 3 ? ['computador', 'Dev Júnior'] : ['broto', 'Dev Iniciante']; }
 
   function showEnd(reason){
     destroyCurrent();
@@ -574,9 +575,9 @@
     document.body.style.setProperty('--theme', g.color);
     document.body.style.setProperty('--theme-d', g.colorDark);
     $('end-card').style.setProperty('--c', g.color);
-    $('end-head').textContent = reason === 'lives' ? g.failText : 'Tempo esgotado! ⏱️';
-    $('end-game').textContent = g.emoji + ' ' + g.title + ' · ' + MODES[run.mode].label;
-    $('medal').textContent = rank[1];
+    $('end-head').textContent = reason === 'lives' ? g.failText : 'Tempo esgotado!';
+    A.iconText($('end-game'), g.icon, g.title + ' · ' + MODES[run.mode].label);
+    $('medal').innerHTML = A.iconHtml(rank[1]);
     $('final').textContent = '0 pts';
     setTimeout(function(){ countUp($('final'), score, 1100, ' pts'); }, 350);
     $('rank').textContent = rank[2];
@@ -588,12 +589,13 @@
       })(starEls[i], i < stars, 600 + i * 380);
     }
     $('new-star').hidden = !(stars > prevStars);
-    $('new-star').textContent = '✨ Nova conquista! ' + stars + (stars === 1 ? ' estrela' : ' estrelas') + ' neste jogo';
+    A.iconText($('new-star'), 'estrela', 'Nova conquista! ' + stars + (stars === 1 ? ' estrela' : ' estrelas') + ' neste jogo');
     $('stats').innerHTML = '';
     g.stats().forEach(function(s){
-      var sp = document.createElement('span'); sp.textContent = s; $('stats').appendChild(sp);
+      var sp = document.createElement('span'); A.iconText(sp, s[0], s[1]); $('stats').appendChild(sp);
     });
-    $('record').textContent = isRecord ? '🎉 Novo recorde neste celular!' : 'Recorde neste celular: ' + best + ' pts';
+    if(isRecord) A.iconText($('record'), 'festa', 'Novo recorde neste celular!');
+    else $('record').textContent = 'Recorde neste celular: ' + best + ' pts';
     $('learn-title').textContent = 'Você praticou: ' + g.concept;
     $('learn').textContent = g.learn;
     $('real').textContent = g.real || '';
@@ -621,7 +623,7 @@
   function resetSendCard(){
     var card = $('send-card');
     card.classList.remove('done');
-    $('send-title').textContent = '🏆 Coloque seu nome no placar!';
+    A.iconText($('send-title'), 'trofeu', 'Coloque seu nome no placar!');
     $('send-form').hidden = false;
     $('send-btn').disabled = false;
     $('send-btn').textContent = 'Enviar';
@@ -653,7 +655,7 @@
     if(!lastRound || sentKey) return;
     var nick = cleanNick($('nick').value), note = $('send-note');
     if(nick.length < 2){ note.textContent = 'Escreva um apelido com pelo menos 2 letras.'; $('nick').focus(); return; }
-    if(isRude(nick)){ note.textContent = 'Opa! Escolha outro apelido, por favor 🙂'; $('nick').value = ''; $('nick').focus(); return; }
+    if(isRude(nick)){ note.textContent = 'Opa! Escolha outro apelido, por favor.'; $('nick').value = ''; $('nick').focus(); return; }
     var btn = $('send-btn');
     btn.disabled = true; btn.textContent = '...';
     var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -664,8 +666,8 @@
       try{ localStorage.setItem('arcade-nick', nick); }catch(e2){}
       $('send-card').classList.add('done');
       $('send-form').hidden = true;
-      $('send-title').textContent = '✅ ' + nick + ', você está no placar!';
-      note.textContent = 'Olhe o telão do estande 👀';
+      A.iconText($('send-title'), 'certo', nick + ', você está no placar!');
+      note.textContent = 'Olhe o telão da sala.';
       A.sfx.gold();
       var p = null;
       for(var tries = 0; tries < 5 && !p; tries++){
@@ -673,8 +675,8 @@
         try{ p = await myPosition(key, lastRound.g); }catch(e3){}
       }
       if(p){
-        $('send-title').textContent = (p.pos <= 3 ? ['🥇', '🥈', '🥉'][p.pos - 1] + ' ' : '✅ ') + nick + ', você ficou em ' + p.pos + 'º lugar!';
-        note.textContent = p.total + (p.total === 1 ? ' jogada' : ' jogadas') + ' neste jogo hoje. Olhe o telão do estande 👀';
+        A.iconText($('send-title'), p.pos <= 3 ? ['ouro', 'prata', 'bronze'][p.pos - 1] : 'certo', nick + ', você ficou em ' + p.pos + 'º lugar!');
+        note.textContent = p.total + (p.total === 1 ? ' jogada' : ' jogadas') + ' neste jogo hoje. Olhe o telão da sala.';
       }
     }catch(err){
       btn.disabled = false; btn.textContent = 'Enviar';
@@ -686,18 +688,18 @@
   var menuRaf = 0, menuArts = [], activeCard = 0;
   var pointer = { x:-1, y:-1 }, mascotJump = -9999, lineI = 0, bubbleT = 0;
   var LINES = [
-    'Oi! Eu sou o Bit 🤖 Escolha um jogo!',
-    'Deslize os cartões para ver os 3 jogos 👉',
-    'Sabia? O primeiro bug famoso foi uma mariposa de verdade, em 1947! 🦋',
-    'Engenheiros de software criam apps, jogos e sites! 💻',
-    'Cada jogo dá até 3 ⭐. Dá para juntar 9!',
-    'Testar é tão importante quanto programar! 🧪',
-    'Acha fácil? Tente o modo 🔥 Desafio: os pontos valem ×1,5!',
-    'O Git guarda todo o histórico do código, como um "desfazer" infinito ⏪',
-    'Versão 2.1.3? O 1º número muda nas mudanças grandes, o último nas correções de bug 🔢',
-    'WhatsApp, jogos, apps de banco: tudo isso é feito por times de engenharia de software 📱',
-    'Bons programadores escrevem testes que rodam sozinhos a cada mudança no código 🤖',
-    'Psiu... toque em mim de novo! 😄'
+    'Oi! Eu sou o Bit. Escolha um jogo!',
+    'Deslize os cartões para ver os 3 jogos.',
+    'Sabia? O primeiro bug famoso foi uma mariposa de verdade, em 1947!',
+    'Engenheiros de software criam apps, jogos e sites!',
+    'Cada jogo dá até 3 estrelas. Dá para juntar 9!',
+    'Testar é tão importante quanto programar!',
+    'Acha fácil? Tente o modo Desafio: os pontos valem ×1,5!',
+    'O Git guarda todo o histórico do código, como um "desfazer" infinito.',
+    'Versão 2.1.3? O 1º número muda nas mudanças grandes, o último nas correções de bug.',
+    'WhatsApp, jogos, apps de banco: tudo isso é feito por times de engenharia de software.',
+    'Bons programadores escrevem testes que rodam sozinhos a cada mudança no código.',
+    'Psiu... toque em mim de novo!'
   ];
 
   function buildMenu(){
@@ -711,15 +713,15 @@
       card.style.setProperty('--c', g.color);
       card.style.setProperty('--cd', g.colorDark);
       card.innerHTML =
-        '<div class="g-art"><canvas></canvas><span class="g-badge">' + g.emoji + '</span><span class="g-stars" data-id="' + id + '"></span></div>' +
+        '<div class="g-art"><canvas></canvas><span class="g-badge">' + A.iconHtml(g.icon) + '</span><span class="g-stars" data-id="' + id + '"></span></div>' +
         '<div class="g-body">' +
           '<h3></h3><p></p>' +
           '<div class="g-meta"><span class="chip"></span><span class="chip best" data-id="' + id + '"></span></div>' +
-          '<button type="button" class="g-play">▶ Jogar</button>' +
+          '<button type="button" class="g-play">' + A.iconHtml('play') + ' Jogar</button>' +
         '</div>';
       card.querySelector('h3').textContent = g.title;
       card.querySelector('p').textContent = g.tagline;
-      card.querySelector('.chip').textContent = g.gesture;
+      A.iconText(card.querySelector('.chip'), g.gestureIcon, g.gesture);
       card.addEventListener('click', function(){
         if(idx !== activeCard && wrap.scrollWidth > wrap.clientWidth + 4){ scrollToCard(idx); return; }
         openHowto(id);
@@ -768,16 +770,16 @@
 
   function renderProgress(){
     var n = totalStars();
-    $('p-stars').textContent = '⭐ ' + n + '/9';
+    A.iconText($('p-stars'), 'estrela', n + '/9');
     $('p-fill').style.width = (n / 9 * 100) + '%';
-    $('p-title').textContent = devTitle(n);
+    A.iconText($('p-title'), devTitle(n)[0], devTitle(n)[1]);
     document.querySelectorAll('.chip.best').forEach(function(c){
       var b = readBest(c.dataset.id);
-      c.textContent = b ? '🏅 ' + b + ' pts' : '✨ Novo!';
+      A.iconText(c, b ? 'trofeu' : 'estrela', b ? b + ' pts' : 'Novo!');
     });
     document.querySelectorAll('.g-stars').forEach(function(s){
       var n = readStars(s.dataset.id);
-      s.innerHTML = '<b>' + '★★★'.slice(0, n) + '</b><i>' + '★★★'.slice(0, 3 - n) + '</i>';
+      s.innerHTML = [0, 1, 2].map(function(i){ return A.iconHtml('estrela').replace('class="icone"', 'class="icone' + (i < n ? '' : ' off') + '"'); }).join('');
       s.setAttribute('role', 'img');
       s.setAttribute('aria-label', n + ' de 3 estrelas');
     });
@@ -855,6 +857,9 @@
   // ---------- início ----------
   A.boot = function(){
     cv = $('confetti'); cx = cv.getContext('2d');
+    // Os ícones fixos da página (data-icone) entram antes do texto de cada elemento
+    document.querySelectorAll('[data-icone]').forEach(function(el){ el.insertAdjacentHTML('afterbegin', A.iconHtml(el.dataset.icone) + (el.textContent.trim() ? ' ' : '')); });
+    setMuted(muted);
     buildMenu();
     bindPractice();
     $('mascot').addEventListener('click', pokeMascot);
