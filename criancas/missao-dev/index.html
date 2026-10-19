@@ -3,185 +3,108 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5fbcff">
 <title>Missão Dev</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
 <style>
-  /* layout: full-screen single-column "arcade console" — one screen visible at a time, header bar + stage + footer action */
-  :root{
-    color-scheme: dark;
-    --bg: #0a0e16;
-    --surface: #141b28;
-    --surface-2: #1c2536;
-    --fg: #e9eef7;
-    --muted: #7f8ba3;
-    --accent: #33e2a0;
-    --accent-dim: #1d8f66;
-    --warn: #ffb15e;
-    --bad: #ff6b6b;
-    --font-display: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
-    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{
-    background:
-      radial-gradient(circle at 15% 0%, rgba(51,226,160,0.08), transparent 45%),
-      radial-gradient(circle at 85% 100%, rgba(255,177,94,0.06), transparent 45%),
-      var(--bg);
-    color:var(--fg);
-    font-family:var(--font-body);
-    min-height:100%;
-    display:flex;
-    flex-direction:column;
-  }
-  h1,h2,h3,.mono{font-family:var(--font-display);}
-  h1,h2{text-wrap:balance; margin:0;}
-  .wrap{
-    max-width:480px;
-    width:100%;
-    margin:0 auto;
-    padding-inline:20px;
-    padding-block:16px;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-height:100%;
-  }
+  /* layout: uma tela por vez no céu do estilo de jogo: barra de progresso, cartão do desafio e botão de ação embaixo */
   [hidden]{display:none!important;}
+  body{-webkit-tap-highlight-color:transparent;}
+  .wrap{max-width:520px; width:100%; margin:0 auto; padding:16px 16px 24px; min-height:100vh; min-height:100svh; display:flex; flex-direction:column;}
+  .icone{display:inline-block; width:1.15em; height:1.15em; vertical-align:-.22em; flex:none;}
 
-  /* top bar */
-  #topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:12px; margin-bottom:18px;
-  }
-  #dots{display:flex; gap:6px;}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--surface-2); border:1px solid rgba(255,255,255,0.08); transition:background .2s;}
-  .dot.done{background:var(--accent);}
-  .dot.active{background:var(--warn);}
-  #score{
-    font-family:var(--font-display); font-weight:700; font-size:.85rem;
-    color:var(--accent); background:var(--surface); border:1px solid rgba(51,226,160,0.25);
-    padding:6px 10px; border-radius:8px; letter-spacing:.02em;
-  }
+  /* barra de cima: uma bolinha por desafio e os pontos */
+  #topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
+  #dots{display:flex; gap:8px;}
+  .dot{width:18px; height:18px; border-radius:50%; background:var(--white); border:3px solid var(--ink); transition:background .2s, transform .2s var(--bounce);}
+  .dot.done{background:var(--mint);}
+  .dot.active{background:var(--yellow); transform:scale(1.3);}
+  #score{font-weight:700; font-size:18px; background:var(--white); border:4px solid var(--ink); border-radius:999px; padding:2px 16px; box-shadow:0 5px 0 var(--ink); font-variant-numeric:tabular-nums;}
 
   .screen{flex:1; display:flex; flex-direction:column;}
-  .eyebrow{
-    font-family:var(--font-display); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--muted); margin-bottom:8px;
-  }
-  .title{font-size:1.5rem; font-weight:800; line-height:1.25; margin-bottom:10px;}
-  .lede{color:var(--muted); font-size:.98rem; line-height:1.55; margin-bottom:20px;}
+  .eyebrow{display:inline-block; align-self:flex-start; background:var(--yellow); border:3px solid var(--ink); border-radius:999px; padding:1px 12px; font-size:14px; font-weight:700; margin-bottom:10px;}
+  .card{padding:20px; border-width:5px; box-shadow:0 9px 0 var(--ink);}
+  .title{font-size:clamp(25px, 7vw, 32px); margin-bottom:8px;}
+  .lede{color:var(--soft); font-size:17px; line-height:1.45; margin:0 0 16px;}
+  .btn{width:100%; min-height:58px; font-size:20px;}
+  .btn:disabled{opacity:.45; cursor:default; --drop-y:7px; transform:none;}
+  .btn:disabled::after{display:none;}
+  @media (max-width:400px){ .card{padding:16px;} }
 
-  .card{
-    background:var(--surface);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:16px;
-    padding:18px;
-  }
+  /* início */
+  #start-stage{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:14px;}
+  #start-stage .eyebrow{align-self:center; margin:0;}
+  .hero{width:140px; height:auto;}
+  .start-title{font-size:clamp(46px, 13vw, 64px); line-height:1;}
+  .pill-row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  .pill .icone{width:22px; height:22px;}
 
-  button{
-    font-family:var(--font-body); font-weight:600; font-size:1rem;
-    cursor:pointer; border:none; border-radius:12px;
-    -webkit-user-select:none; user-select:none;
-  }
-  .btn-primary{
-    background:var(--accent); color:#06231a;
-    padding:14px 22px; width:100%;
-    box-shadow:0 8px 24px -8px rgba(51,226,160,0.5);
-  }
-  .btn-primary:active{transform:scale(0.98);}
-  .btn-primary:disabled{opacity:.35; box-shadow:none;}
-  .btn-ghost{
-    background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.12);
-    padding:10px 16px;
-  }
-
-  #start-stage{flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center; gap:18px;}
-  .badge-emoji{font-size:3.2rem; line-height:1;}
-  .pill-row{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:4px;}
-  .pill{
-    font-family:var(--font-display); font-size:.68rem; letter-spacing:.04em;
-    color:var(--muted); background:var(--surface); border:1px solid rgba(255,255,255,0.08);
-    padding:5px 10px; border-radius:999px;
-  }
-
-  /* game 1: sequence builder */
-  #seq-slots{display:flex; flex-direction:column; gap:8px; margin-bottom:16px; min-height:180px;}
-  .slot{
-    border:1.5px dashed rgba(255,255,255,0.14); border-radius:10px;
-    padding:11px 12px; font-size:.88rem; color:var(--muted);
-    display:flex; align-items:center; gap:8px; min-height:44px;
-  }
-  .slot.filled{border-style:solid; border-color:rgba(51,226,160,0.3); background:var(--surface); color:var(--fg);}
-  .slot-num{font-family:var(--font-display); color:var(--accent); font-weight:700; font-size:.8rem;}
-  #seq-pool{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
-  .chip{
-    background:var(--surface-2); border:1px solid rgba(255,255,255,0.08);
-    border-radius:10px; padding:10px 12px; font-size:.86rem;
-    transition:opacity .15s, transform .15s;
-  }
-  .chip:active{transform:scale(0.96);}
+  /* desafio 1: montar a sequência */
+  #seq-slots{display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
+  .slot{border:3px dashed rgb(47 42 74 / .35); border-radius:14px; padding:8px 12px; font-size:16px; color:var(--soft); display:flex; align-items:center; gap:10px; min-height:50px;}
+  .slot.filled{border-style:solid; border-color:var(--ink); background:#e3fbf1; color:var(--ink); font-weight:600; animation:surgir .3s var(--bounce);}
+  .slot-num{flex:none; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:var(--yellow); border:3px solid var(--ink); font-weight:700; font-size:15px; color:var(--ink);}
+  #seq-pool{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px;}
+  .chip{font:600 16px/1.25 var(--font); color:var(--ink); background:var(--white); border:3px solid var(--ink); border-radius:14px; padding:10px 14px; box-shadow:0 5px 0 var(--ink); cursor:pointer; text-align:left; transition:transform .1s, box-shadow .1s, opacity .15s;}
+  .chip:active{transform:translateY(4px); box-shadow:0 1px 0 var(--ink);}
   .chip.used{opacity:0; pointer-events:none;}
-  .feedback{
-    font-family:var(--font-display); font-size:.82rem; font-weight:700;
-    padding:10px 12px; border-radius:10px; margin-bottom:14px; display:none;
-  }
-  .feedback.show{display:block;}
-  .feedback.ok{background:rgba(51,226,160,0.12); color:var(--accent);}
-  .feedback.bad{background:rgba(255,107,107,0.12); color:var(--bad);}
-  /* Bit appears in the feedback box: happy when it is right, worried when it is not */
-  .feedback.ok, .feedback.bad{padding-left:54px; background-repeat:no-repeat; background-position:10px 50%; background-size:36px;}
-  .feedback.ok{background-image:url("/identidade-visual/mascote/bit-feliz.svg");}
-  .feedback.bad{background-image:url("/identidade-visual/mascote/bit-ops.svg");}
 
-  /* game 2: bug hunt */
-  .code-block{
-    background:#05070d; border-radius:12px; padding:14px; margin-bottom:16px;
-    border:1px solid rgba(255,255,255,0.06);
-  }
-  .code-line{
-    font-family:var(--font-display); font-size:.82rem; line-height:1.9;
-    padding:6px 10px; border-radius:8px; display:flex; gap:10px;
-    border:1px solid transparent;
-  }
-  .code-line:active{background:rgba(255,255,255,0.05);}
-  .code-line .ln{color:#3d4a63; min-width:14px;}
-  .code-line.wrong-pick{border-color:rgba(255,107,107,0.4); background:rgba(255,107,107,0.08);}
-  .code-line.right-pick{border-color:rgba(51,226,160,0.4); background:rgba(51,226,160,0.08);}
+  /* o Bit aparece na caixa de resposta: feliz quando acerta, preocupado quando erra */
+  .feedback{display:none; font-weight:600; font-size:16px; line-height:1.4; padding:10px 12px 10px 62px; min-height:62px; border:3px solid var(--ink); border-radius:16px; margin-bottom:14px; background-repeat:no-repeat; background-position:10px 50%; background-size:42px;}
+  .feedback.show{display:block; animation:surgir .35s var(--bounce);}
+  .feedback.ok{background-color:#e3fbf1; background-image:url("/identidade-visual/mascote/bit-feliz.svg");}
+  .feedback.bad{background-color:#ffe3ec; background-image:url("/identidade-visual/mascote/bit-ops.svg");}
 
-  /* game 3: loop reflex */
+  /* desafios 2 e 3: achar o bug */
+  .code-block{background:var(--ink); border-radius:16px; padding:6px; box-shadow:0 6px 0 rgb(47 42 74 / .3);}
+  .code-line{font-family:ui-monospace, Consolas, 'Courier New', monospace; font-size:14px; line-height:1.5; color:#fff; padding:7px 8px; border-radius:10px; display:flex; gap:10px; border:3px solid transparent; cursor:pointer; white-space:pre-wrap;}
+  .code-line:hover{background:rgb(255 255 255 / .08);}
+  .code-line .ln{color:var(--yellow); min-width:14px; font-weight:700;}
+  .code-line.wrong-pick{border-color:var(--pink); background:rgb(255 95 143 / .22); animation:tremer .45s ease-in-out;}
+  .code-line.right-pick{border-color:var(--mint); background:rgb(79 214 166 / .25);}
+
+  /* desafios 4 e 5: o laço */
   #loop-stage{text-align:center;}
-  #loop-target{font-family:var(--font-display); font-size:3.4rem; font-weight:800; color:var(--accent); margin:6px 0 2px;}
-  #loop-count{font-family:var(--font-display); font-size:1rem; color:var(--muted); margin-bottom:18px;}
-  .timerbar{height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; margin-bottom:22px;}
-  .timerbar > div{height:100%; background:var(--warn); width:100%; transform-origin:left;}
-  #loop-tap{
-    width:150px; height:150px; border-radius:50%; margin:0 auto 22px;
-    background:var(--surface); border:2px solid var(--accent);
-    font-family:var(--font-display); font-size:1rem; font-weight:700; color:var(--accent);
-    display:flex; align-items:center; justify-content:center;
-  }
-  #loop-tap:active{background:var(--accent); color:#06231a; transform:scale(0.96);}
+  .loop-label{font-weight:700; color:var(--soft);}
+  #loop-target{font-size:76px; line-height:1; margin:2px 0 6px;}
+  #loop-count{font-size:18px; font-weight:600; color:var(--soft); margin-bottom:14px;}
+  .timerbar{height:18px; border:3px solid var(--ink); border-radius:999px; background:var(--white); overflow:hidden; margin-bottom:22px;}
+  .timerbar > div{height:100%; width:100%; background:linear-gradient(90deg, var(--mint), var(--yellow)); transform-origin:left;}
+  #loop-tap{width:150px; height:150px; border-radius:50%; margin:0 auto 24px; background:var(--yellow); border:5px solid var(--ink); color:var(--ink); font:700 20px/1 var(--font);
+    box-shadow:inset 0 -8px 0 rgb(47 42 74 / .16), inset 0 5px 0 rgb(255 255 255 / .55), 0 9px 0 var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; -webkit-user-select:none; user-select:none; touch-action:manipulation; transition:transform .08s, box-shadow .08s;}
+  #loop-tap .icone{width:46px; height:46px;}
+  #loop-tap:active{transform:translateY(7px); box-shadow:inset 0 -8px 0 rgb(47 42 74 / .16), inset 0 5px 0 rgb(255 255 255 / .55), 0 2px 0 var(--ink);}
 
-  /* result */
-  #result-stage{flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center;}
-  #result-badge-emoji{font-size:4rem; margin-bottom:6px;}
-  #result-score{font-family:var(--font-display); font-size:2.6rem; font-weight:800; color:var(--accent); margin:6px 0;}
-  .recap{text-align:left; margin-top:22px; display:flex; flex-direction:column; gap:10px;}
-  .recap-item{
-    background:var(--surface); border-radius:12px; padding:12px 14px;
-    display:flex; gap:10px; align-items:flex-start; font-size:.85rem; line-height:1.5;
-  }
-  .recap-item b{color:var(--accent); font-family:var(--font-display); font-size:.78rem; display:block; margin-bottom:2px;}
+  /* resultado */
+  #result-stage{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;}
+  #result-stage .eyebrow{align-self:center;}
+  #result-badge{width:112px; height:112px; display:grid; place-items:center; background:var(--white); border:5px solid var(--ink); border-radius:50%; box-shadow:0 8px 0 var(--ink); margin-bottom:14px;}
+  #result-badge .icone{width:70px; height:70px;}
+  #result-score{font-size:64px; line-height:1; margin:4px 0 10px;}
+  #result-title{font-size:clamp(26px, 7.5vw, 34px);}
+  .recap{width:100%; text-align:left; margin:20px 0 24px; display:flex; flex-direction:column; gap:12px;}
+  .recap-item{background:var(--white); border:4px solid var(--ink); border-radius:18px; padding:10px 14px; display:flex; gap:12px; align-items:center; font-size:16px; line-height:1.4; box-shadow:0 5px 0 var(--ink);}
+  .recap-item > .icone{width:38px; height:38px;}
+  .recap-item b{display:block; font-size:14px; letter-spacing:.06em; text-transform:uppercase;}
 
-  footer{
-    text-align:center; padding-top:14px; color:var(--muted); font-size:.68rem;
-    font-family:var(--font-display); letter-spacing:.06em;
-  }
-
-  @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important;} }
+  footer{text-align:center; padding-top:18px; font-size:14px; font-weight:600; opacity:.75;}
 </style>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 5%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -40s"></span>
+  <span class="nuvem" style="top: 52%; --w: 150px; --t: 80s; --d: -60s"></span>
+  <span class="simbolo" style="left: 4%; top: 36%">&lt;/&gt;</span>
+  <span class="simbolo" style="right: 5%; top: 16%; --d: -2s">{ }</span>
+  <span class="simbolo" style="left: 7%; top: 72%; --d: -4s">01</span>
+  <span class="morros" style="--altura: 110px"></span>
+</div>
 
 <div class="wrap">
   <div id="topbar">
@@ -192,84 +115,98 @@
       <div class="dot" data-d="3"></div>
       <div class="dot" data-d="4"></div>
     </div>
-    <div id="score">0 PTS</div>
+    <div id="score">0 pts</div>
   </div>
 
-  <!-- START -->
+  <!-- INÍCIO -->
   <section class="screen" id="screen-start">
     <div id="start-stage">
-      <div class="badge-emoji">🧑‍💻</div>
-      <div>
-        <div class="eyebrow">Engenharia de Software · Missão</div>
-        <h1 class="title">Vire Engenheiro(a) de Software</h1>
+      <img class="hero anima-flutuar" src="/identidade-visual/mascote/bit-acenando.svg" alt="O robô Bit acenando" width="140" height="140">
+      <div class="eyebrow">Engenharia de Software</div>
+      <h1 class="start-title loud">Missão <span class="yellow">Dev</span></h1>
+      <div class="card">
+        <h2 class="title">Vire Engenheiro(a) de Software</h2>
         <p class="lede">5 desafios rápidos pra você sentir como é pensar como quem cria software de verdade.</p>
+        <div class="pill-row">
+          <span class="pill" style="--c: var(--yellow)" data-icone="peca">Algoritmo</span>
+          <span class="pill" style="--c: var(--pink)" data-icone="bug">Debug</span>
+          <span class="pill" style="--c: var(--mint)" data-icone="repetir">Loop</span>
+        </div>
       </div>
-      <div class="pill-row">
-        <span class="pill">ALGORITMO</span>
-        <span class="pill">DEBUG</span>
-        <span class="pill">LOOP</span>
-      </div>
-      <button class="btn-primary" id="btn-start">Começar missão →</button>
+      <button class="btn btn--jogar btn--big" id="btn-start" type="button" data-icone="play">Começar missão</button>
     </div>
   </section>
 
-  <!-- GAME 1: SEQUENCE -->
+  <!-- DESAFIO 1: SEQUÊNCIA -->
   <section class="screen" id="screen-seq" hidden>
-    <div class="eyebrow">Desafio 1 · Algoritmo</div>
-    <h2 class="title">Monte os passos do robô</h2>
-    <p class="lede">O robô quer fazer um sanduíche de manteiga de amendoim. Toque os passos na ordem certa.</p>
-    <div class="feedback" id="seq-feedback"></div>
-    <div id="seq-slots"></div>
-    <div id="seq-pool"></div>
-    <button class="btn-primary" id="seq-confirm" disabled>Confirmar ordem</button>
-  </section>
-
-  <!-- GAME 2: BUG HUNT -->
-  <section class="screen" id="screen-bug" hidden>
-    <div class="eyebrow">Desafio <span id="bug-round-label">2</span> · Debug</div>
-    <h2 class="title" id="bug-title">Ache o bug no código</h2>
-    <p class="lede" id="bug-lede">Toque na linha que está com o erro.</p>
-    <div class="feedback" id="bug-feedback"></div>
-    <div class="code-block" id="bug-code"></div>
-  </section>
-
-  <!-- GAME 3: LOOP REFLEX -->
-  <section class="screen" id="screen-loop" hidden>
-    <div class="eyebrow">Desafio <span id="loop-round-label">4</span> · Laço de repetição</div>
-    <h2 class="title">Execute o laço certinho</h2>
-    <p class="lede">Toque no botão exatamente o número de vezes pedido, antes que o tempo acabe.</p>
-    <div id="loop-stage">
-      <div class="eyebrow">repita</div>
-      <div id="loop-target">6×</div>
-      <div id="loop-count">0 toques</div>
-      <div class="timerbar"><div id="loop-timerfill"></div></div>
-      <div id="loop-tap">TOCAR</div>
-      <button class="btn-primary" id="loop-confirm" disabled>Concluir laço</button>
+    <div class="card anima-subir">
+      <div class="eyebrow">Desafio 1 · Algoritmo</div>
+      <h2 class="title">Monte os passos do robô</h2>
+      <p class="lede">O robô quer fazer um sanduíche de manteiga de amendoim. Toque os passos na ordem certa.</p>
+      <div class="feedback" id="seq-feedback"></div>
+      <div id="seq-slots"></div>
+      <div id="seq-pool"></div>
+      <button class="btn btn--jogar" id="seq-confirm" type="button" data-icone="certo" disabled>Confirmar ordem</button>
     </div>
   </section>
 
-  <!-- RESULT -->
+  <!-- DESAFIOS 2 E 3: ACHAR O BUG -->
+  <section class="screen" id="screen-bug" hidden>
+    <div class="card anima-subir">
+      <div class="eyebrow">Desafio <span id="bug-round-label">2</span> · Debug</div>
+      <h2 class="title" id="bug-title">Ache o bug no código</h2>
+      <p class="lede" id="bug-lede">Toque na linha que está com o erro.</p>
+      <div class="feedback" id="bug-feedback"></div>
+      <div class="code-block" id="bug-code"></div>
+    </div>
+  </section>
+
+  <!-- DESAFIOS 4 E 5: LAÇO -->
+  <section class="screen" id="screen-loop" hidden>
+    <div class="card anima-subir">
+      <div class="eyebrow">Desafio <span id="loop-round-label">4</span> · Laço de repetição</div>
+      <h2 class="title">Execute o laço certinho</h2>
+      <p class="lede">Toque no botão exatamente o número de vezes pedido, antes que o tempo acabe.</p>
+      <div id="loop-stage">
+        <div class="loop-label">repita</div>
+        <div id="loop-target" class="loud yellow">6×</div>
+        <div id="loop-count">0 toques</div>
+        <div class="timerbar"><div id="loop-timerfill"></div></div>
+        <button id="loop-tap" type="button" data-icone="toque">TOCAR</button>
+        <button class="btn btn--jogar" id="loop-confirm" type="button" data-icone="certo" disabled>Concluir laço</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
   <section class="screen" id="screen-result" hidden>
     <div id="result-stage">
-      <div id="result-badge-emoji">🏆</div>
+      <div id="result-badge" class="anima-pular"></div>
       <div class="eyebrow">Missão concluída</div>
-      <div id="result-score">100 PTS</div>
-      <h2 class="title" id="result-title">Arquiteto(a) de Software</h2>
+      <div id="result-score" class="loud yellow">100 pts</div>
+      <h2 class="loud" id="result-title">Arquiteto(a) de Software</h2>
       <div class="recap">
-        <div class="recap-item">🧩<div><b>ALGORITMO</b>A ordem dos passos importa — é isso que faz um programa funcionar.</div></div>
-        <div class="recap-item">🐛<div><b>DEBUG</b>Todo mundo escreve bugs. O trabalho é saber caçá-los com calma.</div></div>
-        <div class="recap-item">🔁<div><b>LOOP</b>Laços de repetição fazem o computador repetir ações do jeito certo, sem errar a conta.</div></div>
+        <div class="recap-item" data-icone="peca"><div><b>Algoritmo</b>A ordem dos passos importa: é isso que faz um programa funcionar.</div></div>
+        <div class="recap-item" data-icone="bug"><div><b>Debug</b>Todo mundo escreve bugs. O trabalho é saber caçá-los com calma.</div></div>
+        <div class="recap-item" data-icone="repetir"><div><b>Loop</b>Laços de repetição fazem o computador repetir ações do jeito certo, sem errar a conta.</div></div>
       </div>
-      <button class="btn-primary" id="btn-restart" style="margin-top:22px;">Jogar de novo</button>
+      <button class="btn btn--jogar btn--big" id="btn-restart" type="button" data-icone="repetir">Jogar de novo</button>
     </div>
   </section>
 
-  <footer>GAMIFICAPAMPA · ENGENHARIA DE SOFTWARE</footer>
+  <footer>GamificaPampa · Engenharia de Software</footer>
 </div>
 
+<script src="/identidade-visual/js/icones.js"></script>
 <script>
 (function(){
   "use strict";
+
+  // Ícones desenhados do identidade-visual (js/icones.js) antes do texto de cada elemento marcado com data-icone
+  function icon(name){ return window.Icones ? Icones.svg(name) : ''; }
+  document.querySelectorAll('[data-icone]').forEach(function(el){
+    el.insertAdjacentHTML('afterbegin', icon(el.dataset.icone) + (el.textContent.trim() ? ' ' : ''));
+  });
 
   var state = {
     step: 0, // 0 seq, 1 bug-a, 2 bug-b, 3 loop-a, 4 loop-b
@@ -288,7 +225,7 @@
 
   function addScore(n){
     state.score += n;
-    scoreEl.textContent = state.score + ' PTS';
+    scoreEl.textContent = state.score + ' pts';
   }
 
   function updateDots(){
@@ -300,19 +237,19 @@
 
   function showScreen(name){
     Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+    window.scrollTo(0, 0);
   }
 
   function vibrate(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
 
-  // ---------- GAME 1: SEQUENCE ----------
+  // ---------- DESAFIO 1: SEQUÊNCIA ----------
   var seqSteps = [
     "Pegar duas fatias de pão",
     "Passar manteiga de amendoim em uma fatia",
     "Colocar a outra fatia por cima",
     "Servir o sanduíche"
   ];
-  var seqOrder = [];        // correct order kept as indices 0..3
-  var seqChosen = [];       // indices chosen so far
+  var seqChosen = [];       // índices escolhidos até agora
   var seqAttemptedWrong = false;
 
   function shuffle(arr){
@@ -350,7 +287,6 @@
     });
     document.getElementById('seq-feedback').className = 'feedback';
     document.getElementById('seq-confirm').disabled = true;
-    document.getElementById('seq-confirm').textContent = 'Confirmar ordem';
   }
 
   function pickSeqChip(origIndex, chipEl){
@@ -369,17 +305,19 @@
     var correct = seqChosen.every(function(v, i){ return v === i; });
     var fb = document.getElementById('seq-feedback');
     if(correct){
-      fb.textContent = seqAttemptedWrong ? '✓ Certo agora! +10 pts' : '✓ Perfeito na primeira! +20 pts';
+      fb.textContent = seqAttemptedWrong ? 'Certo agora! +10 pts' : 'Perfeito na primeira! +20 pts';
       fb.className = 'feedback show ok';
       addScore(seqAttemptedWrong ? 10 : 20);
       vibrate(30);
       setTimeout(nextStep, 900);
     } else {
       seqAttemptedWrong = true;
-      fb.textContent = '✗ Ainda não é essa ordem. Reveja e confirme de novo.';
+      fb.textContent = 'Ainda não é essa ordem. Reveja e confirme de novo.';
+      fb.className = 'feedback';
+      void fb.offsetWidth;
       fb.className = 'feedback show bad';
       vibrate([20,40,20]);
-      // let them fix: reset chosen but keep pool used chips available again
+      // deixa consertar: limpa a escolha e devolve os passos
       document.querySelectorAll('#seq-pool .chip').forEach(function(c){ c.classList.remove('used'); });
       seqChosen = [];
       document.querySelectorAll('.slot').forEach(function(s, i){
@@ -390,7 +328,7 @@
     }
   });
 
-  // ---------- GAME 2: BUG HUNT (2 rounds) ----------
+  // ---------- DESAFIOS 2 E 3: ACHAR O BUG ----------
   var bugRounds = [
     {
       title: 'Ache o bug no código',
@@ -401,7 +339,7 @@
         'SE sinal = amarelo ENTÃO atenção()'
       ],
       bugIndex: 0,
-      explain: 'No vermelho o robô deveria parar, não andar — as duas primeiras linhas estão trocadas.'
+      explain: 'No vermelho o robô deveria parar, não andar. As duas primeiras linhas estão trocadas.'
     },
     {
       title: 'Ache o bug no código',
@@ -413,7 +351,7 @@
         '    contador = contador + 1'
       ],
       bugIndex: 1,
-      explain: 'A condição devia ser "< 3" — com "< 2" o laço para cedo demais e o robô só pula 2 vezes.'
+      explain: 'A condição devia ser "< 3". Com "< 2", o laço para cedo demais e o robô só pula 2 vezes.'
     }
   ];
 
@@ -430,12 +368,14 @@
     r.lines.forEach(function(text, i){
       var line = document.createElement('div');
       line.className = 'code-line';
-      line.innerHTML = '<span class="ln">' + (i+1) + '</span><span>' + text + '</span>';
+      var ln = document.createElement('span'); ln.className = 'ln'; ln.textContent = i + 1;
+      var code = document.createElement('span'); code.textContent = text;
+      line.appendChild(ln); line.appendChild(code);
       line.addEventListener('click', function(){
         if(line.classList.contains('right-pick')) return;
         if(i === r.bugIndex){
           line.classList.add('right-pick');
-          fb.textContent = (wrongTried ? '✓ Encontrou! +10 pts — ' : '✓ Na mosca! +20 pts — ') + r.explain;
+          fb.textContent = (wrongTried ? 'Encontrou! +10 pts. ' : 'Na mosca! +20 pts. ') + r.explain;
           fb.className = 'feedback show ok';
           addScore(wrongTried ? 10 : 20);
           vibrate(30);
@@ -443,7 +383,9 @@
         } else {
           wrongTried = true;
           line.classList.add('wrong-pick');
-          fb.textContent = '✗ Essa linha está ok. Tenta outra.';
+          fb.textContent = 'Essa linha está ok. Tente outra.';
+          fb.className = 'feedback';
+          void fb.offsetWidth;
           fb.className = 'feedback show bad';
           vibrate([20,40,20]);
           setTimeout(function(){ line.classList.remove('wrong-pick'); }, 500);
@@ -453,7 +395,7 @@
     });
   }
 
-  // ---------- GAME 3: LOOP REFLEX (2 rounds) ----------
+  // ---------- DESAFIOS 4 E 5: LAÇO ----------
   var loopRounds = [
     { target: 6, seconds: 5 },
     { target: 9, seconds: 6 }
@@ -466,7 +408,6 @@
     document.getElementById('loop-target').textContent = r.target + '×';
     document.getElementById('loop-count').textContent = '0 toques';
     document.getElementById('loop-confirm').disabled = true;
-    document.getElementById('loop-confirm').textContent = 'Concluir laço';
     loopState.taps = 0;
     loopState.target = r.target;
     loopState.active = true;
@@ -474,7 +415,7 @@
     var fill = document.getElementById('loop-timerfill');
     fill.style.transition = 'none';
     fill.style.transform = 'scaleX(1)';
-    // force reflow then animate
+    // força o recálculo e depois anima
     void fill.offsetWidth;
     fill.style.transition = 'transform ' + r.seconds + 's linear';
     fill.style.transform = 'scaleX(0)';
@@ -505,7 +446,7 @@
     clearTimeout(loopState.timer);
     var exact = loopState.taps === loopState.target;
     var pts = timedOut ? 0 : (exact ? 20 : 8);
-    // The loop challenge has no feedback box, so Bit explains the result in the corner
+    // O desafio do laço não tem caixa de resposta, então o Bit explica o resultado no canto
     if(window.Bit) Bit.diz(timedOut ? 'ops' : exact ? 'feliz' : 'pensando', timedOut
       ? 'O tempo acabou! Um laço repete o mesmo passo várias vezes. Conte junto e tente de novo na próxima.'
       : exact ? 'Exato! Um laço repete um passo o número certo de vezes.'
@@ -515,7 +456,7 @@
     setTimeout(nextStep, 500);
   }
 
-  // ---------- FLOW ----------
+  // ---------- FLUXO ----------
   function nextStep(){
     state.step++;
     updateDots();
@@ -541,13 +482,13 @@
 
   function showResult(){
     showScreen('result');
-    document.getElementById('result-score').textContent = state.score + ' PTS';
-    var emoji, title;
-    if(state.score >= 90){ emoji='🏆'; title='Arquiteto(a) de Software'; }
-    else if(state.score >= 60){ emoji='💻'; title='Engenheiro(a) Pleno(a)'; }
-    else if(state.score >= 30){ emoji='🌱'; title='Engenheiro(a) Júnior'; }
-    else { emoji='🔍'; title='Estagiário(a) Curioso(a)'; }
-    document.getElementById('result-badge-emoji').textContent = emoji;
+    document.getElementById('result-score').textContent = state.score + ' pts';
+    var badge, title;
+    if(state.score >= 90){ badge='trofeu'; title='Arquiteto(a) de Software'; }
+    else if(state.score >= 60){ badge='computador'; title='Engenheiro(a) Pleno(a)'; }
+    else if(state.score >= 30){ badge='broto'; title='Engenheiro(a) Júnior'; }
+    else { badge='lupa'; title='Estagiário(a) Curioso(a)'; }
+    document.getElementById('result-badge').innerHTML = icon(badge);
     document.getElementById('result-title').textContent = title;
     if(window.Bit) Bit.diz('comemorando', 'Missão cumprida! Você ordenou passos, achou bugs e usou laços, como quem faz software.', 7000);
   }
@@ -555,7 +496,7 @@
   function restart(){
     state.step = 0;
     state.score = 0;
-    scoreEl.textContent = '0 PTS';
+    scoreEl.textContent = '0 pts';
     updateDots();
     showScreen('start');
   }
@@ -569,4 +510,6 @@
   updateDots();
 })();
 </script>
-<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>
+</body>
+</html>
