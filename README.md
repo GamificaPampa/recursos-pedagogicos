@@ -15,6 +15,9 @@ Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celu
 | Arcade do Código, três jogos com placar | Todas | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/) | [criancas/arcade](criancas/arcade) |
 | Caça aos Bugs! | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/) | [criancas/caca-bugs](criancas/caca-bugs) |
 | Missão Dev, a primeira versão dos jogos | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/) | [criancas/missao-dev](criancas/missao-dev) |
+| Pizzaria das Frações, exemplo de Matemática | 9 e 10 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/pizzaria-das-fracoes/) | [criancas/pizzaria-das-fracoes](criancas/pizzaria-das-fracoes) |
+| Ciclo da Água, exemplo de Ciências | 10 e 11 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/ciclo-da-agua/) | [criancas/ciclo-da-agua](criancas/ciclo-da-agua) |
+| Fábrica de Sílabas, exemplo de Língua Portuguesa | 6 e 7 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/fabrica-de-silabas/) | [criancas/fabrica-de-silabas](criancas/fabrica-de-silabas) |
 
 Material de apoio: [mapas da Programação em Dupla](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.html) ([PDF](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.pdf)) e as telas para projetar na sala do [Arcade](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/estande.html), do [Caça aos Bugs](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/estande.html) e da [Missão Dev](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/estande.html).
 

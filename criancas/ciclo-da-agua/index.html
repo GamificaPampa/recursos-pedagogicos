@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ciclo da Água · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Ciências: ajude a Gotinha a dar a volta no ciclo da água, com evaporação, condensação, precipitação e escoamento.">
+  <meta property="og:title" content="Ciclo da Água · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Ciências: ajude a Gotinha a dar a volta no ciclo da água, com evaporação, condensação, precipitação e escoamento.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1000px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* The mission on the left, the scene on the right; one above the other on the phone */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "missao cena" "controles cena"; gap: 18px 24px; }
+    .missao { grid-area: missao; align-self: end; position: relative; padding: 16px 20px 18px; background: #f2fbff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: 21px; font-weight: 700; line-height: 1.3; }
+    .trilha { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+    .trilha li { min-width: 46px; padding: 3px 10px; background: var(--white); border: 3px dashed #9aa3c2; border-radius: 12px; font-size: 14px; font-weight: 700; }
+    .trilha li.cheia { background: var(--c); border: 3px solid var(--ink); }
+    .trilha .seta { min-width: 0; padding: 0; background: none; border: 0; color: var(--soft); }
+    .trilha[hidden] { display: none; }
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; }
+    .opcao { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 12px; background: var(--c); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 18px/1.15 var(--font); color: var(--ink); text-align: left; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao small { display: block; font-size: 13px; font-weight: 600; color: var(--soft); }
+    .opcao svg { width: 40px; height: 40px; flex: none; }
+    .opcao:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:active { transform: translateY(6px); box-shadow: 0 0 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    /* In the phases that ask for the name, the short hint under it would give the answer away */
+    .opcoes.sem-ajuda small { display: none; }
+    .opcao:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 0 6px 0 var(--ink); }
+    .opcao.is-errada { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* The scene: sea, hill, river, sun and the cloud. Each stage turns on its own animation */
+    .cena-jogo { grid-area: cena; display: grid; place-items: center; }
+    #cena { width: 100%; max-width: 480px; height: auto; border: 4px solid var(--ink); border-radius: 26px; background: #dff3ff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .legenda { margin: 10px 0 0; font-weight: 700; text-align: center; min-height: 1.5em; }
+    .raios { transform-box: fill-box; transform-origin: center; animation: raios-giram 18s linear infinite; }
+    @keyframes raios-giram { to { transform: rotate(360deg); } }
+    .vapor path { opacity: 0; }
+    #cena[data-estado="evaporacao"] .vapor path { animation: vapor-sobe 1.8s ease-in infinite; }
+    #cena[data-estado="evaporacao"] .vapor path:nth-child(2) { animation-delay: .6s; }
+    #cena[data-estado="evaporacao"] .vapor path:nth-child(3) { animation-delay: 1.2s; }
+    @keyframes vapor-sobe { 0% { opacity: 0; transform: translateY(14px); } 30% { opacity: .95; } 100% { opacity: 0; transform: translateY(-34px); } }
+    .nuvem-cena { transform-box: fill-box; transform-origin: center; transform: scale(.62); transition: transform .9s var(--bounce); }
+    .nuvem-cena .corpo { fill: #fff; transition: fill .6s; }
+    #cena[data-estado="condensacao"] .nuvem-cena, #cena[data-estado="precipitacao"] .nuvem-cena { transform: scale(1); }
+    #cena[data-estado="precipitacao"] .nuvem-cena .corpo { fill: #c9d4e6; }
+    .chuva line { opacity: 0; }
+    #cena[data-estado="precipitacao"] .chuva line { animation: chuva-cai .7s linear infinite; }
+    @keyframes chuva-cai { 0% { opacity: 0; transform: translateY(-8px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(46px); } }
+    .fluxo { opacity: 0; stroke-dasharray: 6 12; }
+    #cena[data-estado="escoamento"] .fluxo { opacity: 1; animation: rio-corre .7s linear infinite; }
+    @keyframes rio-corre { to { stroke-dashoffset: -18; } }
+    .gotinha { transition: transform 1.1s var(--bounce); }
+    .gotinha-corpo { animation: gotinha-pula 2.4s ease-in-out infinite; }
+    @keyframes gotinha-pula { 50% { transform: translateY(-4px); } }
+
+    /* End of a phase */
+    .bit-fala__balao { pointer-events: none !important; }
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "controles"; gap: 12px; }
+      .missao { padding: 12px 14px; }
+      .missao__texto { font-size: 18px; }
+      .legenda { margin-top: 6px; }
+      .opcao { flex-direction: column; justify-content: center; gap: 2px; min-height: 76px; padding: 6px 6px 8px; font-size: 16px; text-align: center; overflow-wrap: anywhere; }
+      .opcao svg { width: 30px; height: 30px; }
+      .trilha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; counter-reset: passo; }
+      .trilha .seta { display: none; }
+      .trilha li:not(.seta) { counter-increment: passo; font-size: 13px; }
+      .trilha li:not(.seta)::before { content: counter(passo) ". "; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 14px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (max-width: 380px) {
+      .opcao small { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gotinha, .nuvem-cena, .confete, .opcao { transition: none !important; animation: none !important; }
+      #cena * { animation: none !important; }
+      #cena[data-estado] .vapor path, #cena[data-estado] .chuva line, #cena[data-estado] .fluxo { opacity: 1; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">H₂O</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">☁</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">°C</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="../../#criancas">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Ciclo</span> da <span class="pink">Água</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Ciências</li>
+        <li class="pill" style="--c: var(--yellow)">10 e 11 anos</li>
+        <li class="pill">Evaporação, condensação e chuva</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="missao">
+          <p class="missao__topo" id="topo">Em ordem · rodada 1 de 3</p>
+          <p class="missao__texto" id="texto" aria-live="polite">A Gotinha está no mar.</p>
+          <ol class="trilha" id="trilha" aria-label="Caminho da Gotinha"></ol>
+        </div>
+        <div class="cena-jogo">
+          <svg id="cena" viewBox="0 0 400 280" role="img" aria-label="Paisagem com o sol, o mar, um morro com um rio e uma nuvem">
+            <g class="sol">
+              <g class="raios" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"><path d="M62 14v-8M62 102v8M18 58h-8M106 58h8M31 27l-6-6M93 89l6 6M31 89l-6 6M93 27l6-6"/></g>
+              <circle cx="62" cy="58" r="28" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/>
+            </g>
+            <g class="nuvem-cena">
+              <path class="corpo" d="M218 86a22 22 0 0 1 8-42 30 30 0 0 1 56-6 24 24 0 0 1 34 22 18 18 0 0 1-6 26z" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+            <g class="chuva" stroke="#4da3ff" stroke-width="4" stroke-linecap="round">
+              <line x1="236" y1="96" x2="232" y2="108"/><line x1="254" y1="96" x2="250" y2="108" style="animation-delay: .35s"/><line x1="272" y1="96" x2="268" y2="108" style="animation-delay: .15s"/><line x1="290" y1="96" x2="286" y2="108" style="animation-delay: .5s"/><line x1="306" y1="96" x2="302" y2="108" style="animation-delay: .25s"/>
+            </g>
+            <path d="M0 212 Q25 202 50 212 T100 212 T150 212 T200 212 T250 212 V280 H0Z" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M14 236 q10 -6 20 0 M70 248 q10 -6 20 0 M128 238 q10 -6 20 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+            <g class="vapor" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round">
+              <path d="M70 196 q-8 -12 0 -24 q8 -12 0 -24"/><path d="M118 196 q-8 -12 0 -24 q8 -12 0 -24"/><path d="M166 196 q-8 -12 0 -24 q8 -12 0 -24"/>
+            </g>
+            <path d="M192 280 L292 128 Q303 112 314 128 L400 222 V280Z" fill="#8ddf6a" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M304 140 Q284 176 302 198 Q318 220 264 236 Q234 246 214 244" fill="none" stroke="#2f2a4a" stroke-width="13" stroke-linecap="round"/>
+            <path d="M304 140 Q284 176 302 198 Q318 220 264 236 Q234 246 214 244" fill="none" stroke="#4da3ff" stroke-width="7" stroke-linecap="round"/>
+            <path class="fluxo" d="M304 140 Q284 176 302 198 Q318 220 264 236 Q234 246 214 244" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <g class="gotinha" id="gotinha" style="transform: translate(110px, 226px)">
+              <g class="gotinha-corpo">
+                <path d="M0 -20 C9 -7 15 1 15 8 A15 15 0 0 1 -15 8 C-15 1 -9 -7 0 -20Z" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3.5" stroke-linejoin="round"/>
+                <circle cx="-5" cy="6" r="2.6" fill="#2f2a4a"/><circle cx="5" cy="6" r="2.6" fill="#2f2a4a"/>
+                <path d="M-4 12 q4 3 8 0" fill="none" stroke="#2f2a4a" stroke-width="2" stroke-linecap="round"/>
+              </g>
+            </g>
+          </svg>
+          <p class="legenda" id="legenda" aria-live="polite"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes"></div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A pôr em ordem as etapas do ciclo da água (evaporação, condensação, precipitação e escoamento) e a explicar o que acontece em cada uma. Também a perceber que o ciclo não tem começo nem fim e a reconhecer as etapas no dia a dia, como no espelho embaçado ou na roupa secando no varal.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de tocar, a turma explica em voz alta o que vai acontecer com a Gotinha. Quem acertar a etapa explica o porquê.</li>
+            <li><b>No celular:</b> cada criança joga as três fases e anota as situações do dia a dia que reconheceu.</li>
+            <li><b>Depois:</b> com um copo de água gelada e um espelho, a turma vê a condensação acontecer e desenha o ciclo no caderno, com setas.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo sobre [o ciclo da água] para crianças de [10 e 11 anos]: a criança coloca em ordem as etapas [evaporação, condensação, chuva e volta aos rios] e vê uma gotinha fazer o caminho.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: pôr as etapas em ordem, dizer o nome da etapa que aparece na cena e reconhecer o ciclo no dia a dia, como o espelho embaçado], botões grandes para o celular, um som curto no acerto, uma dica quando a criança errar e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-evaporacao" viewBox="0 0 40 40"><circle cx="20" cy="12" r="7" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.5"/><path d="M4 32q4-3 8 0t8 0 8 0 8 0" fill="none" stroke="#4da3ff" stroke-width="3.5" stroke-linecap="round"/><path d="M13 27q-3-3 0-6M27 27q-3-3 0-6" fill="none" stroke="#2f2a4a" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-condensacao" viewBox="0 0 40 40"><path d="M11 30a7 7 0 0 1 1-14 10 10 0 0 1 19 1 7 7 0 0 1 0 13z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="24" r="2" fill="#4da3ff"/><circle cx="23" cy="22" r="2" fill="#4da3ff"/><circle cx="28" cy="26" r="2" fill="#4da3ff"/></symbol>
+    <symbol id="i-precipitacao" viewBox="0 0 40 40"><path d="M11 22a7 7 0 0 1 1-14 10 10 0 0 1 19 1 7 7 0 0 1 0 13z" fill="#c9d4e6" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/><path d="M14 27l-2 5M21 27l-2 5M28 27l-2 5" stroke="#4da3ff" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="i-escoamento" viewBox="0 0 40 40"><path d="M3 34L20 8l17 26z" fill="#8ddf6a" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/><path d="M21 13q-5 7 1 11t-6 10" fill="none" stroke="#4da3ff" stroke-width="3.5" stroke-linecap="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m3 0h4m4 0h1m2 0h1m1 0h2m3 0h1m1 0h7m-37 1h1m5 0h1m4 0h2m3 0h1m3 0h3m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m4 0h1m5 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m1 0h1m1 0h7m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m3 0h1m1 0h4m3 0h2m2 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h1m1 0h4m1 0h3m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m5 0h5m5 0h6m2 0h5m-35 1h2m3 0h1m1 0h5m2 0h2m2 0h2m3 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h1m3 0h3m2 0h1m1 0h1m1 0h1m1 0h4m1 0h2m2 0h1m2 0h6m2 0h2m-37 1h2m5 0h1m1 0h5m1 0h1m5 0h1m5 0h1m1 0h1m1 0h2m3 0h1m-37 1h1m1 0h5m1 0h2m1 0h7m2 0h1m1 0h6m1 0h2m1 0h5m-35 1h1m1 0h1m2 0h3m1 0h2m1 0h1m1 0h1m2 0h5m4 0h1m2 0h1m-32 1h2m2 0h1m1 0h2m7 0h2m1 0h1m1 0h3m4 0h2m1 0h4m1 0h2m-36 1h1m1 0h1m4 0h4m2 0h3m2 0h3m1 0h1m2 0h2m1 0h1m1 0h2m3 0h1m-36 1h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m3 0h2m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h1m1 0h2m1 0h1m4 0h1m1 0h1m2 0h2m2 0h3m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-35 1h2m2 0h6m2 0h2m5 0h3m4 0h2m1 0h3m1 0h3m-36 1h4m2 0h3m2 0h1m3 0h1m3 0h5m1 0h2m1 0h2m5 0h1m-37 1h9m3 0h1m4 0h1m4 0h1m1 0h3m2 0h2m1 0h3m-34 1h1m2 0h1m2 0h4m2 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-33 1h2m1 0h4m2 0h8m2 0h2m2 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-32 1h1m3 0h3m1 0h1m3 0h7m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h1m2 0h1m1 0h2m1 0h1m1 0h1m4 0h2m2 0h2m2 0h3m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h2m1 0h3m4 0h1m4 0h1m2 0h4m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m3 0h3m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m3 0h2m2 0h2m1 0h1m1 0h1m1 0h1m2 0h4m2 0h1m1 0h1m2 0h2m1 0h1m3 0h1m-37 1h1m2 0h6m1 0h3m2 0h3m5 0h13m-28 1h3m1 0h2m2 0h1m2 0h2m2 0h6m3 0h2m-34 1h7m2 0h1m1 0h6m1 0h1m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h1m1 0h1m2 0h2m1 0h1m4 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m1 0h1m1 0h1m3 0h2m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m2 0h4m2 0h2m2 0h1m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h3m2 0h2m1 0h1m1 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m5 0h2m2 0h1m4 0h1m1 0h2m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h4m1 0h1m3 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // The four stages of the water cycle, in the order the drop goes through them
+  const ETAPAS = {
+    evaporacao: { nome: "Evaporação", art: "a", sub: "a água sobe como vapor", cor: "#ffe9a8", onde: [132, 138],
+      texto: "Evaporação: o sol esquenta a água, e ela sobe como vapor.",
+      dica: "Para sair do mar, a água precisa do calor do sol. Ela sobe como vapor." },
+    condensacao: { nome: "Condensação", art: "a", sub: "o vapor vira nuvem", cor: "#ffffff", onde: [262, 66],
+      texto: "Condensação: lá no alto, o vapor esfria e vira gotinhas que formam a nuvem.",
+      dica: "O vapor subiu. Lá no alto é frio: o que acontece com ele?" },
+    precipitacao: { nome: "Precipitação", art: "a", sub: "a chuva cai", cor: "#cfe6ff", onde: [300, 148],
+      texto: "Precipitação: as gotinhas da nuvem ficam pesadas e caem como chuva.",
+      dica: "A nuvem está cheia de gotinhas. O que acontece quando elas ficam pesadas?" },
+    escoamento: { nome: "Escoamento", art: "o", sub: "volta pelos rios", cor: "#c9f5e3", onde: [110, 226],
+      texto: "Escoamento: a água da chuva desce pelo rio e volta para o mar.",
+      dica: "A chuva caiu no morro. Por onde ela volta para o mar?" },
+  }
+  const ORDEM = ["evaporacao", "condensacao", "precipitacao", "escoamento"]
+  const MAR = [110, 226]
+  const FASES = [
+    { nome: "Em ordem", tipo: "ordem",
+      abertura: "Oi! Eu sou o Bit, e esta é a Gotinha. Toque nas etapas na ordem do caminho dela.",
+      rodadas: [{ inicio: 0, onde: "no mar" }, { inicio: 2, onde: "na nuvem" }, { inicio: 3, onde: "no alto do morro" }] },
+    { nome: "Qual é a etapa?", tipo: "nome", cena: true,
+      abertura: "Olhe a cena e leia a frase. Que etapa do ciclo está acontecendo?",
+      rodadas: [
+        { etapa: "condensacao", texto: "O vapor subiu e encontrou o ar frio lá no alto. Ele vira gotinhas e forma uma nuvem." },
+        { etapa: "evaporacao", texto: "O sol esquenta a água do mar, e ela sobe, sem a gente ver, como vapor." },
+        { etapa: "escoamento", texto: "A água da chuva desce o morro pelo rio até chegar ao mar." },
+        { etapa: "precipitacao", texto: "A nuvem ficou escura e pesada, e as gotas começam a cair." },
+        { etapa: "evaporacao", texto: "Num dia de calor, a água do açude vai diminuindo, porque sobe para o ar." },
+      ] },
+    { nome: "No dia a dia", tipo: "nome", cena: false,
+      abertura: "O ciclo da água acontece perto da gente também. Que etapa é cada situação?",
+      rodadas: [
+        { etapa: "evaporacao", texto: "A roupa molhada seca no varal." },
+        { etapa: "condensacao", texto: "O espelho do banheiro fica embaçado depois do banho quente." },
+        { etapa: "condensacao", texto: "Aparecem gotinhas do lado de fora do copo de água gelada." },
+        { etapa: "escoamento", texto: "Depois do temporal, a água corre pela sarjeta até o arroio." },
+        { etapa: "evaporacao", texto: "A poça d'água do pátio some depois de uma tarde de sol." },
+      ] },
+  ]
+  const $ = id => document.getElementById(id)
+  const cena = $("cena")
+  let fase = 0, rodada = 0, passo = 0, erros = 0, errosAqui = 0, ocupado = false
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("ciclo-som") !== "0" } catch {}
+  function tocar(notas, tipo = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipo
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("ciclo-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  // Moving the drop and turning on the animation of a stage in the scene
+  // In "Qual é a etapa?" the scene is the clue, so the name only shows after the answer
+  function mostrar(estado, [x, y], comNome = true) {
+    cena.dataset.estado = estado
+    $("gotinha").style.transform = `translate(${x}px, ${y}px)`
+    $("legenda").textContent = estado && comNome ? ETAPAS[estado].nome : ""
+  }
+
+  function desenharOpcoes() {
+    $("opcoes").innerHTML = ORDEM.map(id => `<button class="opcao" type="button" data-etapa="${id}" style="--c: ${ETAPAS[id].cor}"><svg aria-hidden="true"><use href="#i-${id}"/></svg><span>${ETAPAS[id].nome}<small>${ETAPAS[id].sub}</small></span></button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
+  }
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarRodada() {
+    const f = FASES[fase], r = f.rodadas[rodada]
+    passo = 0
+    errosAqui = 0
+    desenharOpcoes()
+    $("opcoes").classList.toggle("sem-ajuda", f.tipo !== "ordem")
+    desenharPlacar()
+    $("topo").textContent = `${f.nome} · ${f.tipo === "ordem" ? "rodada" : "pergunta"} ${rodada + 1} de ${f.rodadas.length}`
+    if (f.tipo === "ordem") {
+      const antes = ORDEM[(r.inicio + 3) % 4]
+      mostrar(r.inicio === 0 ? "" : antes, r.inicio === 0 ? MAR : ETAPAS[antes].onde)
+      $("texto").textContent = `A Gotinha está ${r.onde}. Toque nas 4 etapas na ordem do caminho dela.`
+      $("trilha").hidden = false
+      desenharTrilha()
+    } else {
+      $("trilha").hidden = true
+      if (f.cena) mostrar(r.etapa, ETAPAS[r.etapa].onde, false)
+      else mostrar("", MAR)
+      $("texto").textContent = r.texto
+    }
+  }
+  function desenharTrilha() {
+    const r = FASES[fase].rodadas[rodada]
+    const itens = [0, 1, 2, 3].map(i => {
+      const id = ORDEM[(r.inicio + i) % 4]
+      return i < passo ? `<li class="cheia" style="--c: ${ETAPAS[id].cor}">${ETAPAS[id].nome}</li>` : `<li aria-label="Vazio">?</li>`
+    })
+    $("trilha").innerHTML = itens.join('<li class="seta" aria-hidden="true">→</li>')
+  }
+
+  function responder(botao) {
+    if (ocupado || botao.disabled) return
+    const f = FASES[fase], r = f.rodadas[rodada], escolha = botao.dataset.etapa
+    const certa = f.tipo === "ordem" ? ORDEM[(r.inicio + passo) % 4] : r.etapa
+    const qual = id => `${ETAPAS[id].art} ${ETAPAS[id].nome.toLowerCase()}`
+    if (escolha !== certa) {
+      erros++
+      errosAqui++
+      somErro()
+      botao.classList.remove("is-errada")
+      void botao.offsetWidth
+      botao.classList.add("is-errada")
+      let frase
+      if (f.tipo === "ordem") frase = errosAqui > 1 ? `A próxima etapa é ${qual(certa)}. ${ETAPAS[certa].dica}` : `Ainda não é ${qual(escolha)}. ${ETAPAS[certa].dica}`
+      else frase = errosAqui > 1 ? `É ${qual(certa)}. ${ETAPAS[certa].texto.split(": ")[1]}` : `Não é ${qual(escolha)}: ${ETAPAS[escolha].art === "o" ? "nele" : "nela"}, ${ETAPAS[escolha].texto.split(": ")[1].replace(/\.$/, "")}. Leia de novo e pense no que acontece com a água.`
+      window.Bit?.diz("ops", frase, 6500)
+      return
+    }
+    somAcerto()
+    if (f.tipo === "ordem") {
+      botao.disabled = true
+      passo++
+      mostrar(certa, ETAPAS[certa].onde)
+      desenharTrilha()
+      errosAqui = 0
+      if (passo < 4) return window.Bit?.diz("feliz", ETAPAS[certa].texto, 4000)
+      window.Bit?.diz("comemorando", "A Gotinha voltou para onde começou. Por isso é um ciclo: ele não tem fim!", 4500)
+    } else {
+      mostrar(certa, ETAPAS[certa].onde)
+      window.Bit?.diz("feliz", `Isso! ${ETAPAS[certa].texto}`, 4000)
+    }
+    ocupado = true
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    setTimeout(() => {
+      ocupado = false
+      rodada++
+      if (rodada < f.rodadas.length) mostrarRodada()
+      else terminarFase()
+    }, f.tipo === "ordem" ? 2600 : 2200)
+  }
+
+  // Stars by how many mistakes the class made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Ciclo completo!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você reconheceu o ciclo da água no dia a dia${comoFoi}. Agora repare: ele está no varal, no espelho e na chuva!`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome.toLowerCase()}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você e a Gotinha deram a volta no ciclo inteiro. Muito bem!" : "Fase completa! Vamos para a próxima?", 5000)
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura, 6000)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>
+</body>
+</html>
