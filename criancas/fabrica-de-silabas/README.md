@@ -11,7 +11,7 @@ Um jogo de Língua Portuguesa para a alfabetização: a criança vê o desenho, 
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/fabrica-de-silabas/                       |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                          |
 
-As palavras usam letra bastão maiúscula. O botão "Ouvir a palavra" usa a voz do próprio aparelho e some quando o navegador não tem voz.
+As palavras usam letra bastão maiúscula. O botão "Ouvir a palavra" usa a voz do próprio aparelho e some quando o navegador não tem voz. O botão "Dica" fala a palavra em sílabas no primeiro toque e faz pular a próxima sílaba no segundo; essa segunda dica conta nas estrelas como um erro.
 
 Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini, no método da Oficina de Prompts.
 
