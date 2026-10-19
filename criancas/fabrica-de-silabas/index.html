@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fábrica de Sílabas · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Língua Portuguesa: junte as sílabas BA, BE, BI, BO e BU para montar as palavras dos desenhos.">
+  <meta property="og:title" content="Fábrica de Sílabas · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Língua Portuguesa: junte as sílabas BA, BE, BI, BO e BU para montar as palavras dos desenhos.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1000px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* The machine: the drawing, the boxes of the word and the syllables to press */
+    .jogo { position: relative; overflow: hidden; }
+    .maquina { display: grid; justify-items: center; gap: 16px; max-width: 680px; margin: 0 auto; text-align: center; }
+    .topo-fase { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); }
+    .pedido { margin: -6px 0 0; font-size: 20px; font-weight: 700; }
+    .figura { position: relative; display: grid; place-items: center; width: clamp(150px, 34vw, 190px); aspect-ratio: 1; background: #fff7d6; border: 4px solid var(--ink); border-radius: 28px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .figura svg { width: 82%; height: 82%; }
+    .figura.pronta { animation: figura-pula .5s var(--bounce); }
+    @keyframes figura-pula { 40% { transform: scale(1.12) rotate(-4deg); } }
+    #ouvir svg { width: 22px; height: 22px; }
+    .caixas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .caixa { display: grid; place-items: center; min-width: clamp(70px, 18vw, 96px); height: clamp(66px, 16vw, 84px); padding: 0 8px; background: var(--white); border: 4px dashed #9aa3c2; border-radius: 18px; font-size: clamp(30px, 8vw, 42px); font-weight: 700; letter-spacing: .02em; }
+    .caixa.cheia { background: var(--c); border: 4px solid var(--ink); animation: caixa-entra .3s var(--bounce); }
+    .caixa.agora { border-color: var(--pink); background: #fff0f5; }
+    @keyframes caixa-entra { from { transform: scale(.6); } }
+    .silabas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .silaba { min-width: clamp(74px, 20vw, 96px); min-height: 70px; padding: 0 12px; background: var(--c); border: 4px solid var(--ink); border-radius: 20px; box-shadow: 0 7px 0 var(--ink); font: 700 clamp(30px, 8vw, 40px)/1 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .silaba:hover { transform: translateY(2px); box-shadow: 0 5px 0 var(--ink); }
+    .silaba:active { transform: translateY(7px); box-shadow: 0 0 0 var(--ink); }
+    .silaba:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .silaba:disabled { opacity: .35; cursor: default; transform: none; box-shadow: 0 7px 0 var(--ink); }
+    .silaba.is-errada { animation: tremida .35s; }
+    .silaba.is-dica { animation: dica-pulsa .8s ease-in-out 3; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    @keyframes dica-pulsa { 50% { transform: scale(1.15); } }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* End of a phase */
+    .bit-fala__balao { pointer-events: none !important; }
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .maquina { gap: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .figura, .caixa, .silaba, .confete { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">BA</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">BO</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">BI</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="../../#criancas">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Fábrica</span> de <span class="pink">Sílabas</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Língua Portuguesa</li>
+        <li class="pill" style="--c: var(--yellow)">6 e 7 anos</li>
+        <li class="pill">BA · BE · BI · BO · BU</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="maquina">
+        <p class="topo-fase" id="topo">Duas sílabas · palavra 1 de 5</p>
+        <div class="figura" id="figura" role="img" aria-label="Desenho"></div>
+        <p class="pedido" id="pedido" aria-live="polite">Monte a palavra do desenho.</p>
+        <button class="btn btn--small" type="button" id="ouvir"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Ouvir a palavra</button>
+        <ol class="caixas" id="caixas" aria-label="Palavra"></ol>
+        <div class="silabas" id="silabas" role="group" aria-label="Sílabas"></div>
+        <ol class="placar" id="placar" aria-label="Palavras da fase"></ol>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>Que as palavras são formadas por sílabas, a juntar sílabas para formar palavras e a perceber qual sílaba falta numa palavra, com a família do B (BA, BE, BI, BO, BU), em letra bastão maiúscula.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de tocar, a turma fala a palavra devagar, batendo uma palma para cada sílaba. Uma criança vem e monta.</li>
+            <li><b>No celular ou tablet:</b> em dupla, uma criança aperta "Ouvir a palavra" e a outra monta. Depois elas trocam.</li>
+            <li><b>Depois:</b> recorte as sílabas em papel e peça para a turma trocar uma sílaba e formar palavras novas, como BOLA e BALA.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes, por exemplo pela família silábica que a turma está estudando.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de alfabetização para crianças de [6 e 7 anos]: aparece o desenho de uma palavra com as sílabas [BA, BE, BI, BO, BU], e a criança toca nas sílabas para montar a palavra, em [letra bastão maiúscula].</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: palavras de duas sílabas, palavras de três sílabas e qual sílaba falta], um botão para ouvir a palavra, botões bem grandes, um som curto no acerto, uma dica quando a criança errar e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m1 0h2m1 0h1m1 0h4m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h1m3 0h3m5 0h2m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m7 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h1m2 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m1 0h4m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m2 0h1m1 0h4m1 0h1m6 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h2m1 0h2m2 0h1m3 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h4m1 0h2m1 0h1m4 0h6m2 0h5m-35 1h3m4 0h4m1 0h2m1 0h2m1 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h4m1 0h2m10 0h2m1 0h2m2 0h1m2 0h6m2 0h2m-37 1h1m4 0h1m4 0h5m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m1 0h2m3 0h1m-37 1h2m2 0h1m1 0h1m2 0h2m1 0h2m2 0h2m1 0h2m1 0h1m1 0h4m1 0h2m1 0h5m-37 1h2m1 0h2m3 0h1m1 0h3m1 0h1m1 0h1m2 0h5m4 0h1m2 0h1m-29 1h1m2 0h3m1 0h1m2 0h6m1 0h2m5 0h2m1 0h4m1 0h2m-34 1h3m1 0h5m2 0h3m1 0h6m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h2m1 0h1m1 0h2m1 0h1m2 0h1m4 0h2m1 0h1m5 0h2m3 0h1m1 0h1m1 0h3m-37 1h1m1 0h1m1 0h1m4 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-33 1h1m2 0h5m4 0h2m3 0h3m1 0h1m2 0h2m1 0h3m1 0h3m-36 1h2m1 0h2m1 0h1m4 0h2m1 0h1m3 0h1m1 0h4m1 0h2m1 0h2m5 0h1m-36 1h4m1 0h2m4 0h1m2 0h1m1 0h1m4 0h1m1 0h3m2 0h2m1 0h3m-34 1h1m5 0h3m1 0h1m2 0h1m4 0h1m3 0h1m4 0h1m4 0h1m-33 1h1m2 0h1m1 0h4m1 0h2m2 0h2m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-36 1h2m1 0h1m4 0h1m9 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h4m1 0h4m2 0h1m1 0h3m1 0h1m1 0h2m1 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h1m1 0h1m1 0h1m2 0h2m2 0h1m3 0h2m2 0h3m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m1 0h3m1 0h4m1 0h1m3 0h2m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h1m1 0h2m2 0h2m1 0h2m3 0h1m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m2 0h2m-37 1h1m2 0h1m2 0h1m1 0h1m2 0h1m1 0h2m1 0h2m1 0h1m4 0h11m1 0h1m-29 1h1m1 0h4m2 0h1m2 0h3m1 0h6m3 0h2m-34 1h7m4 0h1m3 0h4m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m1 0h4m1 0h1m4 0h1m2 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m3 0h3m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m3 0h1m5 0h2m1 0h1m2 0h2m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m3 0h4m1 0h1m1 0h1m1 0h1m2 0h2m5 0h3m-37 1h1m5 0h1m3 0h3m3 0h1m3 0h2m1 0h1m4 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h3m1 0h1m4 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // One drawing per word, with the same thick outline as the rest of the site
+  const T = 'stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"'
+  const DESENHOS = {
+    BOLA: `<circle cx="60" cy="60" r="44" fill="#ff5f8f"/><path d="M18 58q42 10 84 0" fill="none" stroke="#fff" stroke-width="12"/><path d="M28 34q32 14 64 0M28 84q32-14 64 0" fill="none" stroke="#ffd23f" stroke-width="8"/><circle cx="60" cy="60" r="44" fill="none" ${T}/>`,
+    BOLO: `<rect x="20" y="58" width="80" height="44" rx="8" fill="#ffb3c7" ${T}/><path d="M20 74q10 8 20 0t20 0 20 0 20 0" fill="none" ${T}/><rect x="28" y="40" width="64" height="20" rx="6" fill="#fff" ${T}/><rect x="56" y="18" width="8" height="22" rx="3" fill="#4da3ff" ${T}/><path d="M60 6c6 6 6 10 0 12-6-2-6-6 0-12z" fill="#ffd23f" ${T}/>`,
+    BOTA: `<path d="M36 14h34v52l26 10c8 3 10 10 10 16v10H26V40z" fill="#ff8a3d" ${T}/><path d="M26 92h80" ${T}/><path d="M38 30h30M38 44h30" ${T}/>`,
+    BOCA: `<path d="M12 58q24-24 48-8 24-16 48 8-24 34-48 34T12 58z" fill="#ff5f5f" ${T}/><path d="M18 60q42 14 84 0" fill="none" ${T}/><path d="M34 62h52" stroke="#fff" stroke-width="6" stroke-linecap="round"/>`,
+    BALA: `<path d="M30 60L8 40v40zM90 60l22-20v40z" fill="#4fd6a6" ${T}/><ellipse cx="60" cy="60" rx="32" ry="24" fill="#ffd23f" ${T}/><path d="M44 44l-6 32M60 38l-4 44M76 44l-6 32" stroke="#ff5f8f" stroke-width="5" stroke-linecap="round"/><ellipse cx="60" cy="60" rx="32" ry="24" fill="none" ${T}/>`,
+    BANANA: `<path d="M20 30c4 40 30 64 80 58-4 10-14 14-26 14-38 0-62-34-60-72z" fill="#ffd23f" ${T}/><path d="M20 30l-4-12 10 4" fill="#8b5a2b" ${T}/><path d="M30 46q10 30 44 44" fill="none" stroke="#d9a400" stroke-width="3" stroke-linecap="round"/>`,
+    BONECA: `<path d="M38 66h44l14 44H24z" fill="#a08bff" ${T}/><circle cx="60" cy="42" r="24" fill="#ffd9b8" ${T}/><path d="M36 40c0-18 12-26 24-26s24 8 24 26c-8-8-14-12-24-12s-16 4-24 12z" fill="#8b5a2b" ${T}/><circle cx="52" cy="44" r="3" fill="#2f2a4a"/><circle cx="68" cy="44" r="3" fill="#2f2a4a"/><path d="M53 54q7 5 14 0" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/><circle cx="44" cy="51" r="4" fill="#ff8fb0"/><circle cx="76" cy="51" r="4" fill="#ff8fb0"/>`,
+    BIGODE: `<path d="M60 52c-10-10-26-14-36-4-8 8-6 20 2 20 4 0 6-4 4-8 8 6 20 6 30-8 10 14 22 14 30 8-2 4 0 8 4 8 8 0 10-12 2-20-10-10-26-6-36 4z" fill="#5d4037" ${T}/>`,
+    BATATA: `<path d="M24 46c8-22 40-30 64-18 20 10 22 36 8 52-16 18-52 20-68 4-10-10-10-24-4-38z" fill="#d9a066" ${T}/><circle cx="44" cy="50" r="3" fill="#8b5a2b"/><circle cx="70" cy="42" r="3" fill="#8b5a2b"/><circle cx="62" cy="72" r="3" fill="#8b5a2b"/><circle cx="84" cy="64" r="3" fill="#8b5a2b"/>`,
+    BOLACHA: `<circle cx="60" cy="60" r="44" fill="#e8b46a" ${T}/><circle cx="44" cy="44" r="6" fill="#5d4037"/><circle cx="72" cy="40" r="5" fill="#5d4037"/><circle cx="80" cy="66" r="6" fill="#5d4037"/><circle cx="50" cy="76" r="5" fill="#5d4037"/><circle cx="62" cy="58" r="4" fill="#5d4037"/>`,
+    TUBARAO: `<path d="M8 66c20-22 58-30 90-12l14-14v44l-14-14c-32 18-70 10-90-4z" fill="#9aa9c2" ${T}/><path d="M54 46l8-26 18 30" fill="#9aa9c2" ${T}/><path d="M10 68c24 10 54 12 78 2" fill="none" ${T}/><circle cx="30" cy="60" r="4" fill="#2f2a4a"/><path d="M18 72l4 4 4-4 4 4 4-4" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/>`,
+    ABELHA: `<ellipse cx="44" cy="40" rx="16" ry="20" fill="#cfe6ff" ${T} transform="rotate(-20 44 40)"/><ellipse cx="72" cy="38" rx="16" ry="20" fill="#cfe6ff" ${T} transform="rotate(20 72 38)"/><ellipse cx="60" cy="70" rx="36" ry="26" fill="#ffd23f" ${T}/><path d="M48 46v48M66 45v50" stroke="#2f2a4a" stroke-width="9"/><ellipse cx="60" cy="70" rx="36" ry="26" fill="none" ${T}/><circle cx="88" cy="64" r="4" fill="#2f2a4a"/><path d="M24 70l-12 0" ${T}/>`,
+    CABIDE: `<path d="M60 40c0-8 4-10 8-14 6-6 0-16-8-16s-12 6-12 10" fill="none" ${T}/><path d="M60 40L14 80c-4 4-2 10 4 10h84c6 0 8-6 4-10z" fill="none" stroke="#4da3ff" stroke-width="9" stroke-linejoin="round"/><path d="M60 40L14 80c-4 4-2 10 4 10h84c6 0 8-6 4-10z" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>`,
+    CEBOLA: `<path d="M60 22c30 18 42 40 30 62-8 14-52 14-60 0-12-22 0-44 30-62z" fill="#c084fc" ${T}/><path d="M60 26c-8 20-8 44 0 66M60 26c8 20 8 44 0 66" fill="none" stroke="#2f2a4a" stroke-width="3"/><path d="M60 22c-2-8 0-14 6-18M60 22c4-6 10-8 16-6" fill="none" stroke="#4fd6a6" stroke-width="5" stroke-linecap="round"/><path d="M50 100l-4 8M60 100v10M70 100l4 8" ${T}/>`,
+    BUZINA: `<circle cx="30" cy="60" r="20" fill="#ff5f5f" ${T}/><rect x="48" y="54" width="20" height="12" fill="#ffd23f" ${T}/><path d="M66 56l40-20v48l-40-20z" fill="#ffd23f" ${T}/><path d="M110 50q6 10 0 20" fill="none" ${T}/>`,
+  }
+
+  // The three phases: build words of two and three syllables, then find the missing syllable
+  const FASES = [
+    { nome: "Duas sílabas", tipo: "montar",
+      abertura: "Oi! Eu sou o Bit e trabalho na fábrica de sílabas. Olhe o desenho e toque nas sílabas na ordem para montar a palavra.",
+      palavras: [
+        { palavra: "BOLA", silabas: ["BO", "LA"], pecas: ["LA", "BA", "BO", "LO", "BI"] },
+        { palavra: "BOLO", silabas: ["BO", "LO"], pecas: ["BU", "LO", "LA", "BO", "BE"] },
+        { palavra: "BOTA", silabas: ["BO", "TA"], pecas: ["TA", "BE", "TO", "BO", "BA"] },
+        { palavra: "BALA", silabas: ["BA", "LA"], pecas: ["LE", "BA", "BO", "LA", "BU"] },
+        { palavra: "BOCA", silabas: ["BO", "CA"], pecas: ["CO", "BU", "CA", "BI", "BO"] },
+      ] },
+    { nome: "Três sílabas", tipo: "montar",
+      abertura: "Agora as palavras têm três sílabas. Fale a palavra devagar e bata uma palma para cada sílaba.",
+      palavras: [
+        { palavra: "BANANA", silabas: ["BA", "NA", "NA"], pecas: ["NA", "BO", "MA", "BA", "NE", "NA"] },
+        { palavra: "BONECA", silabas: ["BO", "NE", "CA"], pecas: ["CA", "NI", "BO", "CO", "NE", "BA"] },
+        { palavra: "BATATA", silabas: ["BA", "TA", "TA"], pecas: ["TE", "TA", "BA", "DA", "TA", "BO"] },
+        { palavra: "BIGODE", silabas: ["BI", "GO", "DE"], pecas: ["DE", "GA", "BE", "GO", "DI", "BI"] },
+        { palavra: "BOLACHA", silabas: ["BO", "LA", "CHA"], pecas: ["LO", "CHA", "BA", "LA", "XA", "BO"] },
+      ] },
+    { nome: "Qual sílaba falta?", tipo: "falta",
+      abertura: "Agora falta uma sílaba em cada palavra. É uma da família do B: BA, BE, BI, BO ou BU.",
+      palavras: [
+        { palavra: "CEBOLA", desenho: "CEBOLA", silabas: ["CE", "BO", "LA"], falta: 1 },
+        { palavra: "TUBARÃO", desenho: "TUBARAO", silabas: ["TU", "BA", "RÃO"], falta: 1 },
+        { palavra: "CABIDE", desenho: "CABIDE", silabas: ["CA", "BI", "DE"], falta: 1 },
+        { palavra: "BUZINA", desenho: "BUZINA", silabas: ["BU", "ZI", "NA"], falta: 0 },
+        { palavra: "ABELHA", desenho: "ABELHA", silabas: ["A", "BE", "LHA"], falta: 1 },
+      ] },
+  ]
+  const CORES = ["#ffe9a8", "#cfe6ff", "#c9f5e3", "#ffd6e2", "#e6dfff", "#ffdcc4"]
+  const $ = id => document.getElementById(id)
+  let fase = 0, item = 0, passo = 0, erros = 0, errosAqui = 0, ocupado = false
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("silabas-som") !== "0" } catch {}
+  function tocar(notas, tipo = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipo
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somPeca = () => tocar([[660, 0, .08], [880, .06, .08]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("silabas-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  // The browser reads the word aloud, when the device has a Portuguese voice
+  const podeFalar = "speechSynthesis" in window
+  function falar(texto) {
+    if (!podeFalar) return
+    speechSynthesis.cancel()
+    const fala = new SpeechSynthesisUtterance(texto.toLowerCase())
+    fala.lang = "pt-BR"
+    fala.rate = .8
+    speechSynthesis.speak(fala)
+  }
+  if (!podeFalar) $("ouvir").hidden = true
+  $("ouvir").onclick = () => falar(atual().palavra)
+
+  const atual = () => FASES[fase].palavras[item]
+  function desenharCaixas() {
+    const p = atual(), f = FASES[fase]
+    $("caixas").innerHTML = p.silabas.map((silaba, i) => {
+      const cheia = f.tipo === "montar" ? i < passo : (i !== p.falta || passo > 0)
+      const agora = f.tipo === "montar" ? i === passo : i === p.falta && passo === 0
+      return `<li class="caixa${cheia ? " cheia" : ""}${agora ? " agora" : ""}" style="--c: ${CORES[i % CORES.length]}">${cheia ? silaba : ""}</li>`
+    }).join("")
+    $("caixas").setAttribute("aria-label", `Palavra: ${p.silabas.map((s, i) => $("caixas").children[i].textContent || "espaço vazio").join(", ")}`)
+  }
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].palavras.map((_, i) => `<li class="${i < item ? "feito" : i === item ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarPalavra() {
+    const f = FASES[fase], p = atual()
+    passo = 0
+    errosAqui = 0
+    $("topo").textContent = `${f.nome} · palavra ${item + 1} de ${f.palavras.length}`
+    $("figura").innerHTML = `<svg viewBox="0 0 120 120" aria-hidden="true">${DESENHOS[p.desenho || p.palavra]}</svg>`
+    $("figura").setAttribute("aria-label", `Desenho: ${p.palavra.toLowerCase()}`)
+    $("figura").classList.remove("pronta")
+    $("pedido").textContent = f.tipo === "montar" ? "Monte a palavra do desenho." : "Qual sílaba falta na palavra?"
+    const pecas = f.tipo === "montar" ? p.pecas : ["BA", "BE", "BI", "BO", "BU"]
+    $("silabas").innerHTML = pecas.map((peca, i) => `<button class="silaba" type="button" style="--c: ${CORES[(i + item) % CORES.length]}">${peca}</button>`).join("")
+    $("silabas").querySelectorAll(".silaba").forEach(botao => botao.onclick = () => escolher(botao))
+    desenharCaixas()
+    desenharPlacar()
+  }
+
+  function errar(botao, frase) {
+    erros++
+    errosAqui++
+    somErro()
+    botao.classList.remove("is-errada")
+    void botao.offsetWidth
+    botao.classList.add("is-errada")
+    window.Bit?.diz("ops", frase, 6000)
+  }
+  function mostrarDica(certa) {
+    const botao = [...$("silabas").querySelectorAll(".silaba")].find(b => !b.disabled && b.textContent === certa)
+    botao?.classList.add("is-dica")
+    setTimeout(() => botao?.classList.remove("is-dica"), 2600)
+  }
+
+  function escolher(botao) {
+    if (ocupado || botao.disabled) return
+    const f = FASES[fase], p = atual(), peca = botao.textContent
+    if (f.tipo === "montar") {
+      const certa = p.silabas[passo]
+      if (peca !== certa) {
+        const frase = errosAqui === 0
+          ? `${peca} não é a ${["primeira", "segunda", "terceira"][passo]} sílaba. Fale ${p.palavra.toLowerCase()} devagar, batendo uma palma para cada sílaba.`
+          : `${p.silabas.join(" - ")}. A ${["primeira", "segunda", "terceira"][passo]} sílaba é ${certa}.`
+        errar(botao, frase)
+        if (errosAqui > 1) mostrarDica(certa)
+        return
+      }
+      somPeca()
+      botao.disabled = true
+      passo++
+      desenharCaixas()
+      if (passo < p.silabas.length) return
+    } else {
+      const certa = p.silabas[p.falta]
+      if (peca !== certa) {
+        const inventada = p.silabas.map((s, i) => i === p.falta ? peca : s).join("")
+        const frase = errosAqui === 0
+          ? `Com ${peca}, fica ${inventada}. Essa palavra não existe! Fale ${p.palavra.toLowerCase()} devagar.`
+          : `${p.silabas.join(" - ")}. A sílaba que falta é ${certa}.`
+        errar(botao, frase)
+        if (errosAqui > 1) mostrarDica(certa)
+        return
+      }
+      passo = 1
+      desenharCaixas()
+    }
+    // The word is ready: the drawing jumps, Bit reads it and the next word comes
+    ocupado = true
+    somAcerto()
+    $("silabas").querySelectorAll(".silaba").forEach(b => b.disabled = true)
+    $("figura").classList.add("pronta")
+    window.Bit?.diz("feliz", `Isso! ${p.silabas.join(" + ")} = ${p.palavra}`, 3200)
+    setTimeout(() => falar(p.palavra), 350)
+    setTimeout(() => {
+      ocupado = false
+      item++
+      if (item < f.palavras.length) mostrarPalavra()
+      else terminarFase()
+    }, 2300)
+  }
+
+  // Stars by how many mistakes the class made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Fábrica completa!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você achou todas as sílabas que faltavam${comoFoi}. Agora você sabe juntar sílabas e formar palavras!`
+      : `Você montou as 5 palavras${comoFoi}. Próxima fase: ${FASES[fase + 1].nome.toLowerCase()}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].palavras.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você é a melhor ajudante da fábrica de sílabas!" : "Palavras prontas! Vamos para a próxima fase?", 5000)
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    item = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarPalavra()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura, 6500)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>
+</body>
+</html>
