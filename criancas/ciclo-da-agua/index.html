@@ -34,7 +34,7 @@
 
     /* The mission on the left, the scene on the right; one above the other on the phone */
     .jogo { position: relative; overflow: hidden; }
-    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "missao cena" "controles cena"; gap: 18px 24px; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 18px 24px; }
     .missao { grid-area: missao; align-self: end; position: relative; padding: 16px 20px 18px; background: #f2fbff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
     .missao p { margin: 0; }
     .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
@@ -88,7 +88,15 @@
     @keyframes gotinha-pula { 50% { transform: translateY(-4px); } }
 
     /* End of a phase */
-    .bit-fala__balao { pointer-events: none !important; }
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
     .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
     .fim[hidden] { display: none; }
     .fim h2 { font-size: clamp(32px, 6vw, 50px); }
@@ -113,7 +121,7 @@
     .linha svg { width: 22px; height: 22px; }
 
     @media (max-width: 760px) {
-      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "controles"; gap: 12px; }
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
       .missao { padding: 12px 14px; }
       .missao__texto { font-size: 18px; }
       .legenda { margin-top: 6px; }
@@ -176,6 +184,10 @@ p, li, blockquote {
     <section class="card jogo" aria-label="Jogo">
       <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
       <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
         <div class="missao">
           <p class="missao__topo" id="topo">Em ordem · rodada 1 de 3</p>
           <p class="missao__texto" id="texto" aria-live="polite">A Gotinha está no mar.</p>
@@ -312,6 +324,22 @@ p, li, blockquote {
       ] },
   ]
   const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
   const cena = $("cena")
   let fase = 0, rodada = 0, passo = 0, erros = 0, errosAqui = 0, ocupado = false
 
@@ -505,6 +533,5 @@ p, li, blockquote {
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>
-<script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>
 </body>
 </html>
