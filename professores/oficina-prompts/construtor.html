@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Construtor de prompts</title>
-<meta name="description" content="Monte em um minuto um bom pedido para o Gemini criar atividades, jogos, histórias e planos de aula para a sua turma.">
+<meta name="description" content="Monte em um minuto um bom pedido para o ChatGPT ou o Gemini criar atividades, jogos, histórias e planos de aula para a sua turma.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
@@ -104,7 +104,10 @@
   .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
   .btn svg { width: 22px; height: 22px; overflow: visible }
   #copy { --c: var(--mint) }
-  #open { --c: var(--blue) }
+  .open { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-basis: 100% }
+  .open .btn { padding: 8px 14px; text-align: center }
+  #open-chatgpt { --c: var(--purple) }
+  #open-gemini { --c: var(--blue) }
   #copied { font-weight: 700; color: #1f8a60 }
   .tip { margin-top: 10px; padding: 12px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 500 }
   .next { margin: 0; padding: 0; list-style: none }
@@ -124,6 +127,7 @@
     .kinds { grid-template-columns: repeat(2, 1fr) }
     .bot { width: 80px }
     .btn { font-size: 19px; padding: 8px 16px }
+    .open .btn { font-size: 17px; padding: 8px 10px; gap: 6px }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important }
@@ -150,7 +154,7 @@
   <div>
     <a class="back" href="index.html"><svg viewBox="0 0 24 24"><path d="M15 4.5 L7.5 12 L15 19.5" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Oficina de Prompts</a>
     <h1><span class="w1">Construtor</span> <span class="w2">de</span> <span class="w3">prompts</span></h1>
-    <p>Monte em um minuto um bom pedido para o Gemini criar material para a sua turma.</p>
+    <p>Monte em um minuto um bom pedido para a IA criar material para a sua turma.</p>
     <ul class="parts"><li class="role"><i>P</i>Papel</li><li class="task"><i>T</i>Tarefa</li><li class="context"><i>C</i>Contexto</li><li class="format"><i>F</i>Formato</li></ul>
   </div>
 </header>
@@ -205,11 +209,11 @@
       </label>
       <span class="needs-title">Na turma há crianças com:</span>
       <div class="checks" id="needs"></div>
-      <label>Algo mais que o Gemini precisa saber? <small>(opcional)</small>
+      <label>Algo mais que a IA precisa saber? <small>(opcional)</small>
         <textarea id="extra" placeholder="Por exemplo: a turma adora futebol; não temos impressora colorida"></textarea>
       </label>
-      <label class="ask"><input type="checkbox" id="ask">Pedir para o Gemini me fazer perguntas antes de começar</label>
-      <div class="privacy"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="16" width="22" height="17" rx="4" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg>Nunca escreva o nome ou dados das crianças no Gemini. Fale da turma de um jeito geral.</div>
+      <label class="ask"><input type="checkbox" id="ask">Pedir para a IA me fazer perguntas antes de começar</label>
+      <div class="privacy"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="16" width="22" height="17" rx="4" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg>Nunca escreva o nome ou dados das crianças na conversa com a IA. Fale da turma de um jeito geral.</div>
     </section>
   </form>
 
@@ -219,14 +223,17 @@
       <div class="prompt" id="prompt"></div>
       <div class="actions">
         <button class="btn" type="button" id="copy"><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar prompt</button>
-        <a class="btn" id="open" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
         <span id="copied"></span>
+        <div class="open">
+          <a class="btn" id="open-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 5 H20 A1.5 1.5 0 0 1 21.5 6.5 V15.5 A1.5 1.5 0 0 1 20 17 H11 L6 21 V17 H4 A1.5 1.5 0 0 1 2.5 15.5 V6.5 A1.5 1.5 0 0 1 4 5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o ChatGPT</a>
+          <a class="btn" id="open-gemini" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
+        </div>
       </div>
       <div class="tip" id="tip"></div>
     </section>
     <section class="card">
       <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 12 H44 V36 H26 L16 46 V36 H8 Z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M50 24 H58 V48 H50 V56 L42 48 H30 V42" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>Depois, continue a conversa</h2>
-      <p style="margin: 0 0 8px">Um bom resultado quase nunca vem no primeiro pedido. Quando o Gemini responder, peça ajustes como estes:</p>
+      <p style="margin: 0 0 8px">Um bom resultado quase nunca vem no primeiro pedido. Quando a IA responder, peça ajustes como estes:</p>
       <ul class="next" id="next"></ul>
     </section>
   </aside>
@@ -394,7 +401,7 @@ function buildPrompt() {
 const selectedNeeds = () => [...document.querySelectorAll("#needs input:checked")].map(input => input.value)
 const joinList = list => list.length < 2 ? list.join("") : `${list.slice(0, -1).join(", ")} e ${list.at(-1)}`
 
-// Writing the prompt as plain text with labelled parts, which is what gets copied into Gemini
+// Writing the prompt as plain text with labelled parts, which is what gets copied into the AI chat
 function toText(prompt) {
   return [
     `Papel: ${prompt.role}`,
@@ -415,8 +422,8 @@ function render() {
     <div class="part format-part"><b class="format"><i>F</i>Formato</b>${list(prompt.format)}</div>
     ${prompt.ask ? `<div class="part ask-part"><b style="--c: #e2dbff"><i>?</i>Antes de começar</b><p>Antes de criar, me faça até 3 perguntas para entender melhor o que eu preciso. Só comece depois das minhas respostas.</p></div>` : ""}`
   $("tip").innerHTML = kind === "jogo"
-    ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Se ele disser que não consegue, mande primeiro só a ideia do jogo, em uma frase, e o resto na mensagem seguinte."
-    : "<b>Dica:</b> leia a resposta com atenção antes de usar com a turma. O Gemini pode errar fatos, trocar códigos da BNCC e inventar nomes de livros e músicas."
+    ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Se ele disser que não consegue, mande primeiro só a ideia do jogo, em uma frase, e o resto na mensagem seguinte. No ChatGPT, se a resposta mostrar só o código, peça na conversa para ver o jogo funcionando."
+    : "<b>Dica:</b> leia a resposta com atenção antes de usar com a turma. A IA pode errar fatos, trocar códigos da BNCC e inventar nomes de livros e músicas."
   $("next").innerHTML = details.next.concat(COMMON_NEXT).map(text =>
     `<li><span>${escape(text)}</span><button type="button" data-copy="${escape(text)}">Copiar</button></li>`).join("")
   $("paste-box").hidden = kind !== "adaptar"
@@ -465,7 +472,7 @@ $("form").addEventListener("change", render)
 $("form").addEventListener("submit", event => event.preventDefault())
 $("copy").addEventListener("click", async () => {
   await copyText(toText(buildPrompt()))
-  $("copied").textContent = "Copiado! Agora cole no Gemini."
+  $("copied").textContent = "Copiado! Agora cole no ChatGPT ou no Gemini."
   setTimeout(() => { $("copied").textContent = "" }, 4000)
 })
 $("next").addEventListener("click", async event => {
