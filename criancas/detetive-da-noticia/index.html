@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detetive da Notícia · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Língua Portuguesa: ache as pistas de que uma notícia pode ser falsa, decida se ela parece confiável e escolha o que fazer antes de compartilhar.">
+  <meta property="og:title" content="Detetive da Notícia · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Língua Portuguesa sobre notícias falsas: pistas, fontes e o que fazer antes de compartilhar.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The case on the left, the news on the right; one above the other on the phone */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); grid-template-areas: "fala fala" "missao noticia" "controles noticia"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: 20px; font-weight: 700; line-height: 1.3; }
+    .pistas { display: flex; justify-content: center; gap: 8px; margin: 10px 0 0 !important; }
+    .pistas[hidden] { display: none; }
+    .pistas span { display: grid; place-items: center; width: 36px; height: 36px; background: var(--white); border: 3px dashed #9aa3c2; border-radius: 50%; }
+    .pistas span.achada { background: #ffd6e2; border: 3px solid var(--ink); }
+    .pistas svg { width: 22px; height: 22px; }
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 12px; justify-items: center; }
+    .opcoes { display: grid; gap: 10px; width: 100%; }
+    .opcao { min-height: 56px; padding: 8px 14px; background: var(--c, var(--white)); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 17px/1.25 var(--font); color: var(--ink); text-align: left; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:active { transform: translateY(6px); box-shadow: 0 0 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao:disabled { opacity: .45; cursor: default; }
+    .opcao.is-errada { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .opcoes--duas { grid-template-columns: 1fr 1fr; }
+    .opcoes--duas .opcao { text-align: center; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* The news, like a page on a phone. In the first phase each part is a button */
+    .noticia-area { grid-area: noticia; display: grid; gap: 8px; align-content: start; }
+    .noticia { overflow: hidden; background: var(--white); border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .noticia[hidden] { display: none; }
+    .parte { display: block; width: 100%; margin: 0; padding: 8px 16px; background: none; border: 3px solid transparent; border-radius: 12px; font: inherit; color: inherit; text-align: left; }
+    .clicavel .parte { cursor: pointer; }
+    .clicavel .parte:hover, .clicavel .parte:focus-visible { border-color: #9aa3c2; border-style: dashed; outline: none; }
+    .parte.suspeita { background: #ffe0ea; border: 3px solid #e53950; }
+    .parte.normal { background: #e3f8ef; border: 3px dashed #1f8a60; }
+    .parte--site { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #eef1f7; border-radius: 0; font-size: 15px; font-weight: 600; }
+    .parte--site svg { width: 20px; height: 20px; flex: none; }
+    .parte--data { padding-top: 10px; font-size: 14px; font-weight: 600; color: var(--soft); }
+    .parte--titulo { font-size: clamp(20px, 2.6vw, 25px); font-weight: 700; line-height: 1.2; }
+    .parte--autor { font-size: 14px; font-weight: 600; color: var(--soft); }
+    .parte--texto { font-size: 16px; font-weight: 500; line-height: 1.4; }
+    .parte--fim { margin-bottom: 8px; font-size: 15px; font-weight: 700; }
+    .aviso { margin: 0; font-size: 14px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "noticia" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .missao__texto { font-size: 17px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .parte { padding: 6px 12px; }
+      .opcao { font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .opcao { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">?</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">!!!</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">www</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="../../#criancas">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Detetive</span> da <span class="pink">Notícia</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Língua Portuguesa</li>
+        <li class="pill" style="--c: var(--yellow)">12 a 15 anos</li>
+        <li class="pill">Notícias falsas</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Ache as pistas · notícia 1 de 3</p>
+          <p class="missao__texto" id="texto">Toque nas 3 partes da notícia que mostram que ela pode ser falsa.</p>
+          <p class="pistas" id="pistas" aria-label="Pistas encontradas"></p>
+        </div>
+        <div class="noticia-area">
+          <article class="noticia" id="noticia" aria-label="Notícia"></article>
+          <p class="aviso">Todas as notícias, sites e nomes deste jogo são inventados.</p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes"></div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A ler uma notícia procurando pistas: o endereço do site, a data, o autor, a fonte das informações e o tom do título. Também a decidir se uma notícia parece confiável e o que fazer antes de compartilhar, como conferir em outros jornais e nunca mandar dados pessoais.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> a turma lê a notícia junto e vota em cada parte suspeita antes de alguém tocar.</li>
+            <li><b>No celular:</b> em dupla, os estudantes jogam e anotam as pistas que mais apareceram.</li>
+            <li><b>Depois:</b> cada dupla escreve uma notícia inventada com três pistas escondidas e troca com outra dupla para investigar.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Peça sempre notícias inventadas, sem pessoas reais nem política.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo sobre [notícias falsas] para estudantes de [12 a 15 anos]: aparece uma notícia inventada, e o estudante toca nas pistas de que ela pode ser falsa, como o endereço do site, a data e o título exagerado.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: achar as pistas, decidir se a notícia parece confiável ou suspeita e escolher o que fazer antes de compartilhar], só notícias inventadas, sem pessoas reais nem política, botões grandes para o celular, uma explicação a cada resposta e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <symbol id="lupa" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></symbol>
+    <symbol id="globo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="2.2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="#2f2a4a" stroke-width="1.8"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m2 0h1m6 0h3m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m3 0h1m1 0h1m3 0h1m3 0h3m1 0h1m2 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h4m1 0h3m3 0h3m4 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h3m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m1 0h7m4 0h1m3 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h1m1 0h1m2 0h2m1 0h2m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m3 0h4m2 0h2m4 0h2m1 0h3m2 0h5m-26 1h1m1 0h1m2 0h2m2 0h3m1 0h2m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h1m1 0h2m1 0h2m6 0h1m1 0h4m2 0h1m5 0h6m2 0h2m-37 1h1m2 0h1m6 0h1m1 0h4m3 0h3m5 0h1m1 0h1m1 0h2m3 0h1m-34 1h1m2 0h1m1 0h1m3 0h1m2 0h3m1 0h2m1 0h1m1 0h4m1 0h2m1 0h5m-37 1h3m5 0h2m3 0h2m1 0h2m1 0h5m4 0h1m2 0h1m-32 1h1m1 0h1m1 0h1m1 0h3m2 0h6m1 0h1m1 0h1m1 0h1m4 0h2m1 0h4m1 0h2m-36 1h2m1 0h1m3 0h1m1 0h1m1 0h5m2 0h3m1 0h1m2 0h2m1 0h1m1 0h2m3 0h1m-33 1h1m1 0h1m1 0h3m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h3m1 0h2m6 0h1m2 0h2m1 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-35 1h2m2 0h3m2 0h2m2 0h1m5 0h3m1 0h1m2 0h2m1 0h3m1 0h3m-37 1h2m2 0h1m2 0h1m4 0h2m2 0h1m3 0h3m3 0h2m1 0h2m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m1 0h3m-35 1h1m1 0h1m1 0h1m3 0h1m2 0h4m4 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-33 1h2m3 0h3m2 0h3m1 0h4m1 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-36 1h4m2 0h1m1 0h1m1 0h4m4 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h1m2 0h1m2 0h1m2 0h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h3m1 0h1m2 0h2m3 0h2m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m4 0h7m1 0h6m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h2m5 0h1m3 0h1m2 0h1m1 0h1m2 0h1m4 0h1m2 0h2m1 0h1m-33 1h1m1 0h1m3 0h5m1 0h3m1 0h2m6 0h11m1 0h1m-29 1h2m2 0h1m1 0h1m1 0h2m1 0h2m2 0h6m3 0h2m-34 1h7m4 0h1m3 0h2m1 0h1m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m6 0h1m4 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m8 0h3m2 0h1m5 0h2m1 0h1m2 0h2m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m1 0h4m3 0h1m1 0h1m2 0h2m5 0h3m-37 1h1m5 0h1m2 0h3m1 0h1m1 0h1m4 0h2m6 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h4m2 0h2m1 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // Phase 1: each news has parts; three of them are clues ("s") and the others look normal ("n")
+  const CASOS = [
+    { partes: [
+      ["site", "verdade-urgente.xyz", "s", "O endereço é estranho e não é de nenhum jornal conhecido."],
+      ["data", "Publicada hoje, às 9h", "n", "A data está certa: é uma notícia de hoje."],
+      ["titulo", "URGENTE!!! CHOCOLATE CURA A GRIPE EM UM DIA", "s", "Letras maiúsculas, muitas exclamações e uma promessa milagrosa são sinais de alerta."],
+      ["autor", "Por Equipe de Redação", "n", "Não ter um nome de repórter é comum em alguns sites; sozinho, não prova nada."],
+      ["texto", "A gripe é causada por um vírus e costuma passar em alguns dias de descanso.", "n", "Essa frase é verdadeira e fácil de conferir."],
+      ["fim", "Compartilhe com todos os seus contatos antes que apaguem!", "s", "Pedir para espalhar rápido, com medo de que apaguem, é um truque das notícias falsas."],
+    ] },
+    { partes: [
+      ["site", "Jornal Exemplo · jornalexemplo.com.br", "n", "É o site de um jornal, com nome e endereço claros."],
+      ["data", "Publicada em 05/08/2018", "s", "É uma notícia de anos atrás, circulando como se fosse nova."],
+      ["titulo", "Escolas da cidade fecham por causa do calor", "n", "O título é calmo e diz só o fato."],
+      ["autor", "Sem autor", "s", "Ninguém assina a notícia, então não dá para saber quem escreveu."],
+      ["texto", "Segundo o amigo de um funcionário, todas as escolas vão fechar amanhã.", "s", "A fonte é o amigo de alguém: ninguém que se possa conferir."],
+      ["fim", "Foto: arquivo do jornal", "n", "Dizer de onde veio a foto é um bom sinal."],
+    ] },
+    { partes: [
+      ["site", "jornalexemp1o.com", "s", "Olhe de perto: o nome imita o Jornal Exemplo, mas troca a letra l pelo número 1."],
+      ["data", "Publicada hoje, às 14h", "n", "A data está certa: é uma notícia de hoje."],
+      ["titulo", "Todos os celulares vão parar de funcionar à meia-noite", "s", "É uma afirmação enorme, sem nenhuma prova, para assustar."],
+      ["autor", "Por Ana Souza, repórter", "n", "A notícia diz quem escreveu, o que ajuda a conferir."],
+      ["texto", "A empresa de telefonia disse que não recebeu nenhum aviso sobre isso.", "n", "Esse trecho até ajuda o detetive: a própria empresa não confirma a história."],
+      ["fim", "Fonte: confia em mim", "s", "Isso não é uma fonte. Uma notícia séria diz de onde veio a informação."],
+    ] },
+  ]
+  // Phase 2: reliable or suspicious
+  const NOTICIAS = [
+    { site: "Jornal Exemplo · jornalexemplo.com.br", data: "Publicada hoje", titulo: "Prefeitura divulga o calendário de vacinação nas escolas", texto: "As datas também estão no site oficial da prefeitura.", confiavel: true,
+      explica: "Site de jornal, notícia de hoje e um lugar oficial para conferir." },
+    { site: "superfatos.click", data: "Publicada há 6 anos", titulo: "Cientistas proíbem o uso de borracha nas escolas!!!", texto: "Os nomes dos cientistas não foram divulgados.", confiavel: false,
+      explica: "Site desconhecido, notícia velha, exclamações e cientistas sem nome." },
+    { site: "Rádio Exemplo FM · radioexemplo.com.br", data: "Publicada ontem", titulo: "Chuva forte deve atingir a região no fim de semana", texto: "A previsão é do instituto de meteorologia, que publicou um alerta.", confiavel: true,
+      explica: "Notícia recente, título calmo e a fonte é um instituto que dá para conferir." },
+    { site: "Mensagem encaminhada no celular", data: "Recebida hoje", titulo: "Ganhe um celular novo: responda esta pesquisa!", texto: "Mande seu nome, seu endereço e os contatos de 10 amigos.", confiavel: false,
+      explica: "Não tem site nem autor e pede dados pessoais: isso é golpe." },
+    { site: "Jornal Exemplo · jornalexemplo.com.br", data: "Publicada em 15/02/2016", titulo: "Ponte do centro será fechada amanhã", texto: "A obra deve durar dois meses.", confiavel: false,
+      explica: "Pode ter sido verdade em 2016, mas não é notícia de hoje. Sempre olhe a data!" },
+  ]
+  // Phase 3: what to do before sharing
+  const SITUACOES = [
+    { texto: "Chegou no grupo da turma: \"URGENTE: amanhã não tem aula!\". O que fazer primeiro?",
+      opcoes: ["Compartilhar logo para todo mundo saber", "Conferir no site ou no aviso oficial da escola", "Responder com um áudio dizendo que é verdade"], certa: 1,
+      explica: "Antes de espalhar, confira na fonte oficial: o site, o aviso ou a secretaria da escola." },
+    { texto: "Você achou uma notícia incrível, mas ela não aparece em nenhum outro jornal.",
+      opcoes: ["Desconfiar e esperar outros jornais confirmarem", "Compartilhar, porque você viu primeiro", "Mudar o título para ficar mais chamativo"], certa: 0,
+      explica: "Notícia de verdade costuma aparecer em mais de um lugar. Se só um site fala, desconfie." },
+    { texto: "A notícia é verdadeira, mas é de 2017.",
+      opcoes: ["Compartilhar como se fosse de hoje", "Avisar que ela é antiga, se for compartilhar", "Apagar a data e compartilhar"], certa: 1,
+      explica: "Notícia velha passada como nova também engana. Se for mandar, diga a data." },
+    { texto: "Uma mensagem pede seu nome, seu endereço e uma senha para você ganhar um prêmio.",
+      opcoes: ["Preencher rápido antes que acabe", "Mandar os dados de um amigo", "Não responder e avisar um adulto"], certa: 2,
+      explica: "Nenhum prêmio de verdade pede senha. Dados pessoais não se mandam para ninguém." },
+    { texto: "Um vídeo diz que um chá caseiro cura todas as doenças.",
+      opcoes: ["Testar em casa para ver se funciona", "Perguntar a um profissional de saúde e procurar fontes confiáveis", "Mandar para a família toda"], certa: 1,
+      explica: "Promessa de cura para tudo é sinal de alerta. Quem entende de saúde é o profissional de saúde." },
+  ]
+  const FASES = [
+    { nome: "Ache as pistas", tipo: "pistas", total: CASOS.length,
+      abertura: "Oi! Eu sou o Bit, detetive de notícias. Toque nas partes da notícia que parecem suspeitas. Em cada uma há 3 pistas." },
+    { nome: "Confiável ou suspeita?", tipo: "julgar", total: NOTICIAS.length,
+      abertura: "Agora leia a notícia inteira e decida: ela parece confiável ou suspeita? Olhe o site, a data e a fonte." },
+    { nome: "Antes de compartilhar", tipo: "agir", total: SITUACOES.length,
+      abertura: "Um bom detetive também sabe o que fazer. Escolha a melhor atitude em cada situação." },
+  ]
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, achadas = 0
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("detetive-som") !== "0" } catch {}
+  function tocar(notas, tipo = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipo
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somPista = () => tocar([[660, 0, .08], [880, .06, .1]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("detetive-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  const escapar = texto => texto.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch])
+  // The news page: in phase 1 every part is a button; otherwise it is just text
+  function desenharNoticia(partes, clicavel) {
+    $("noticia").classList.toggle("clicavel", clicavel)
+    $("noticia").hidden = !partes
+    if (!partes) return
+    $("noticia").innerHTML = partes.map(([tipo, texto], i) => {
+      const conteudo = tipo === "site" ? `<svg aria-hidden="true"><use href="#globo"/></svg><span>${escapar(texto)}</span>` : escapar(texto)
+      return clicavel
+        ? `<button class="parte parte--${tipo}" type="button" data-i="${i}">${conteudo}</button>`
+        : `<p class="parte parte--${tipo}">${conteudo}</p>`
+    }).join("")
+    if (clicavel) $("noticia").querySelectorAll(".parte").forEach(botao => botao.onclick = () => investigar(botao))
+  }
+  function desenharPistas() {
+    $("pistas").innerHTML = [0, 1, 2].map(i => `<span class="${i < achadas ? "achada" : ""}"><svg aria-hidden="true"><use href="#lupa"/></svg></span>`).join("")
+    $("pistas").setAttribute("aria-label", `${achadas} de 3 pistas encontradas`)
+  }
+  function desenharPlacar() {
+    $("placar").innerHTML = Array.from({ length: FASES[fase].total }, (_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarRodada() {
+    const f = FASES[fase]
+    achadas = 0
+    desenharPlacar()
+    $("topo").textContent = `${f.nome} · ${f.tipo === "agir" ? "situação" : "notícia"} ${rodada + 1} de ${f.total}`
+    $("pistas").hidden = f.tipo !== "pistas"
+    $("opcoes").className = "opcoes"
+    if (f.tipo === "pistas") {
+      $("texto").textContent = "Toque nas 3 partes da notícia que mostram que ela pode ser falsa."
+      desenharNoticia(CASOS[rodada].partes, true)
+      desenharPistas()
+      $("opcoes").innerHTML = ""
+    } else if (f.tipo === "julgar") {
+      const n = NOTICIAS[rodada]
+      $("texto").textContent = "Essa notícia parece confiável ou suspeita?"
+      desenharNoticia([["site", n.site], ["data", n.data], ["titulo", n.titulo], ["texto", n.texto]], false)
+      $("opcoes").className = "opcoes opcoes--duas"
+      $("opcoes").innerHTML = `<button class="opcao" type="button" data-v="1" style="--c: #c9f5e3">Parece confiável</button><button class="opcao" type="button" data-v="0" style="--c: #ffd6e2">Suspeita</button>`
+    } else {
+      const s = SITUACOES[rodada]
+      $("texto").textContent = s.texto
+      desenharNoticia(null)
+      $("opcoes").innerHTML = s.opcoes.map((opcao, i) => `<button class="opcao" type="button" data-v="${i}" style="--c: ${["#cfe6ff", "#fff1a8", "#e6dfff"][i]}">${escapar(opcao)}</button>`).join("")
+    }
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
+  }
+
+  function errar(frase, botao) {
+    erros++
+    somErro()
+    if (botao) {
+      botao.classList.remove("is-errada")
+      void botao.offsetWidth
+      botao.classList.add("is-errada")
+    }
+    window.Bit?.diz("ops", frase)
+  }
+  function proxima(espera = 2600) {
+    ocupado = true
+    setTimeout(() => {
+      ocupado = false
+      rodada++
+      if (rodada < FASES[fase].total) mostrarRodada()
+      else terminarFase()
+    }, espera)
+  }
+
+  // Phase 1: a clue turns red and counts; a normal part turns green and counts as a mistake
+  function investigar(botao) {
+    if (ocupado || botao.classList.contains("suspeita") || botao.classList.contains("normal")) return
+    const [, , tipo, explica] = CASOS[rodada].partes[+botao.dataset.i]
+    if (tipo === "s") {
+      botao.classList.add("suspeita")
+      achadas++
+      somPista()
+      desenharPistas()
+      if (achadas < 3) return window.Bit?.diz("feliz", `Pista! ${explica}`)
+      somAcerto()
+      window.Bit?.diz("comemorando", `Pista! ${explica} Você achou as 3 pistas desta notícia.`)
+      return proxima(3200)
+    }
+    botao.classList.add("normal")
+    errar(`Essa parte parece normal. ${explica}`)
+  }
+
+  // Phases 2 and 3: one answer, and Bit explains why
+  function responder(botao) {
+    if (ocupado) return
+    const f = FASES[fase], v = +botao.dataset.v
+    if (f.tipo === "julgar") {
+      const n = NOTICIAS[rodada]
+      if ((v === 1) === n.confiavel) {
+        somAcerto()
+        window.Bit?.diz("feliz", `Isso! ${n.confiavel ? "Parece confiável" : "É suspeita"}: ${n.explica}`)
+        $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+        return proxima()
+      }
+      return errar(`Olhe de novo. ${n.explica}`, botao)
+    }
+    const s = SITUACOES[rodada]
+    if (v === s.certa) {
+      somAcerto()
+      window.Bit?.diz("feliz", `Boa escolha! ${s.explica}`)
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+      return proxima()
+    }
+    errar(`Essa não é a melhor atitude. ${s.explica}`, botao)
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Caso encerrado!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou a investigação${comoFoi}. Antes de compartilhar, lembre: site, data, autor, fonte e outros jornais.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = Array.from({ length: FASES[fase].total }, () => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você é um detetive de notícias! Agora ensine isso para a sua família." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

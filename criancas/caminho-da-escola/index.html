@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caminho da Escola · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Geografia: use a legenda, guie o Bit com siga em frente, vire à direita e vire à esquerda, e leia um caminho no mapa do bairro.">
+  <meta property="og:title" content="Caminho da Escola · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Geografia: use a legenda, guie o Bit pelo mapa do bairro e leia um caminho com direita e esquerda.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The mission and the controls on the left, the map on the right; one above the other on the phone */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); grid-template-areas: "fala fala" "missao mapa" "controles mapa"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+    .missao__texto { margin-top: 6px !important; font-size: 20px; font-weight: 700; line-height: 1.3; text-align: center; }
+    .roteiro { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; counter-reset: passo; }
+    .roteiro li { counter-increment: passo; display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--white); border: 3px solid var(--ink); border-radius: 12px; font-weight: 600; }
+    .roteiro li::before { content: counter(passo); display: grid; place-items: center; flex: none; width: 26px; height: 26px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 50%; font-size: 14px; }
+    .roteiro[hidden] { display: none; }
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 12px; justify-items: center; }
+    .controles[hidden] { display: none; }
+    .comandos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
+    .comando { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 76px; padding: 6px; background: var(--c); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 16px/1.1 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .comando svg { width: 34px; height: 34px; }
+    .comando:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .comando:active { transform: translateY(6px); box-shadow: 0 0 0 var(--ink); }
+    .comando:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .programa { display: flex; flex-wrap: wrap; gap: 6px; min-height: 44px; width: 100%; margin: 0; padding: 8px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 14px; list-style: none; }
+    .programa li { display: grid; place-items: center; width: 36px; height: 36px; background: var(--c); border: 3px solid var(--ink); border-radius: 10px; }
+    .programa li.agora { outline: 4px solid var(--pink); }
+    .programa li svg { width: 22px; height: 22px; }
+    .programa:empty::before { content: "Seus comandos aparecem aqui"; color: var(--soft); font-weight: 600; font-size: 15px; align-self: center; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* The map of the neighbourhood, with roads, blocks and the legend */
+    .mapa-area { grid-area: mapa; display: grid; gap: 12px; align-content: start; }
+    #mapa { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #9aa6bd; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .lugar { cursor: pointer; outline: none; }
+    .lugar .fundo { fill: #8ddf6a; stroke: #2f2a4a; stroke-width: 3; transition: fill .2s; }
+    .clicavel .lugar:hover .fundo, .clicavel .lugar:focus-visible .fundo { fill: #ffe27d; }
+    .lugar:focus-visible .fundo { stroke: #ff5f8f; stroke-width: 5; }
+    .lugar.certo .fundo { fill: #4fd6a6; }
+    .lugar.errado .fundo { fill: #ff9ab8; }
+    .robo { transition: transform .45s ease-in-out; }
+    .robo.bateu { animation: bateu .4s; }
+    @keyframes bateu { 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
+    .legenda { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .legenda li { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; background: var(--white); border: 3px solid var(--ink); border-radius: 999px; font-size: 15px; font-weight: 600; }
+    .legenda svg { width: 30px; height: 30px; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "mapa" "fala" "controles"; gap: 12px; }
+      .missao__texto { font-size: 18px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .legenda { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+      .legenda li { gap: 4px; padding: 1px 8px 1px 2px; font-size: 12.5px; }
+      .legenda svg { width: 22px; height: 22px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .comando { min-height: 62px; font-size: 14px; }
+      .comando svg { width: 28px; height: 28px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .robo, .confete, .comando { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">N</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">→</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">↰</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="../../#criancas">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Caminho</span> da <span class="pink">Escola</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Geografia</li>
+        <li class="pill" style="--c: var(--yellow)">8 e 9 anos</li>
+        <li class="pill">Mapa, legenda, direita e esquerda</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Legenda · pergunta 1 de 5</p>
+          <p class="missao__texto" id="texto">Toque na farmácia.</p>
+          <ol class="roteiro" id="roteiro" hidden></ol>
+        </div>
+        <div class="mapa-area">
+          <svg id="mapa" viewBox="0 0 448 320" role="group" aria-label="Mapa do bairro"></svg>
+          <ul class="legenda" id="legenda" aria-label="Legenda do mapa"></ul>
+        </div>
+        <div class="controles" id="controles">
+          <div class="comandos" role="group" aria-label="Comandos">
+            <button class="comando" type="button" data-cmd="E" style="--c: #cfe6ff"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#c-E"/></svg>Vire à esquerda</button>
+            <button class="comando" type="button" data-cmd="F" style="--c: #c9f5e3"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#c-F"/></svg>Siga em frente</button>
+            <button class="comando" type="button" data-cmd="D" style="--c: #ffe9a8"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#c-D"/></svg>Vire à direita</button>
+          </div>
+          <ol class="programa" id="programa" aria-label="Comandos escolhidos"></ol>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="ir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg>Andar</button>
+            <button class="btn" type="button" id="apagar">Apagar</button>
+          </div>
+        </div>
+      </div>
+      <ol class="placar" id="placar" aria-label="Rodadas da fase" style="justify-content: center; margin-top: 14px"></ol>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A usar a legenda e os pontos de referência para achar lugares num mapa, a descrever um caminho com siga em frente, vire à direita e vire à esquerda e a perceber que a direita e a esquerda dependem de para onde a pessoa está virada.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de apertar Andar, uma criança fica de pé e faz o caminho com o corpo, virando como o Bit vira.</li>
+            <li><b>No celular:</b> em dupla, uma criança lê os comandos em voz alta e a outra toca nos botões.</li>
+            <li><b>Depois:</b> cada criança desenha o caminho de casa até a escola, com legenda, e escreve os comandos para um colega seguir.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes, por exemplo pelos lugares do bairro da escola.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de Geografia para crianças de [8 e 9 anos]: aparece o mapa de um bairro com [casa, escola, praça e mercado], e a criança guia um robô até [a escola] com os comandos siga em frente, vire à direita e vire à esquerda.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: achar os lugares pela legenda, guiar o robô e ler um caminho escrito], uma legenda com desenhos, botões grandes para o celular, um som curto no acerto, uma dica quando a criança errar e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <symbol id="c-F" viewBox="0 0 32 32"><path d="M16 28V6M8 13l8-8 8 8" fill="none" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="c-D" viewBox="0 0 32 32"><path d="M9 28V16q0-6 6-6h10M20 4l6 6-6 6" fill="none" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="c-E" viewBox="0 0 32 32"><path d="M23 28V16q0-6-6-6H7M12 4l-6 6 6 6" fill="none" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="robo-arte" viewBox="0 0 100 100">
+      <line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="5"/>
+      <circle cx="50" cy="8" r="7" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/>
+      <rect x="16" y="22" width="68" height="52" rx="16" fill="#4da3ff" stroke="#2f2a4a" stroke-width="5"/>
+      <circle cx="37" cy="46" r="9" fill="#fff"/><circle cx="63" cy="46" r="9" fill="#fff"/>
+      <circle cx="39" cy="47" r="4" fill="#2f2a4a"/><circle cx="65" cy="47" r="4" fill="#2f2a4a"/>
+      <path d="M40 62 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <rect x="30" y="76" width="40" height="18" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="5"/>
+    </symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m4 0h1m3 0h1m2 0h4m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h2m1 0h1m1 0h2m4 0h3m1 0h1m2 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h2m3 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m6 0h3m4 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h1m1 0h4m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h2m1 0h2m2 0h1m1 0h1m3 0h1m3 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h5m1 0h1m4 0h1m1 0h1m2 0h1m1 0h1m-27 1h1m1 0h5m2 0h3m1 0h1m2 0h2m4 0h6m2 0h5m-35 1h1m1 0h1m4 0h2m1 0h3m2 0h1m2 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h1m4 0h2m2 0h2m1 0h1m2 0h4m1 0h2m5 0h6m2 0h2m-37 1h1m3 0h2m5 0h1m1 0h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h1m1 0h1m1 0h2m3 0h1m-36 1h1m3 0h4m2 0h1m1 0h5m2 0h1m1 0h6m1 0h2m1 0h5m-37 1h3m4 0h1m1 0h4m3 0h2m1 0h2m1 0h2m4 0h1m2 0h1m-31 1h2m2 0h2m2 0h2m2 0h1m1 0h2m3 0h1m1 0h1m4 0h2m1 0h4m1 0h2m-33 1h1m2 0h3m5 0h2m1 0h6m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h3m3 0h1m1 0h3m1 0h3m2 0h1m1 0h2m3 0h3m3 0h1m1 0h1m1 0h3m-37 1h2m5 0h2m2 0h1m2 0h3m1 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-36 1h1m1 0h2m1 0h2m1 0h3m1 0h2m6 0h3m4 0h2m1 0h3m1 0h3m-37 1h1m3 0h2m2 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m1 0h2m5 0h1m-36 1h1m1 0h1m1 0h2m1 0h4m1 0h2m2 0h1m4 0h5m2 0h2m1 0h3m-35 1h1m1 0h4m1 0h4m1 0h1m6 0h1m3 0h1m4 0h1m4 0h1m-33 1h1m2 0h5m1 0h2m3 0h2m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-37 1h5m2 0h2m1 0h1m1 0h1m6 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h3m2 0h4m3 0h1m1 0h6m2 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h2m2 0h1m3 0h2m2 0h1m1 0h2m2 0h4m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m1 0h3m1 0h1m2 0h8m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h3m2 0h1m1 0h4m2 0h1m2 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m3 0h1m-37 1h1m1 0h1m1 0h3m2 0h2m4 0h3m1 0h1m4 0h11m1 0h1m-29 1h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h3m1 0h6m3 0h2m-34 1h7m2 0h2m4 0h3m2 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h1m1 0h1m1 0h1m3 0h1m4 0h1m2 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m8 0h2m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h3m1 0h2m3 0h1m5 0h2m1 0h1m2 0h2m-37 1h1m1 0h3m1 0h1m1 0h2m2 0h1m4 0h2m1 0h1m1 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m5 0h3m1 0h1m4 0h1m1 0h2m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h1m1 0h2m1 0h1m3 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // The neighbourhood: roads ("."), places and gardens ("g"), one letter per block of 64 x 64
+  const MAPA = [
+    "c.d.m.g",
+    ".......",
+    "g.p.f.s",
+    ".......",
+    "b.g.e.g",
+  ]
+  const T = 'stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"'
+  const LUGARES = {
+    c: { nome: "casa", art: "a", desenho: `<path d="M14 30 32 14l18 16" fill="#ff5f8f" ${T}/><rect x="18" y="28" width="28" height="22" fill="#fff" ${T}/><rect x="28" y="36" width="8" height="14" fill="#a0522d" ${T}/><rect x="20" y="32" width="6" height="6" fill="#8cc4ff" ${T}/>` },
+    d: { nome: "padaria", art: "a", desenho: `<rect x="14" y="24" width="36" height="26" fill="#fff" ${T}/><path d="M12 24h40l-4-10H16z" fill="#ff8a3d" ${T}/><path d="M18 40c4-6 24-6 28 0-4 6-24 6-28 0z" fill="#e8b46a" ${T}/><path d="M26 37l2 6M32 36v7M38 37l-2 6" stroke="#a0662f" stroke-width="2" stroke-linecap="round"/>` },
+    m: { nome: "mercado", art: "o", desenho: `<rect x="12" y="22" width="40" height="28" fill="#fff" ${T}/><path d="M10 22h44v-8H10z" fill="#4fd6a6" ${T}/><path d="M20 30h20l-3 10H23z" fill="#ffd23f" ${T}/><circle cx="25" cy="44" r="2.5" fill="#2f2a4a"/><circle cx="35" cy="44" r="2.5" fill="#2f2a4a"/><path d="M40 30l4-4" ${T}/>` },
+    p: { nome: "praça", art: "a", desenho: `<circle cx="24" cy="24" r="10" fill="#4fd6a6" ${T}/><rect x="22" y="33" width="4" height="10" fill="#8b5a2b"/><circle cx="42" cy="22" r="7" fill="#4fd6a6" ${T}/><rect x="40" y="28" width="4" height="8" fill="#8b5a2b"/><rect x="16" y="46" width="32" height="5" rx="2" fill="#a0522d" ${T}/><path d="M20 51v4M44 51v4" ${T}/>` },
+    f: { nome: "farmácia", art: "a", desenho: `<rect x="14" y="18" width="36" height="32" fill="#fff" ${T}/><path d="M28 24h8v8h8v8h-8v8h-8v-8h-8v-8h8z" fill="#4fd6a6" ${T}/>` },
+    s: { nome: "posto de saúde", art: "o", desenho: `<rect x="12" y="20" width="40" height="30" fill="#fff" ${T}/><path d="M10 20h44l-6-8H16z" fill="#4da3ff" ${T}/><path d="M29 26h6v6h6v6h-6v6h-6v-6h-6v-6h6z" fill="#4da3ff" ${T}/>` },
+    b: { nome: "campo de futebol", art: "o", desenho: `<rect x="10" y="14" width="44" height="36" rx="3" fill="#3cc26b" ${T}/><path d="M32 14v36" stroke="#fff" stroke-width="2.5"/><circle cx="32" cy="32" r="7" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="44" cy="40" r="4" fill="#fff" ${T}/>` },
+    e: { nome: "escola", art: "a", desenho: `<rect x="12" y="26" width="40" height="24" fill="#ffd23f" ${T}/><path d="M8 28 32 12l24 16" fill="#ff5f8f" ${T}/><rect x="28" y="36" width="8" height="14" fill="#a0522d" ${T}/><rect x="16" y="32" width="7" height="6" fill="#8cc4ff" ${T}/><rect x="41" y="32" width="7" height="6" fill="#8cc4ff" ${T}/><path d="M32 12V4l7 3-7 3" fill="#4da3ff" ${T}/>` },
+    g: { nome: "jardim", desenho: `<circle cx="20" cy="22" r="4" fill="#ff5f8f"/><circle cx="42" cy="30" r="4" fill="#ffd23f"/><circle cx="26" cy="44" r="4" fill="#fff"/><circle cx="46" cy="48" r="3" fill="#ff5f8f"/>` },
+  }
+  // Directions: 0 up (north), 1 right (east), 2 down (south), 3 left (west)
+  const PASSO = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+
+  const FASES = [
+    { nome: "Legenda", tipo: "tocar",
+      abertura: "Oi! Eu sou o Bit e vou conhecer o bairro. Use a legenda embaixo do mapa para achar cada lugar.",
+      rodadas: [
+        { texto: "Toque na farmácia.", alvo: [2, 4] },
+        { texto: "Toque no campo de futebol.", alvo: [4, 0] },
+        { texto: "Toque no lugar que fica do outro lado da rua, bem em frente à padaria.", alvo: [2, 2], dica: "Ache a padaria e atravesse a rua para baixo." },
+        { texto: "Toque no lugar que fica entre a praça e o posto de saúde.", alvo: [2, 4], dica: "Ache a praça e o posto de saúde. O que fica no meio deles?" },
+        { texto: "Toque no lugar que fica do outro lado da rua, bem embaixo da farmácia.", alvo: [4, 4], dica: "Ache a farmácia e atravesse a rua para baixo." },
+      ] },
+    { nome: "Guie o Bit", tipo: "guiar",
+      abertura: "Agora monte os comandos e aperte Andar. Lembre: virar à direita ou à esquerda depende de para onde eu estou olhando!",
+      rodadas: [
+        { de: [1, 0], dir: 1, para: "d" },
+        { de: [1, 0], dir: 1, para: "b" },
+        { de: [1, 2], dir: 1, para: "e" },
+        { de: [3, 6], dir: 3, para: "p" },
+        { de: [3, 4], dir: 0, para: "s" },
+      ] },
+    { nome: "Leia o caminho", tipo: "ler",
+      abertura: "Agora eu já andei! Leia o caminho que eu fiz e descubra onde eu parei.",
+      rodadas: [
+        { de: [1, 0], dir: 1, cmds: "FFFF", lado: "E" },
+        { de: [1, 0], dir: 1, cmds: "FDFFEF", lado: "E" },
+        { de: [3, 0], dir: 1, cmds: "FFFEFFDF", lado: "D" },
+        { de: [1, 6], dir: 3, cmds: "FEFFDF", lado: "E" },
+        { de: [3, 6], dir: 3, cmds: "FDF", lado: "D" },
+      ] },
+  ]
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  const ehRua = (l, c) => MAPA[l] && MAPA[l][c] === "."
+  const lugar = (l, c) => MAPA[l] && MAPA[l][c] && MAPA[l][c] !== "." ? MAPA[l][c] : null
+  const nomeCom = (letra, prep) => {
+    const L = LUGARES[letra]
+    const contracao = { a: { em: "na", de: "da", "": "a" }, o: { em: "no", de: "do", "": "o" } }[L.art]
+    return `${contracao[prep]} ${L.nome}`
+  }
+  // The place on the right or on the left of the robot, looking where it looks
+  const doLado = (pos, dir, lado) => {
+    const d = (dir + (lado === "D" ? 1 : 3)) % 4
+    return lugar(pos[0] + PASSO[d][0], pos[1] + PASSO[d][1])
+  }
+  // Running a list of commands; stops at the first block that is not a road
+  function andar(de, dir, cmds) {
+    const passos = [{ pos: de, dir }]
+    let pos = de
+    for (const cmd of cmds) {
+      if (cmd === "D") dir = (dir + 1) % 4
+      else if (cmd === "E") dir = (dir + 3) % 4
+      else {
+        const prox = [pos[0] + PASSO[dir][0], pos[1] + PASSO[dir][1]]
+        if (!ehRua(...prox)) return { passos, bateu: prox }
+        pos = prox
+      }
+      passos.push({ pos, dir })
+    }
+    return { passos, bateu: null }
+  }
+
+  let fase = 0, rodada = 0, erros = 0, errosAqui = 0, ocupado = false, programa = []
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("caminho-som") !== "0" } catch {}
+  function tocar(notas, tipo = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipo
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somPasso = () => tocar([[520, 0, .06]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("caminho-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  // Drawing the map once: roads with dashes, one block per place, and the robot on top
+  function desenharMapa() {
+    const partes = ['<path d="M0 96H448M0 224H448M96 0V320M224 0V320M352 0V320" stroke="#fff" stroke-width="3" stroke-dasharray="10 10" opacity=".8"/>']
+    MAPA.forEach((linha, l) => [...linha].forEach((letra, c) => {
+      if (letra === ".") return
+      const L = LUGARES[letra], x = c * 64, y = l * 64
+      const clicavel = letra !== "g"
+      partes.push(`<g class="${clicavel ? "lugar" : "jardim"}" data-l="${l}" data-c="${c}" ${clicavel ? `tabindex="0" role="button" aria-label="${L.nome}"` : 'aria-hidden="true"'} transform="translate(${x} ${y})"><rect class="fundo" x="3" y="3" width="58" height="58" rx="10" ${clicavel ? "" : 'fill="#8ddf6a" stroke="#2f2a4a" stroke-width="3"'}/>${L.desenho}</g>`)
+    }))
+    partes.push('<g class="robo" id="robo"><circle r="27" fill="#fff" opacity=".55"/><g id="robo-giro"><path d="M0 -37l9 10h-18z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></g><use href="#robo-arte" x="-23" y="-23" width="46" height="46"/></g>')
+    $("mapa").innerHTML = partes.join("")
+    $("mapa").querySelectorAll(".lugar").forEach(g => {
+      g.onclick = () => tocarLugar(g)
+      g.onkeydown = evento => { if (evento.key === "Enter" || evento.key === " ") { evento.preventDefault(); tocarLugar(g) } }
+    })
+    $("legenda").innerHTML = "cdmpfsbe".split("").map(letra => `<li><svg viewBox="0 0 64 64" aria-hidden="true">${LUGARES[letra].desenho}</svg>${LUGARES[letra].nome}</li>`).join("")
+  }
+  function porRobo(pos, dir, visivel = true) {
+    $("robo").style.transform = `translate(${pos[1] * 64 + 32}px, ${pos[0] * 64 + 32}px)`
+    $("robo-giro").setAttribute("transform", `rotate(${dir * 90})`)
+    $("robo").style.opacity = visivel ? 1 : 0
+  }
+  function limparMarcas() {
+    $("mapa").querySelectorAll(".lugar").forEach(g => g.classList.remove("certo", "errado"))
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function desenharPrograma(atual = -1) {
+    $("programa").innerHTML = programa.map((cmd, i) => `<li class="${i === atual ? "agora" : ""}" style="--c: ${{ F: "#c9f5e3", D: "#ffe9a8", E: "#cfe6ff" }[cmd]}"><svg viewBox="0 0 32 32" aria-label="${{ F: "Siga em frente", D: "Vire à direita", E: "Vire à esquerda" }[cmd]}"><use href="#c-${cmd}"/></svg></li>`).join("")
+  }
+  const textoComando = cmd => ({ F: "Siga em frente um passo.", D: "Vire à direita.", E: "Vire à esquerda." })[cmd]
+  // Writing the walk the way a person says it: "Siga em frente 3 passos."
+  function roteiroEmPalavras(cmds) {
+    const frases = []
+    for (let i = 0; i < cmds.length; i++) {
+      if (cmds[i] !== "F") { frases.push(textoComando(cmds[i])); continue }
+      let n = 1
+      while (cmds[i + 1] === "F") { n++; i++ }
+      frases.push(n === 1 ? "Siga em frente um passo." : `Siga em frente ${n} passos.`)
+    }
+    return frases
+  }
+
+  function mostrarRodada() {
+    const f = FASES[fase], r = f.rodadas[rodada]
+    errosAqui = 0
+    programa = []
+    limparMarcas()
+    desenharPlacar()
+    $("topo").textContent = `${f.nome} · ${f.tipo === "guiar" ? "caminho" : "pergunta"} ${rodada + 1} de ${f.rodadas.length}`
+    $("mapa").classList.toggle("clicavel", f.tipo !== "guiar")
+    $("controles").hidden = f.tipo !== "guiar"
+    $("roteiro").hidden = f.tipo !== "ler"
+    if (f.tipo === "tocar") {
+      porRobo([1, 0], 1, false)
+      $("texto").textContent = r.texto
+    } else if (f.tipo === "guiar") {
+      porRobo(r.de, r.dir)
+      desenharPrograma()
+      $("texto").textContent = `Leve o Bit até ${nomeCom(r.para, "")}. A seta rosa mostra para onde ele está olhando.`
+    } else {
+      porRobo(r.de, r.dir)
+      $("texto").textContent = `O Bit saiu de onde ele está, olhando para o lado da seta rosa, e fez este caminho. Toque no lugar que ficou à ${r.lado === "D" ? "direita" : "esquerda"} dele quando ele parou.`
+      $("roteiro").innerHTML = roteiroEmPalavras(r.cmds).map(frase => `<li>${frase}</li>`).join("")
+    }
+  }
+
+  function errar(frase) {
+    erros++
+    errosAqui++
+    somErro()
+    window.Bit?.diz("ops", frase)
+  }
+  function acertar(frase) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("feliz", frase)
+    setTimeout(() => {
+      ocupado = false
+      rodada++
+      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+      else terminarFase()
+    }, 2200)
+  }
+
+  // Phases 1 and 3: the child taps a place on the map
+  async function tocarLugar(g) {
+    const f = FASES[fase], r = f.rodadas[rodada]
+    if (ocupado || f.tipo === "guiar") return
+    const l = +g.dataset.l, c = +g.dataset.c, letra = MAPA[l][c]
+    if (f.tipo === "tocar") {
+      if (l === r.alvo[0] && c === r.alvo[1]) {
+        g.classList.add("certo")
+        return acertar(`Isso! Ali fica ${nomeCom(letra, "")}.`)
+      }
+      g.classList.add("errado")
+      setTimeout(() => g.classList.remove("errado"), 900)
+      const certo = MAPA[r.alvo[0]][r.alvo[1]]
+      return errar(errosAqui === 0 && r.dica ? `Aí fica ${nomeCom(letra, "")}. ${r.dica}` : `Aí fica ${nomeCom(letra, "")}. Procure o desenho ${nomeCom(certo, "de")} na legenda e depois o mesmo desenho no mapa.`)
+    }
+    // Reading the path: Bit walks it, then we look at its right or left side
+    const { passos } = andar(r.de, r.dir, r.cmds)
+    const fimDoCaminho = passos[passos.length - 1]
+    const certo = doLado(fimDoCaminho.pos, fimDoCaminho.dir, r.lado)
+    if (letra === certo) {
+      ocupado = true
+      g.classList.add("certo")
+      await animar(passos)
+      ocupado = false
+      return acertar(`Isso! Eu parei e ${nomeCom(certo, "")} ficou à minha ${r.lado === "D" ? "direita" : "esquerda"}.`)
+    }
+    g.classList.add("errado")
+    setTimeout(() => g.classList.remove("errado"), 900)
+    if (errosAqui === 0) return errar(`Hum, não foi ${nomeCom(letra, "")}. Siga o caminho com o dedo no mapa, um passo de cada vez, e vire como eu viro.`)
+    errar(`Olhe eu fazendo o caminho. No fim, veja o que fica à minha ${r.lado === "D" ? "direita" : "esquerda"}.`)
+    ocupado = true
+    await animar(passos)
+    await espera(1500)
+    porRobo(r.de, r.dir)
+    ocupado = false
+  }
+
+  const espera = ms => new Promise(pronto => setTimeout(pronto, ms))
+  async function animar(passos, comPrograma = false) {
+    for (let i = 1; i < passos.length; i++) {
+      porRobo(passos[i].pos, passos[i].dir)
+      if (comPrograma) desenharPrograma(i - 1)
+      somPasso()
+      await espera(520)
+    }
+  }
+
+  // Phase 2: the child builds the list of commands and Bit walks it
+  document.querySelectorAll(".comando").forEach(botao => botao.onclick = () => {
+    if (ocupado || programa.length >= 14) return
+    programa.push(botao.dataset.cmd)
+    somPasso()
+    desenharPrograma()
+  })
+  $("apagar").onclick = () => {
+    if (ocupado) return
+    programa.pop()
+    desenharPrograma()
+  }
+  $("ir").onclick = async () => {
+    const r = FASES[fase].rodadas[rodada]
+    if (ocupado) return
+    if (!programa.length) return window.Bit?.diz("pensando", "Toque nos comandos para montar o caminho e depois aperte Andar.")
+    ocupado = true
+    const { passos, bateu } = andar(r.de, r.dir, programa)
+    await animar(passos, true)
+    const fim = passos[passos.length - 1]
+    if (bateu) {
+      $("robo").classList.remove("bateu")
+      void $("robo").offsetWidth
+      $("robo").classList.add("bateu")
+      errar(`Ops! No comando ${passos.length}, em frente não tinha rua. ${errosAqui > 0 ? "Antes de seguir em frente, veja para onde eu estou olhando." : "Confira para onde eu estou olhando antes de seguir."}`)
+    } else {
+      const vizinhos = [0, 1, 2, 3].map(d => lugar(fim.pos[0] + PASSO[d][0], fim.pos[1] + PASSO[d][1]))
+      if (vizinhos.includes(r.para)) {
+        ocupado = false
+        programa = []
+        return acertar(`Cheguei ${nomeCom(r.para, "em")}! ${passos.length - 1} comandos e nenhuma batida.`)
+      }
+      errar(`Parei, mas não estou ao lado ${nomeCom(r.para, "de")}. ${errosAqui > 0 ? "Conte os passos no mapa e use Apagar para trocar um comando." : "Use Apagar para trocar um comando e tente de novo."}`)
+    }
+    await espera(1300)
+    porRobo(r.de, r.dir)
+    desenharPrograma()
+    ocupado = false
+  }
+
+  // Stars by how many mistakes the class made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Bairro explorado!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você leu todos os caminhos${comoFoi}. Agora você sabe usar a legenda e dizer para onde virar!`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você me guiou pelo bairro inteiro. Obrigado!" : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  desenharMapa()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
