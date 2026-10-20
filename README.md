@@ -18,6 +18,9 @@ Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celu
 | Pizzaria das Frações, exemplo de Matemática | 9 e 10 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/pizzaria-das-fracoes/) | [criancas/pizzaria-das-fracoes](criancas/pizzaria-das-fracoes) |
 | Ciclo da Água, exemplo de Ciências | 10 e 11 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/ciclo-da-agua/) | [criancas/ciclo-da-agua](criancas/ciclo-da-agua) |
 | Fábrica de Sílabas, exemplo de Língua Portuguesa | 6 e 7 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/fabrica-de-silabas/) | [criancas/fabrica-de-silabas](criancas/fabrica-de-silabas) |
+| Caminho da Escola, exemplo de Geografia | 8 e 9 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caminho-da-escola/) | [criancas/caminho-da-escola](criancas/caminho-da-escola) |
+| Balança do Bit, exemplo de Matemática para os anos finais | 12 e 13 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/balanca-do-bit/) | [criancas/balanca-do-bit](criancas/balanca-do-bit) |
+| Detetive da Notícia, exemplo de Língua Portuguesa para os anos finais | 12 a 15 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/detetive-da-noticia/) | [criancas/detetive-da-noticia](criancas/detetive-da-noticia) |
 
 Material de apoio: [mapas da Programação em Dupla](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.html) ([PDF](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/mapas.pdf)) e as telas para projetar na sala do [Arcade](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/estande.html), do [Caça aos Bugs](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/estande.html) e da [Missão Dev](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/estande.html).
 

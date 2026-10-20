@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Balança do Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Matemática: tire pesos dos dois pratos e divida os dois lados para descobrir quanto vale o x, sem desequilibrar a balança.">
+  <meta property="og:title" content="Balança do Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Matemática: equações do 1º grau numa balança em equilíbrio.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The equation and the buttons on the left, the scale on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.25fr); grid-template-areas: "fala fala" "missao balanca" "controles balanca"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .equacao { margin: 8px 0 4px !important; font-size: clamp(40px, 7vw, 58px); font-weight: 700; line-height: 1.1; letter-spacing: .02em; }
+    .equacao .x { color: #7b5cff; }
+    .equacao .dif { color: #e53950; }
+    .missao__texto { font-size: 17px; font-weight: 600; color: var(--soft); }
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 12px; justify-items: center; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .btn[disabled] { opacity: .45; cursor: default; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* The scale: the beam tilts to the heavier side and the pans hang from its ends */
+    .balanca-area { grid-area: balanca; display: grid; gap: 8px; align-content: start; }
+    #balanca { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: linear-gradient(#e9f6ff, #fff); box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .braco, .prato { transition: transform .5s var(--bounce); }
+    .prato { cursor: pointer; outline: none; }
+    .prato:hover .peso rect, .prato:focus-visible .peso rect { stroke: #ff5f8f; stroke-width: 4; }
+    .prato:focus-visible path:last-of-type { stroke: #ff5f8f; }
+    .caixa-x { cursor: help; }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "balanca" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .braco, .prato, .confete { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">x</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">=</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">2x</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="../../#criancas">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Balança</span> do <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Matemática</li>
+        <li class="pill" style="--c: var(--yellow)">12 e 13 anos</li>
+        <li class="pill">Equações do 1º grau</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Tirar dos dois lados · equação 1 de 5</p>
+          <p class="equacao" id="equacao" aria-live="polite">x + 3 = 7</p>
+          <p class="missao__texto">Quanto vale o x? Deixe a caixa x sozinha num prato, sem desequilibrar a balança.</p>
+        </div>
+        <div class="balanca-area">
+          <svg id="balanca" viewBox="0 0 440 300" role="group" aria-label="Balança"></svg>
+          <p class="nota">Toque num prato para tirar um peso de 1 dele.</p>
+        </div>
+        <div class="controles">
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="dividir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="6" r="2.4" fill="#2f2a4a"/><circle cx="12" cy="18" r="2.4" fill="#2f2a4a"/></svg><span>Dividir os dois lados</span></button>
+          </div>
+          <div class="acoes">
+            <button class="btn btn--small" type="button" id="desfazer">Desfazer</button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Equações da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A resolver equações do 1º grau como x + 3 = 7, 2x = 10 e 2x + 1 = 9, entendendo por que se faz a mesma operação dos dois lados: a igualdade é uma balança em equilíbrio, e o que se tira ou divide de um lado precisa ser feito do outro.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de cada toque, a turma diz qual operação vai fazer e o que vai acontecer com a balança.</li>
+            <li><b>No celular:</b> cada estudante resolve as três fases e escreve no caderno cada passo da equação, como na balança.</li>
+            <li><b>Depois:</b> a turma inventa equações com uma balança desenhada no quadro e troca com os colegas para resolver.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [equações do 1º grau] para estudantes de [12 e 13 anos]: uma balança em equilíbrio com caixas x e pesos de 1, e o estudante tira pesos dos dois lados até descobrir quanto vale o x.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: x + 3 = 7, depois 2x = 10, depois 2x + 1 = 9], a balança inclina quando fica desequilibrada, um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Um visual que não pareça infantil demais para essa idade. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="../../professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h2m2 0h2m1 0h2m1 0h1m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m3 0h1m2 0h1m1 0h1m5 0h2m1 0h1m2 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m2 0h1m3 0h2m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m4 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h1m1 0h5m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m1 0h1m2 0h3m1 0h1m7 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h1m1 0h2m5 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m3 0h1m1 0h3m3 0h1m1 0h1m1 0h6m2 0h5m-35 1h2m1 0h1m1 0h1m4 0h1m2 0h1m1 0h2m1 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h8m2 0h1m1 0h2m3 0h2m1 0h2m5 0h6m2 0h2m-37 1h3m1 0h1m2 0h3m1 0h1m1 0h2m1 0h1m4 0h1m2 0h1m2 0h1m1 0h1m1 0h2m3 0h1m-34 1h1m2 0h2m2 0h1m2 0h1m2 0h2m1 0h2m1 0h1m1 0h4m1 0h2m1 0h5m-34 1h2m4 0h1m1 0h2m3 0h2m1 0h5m4 0h1m2 0h1m-31 1h4m1 0h1m1 0h1m1 0h1m3 0h4m2 0h2m5 0h2m1 0h4m1 0h2m-36 1h1m2 0h2m2 0h1m1 0h1m4 0h9m2 0h2m1 0h1m1 0h2m3 0h1m-36 1h3m1 0h2m2 0h6m1 0h1m2 0h1m4 0h3m3 0h1m1 0h1m1 0h3m-37 1h1m2 0h3m2 0h4m1 0h3m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-36 1h2m1 0h1m2 0h7m1 0h3m4 0h2m1 0h1m2 0h2m1 0h3m1 0h3m-37 1h1m1 0h3m2 0h5m2 0h2m3 0h1m1 0h2m3 0h2m1 0h2m5 0h1m-37 1h2m1 0h1m2 0h2m1 0h3m1 0h3m1 0h1m4 0h5m2 0h2m1 0h3m-35 1h1m1 0h2m1 0h1m1 0h2m2 0h2m1 0h1m4 0h1m3 0h1m4 0h1m4 0h1m-34 1h1m1 0h1m1 0h4m2 0h2m1 0h1m1 0h2m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-37 1h2m1 0h3m1 0h2m1 0h3m1 0h1m4 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-36 1h1m4 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h2m2 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h3m1 0h1m3 0h2m2 0h1m1 0h3m2 0h3m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h5m1 0h2m1 0h1m2 0h1m2 0h2m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h1m1 0h1m2 0h1m1 0h2m2 0h1m2 0h1m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m2 0h2m-37 1h1m1 0h1m3 0h1m2 0h1m1 0h4m1 0h2m1 0h1m4 0h12m-28 1h5m1 0h1m1 0h2m1 0h3m1 0h6m3 0h2m-34 1h7m2 0h2m1 0h2m1 0h3m2 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h4m2 0h1m1 0h3m2 0h1m2 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m4 0h1m2 0h1m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h3m1 0h1m2 0h2m3 0h1m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h6m1 0h1m1 0h1m1 0h1m2 0h2m5 0h3m-37 1h1m5 0h1m3 0h2m2 0h2m3 0h3m1 0h2m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h1m1 0h3m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // [a, b, c, x]: a boxes x and b weights of 1 on the left, c weights of 1 on the right, and the hidden value of x
+  const FASES = [
+    { nome: "Tirar dos dois lados", abertura: "Oi! Eu sou o Bit. A caixa x tem um peso escondido. Tire pesos de 1 dos dois pratos até a caixa ficar sozinha, sem desequilibrar.",
+      rodadas: [[1, 3, 7, 4], [1, 2, 5, 3], [1, 5, 9, 4], [1, 4, 10, 6], [1, 1, 8, 7]] },
+    { nome: "Dividir", abertura: "Agora são várias caixas iguais. Se 2 caixas pesam 10, quanto pesa uma? Use o botão Dividir os dois lados.",
+      rodadas: [[2, 0, 10, 5], [3, 0, 12, 4], [2, 0, 8, 4], [4, 0, 12, 3], [3, 0, 15, 5]] },
+    { nome: "Os dois juntos", abertura: "Agora tem caixas e pesos juntos. Primeiro tire os pesos dos dois lados, depois divida.",
+      rodadas: [[2, 1, 9, 4], [3, 2, 11, 3], [2, 3, 11, 4], [4, 1, 13, 3], [3, 3, 12, 3]] },
+  ]
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false
+  let a = 1, b = 0, c = 0, xv = 0, historico = []
+  const esquerda = () => a * xv + b
+  const diferenca = () => esquerda() - c
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("balanca-som") !== "0" } catch {}
+  function tocar(notas, tipo = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipo
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somPeso = () => tocar([[440, 0, .07], [330, .05, .08]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("balanca-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  // Drawing the scale: the beam tilts by the difference of weight and the pans hang from its ends
+  const PIVO = [220, 82], BRACO = 128
+  function itens(lado) {
+    const lista = lado === "E" ? [...Array(a).fill("x"), ...Array(b).fill(1)] : Array(c).fill(1)
+    return lista.map((tipo, i) => {
+      const porLinha = 5, col = i % porLinha, lin = Math.floor(i / porLinha)
+      const x = -67 + col * 27, y = 93 - lin * 28
+      if (tipo === "x") return `<g class="caixa-x" data-lado="${lado}" transform="translate(${x} ${y - 4})"><rect width="27" height="31" rx="5" fill="#a08bff" stroke="#2f2a4a" stroke-width="3"/><text x="13.5" y="22" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="18" fill="#fff">x</text></g>`
+      return `<g class="peso" data-lado="${lado}" transform="translate(${x} ${y})"><rect width="25" height="25" rx="5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="12.5" y="18" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="15" fill="#2f2a4a">1</text></g>`
+    }).join("")
+  }
+  function desenharBalanca() {
+    const d = diferenca(), angulo = Math.max(-12, Math.min(12, -d * 2.5)), rad = angulo * Math.PI / 180
+    const ponta = s => [PIVO[0] + s * BRACO * Math.cos(rad), PIVO[1] + s * BRACO * Math.sin(rad)]
+    const prato = (s, lado) => {
+      const [px, py] = ponta(s)
+      const pesos = lado === "E" ? b : c
+      return `<g class="prato" data-lado="${lado}" tabindex="0" role="button" aria-label="Tirar um peso de 1 do prato da ${lado === "E" ? "esquerda" : "direita"} (${pesos} ${pesos === 1 ? "peso" : "pesos"})" style="transform: translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)"><rect x="-90" y="0" width="180" height="146" fill="transparent"/><path d="M0 0L-70 120M0 0L70 120" stroke="#2f2a4a" stroke-width="3"/><circle r="6" fill="#2f2a4a"/>${itens(lado)}<path d="M-82 118h164q-10 22-82 22t-82-22z" fill="#cfd8e6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></g>`
+    }
+    $("balanca").innerHTML = `
+      <path d="M190 284h60l-8-14h-44z" fill="#a0522d" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="213" y="86" width="14" height="186" fill="#c98a5a" stroke="#2f2a4a" stroke-width="4"/>
+      <g class="braco" style="transform-origin: ${PIVO[0]}px ${PIVO[1]}px; transform: rotate(${angulo}deg)"><rect x="${PIVO[0] - BRACO - 8}" y="${PIVO[1] - 7}" width="${2 * BRACO + 16}" height="14" rx="7" fill="#8b5a2b" stroke="#2f2a4a" stroke-width="4"/></g>
+      <circle cx="${PIVO[0]}" cy="${PIVO[1]}" r="11" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/>
+      ${prato(-1, "E")}${prato(1, "D")}`
+    $("balanca").querySelectorAll(".prato").forEach(g => {
+      g.onclick = evento => { if (!evento.target.closest(".caixa-x")) tirar(g.dataset.lado) }
+      g.onkeydown = evento => { if (evento.key === "Enter" || evento.key === " ") { evento.preventDefault(); tirar(g.dataset.lado) } }
+    })
+    $("balanca").querySelectorAll(".caixa-x").forEach(g => g.onclick = () => window.Bit?.diz("pensando", "Não sabemos quanto pesa a caixa x, então ela fica na balança. Mexa nos pesos de 1."))
+    const lado = (a === 1 ? "<span class=\"x\">x</span>" : `${a}<span class="x">x</span>`) + (b ? ` + ${b}` : "")
+    $("equacao").innerHTML = `${lado} ${d === 0 ? "=" : '<span class="dif">≠</span>'} ${c}`
+    $("dividir").hidden = a === 1
+    $("dividir").querySelector("span").textContent = `Dividir os dois lados por ${a}`
+    $("desfazer").disabled = !historico.length
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrarRodada() {
+    ;[a, b, c, xv] = FASES[fase].rodadas[rodada]
+    historico = []
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · equação ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    desenharBalanca()
+  }
+
+  // Taking a weight of 1 from one pan. Making the scale more unbalanced than it was is a mistake
+  function tirar(lado) {
+    if (ocupado) return
+    const antes = Math.abs(diferenca())
+    if (lado === "E" ? b === 0 : c === 0) return window.Bit?.diz("pensando", "Esse prato não tem peso de 1 para tirar.")
+    historico.push([a, b, c])
+    if (lado === "E") b--
+    else c--
+    somPeso()
+    const depois = Math.abs(diferenca())
+    desenharBalanca()
+    if (antes !== 0 && depois > antes) {
+      erros++
+      somErro()
+      return window.Bit?.diz("ops", `A balança ficou ainda mais torta! O prato da ${lado === "E" ? "esquerda" : "direita"} já estava mais leve. Use Desfazer e tire do outro prato.`)
+    }
+    if (depois !== 0) return window.Bit?.diz("pensando", "A balança desequilibrou! O que você tira de um prato precisa tirar do outro também.")
+    window.Bit?.diz("feliz", `Equilibrou de novo: tirar 1 dos dois lados mantém a igualdade.`)
+    conferir()
+  }
+
+  $("dividir").onclick = () => {
+    if (ocupado || a === 1) return
+    if (diferenca() !== 0) return window.Bit?.diz("pensando", "Primeiro deixe a balança equilibrada de novo.")
+    if (b > 0) {
+      erros++
+      somErro()
+      return window.Bit?.diz("ops", `Ainda tem ${b === 1 ? "um peso de 1" : `${b} pesos de 1`} junto das caixas. Tire os pesos dos dois lados primeiro, depois divida.`)
+    }
+    historico.push([a, b, c])
+    const partes = a
+    c = c / a
+    a = 1
+    somPeso()
+    desenharBalanca()
+    window.Bit?.diz("feliz", `${partes} caixas pesam ${c * partes}, então cada caixa pesa ${c * partes} ÷ ${partes}.`)
+    conferir()
+  }
+  $("desfazer").onclick = () => {
+    if (ocupado || !historico.length) return
+    ;[a, b, c] = historico.pop()
+    desenharBalanca()
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const d = diferenca()
+    if (d !== 0) return window.Bit?.diz("pensando", `O prato da ${d > 0 ? "esquerda" : "direita"} está mais pesado. Tire um peso de 1 dele para equilibrar.`)
+    if (b > 0) return window.Bit?.diz("pensando", "Tire um peso de 1 do prato da esquerda e um do prato da direita. A balança continua equilibrada.")
+    if (a > 1) return window.Bit?.diz("pensando", `Só tem caixas x na esquerda. Divida os dois lados por ${a} para ver quanto pesa uma caixa.`)
+  }
+
+  // The round ends when one box x is alone and the scale is balanced
+  function conferir() {
+    if (a !== 1 || b !== 0 || diferenca() !== 0) return
+    ocupado = true
+    somAcerto()
+    const [a0, b0, c0] = FASES[fase].rodadas[rodada]
+    window.Bit?.diz("comemorando", `x = ${c}! Confira: ${a0 === 1 ? "" : `${a0} × `}${c}${b0 ? ` + ${b0}` : ""} = ${c0}.`)
+    setTimeout(() => {
+      ocupado = false
+      rodada++
+      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+      else terminarFase()
+    }, 2600)
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Equações resolvidas!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você resolveu as equações${comoFoi}. A regra da balança vale para qualquer equação: o que faz de um lado, faz do outro.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você domina a balança! Agora é só fazer o mesmo no caderno." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
