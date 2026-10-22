@@ -588,7 +588,8 @@ $("form").addEventListener("submit", event => event.preventDefault())
 $("form").addEventListener("input", lembrarEscolhas)
 $("form").addEventListener("change", lembrarEscolhas)
 $("kinds").addEventListener("click", lembrarEscolhas)
-Lembrar.botaoEsquecer($("form"))
+// O Esquecer fica dentro do formulário, no fim, para não ocupar a coluna do prompt nas telas largas
+Lembrar.botaoEsquecer($("form").lastElementChild)
 // No celular, o prompt e o Copiar ficam depois do formulário: uma barra no pé da tela traz o Copiar para perto
 Copiar.barraFixa({ observar: document.querySelector(".result .actions"), copiar: $("copy"), largura: 861 })
 $("copy").addEventListener("click", () => copyMessage(0))
