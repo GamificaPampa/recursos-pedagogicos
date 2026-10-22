@@ -13,7 +13,12 @@ Cada recurso nasce de `modelos/recurso/`, vive numa pasta própria e abre direto
 2. **Pasta.** Escolha um nome curto em minúsculas, sem acento, com hífen entre as palavras, e confirme que `criancas/<nome>/` ou `professores/<nome>/` ainda não existe. Copie `modelos/recurso/` para lá. Pronto quando a pasta nova tem `index.html` e `README.md`.
 3. **Recurso.** Construa o jogo ou o material dentro do `index.html`, seguindo as regras de visual e de conteúdo abaixo. Troque cada comentário `TROCAR` e cada texto de exemplo do modelo. Pronto quando `grep -rn "TROCAR\|Nome do recurso\|O jogo ou o material entra aqui" <pasta>` não encontra nada e o `README.md` da pasta está preenchido.
 4. **Teste.** Sirva o repositório como manda o `AGENTS.md` e abra o recurso em largura de celular (375 px) e de projetor (1280 px). Pronto quando a página abre sem erro no console, usa a fonte Fredoka, cabe na tela sem rolagem lateral e cada botão responde ao toque e ao teclado.
-5. **Registro.** Acrescente uma linha na tabela certa do `README.md` da raiz, com o link publicado e o link da pasta, no mesmo formato das linhas que já existem, e um cartão na seção certa do `index.html` da raiz (`#criancas` ou `#professores`), igual aos que já estão lá. Se for um jogo para crianças, avise a pessoa que o menu da turma fica em outro repositório (`gamificapampa.github.io/turma/index.html`) e ofereça incluir um cartão lá.
+5. **Registro.** Acrescente uma linha na tabela certa do `README.md` da raiz, com o link publicado e o link da pasta, no mesmo formato das linhas que já existem, e um cartão na seção certa do `index.html` da raiz (`#criancas`, `#materias` ou `#professores`), igual aos que já estão lá. Se for um jogo para crianças, ele também entra no menu da turma, que monta os cartões a partir de uma lista só:
+   - grave o desenho do cartão em `criancas/<nome>/capa.svg` (200 × 120, fundo transparente, como as capas que já existem);
+   - gere o QR do link curto com `python ../equipe/ferramentas/qr.py arquivo https://gamificapampa.github.io/<atalho> criancas/<nome>/qr.svg` (o `equipe` é privado; quem não tiver acesso pede ao Arthur);
+   - acrescente a pasta à lista `RECURSOS` do `.github/scripts/kit_sem_internet.py`;
+   - avise a pessoa que a lista `JOGOS` (`jogos.js`) e o link curto (`404.html`) ficam no repositório do hub, `gamificapampa.github.io`, e ofereça incluir o jogo nos dois.
+   Pronto quando o jogo aparece no `/turma/` e o kit sem internet monta sem erro.
 6. **Entrega.** Crie uma branch, faça o commit e abra o pull request. Termine dizendo à pessoa o endereço que o recurso terá depois do merge.
 
 ## Visual

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.d-hop { animation: d-hop 1s ease-in-out infinite }
+@keyframes d-hop { 0%, 60%, 100% { transform: translateY(0) } 30% { transform: translateY(-12px) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="40" y="10" width="120" height="100" rx="12" fill="#9aa6bd" stroke="#2f2a4a" stroke-width="4"/>
+          <path d="M40 60H160M100 10V110" stroke="#fff" stroke-width="3" stroke-dasharray="8 8"/>
+          <rect x="52" y="20" width="36" height="30" rx="6" fill="#8ddf6a" stroke="#2f2a4a" stroke-width="3"/><path d="M58 38l12-10 12 10" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="112" y="70" width="36" height="30" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M130 70v-10l7 3-7 3" fill="#4da3ff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/>
+          <g class="g d-hop"><circle cx="100" cy="60" r="11" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3"/><circle cx="96" cy="58" r="2.5" fill="#fff"/><circle cx="104" cy="58" r="2.5" fill="#fff"/><path d="M114 60l8-6v12z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2"/></g>
+</svg>

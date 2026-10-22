@@ -17,11 +17,14 @@ from pathlib import Path
 
 SITE = "https://gamificapampa.github.io/"
 RAIZ = Path(__file__).resolve().parents[2]
+# Os jogos do menu da turma (a lista JOGOS do jogos.js do hub) e a aula com as crianças
 RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conecta", "criancas/arcade",
-            "criancas/caca-bugs", "criancas/missao-dev", "professores/aula-engenharia-de-software"]
+            "criancas/caca-bugs", "criancas/missao-dev", "criancas/pizzaria-das-fracoes", "criancas/balanca-do-bit",
+            "criancas/fabrica-de-silabas", "criancas/detetive-da-noticia", "criancas/ciclo-da-agua",
+            "criancas/caminho-da-escola", "professores/aula-engenharia-de-software"]
 FONTE = "identidade-visual/fontes/fredoka/fredoka.woff2"
-# Pastas do identidade-visual que os jogos carregam: o CSS do estilo de jogo, os scripts (Bit que fala e ícones) e as poses do Bit
-PASTAS_IDENTIDADE = ["css", "js", "mascote"]
+# Pastas do identidade-visual que as páginas do kit carregam: CSS, scripts (Bit que fala e ícones), poses do Bit e logos
+PASTAS_IDENTIDADE = ["css", "js", "mascote", "logos"]
 FONTE_GOOGLE = re.compile(r'(?:<link rel="preconnect" href="https://fonts\.(?:googleapis|gstatic)\.com"(?: crossorigin)?>\s*)*'
                           r'<link href="https://fonts\.googleapis\.com/css2\?family=Fredoka[^"]*" rel="stylesheet">')
 LEIA_ME = """Kit sem internet do GamificaPampa
@@ -68,6 +71,8 @@ def ajustar(arquivo, kit):
         return f"{encontrado.group(1)}{relativo(alvo, arquivo)}{encontrado.group(3)}"
 
     texto = re.sub(r'((?:src|href)="|url\(")/identidade-visual/([^"]+)(")', identidade, texto)
+    # A lista de jogos do hub, que o menu da turma lê, fica na raiz do kit
+    texto = texto.replace('src="/jogos.js"', f'src="{relativo(kit / "jogos.js", arquivo)}"')
 
     def link(encontrado):
         endereco = encontrado.group(2)
@@ -94,6 +99,11 @@ def ajustar(arquivo, kit):
 def conferir(kit):
     # Todo link relativo e todo arquivo carregado pelas páginas precisa existir dentro do kit
     faltando = []
+    # O menu da turma monta os cartões pelo jogos.js: cada jogo precisa da pasta, da capa e do QR
+    for pasta in re.findall(r"pasta: '([^']+)'", (kit / "jogos.js").read_text(encoding="utf-8")):
+        for nome in ("index.html", "capa.svg", "qr.svg"):
+            if not (kit / "recursos-pedagogicos" / "criancas" / pasta / nome).is_file():
+                faltando.append(f"jogos.js: {pasta}/{nome}")
     for pagina in kit.rglob("*.html"):
         texto = pagina.read_text(encoding="utf-8")
         for endereco in re.findall(r'(?:href|src)="([^"]+)"', texto) + re.findall(r'url\("([^"]+)"\)', texto):
@@ -116,6 +126,7 @@ def montar(hub, identidade, saida):
     for pasta in PASTAS_IDENTIDADE:
         shutil.copytree(identidade / pasta, kit / "identidade-visual" / pasta)
     shutil.copy2(hub / "turma" / "index.html", kit / "index.html")
+    shutil.copy2(hub / "jogos.js", kit / "jogos.js")
     (kit / "LEIA-ME.txt").write_text(LEIA_ME, encoding="utf-8", newline="\r\n")
     for pagina in kit.rglob("*.html"):
         ajustar(pagina, kit)

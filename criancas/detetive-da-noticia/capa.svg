@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="34" y="14" width="96" height="92" rx="10" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+          <rect x="34" y="14" width="96" height="16" rx="8" fill="#eef1f7" stroke="#2f2a4a" stroke-width="4"/>
+          <path d="M46 44h70M46 56h56M46 72h66M46 84h48" stroke="#9aa3c2" stroke-width="5" stroke-linecap="round"/>
+          <text x="104" y="60" font-family='Fredoka, "Trebuchet MS", "Arial Rounded MT Bold", sans-serif' font-weight="700" font-size="22" fill="#e53950">!!!</text>
+          <g class="g a-tw"><circle cx="140" cy="62" r="20" fill="#cfe6ff" fill-opacity=".6" stroke="#2f2a4a" stroke-width="5"/><path d="M154 76l18 18" stroke="#2f2a4a" stroke-width="8" stroke-linecap="round"/></g>
+</svg>

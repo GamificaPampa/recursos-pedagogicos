@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.m-fly { animation: m-fly 2.2s ease-in-out infinite }
+@keyframes m-fly { 50% { transform: translateY(-8px) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<circle cx="34" cy="30" r="16" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3.5"/>
+          <path d="M120 44a14 14 0 0 1 5-26 19 19 0 0 1 35-4 15 15 0 0 1 21 14 11 11 0 0 1-4 16z" fill="#fff" stroke="#2f2a4a" stroke-width="3.5" stroke-linejoin="round"/>
+          <path d="M0 98 Q20 90 40 98 T80 98 T120 98 V120 H0Z" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3.5"/>
+          <path d="M100 120 L156 52 L200 96 V120Z" fill="#8ddf6a" stroke="#2f2a4a" stroke-width="3.5" stroke-linejoin="round"/>
+          <g class="m-fly"><path d="M62 52 C68 61 72 66 72 70 A10 10 0 0 1 52 70 C52 66 56 61 62 52Z" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="3"/><circle cx="58" cy="69" r="1.8" fill="#2f2a4a"/><circle cx="66" cy="69" r="1.8" fill="#2f2a4a"/></g>
+          <path d="M136 52l-3 8M150 52l-3 8M164 52l-3 8" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/>
+</svg>

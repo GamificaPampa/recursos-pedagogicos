@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.n1 { animation: n-arc 2.6s infinite }
+.n2 { animation: n-arc2 2.6s infinite; animation-delay: -1.3s }
+.n-slash { stroke-dasharray: 140; animation: n-slash 2.6s infinite }
+@keyframes n-arc { 0% { transform: translate(30px, 130px) rotate(0); animation-timing-function: cubic-bezier(.2, .6, .4, 1) }
+    50% { transform: translate(64px, 18px) rotate(160deg); animation-timing-function: cubic-bezier(.6, 0, .8, .4) }
+    100% { transform: translate(98px, 130px) rotate(320deg) } }
+@keyframes n-arc2 { 0% { transform: translate(160px, 130px) rotate(0); animation-timing-function: cubic-bezier(.2, .6, .4, 1) }
+    50% { transform: translate(126px, 26px) rotate(-160deg); animation-timing-function: cubic-bezier(.6, 0, .8, .4) }
+    100% { transform: translate(92px, 130px) rotate(-320deg) } }
+@keyframes n-slash { 0%, 44% { stroke-dashoffset: 140; opacity: 1 } 52% { stroke-dashoffset: 0; opacity: 1 } 70%, 100% { stroke-dashoffset: 0; opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<defs><symbol id="bug" viewBox="0 0 100 100">
+    <path d="M26 54 10 46M24 67 8 70M29 81 17 93M74 54 90 46M76 67 92 70M71 81 83 93M43 18 35 6M57 18 65 6" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <circle cx="35" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/><circle cx="65" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/>
+    <ellipse cx="50" cy="64" rx="30" ry="29" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="5"/>
+    <path d="M50 40V91" stroke="#b52a2a" stroke-width="4"/>
+    <circle cx="38" cy="58" r="6" fill="#b52a2a"/><circle cx="63" cy="56" r="5" fill="#b52a2a"/><circle cx="62" cy="78" r="6" fill="#b52a2a"/><circle cx="38" cy="79" r="4" fill="#b52a2a"/>
+    <circle cx="50" cy="30" r="17" fill="#2f2a4a"/>
+    <circle cx="43" cy="29" r="6.5" fill="#fff"/><circle cx="57" cy="29" r="6.5" fill="#fff"/>
+    <circle cx="44" cy="30" r="3" fill="#2f2a4a"/><circle cx="58" cy="30" r="3" fill="#2f2a4a"/>
+    <path d="M45 39q5 4 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </symbol></defs>
+<g class="g n1"><use href="#bug" width="42" height="42"/></g>
+          <g class="g n2"><use href="#bug" width="34" height="34"/></g>
+          <path class="n-slash" d="M34 78 L140 -7" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+</svg>

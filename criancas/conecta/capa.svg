@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.c-flow { stroke-dasharray: 5 7; animation: c-flow .7s linear infinite }
+@keyframes c-flow { to { stroke-dashoffset: -12 } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<defs><symbol id="cellphone" viewBox="0 0 100 100">
+    <rect x="26" y="6" width="48" height="88" rx="10" fill="#fff" stroke="#2f2a4a" stroke-width="5"/>
+    <rect x="33" y="16" width="34" height="58" rx="4" fill="#8cc4ff"/>
+    <circle cx="57" cy="30" r="7" fill="#ffd84d"/>
+    <path d="M33 74 V58 Q42 46 50 56 Q58 48 67 58 V74 Z" fill="#3cc26b"/>
+    <circle cx="50" cy="84" r="4" fill="#2f2a4a"/>
+  </symbol><symbol id="database" viewBox="0 0 100 100">
+    <path d="M20 22 V78 A30 12 0 0 0 80 78 V22" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5"/>
+    <path d="M20 41 A30 12 0 0 0 80 41 M20 60 A30 12 0 0 0 80 60" fill="none" stroke="#2f2a4a" stroke-width="4"/>
+    <ellipse cx="50" cy="22" rx="30" ry="12" fill="#ffe88a" stroke="#2f2a4a" stroke-width="5"/>
+  </symbol><symbol id="server" viewBox="0 0 100 100">
+    <rect x="18" y="8" width="64" height="84" rx="10" fill="#ff9a3c" stroke="#2f2a4a" stroke-width="5"/>
+    <rect x="28" y="20" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <rect x="28" y="43" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <rect x="28" y="66" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
+    <circle cx="62" cy="27.5" r="4" fill="#3cc26b"/><circle cx="62" cy="50.5" r="4" fill="#3cc26b"/><circle cx="62" cy="73.5" r="4" fill="#3cc26b"/>
+  </symbol></defs>
+<path d="M36 70 H86 M114 70 H162" stroke="#2f2a4a" stroke-width="10" stroke-linecap="round"/>
+          <path class="c-flow" d="M162 70 H114 M86 70 H36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <rect x="-8" y="-7" width="16" height="13" rx="3" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite" path="M172 70 H24"/></rect>
+          <use href="#cellphone" x="2" y="34" width="46" height="70"/>
+          <use href="#server" x="72" y="20" width="56" height="88"/>
+          <use href="#database" x="146" y="40" width="50" height="58"/>
+</svg>
