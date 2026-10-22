@@ -78,7 +78,7 @@
   .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
   .btn svg { width: 22px; height: 22px }
   .btn.calm { background: #fff; color: var(--ink); -webkit-text-stroke: 0; font-size: 17px }
-  .done { font-weight: 700; color: #1f8a60 }
+  .done { font-weight: 700; color: #17694a }
   .more { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
   footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
 
@@ -129,7 +129,7 @@
   <section class="gems" id="gems" data-bit-pose="feliz" data-bit-dica="Comece pelo meu Gem: eu faço uma pergunta por vez e monto o prompt com você. Depois teste com o pedido que está no cartão."></section>
 
   <div class="more">
-    <a class="btn" href="construtor.html" style="--c: var(--blue)">Construtor de prompts</a>
+    <a class="btn" href="construtor.html" style="--c: var(--yellow)">Construtor de prompts</a>
     <a class="btn calm" href="biblioteca.html">Biblioteca de prompts</a>
     <a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener">Abrir o Gemini</a>
   </div>
@@ -275,26 +275,30 @@ document.getElementById("gems").innerHTML = GEMS.map((gem, index) => `
     <div class="row"><button class="btn" type="button" data-index="${index}" style="--c: var(--mint)">${COPY}Copiar instruções</button><span class="done" aria-live="polite"></span></div>
   </article>`).join("")
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file
+// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file.
+// Returns whether it worked, so the page only says "copiado" when the text really is in the clipboard
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text)
+    return true
   } catch {
-    const box = document.createElement("textarea")
-    box.value = text
+    const box = Object.assign(document.createElement("textarea"), { value: text })
+    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
     document.body.append(box)
     box.select()
-    document.execCommand("copy")
+    let ok = false
+    try { ok = document.execCommand("copy") } catch {}
     box.remove()
+    return ok
   }
 }
 
 document.getElementById("gems").addEventListener("click", async event => {
   const button = event.target.closest("button[data-index]")
   if (!button) return
-  await copyText(GEMS[button.dataset.index].text)
+  const ok = await copyText(GEMS[button.dataset.index].text)
   const done = button.parentElement.querySelector(".done")
-  done.textContent = "Copiado! Agora cole nas instruções do Gem."
+  done.textContent = ok ? "Copiado! Agora cole nas instruções do Gem." : "Não deu para copiar. Selecione as instruções e copie à mão."
   setTimeout(() => { done.textContent = "" }, 4000)
 })
 </script>

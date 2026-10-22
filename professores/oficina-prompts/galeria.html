@@ -49,7 +49,9 @@
   .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
   .btn.white { background: #fff }
   .btn.small { min-height: 44px; padding: 5px 14px; font-size: 16px; box-shadow: 0 4px 0 var(--ink) }
-  .btn.whatsapp { --c: #6be08f }
+  .btn.whatsapp { --c: var(--purple) }
+  /* Jogar é sempre verde, como em todo o site */
+  a.btn.loud.grow { --c: var(--mint) }
   .btn.off { background: rgba(255, 255, 255, .6); border-style: dashed; box-shadow: none; color: var(--soft); font-size: 16px; cursor: default; transform: none }
   .loud { color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; letter-spacing: .3px }
   .loud .i { filter: drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink)) }
@@ -76,7 +78,7 @@
   .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
   .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
   .nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0 0 }
-  .nav a { padding: 6px 16px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-weight: 700; text-decoration: none; transition: transform .1s }
+  .nav a { padding: 6px 16px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-weight: 700; text-decoration: none; transition: transform .1s }
   .nav a:hover { transform: translateY(-3px) rotate(-2deg) }
 
   /* Section titles drawn like the title of the page */
@@ -267,7 +269,7 @@
     <div>
       <h3>Ainda não tem jogos aqui.</h3>
       <p>Os primeiros aparecem depois do Encontro 3. Fez um jogo com o Gemini? Envie o link para ele entrar na galeria.</p>
-      <a class="btn loud" href="#enviar" style="--c: var(--mint)"><svg class="i"><use href="#i-send"/></svg>Enviar o meu jogo</a>
+      <a class="btn loud" href="#enviar" style="--c: var(--pink)"><svg class="i"><use href="#i-send"/></svg>Enviar o meu jogo</a>
     </div>
   </div>
 </section>
@@ -580,19 +582,27 @@ function toast(text) {
   toastTimer = setTimeout(() => $("toast").classList.remove("show"), 1800)
 }
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file
-async function copy(text, done) {
+// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file.
+// Returns whether it worked, so the page only says "copiado" when the text really is in the clipboard
+async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text)
+    return true
   } catch {
-    const area = Object.assign(document.createElement("textarea"), { value: text })
-    document.body.append(area)
-    area.select()
-    document.execCommand("copy")
-    area.remove()
+    const box = Object.assign(document.createElement("textarea"), { value: text })
+    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
+    document.body.append(box)
+    box.select()
+    let ok = false
+    try { ok = document.execCommand("copy") } catch {}
+    box.remove()
+    return ok
   }
-  toast(done)
 }
+async function copy(text, done) {
+  toast(await copyText(text) ? done : "Não deu para copiar. Selecione o texto e copie à mão.")
+}
+
 
 $("filters").addEventListener("click", event => {
   const button = event.target.closest("[data-filter]")
