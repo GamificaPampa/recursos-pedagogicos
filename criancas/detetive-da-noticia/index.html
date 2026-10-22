@@ -92,6 +92,27 @@
     .parte--texto { font-size: 16px; font-weight: 500; line-height: 1.4; }
     .parte--fim { margin-bottom: 8px; font-size: 15px; font-weight: 700; }
     .aviso { margin: 0; font-size: 14px; font-weight: 600; color: var(--soft); text-align: center; }
+    .aviso .btn { margin-top: 8px; }
+    .aviso svg { width: 20px; height: 20px; }
+    .caderno { padding:12px 16px 14px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 20px; }
+    .caderno[hidden] { display: none; }
+    .caderno h3 { margin: 0 0 6px; font-size: 19px; }
+    .caderno ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .caderno li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 2px 10px; align-items: start; font-size: 16px; font-weight: 500; line-height: 1.35; }
+    .caderno li svg { grid-row: span 2; width: 26px; height: 26px; }
+    .caderno li b { color: #c2264a; }
+    .caderno li.caderno__vazio { display: block; font-size: 15px; font-weight: 600; color: var(--soft); }
+
+    /* Before the game: why this matters */
+    .intro { display: grid; justify-items: center; gap: 12px; max-width: 760px; margin: 0 auto; padding: 4px 0 8px; text-align: center; }
+    .intro[hidden] { display: none; }
+    .intro img { width: 104px; height: auto; }
+    .intro h2 { font-size: clamp(28px, 5vw, 42px); }
+    .intro ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; text-align: left; }
+    .intro li { padding: 12px 16px; background: var(--c); border: 3px solid var(--ink); border-radius: 18px; font-size: 17px; font-weight: 500; line-height: 1.4; }
+    .intro li b { display: block; font-size: 19px; }
+    .intro p { margin: 0; font-size: 17px; font-weight: 600; }
+    .mesa[hidden], .fases[hidden], .btn[hidden] { display: none; }
 
     /* End of a phase */
     .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
@@ -171,9 +192,20 @@ p, li, blockquote {
       </ul>
     </header>
 
-    <section class="card jogo" aria-label="Jogo">
-      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
-      <div class="mesa">
+    <section class="card jogo" id="jogo" aria-label="Jogo">
+      <div class="intro" id="intro">
+        <img src="/identidade-visual/mascote/bit-pensando.svg" alt="" width="104" height="104">
+        <h2 class="loud">Por que ser detetive de notícias?</h2>
+        <ul>
+          <li style="--c: #cfe6ff"><b>Muita notícia chega pelo celular.</b>Ela aparece no grupo da turma, no da família e nos vídeos, e nem toda é verdadeira. Algumas são inventadas, outras são velhas e voltam como se fossem de hoje.</li>
+          <li style="--c: #ffd6e2"><b>Notícia falsa faz mal de verdade.</b>Ela assusta, faz alguém tomar um remédio que não funciona, gastar dinheiro à toa ou mandar dados pessoais para um golpe.</li>
+          <li style="--c: #fff1a8"><b>Ler bem é ler com atenção.</b>Toda notícia tem partes: o site, a data, o título, o autor, o texto e a fonte. Cada parte pode dar uma pista de que algo está errado.</li>
+        </ul>
+        <p>Você vai treinar três coisas: achar as pistas, decidir se uma notícia é confiável e saber o que fazer antes de compartilhar.</p>
+        <button class="btn btn--jogar btn--big" type="button" id="comecar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar a investigação</span></button>
+      </div>
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases" hidden></div>
+      <div class="mesa" id="mesa" hidden>
         <div class="fala-bit">
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
@@ -185,10 +217,15 @@ p, li, blockquote {
         </div>
         <div class="noticia-area">
           <article class="noticia" id="noticia" aria-label="Notícia"></article>
-          <p class="aviso">Todas as notícias, sites e nomes deste jogo são inventados.</p>
+          <section class="caderno" id="caderno" aria-labelledby="titulo-caderno" hidden>
+            <h3 id="titulo-caderno">Caderno do detetive</h3>
+            <ol id="caderno-lista"></ol>
+          </section>
+          <p class="aviso">Todas as notícias, sites e nomes deste jogo são inventados. <button class="btn btn--small btn--conhecer" type="button" id="por-que"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Por que isso importa?</button></p>
         </div>
         <div class="controles">
           <div class="opcoes" id="opcoes"></div>
+          <button class="btn btn--jogar" type="button" id="proxima" hidden><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima notícia</span></button>
           <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
         </div>
       </div>
@@ -207,6 +244,8 @@ p, li, blockquote {
         <div>
           <h3>O que a turma aprende</h3>
           <p>A ler uma notícia procurando pistas: o endereço do site, a data, o autor, a fonte das informações e o tom do título. Também a decidir se uma notícia parece confiável e o que fazer antes de compartilhar, como conferir em outros jornais e nunca mandar dados pessoais.</p>
+          <h3>Por que isso importa</h3>
+          <p>Estudantes dessa idade recebem notícias pelo celular o tempo todo, em grupos e vídeos, e repassam para a família. Uma notícia falsa pode assustar, levar a um golpe ou a um remédio que não funciona. Ler a notícia como um gênero, com partes que dão pistas (site, data, título, autor, fonte), é leitura crítica, conteúdo de Língua Portuguesa, e vale para qualquer texto que eles leiam.</p>
           <h3>Como jogar com a turma</h3>
           <ul>
             <li><b>No projetor:</b> a turma lê a notícia junto e vota em cada parte suspeita antes de alguém tocar.</li>
@@ -245,31 +284,32 @@ p, li, blockquote {
 
 <script src="/identidade-visual/js/jogo.js"></script>
 <script>
-  // Phase 1: each news has parts; three of them are clues ("s") and the others look normal ("n")
+  // Phase 1: each news has parts; three of them are clues ("s", with the name of the clue and what it means)
+  // and the others look normal ("n", with why)
   const CASOS = [
     { partes: [
-      ["site", "verdade-urgente.xyz", "s", "O endereço é estranho e não é de nenhum jornal conhecido."],
+      ["site", "verdade-urgente.xyz", "s", "Site desconhecido", "Não é o endereço de nenhum jornal. Jornal de verdade tem nome e endereço que dá para procurar e conferir."],
       ["data", "Publicada hoje, às 9h", "n", "A data está certa: é uma notícia de hoje."],
-      ["titulo", "URGENTE!!! CHOCOLATE CURA A GRIPE EM UM DIA", "s", "Letras maiúsculas, muitas exclamações e uma promessa milagrosa são sinais de alerta."],
+      ["titulo", "URGENTE!!! CHOCOLATE CURA A GRIPE EM UM DIA", "s", "Título exagerado", "Letras maiúsculas, exclamações e uma cura milagrosa servem para chamar a atenção, não para informar. Notícia séria conta o fato com calma."],
       ["autor", "Por Equipe de Redação", "n", "Não ter um nome de repórter é comum em alguns sites; sozinho, não prova nada."],
       ["texto", "A gripe é causada por um vírus e costuma passar em alguns dias de descanso.", "n", "Essa frase é verdadeira e fácil de conferir."],
-      ["fim", "Compartilhe com todos os seus contatos antes que apaguem!", "s", "Pedir para espalhar rápido, com medo de que apaguem, é um truque das notícias falsas."],
+      ["fim", "Compartilhe com todos os seus contatos antes que apaguem!", "s", "Pressa para espalhar", "Pedir que você espalhe logo, antes que apaguem, é para ninguém ter tempo de conferir. Jornal não pede isso."],
     ] },
     { partes: [
       ["site", "Jornal Exemplo · jornalexemplo.com.br", "n", "É o site de um jornal, com nome e endereço claros."],
-      ["data", "Publicada em 05/08/2018", "s", "É uma notícia de anos atrás, circulando como se fosse nova."],
+      ["data", "Publicada em 05/08/2018", "s", "Notícia velha", "É de 2018 e está circulando como se fosse de hoje. Um fato antigo, fora de hora, engana do mesmo jeito que um inventado."],
       ["titulo", "Escolas da cidade fecham por causa do calor", "n", "O título é calmo e diz só o fato."],
-      ["autor", "Sem autor", "s", "Ninguém assina a notícia, então não dá para saber quem escreveu."],
-      ["texto", "Segundo o amigo de um funcionário, todas as escolas vão fechar amanhã.", "s", "A fonte é o amigo de alguém: ninguém que se possa conferir."],
+      ["autor", "Sem autor", "s", "Ninguém assina", "Sem o nome de quem escreveu, ninguém responde pelo que está ali, e não dá para perguntar de onde veio a informação."],
+      ["texto", "Segundo o amigo de um funcionário, todas as escolas vão fechar amanhã.", "s", "Fonte que não dá para conferir", "\"O amigo de um funcionário\" não é ninguém que se possa procurar. Notícia séria diz quem informou: a escola, a prefeitura, a secretaria."],
       ["fim", "Foto: arquivo do jornal", "n", "Dizer de onde veio a foto é um bom sinal."],
     ] },
     { partes: [
-      ["site", "jornalexemp1o.com", "s", "Olhe de perto: o nome imita o Jornal Exemplo, mas troca a letra l pelo número 1."],
+      ["site", "jornalexemp1o.com", "s", "Site que imita outro", "O endereço troca a letra l pelo número 1 para parecer o Jornal Exemplo. Leia o endereço letra por letra."],
       ["data", "Publicada hoje, às 14h", "n", "A data está certa: é uma notícia de hoje."],
-      ["titulo", "Todos os celulares vão parar de funcionar à meia-noite", "s", "É uma afirmação enorme, sem nenhuma prova, para assustar."],
+      ["titulo", "Todos os celulares vão parar de funcionar à meia-noite", "s", "Afirmação sem prova", "Uma notícia enorme, sem nenhum dado nem especialista, feita para assustar. Quanto maior a afirmação, mais prova ela precisa."],
       ["autor", "Por Ana Souza, repórter", "n", "A notícia diz quem escreveu, o que ajuda a conferir."],
       ["texto", "A empresa de telefonia disse que não recebeu nenhum aviso sobre isso.", "n", "Esse trecho até ajuda o detetive: a própria empresa não confirma a história."],
-      ["fim", "Fonte: confia em mim", "s", "Isso não é uma fonte. Uma notícia séria diz de onde veio a informação."],
+      ["fim", "Fonte: confia em mim", "s", "Sem fonte de verdade", "\"Confia em mim\" não é fonte. Notícia séria diz de onde veio a informação, para qualquer um poder conferir."],
     ] },
   ]
   // Phase 2: reliable or suspicious
@@ -305,7 +345,7 @@ p, li, blockquote {
   ]
   const FASES = [
     { nome: "Ache as pistas", tipo: "pistas", total: CASOS.length,
-      abertura: "Oi! Eu sou o Bit, detetive de notícias. Toque nas partes da notícia que parecem suspeitas. Em cada uma há 3 pistas." },
+      abertura: "Oi! Eu sou o Bit, detetive de notícias. Leia cada parte da notícia e toque nas que parecem suspeitas. Em cada notícia há 3 pistas, e eu anoto o que cada uma quer dizer no caderno." },
     { nome: "Confiável ou suspeita?", tipo: "julgar", total: NOTICIAS.length,
       abertura: "Agora leia a notícia inteira e decida: ela parece confiável ou suspeita? Olhe o site, a data e a fonte." },
     { nome: "Antes de compartilhar", tipo: "agir", total: SITUACOES.length,
@@ -329,7 +369,7 @@ p, li, blockquote {
     cala() {},
   }
 
-  let fase = 0, rodada = 0, erros = 0, ocupado = false, achadas = 0
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, achadas = 0, anotadas = []
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
@@ -385,6 +425,12 @@ p, li, blockquote {
     $("pistas").innerHTML = [0, 1, 2].map(i => `<span class="${i < achadas ? "achada" : ""}"><svg aria-hidden="true"><use href="#lupa"/></svg></span>`).join("")
     $("pistas").setAttribute("aria-label", `${achadas} de 3 pistas encontradas`)
   }
+  // The detective's notebook: every clue found stays on screen with its name and what it means
+  function desenharCaderno() {
+    $("caderno-lista").innerHTML = anotadas.length
+      ? anotadas.map(([nome, explica]) => `<li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg><b>${escapar(nome)}</b><span>${escapar(explica)}</span></li>`).join("")
+      : '<li class="caderno__vazio">Toque numa parte suspeita da notícia. Cada pista que você achar fica anotada aqui.</li>'
+  }
   function desenharPlacar() {
     $("placar").innerHTML = Array.from({ length: FASES[fase].total }, (_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
@@ -392,6 +438,10 @@ p, li, blockquote {
   function mostrarRodada() {
     const f = FASES[fase]
     achadas = 0
+    anotadas = []
+    $("proxima").hidden = true
+    $("caderno").hidden = f.tipo !== "pistas"
+    desenharCaderno()
     desenharPlacar()
     $("topo").textContent = `${f.nome} · ${f.tipo === "agir" ? "situação" : "notícia"} ${rodada + 1} de ${f.total}`
     $("pistas").hidden = f.tipo !== "pistas"
@@ -426,32 +476,40 @@ p, li, blockquote {
     }
     window.Bit?.diz("ops", frase)
   }
-  function proxima(espera = 2600) {
+  // After a right answer the round stays on screen, with the explanation, until the student taps Próxima
+  function proxima() {
     ocupado = true
-    setTimeout(() => {
-      ocupado = false
-      rodada++
-      if (rodada < FASES[fase].total) mostrarRodada()
-      else terminarFase()
-    }, espera)
+    const ultima = rodada === FASES[fase].total - 1
+    $("proxima").querySelector("span").textContent = ultima ? "Ver o resultado" : FASES[fase].tipo === "agir" ? "Próxima situação" : "Próxima notícia"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].total) mostrarRodada()
+    else terminarFase()
   }
 
   // Phase 1: a clue turns red and counts; a normal part turns green and counts as a mistake
   function investigar(botao) {
     if (ocupado || botao.classList.contains("suspeita") || botao.classList.contains("normal")) return
-    const [, , tipo, explica] = CASOS[rodada].partes[+botao.dataset.i]
-    if (tipo === "s") {
+    const parte = CASOS[rodada].partes[+botao.dataset.i]
+    if (parte[2] === "s") {
+      const [, , , nome, explica] = parte
       botao.classList.add("suspeita")
       achadas++
+      anotadas.push([nome, explica])
       somPista()
       desenharPistas()
-      if (achadas < 3) return window.Bit?.diz("feliz", `Pista! ${explica}`)
+      desenharCaderno()
+      if (achadas < 3) return window.Bit?.diz("feliz", `Pista: ${nome.toLowerCase()}. ${explica}`)
       somAcerto()
-      window.Bit?.diz("comemorando", `Pista! ${explica} Você achou as 3 pistas desta notícia.`)
-      return proxima(3200)
+      window.Bit?.diz("comemorando", `Pista: ${nome.toLowerCase()}. Você achou as 3 pistas! Releia o caderno: são elas que mostram que essa notícia não merece confiança.`)
+      return proxima()
     }
     botao.classList.add("normal")
-    errar(`Essa parte parece normal. ${explica}`)
+    errar(`Essa parte parece normal. ${parte[3]}`)
   }
 
   // Phases 2 and 3: one answer, and Bit explains why
@@ -526,6 +584,23 @@ p, li, blockquote {
   $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
   $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
   $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  function mostrarIntro(aberta) {
+    $("intro").hidden = !aberta
+    $("mesa").hidden = aberta
+    $("fases").hidden = aberta
+  }
+  $("comecar").onclick = () => {
+    const primeiraVez = !$("bit-balao").dataset.comecou
+    $("bit-balao").dataset.comecou = "1"
+    mostrarIntro(false)
+    if (primeiraVez) comecar(0)
+    $("jogo").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+  }
+  $("por-que").onclick = () => {
+    $("comecar").querySelector("span").textContent = "Voltar para a investigação"
+    mostrarIntro(true)
+    $("jogo").scrollIntoView({ block: "start" })
+  }
 
   // Copying the prompt messages for the Gemini
   document.querySelectorAll("[data-copiar]").forEach(botao => {
@@ -544,7 +619,7 @@ p, li, blockquote {
   })
 
   desenharSom()
-  addEventListener("load", () => comecar(0))
+  desenharCaderno()
 </script>
 </body>
 </html>
