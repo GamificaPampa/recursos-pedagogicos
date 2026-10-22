@@ -61,7 +61,10 @@
     .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
     .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
     .placar li.feito { background: var(--mint); }
-    .placar li.agora { background: var(--yellow); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A fase feita tem um visto, além da cor, e a atual é maior: a cor não é a única pista */
+    .placar li { position: relative; }
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
 
     /* End of a phase */
     /* Bit lives inside the game, big, and keeps the last thing he said on screen */
@@ -212,6 +215,7 @@ p, li, blockquote {
     <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m1 0h2m1 0h1m1 0h4m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h1m3 0h3m5 0h2m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m7 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h1m2 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m1 0h4m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m2 0h1m1 0h4m1 0h1m6 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h2m1 0h2m2 0h1m3 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h4m1 0h2m1 0h1m4 0h6m2 0h5m-35 1h3m4 0h4m1 0h2m1 0h2m1 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h4m1 0h2m10 0h2m1 0h2m2 0h1m2 0h6m2 0h2m-37 1h1m4 0h1m4 0h5m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m1 0h2m3 0h1m-37 1h2m2 0h1m1 0h1m2 0h2m1 0h2m2 0h2m1 0h2m1 0h1m1 0h4m1 0h2m1 0h5m-37 1h2m1 0h2m3 0h1m1 0h3m1 0h1m1 0h1m2 0h5m4 0h1m2 0h1m-29 1h1m2 0h3m1 0h1m2 0h6m1 0h2m5 0h2m1 0h4m1 0h2m-34 1h3m1 0h5m2 0h3m1 0h6m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h2m1 0h1m1 0h2m1 0h1m2 0h1m4 0h2m1 0h1m5 0h2m3 0h1m1 0h1m1 0h3m-37 1h1m1 0h1m1 0h1m4 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-33 1h1m2 0h5m4 0h2m3 0h3m1 0h1m2 0h2m1 0h3m1 0h3m-36 1h2m1 0h2m1 0h1m4 0h2m1 0h1m3 0h1m1 0h4m1 0h2m1 0h2m5 0h1m-36 1h4m1 0h2m4 0h1m2 0h1m1 0h1m4 0h1m1 0h3m2 0h2m1 0h3m-34 1h1m5 0h3m1 0h1m2 0h1m4 0h1m3 0h1m4 0h1m4 0h1m-33 1h1m2 0h1m1 0h4m1 0h2m2 0h2m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-36 1h2m1 0h1m4 0h1m9 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h4m1 0h4m2 0h1m1 0h3m1 0h1m1 0h2m1 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h1m1 0h1m1 0h1m2 0h2m2 0h1m3 0h2m2 0h3m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m1 0h3m1 0h4m1 0h1m3 0h2m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h1m1 0h2m2 0h2m1 0h2m3 0h1m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m2 0h2m-37 1h1m2 0h1m2 0h1m1 0h1m2 0h1m1 0h2m1 0h2m1 0h1m4 0h11m1 0h1m-29 1h1m1 0h4m2 0h1m2 0h3m1 0h6m3 0h2m-34 1h7m4 0h1m3 0h4m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m1 0h4m1 0h1m4 0h1m2 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m3 0h3m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m3 0h1m5 0h2m1 0h1m2 0h2m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m3 0h4m1 0h1m1 0h1m1 0h1m2 0h2m5 0h3m-37 1h1m5 0h1m3 0h3m3 0h1m3 0h2m1 0h1m4 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h3m1 0h1m4 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
   </svg>
 
+<script src="/identidade-visual/js/jogo.js"></script>
 <script>
   // One drawing per word, with the thick outline, the bright colors and the shine of the rest of the site
   const T = 'stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"'
@@ -303,7 +307,6 @@ p, li, blockquote {
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
-  try { comSom = localStorage.getItem("silabas-som") !== "0" } catch {}
   function tocar(notas, tipo = "triangle") {
     if (!comSom) return
     try {
@@ -331,11 +334,12 @@ p, li, blockquote {
     $("som").setAttribute("aria-pressed", String(comSom))
     $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
   }
-  $("som").onclick = () => {
-    comSom = !comSom
-    try { localStorage.setItem("silabas-som", comSom ? "1" : "0") } catch {}
-    desenharSom()
-  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // The browser reads the word aloud, when the device has a Portuguese voice
   const podeFalar = "speechSynthesis" in window
@@ -472,7 +476,8 @@ p, li, blockquote {
     $("silabas").querySelectorAll(".silaba").forEach(b => b.disabled = true)
     $("figura").classList.add("pronta")
     window.Bit?.diz("feliz", `Isso! ${p.silabas.join(" + ")} = ${p.palavra}`, 3200)
-    setTimeout(() => falar(p.palavra), 350)
+    // A leitura automática respeita o Sem som; o botão Ouvir e a Dica falam sempre, porque a criança pediu
+    setTimeout(() => comSom && falar(p.palavra), 350)
     setTimeout(() => {
       ocupado = false
       item++

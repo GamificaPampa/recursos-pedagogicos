@@ -42,6 +42,9 @@
   .hills::after{right:-25%; width:95%; height:120%; background:var(--hill2);}
 
   .app{position:relative; z-index:1; height:100%; max-width:480px; margin:0 auto; padding-inline:16px; padding-block:12px 16px; display:flex; flex-direction:column;}
+  /* Outros jogos e tela cheia no começo e no fim; durante a rodada o topo é do placar */
+  .topo-jogo{display:flex; justify-content:space-between; gap:10px;}
+  .app:has(#scr-game:not([hidden])) .topo-jogo{display:none;}
 
   /* ---------- start ---------- */
   .start{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px;}
@@ -76,7 +79,7 @@
   .hearts span{display:block; width:24px; height:24px; transition:transform .3s, filter .3s;}
   .hearts .icone{display:block; width:100%; height:100%;}
   .hearts span.lost{filter:grayscale(1) opacity(.35); transform:scale(.8);}
-  #mute{width:38px; height:38px; border-radius:50%; background:#fff; display:grid; place-items:center; box-shadow:0 3px 0 rgba(47,42,74,.12);}
+  #mute{width:44px; height:44px; border-radius:50%; background:#fff; display:grid; place-items:center; box-shadow:0 3px 0 rgba(47,42,74,.12);}
   #mute .icone{width:24px; height:24px;}
 
   .stage{flex:1; min-height:0; display:grid; place-items:center;}
@@ -162,6 +165,13 @@
 
   #confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:20;}
 
+  /* No projetor (a partir de 1024 px), o celular desenhado fica mais largo e os textos crescem */
+  @media (min-width:1024px){
+    .app{max-width:640px;}
+    .phone{width:min(100%, 520px, calc((100vh - 130px) * .75)); width:min(100%, 520px, calc((100svh - 130px) * .75)); aspect-ratio:3/4;}
+    .story{font-size:1.25rem;}
+    .how{font-size:1.1rem;}
+  }
   @media (prefers-reduced-motion: reduce){ .cloud,.logo span,.hero,.medal,.bug svg,.bug .legs{animation:none!important;} }
 </style>
 </head>
@@ -236,6 +246,7 @@
 <canvas id="confetti"></canvas>
 
 <script src="/identidade-visual/js/icones.js"></script>
+<script src="/identidade-visual/js/jogo.js"></script>
 <script>
 (function(){
   'use strict';
@@ -311,11 +322,17 @@
     crash: function(){ tone(300, 0.6, 'sawtooth', 0.07, 0, 60); }
   };
   function vibrate(p){ try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} }
-  $('mute').addEventListener('click', function(){
-    muted = !muted;
-    this.innerHTML = icon(muted ? 'mudo' : 'som');
-    this.setAttribute('aria-label', muted ? 'Ligar som' : 'Desligar som');
+  // O som vale para todos os jogos e fica guardado no aparelho (kit de jogo do identidade-visual)
+  $('mute').addEventListener('click', function(){ Jogo.som.mudar(); });
+  Jogo.som.aoMudar(function(ligado){
+    muted = !ligado;
+    $('mute').innerHTML = icon(muted ? 'mudo' : 'som');
+    $('mute').setAttribute('aria-label', muted ? 'Ligar som' : 'Desligar som');
   });
+  var topoJogo = document.createElement('div');
+  topoJogo.className = 'topo-jogo';
+  topoJogo.append(Jogo.botao('casa'), Jogo.botao('tela-cheia'));
+  document.querySelector('.app').prepend(topoJogo);
 
   // ---- state ----
   var S = { running:false, score:0, hearts:MAX_HEARTS, combo:0, t0:0, hit:0, miss:0, spawnT:0, raf:0, lastTick:-1 };
@@ -606,7 +623,7 @@
   });
 
   $('btn-start').addEventListener('click', startRound);
-  $('btn-again').addEventListener('click', startRound);
+  $('btn-again').replaceWith(Jogo.acoesDoFim(startRound));
   document.addEventListener('visibilitychange', function(){ if(document.hidden && S.running) endRound('time'); });
 
   // ---- confetti ----
