@@ -11,6 +11,10 @@ Um jogo de Língua Portuguesa sobre notícias falsas: o estudante acha as pistas
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/detetive-da-noticia/                            |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                                |
 
-Parte do prompt "Notícia falsa ou verdadeira?", da Biblioteca da Oficina de Prompts. Todas as notícias, sites e nomes do jogo são inventados, sem pessoas reais nem política. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
+Parte do prompt "Notícia falsa ou verdadeira?", da Biblioteca da Oficina de Prompts. Todas as notícias, sites e nomes do jogo são inventados, sem pessoas reais nem política.
+
+Antes de jogar, uma tela explica por que isso importa: a notícia chega pelo celular, a falsa faz mal de verdade e cada parte da notícia pode dar uma pista. Na fase 1, cada pista achada vai para o Caderno do detetive, com o nome dela (site desconhecido, notícia velha, fonte que não dá para conferir...) e o que ela quer dizer. Depois de cada acerto, a notícia fica na tela até o estudante tocar em Próxima.
+
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.
