@@ -241,6 +241,8 @@
 </div>
 </div>
 
+<script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Describing every class the teacher can pick: its age, its stage and how well the children read
 const STAGES = [
@@ -511,21 +513,10 @@ function missingField() {
   return null
 }
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    const box = Object.assign(document.createElement("textarea"), { value: text })
-    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
-    document.body.append(box)
-    box.select()
-    let copied = false
-    try { copied = document.execCommand("copy") } catch {}
-    box.remove()
-    return copied
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 
 let copiedTimer
@@ -544,7 +535,7 @@ async function copyMessage(index) {
     return $(missing[0]).focus()
   }
   const messages = toMessages(buildPrompt())
-  if (!await copyText(messages[index])) return tell("Não deu para copiar. Selecione o texto do prompt e copie.", true)
+  if (!await copyText(messages[index])) return
   tell(kind !== "jogo" ? "Copiado! Agora cole no ChatGPT ou no Gemini." : index === 0 ? "Copiado! Cole no Gemini com o Canvas ligado e espere a página aparecer." : "Copiado! Cole no Gemini, na mesma conversa.")
 }
 
@@ -556,12 +547,29 @@ function fillAreas() {
   if (areas.includes(previous)) $("area").value = previous
 }
 
+// O site lembra as escolhas da última visita neste aparelho (o texto colado para adaptar fica de fora)
+const lembrado = Lembrar.ler("construtor", {})
+if (KINDS[lembrado.kind]) kind = lembrado.kind
 $("kinds").innerHTML = Object.entries(KINDS).map(([id, details]) =>
   `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}"><svg viewBox="0 0 64 64" aria-hidden="true">${KIND_ICONS[id]}</svg>${details.label}</button>`).join("")
 $("stage").innerHTML = STAGES.map(group => `<optgroup label="${group.group}">${group.items.map(([id, label]) => `<option value="${id}">${label}</option>`).join("")}</optgroup>`).join("")
 $("stage").value = "f2"
 $("needs").innerHTML = Object.keys(NEEDS).map(need => `<label><input type="checkbox" value="${need}">${need}</label>`).join("")
 fillAreas()
+const temOpcao = (campo, valor) => !campo.options || [...campo.options].some(opcao => opcao.value === valor)
+if (typeof lembrado.stage === "string" && temOpcao($("stage"), lembrado.stage)) { $("stage").value = lembrado.stage; fillAreas() }
+for (const id of ["area", "topic", "goal", "time", "place", "extra"]) {
+  if (typeof lembrado[id] === "string" && temOpcao($(id), lembrado[id])) $(id).value = lembrado[id]
+}
+$("ask").checked = Boolean(lembrado.ask)
+document.querySelectorAll("#needs input").forEach(box => { box.checked = (lembrado.needs || []).includes(box.value) })
+function lembrarEscolhas() {
+  Lembrar.guardar("construtor", {
+    kind, stage: $("stage").value, area: $("area").value, topic: $("topic").value, goal: $("goal").value,
+    time: $("time").value, place: $("place").value, extra: $("extra").value, ask: $("ask").checked,
+    needs: [...document.querySelectorAll("#needs input:checked")].map(box => box.value),
+  })
+}
 
 $("kinds").addEventListener("click", event => {
   const button = event.target.closest("button")
@@ -577,6 +585,12 @@ $("stage").addEventListener("change", () => { fillAreas(); render() })
 $("form").addEventListener("input", render)
 $("form").addEventListener("change", render)
 $("form").addEventListener("submit", event => event.preventDefault())
+$("form").addEventListener("input", lembrarEscolhas)
+$("form").addEventListener("change", lembrarEscolhas)
+$("kinds").addEventListener("click", lembrarEscolhas)
+Lembrar.botaoEsquecer($("form"))
+// No celular, o prompt e o Copiar ficam depois do formulário: uma barra no pé da tela traz o Copiar para perto
+Copiar.barraFixa({ observar: document.querySelector(".result .actions"), copiar: $("copy"), largura: 861 })
 $("copy").addEventListener("click", () => copyMessage(0))
 $("copy2").addEventListener("click", () => copyMessage(1))
 $("next").addEventListener("click", async event => {

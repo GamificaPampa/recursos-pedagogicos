@@ -123,6 +123,15 @@
   .tags { display: flex; flex-wrap: wrap; gap: 6px }
   .tag { padding: 0 10px; background: var(--c, #fff); border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 600 }
   .pcard-body { display: flex; flex-direction: column; flex: 1; padding: 14px 18px 18px }
+  /* O prompt inteiro fica guardado; o cartão mostra os campos para trocar e o Copiar */
+  .ver-prompt { margin: 4px 0 10px }
+  .ver-prompt summary { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; cursor: pointer; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px }
+  .ver-prompt[open] summary { margin-bottom: 8px }
+  .trocas { display: grid; gap: 8px; margin: 4px 0 10px; padding: 12px 14px; background: #fff8e1; border: 3px solid var(--ink); border-radius: 16px }
+  .trocas b { font-size: 16px }
+  .trocas label { display: grid; gap: 4px; font-weight: 600; font-size: 15px }
+  .trocas input { min-height: 44px; padding: 6px 12px; border: 3px solid var(--ink); border-radius: 12px; font: inherit; font-weight: 500 }
+  .trocas input:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
   .area { margin: 0 0 12px; font-weight: 500; color: var(--soft) }
   .area b { color: var(--ink); font-weight: 600 }
   .prompt { flex: 1; font-size: 16px; overflow-wrap: anywhere }
@@ -243,6 +252,8 @@
 
 <footer>Curso de Engenharia de Software · UNIPAMPA · Campus Alegrete</footer>
 
+<script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Listing every prompt of the library. To add one, copy a block and change the texts.
 // stage: "infantil", "iniciais" or "finais". kind: one of the keys of KINDS, further down.
@@ -845,6 +856,22 @@ const marked = text => escape(text).replace(/\[[^\]]*\]/g, part => `<mark>${part
 const list = lines => `<ul>${lines.map(line => `<li${line.startsWith("MATERIAL") ? ' class="paste"' : ""}>${marked(line)}</li>`).join("")}</ul>`
 
 // Drawing one card: the coloured top, the four parts like the builder, the buttons and the tip
+// As partes entre colchetes viram campos: o que a pessoa escreve entra no lugar delas na hora de copiar
+const lacunas = prompt => [...new Set(toText(prompt).match(/\[[^\]]+\]/g) || [])]
+function trocas(prompt, index) {
+  const lista = lacunas(prompt)
+  if (!lista.length) return ""
+  return `<div class="trocas"><b>Antes de copiar, troque o que está entre colchetes:</b>${lista.map(lacuna =>
+    `<label>${escape(lacuna.slice(1, -1))}<input type="text" data-prompt="${index}" data-lacuna="${escape(lacuna)}" placeholder="Deixe em branco para trocar depois"></label>`).join("")}</div>`
+}
+function textoPreenchido(index) {
+  let texto = toText(PROMPTS[index])
+  document.querySelectorAll(`input[data-prompt="${index}"]`).forEach(campo => {
+    if (campo.value.trim()) texto = texto.split(campo.dataset.lacuna).join(campo.value.trim())
+  })
+  return texto
+}
+
 function cardHTML(prompt, index) {
   const stage = STAGES[prompt.stage], kind = KINDS[prompt.kind]
   return `
@@ -858,6 +885,8 @@ function cardHTML(prompt, index) {
     </div>
     <div class="pcard-body">
       <p class="area"><b>${stage.area}:</b> ${escape(prompt.area)}</p>
+      ${trocas(prompt, index)}
+      <details class="ver-prompt"><summary>Ver o prompt inteiro</summary>
       <div class="prompt">
         <div class="part role-part"><b class="role"><i>P</i>Papel</b><p>${marked(prompt.role)}</p></div>
         <div class="part task-part"><b class="task"><i>T</i>Tarefa</b><p>${marked(prompt.task)}</p></div>
@@ -865,6 +894,7 @@ function cardHTML(prompt, index) {
         <div class="part format-part"><b class="format"><i>F</i>Formato</b>${list(prompt.format)}</div>
         ${prompt.ask ? `<div class="part ask-part"><b style="--c: #e2dbff"><i>?</i>Antes de começar</b><p>${ASK}</p></div>` : ""}
       </div>
+      </details>
       <div class="actions">
         <button class="btn copy" type="button" data-copy="${index}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar prompt</button>
         <a class="btn open" href="${GEMINI}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
@@ -926,22 +956,10 @@ function clearFilters() {
   applyFilters()
 }
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file.
-// Returns whether it worked, so the page only says "copiado" when the text really is in the clipboard
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    const box = Object.assign(document.createElement("textarea"), { value: text })
-    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
-    document.body.append(box)
-    box.select()
-    let ok = false
-    try { ok = document.execCommand("copy") } catch {}
-    box.remove()
-    return ok
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 
 document.querySelectorAll(".chips").forEach(group => group.addEventListener("click", event => {
@@ -960,12 +978,34 @@ $("clear-empty").addEventListener("click", clearFilters)
 $("library").addEventListener("click", async event => {
   const button = event.target.closest("[data-copy]")
   if (!button) return
-  const ok = await copyText(toText(PROMPTS[Number(button.dataset.copy)]))
+  const ok = await copyText(textoPreenchido(Number(button.dataset.copy)))
   const status = button.parentElement.querySelector(".copied")
-  status.textContent = ok ? "Copiado! Agora cole no Gemini." : "Não deu para copiar. Selecione o texto do prompt e copie à mão."
+  status.textContent = ok ? "Copiado! Agora cole no Gemini." : ""
   clearTimeout(status.timer)
   status.timer = setTimeout(() => { status.textContent = "" }, 4000)
 })
+// O site lembra os filtros: eles vão para o endereço, para mandar o link já filtrado, e ficam guardados no aparelho
+const pedidos = new URLSearchParams(location.search)
+const guardados = pedidos.has("etapa") || pedidos.has("tipo") || pedidos.has("busca")
+  ? { stage: pedidos.get("etapa") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "" }
+  : Lembrar.ler("biblioteca", {})
+if (chips.some(chip => chip.dataset.filter === "stage" && chip.dataset.value === guardados.stage)) filters.stage = guardados.stage
+if (chips.some(chip => chip.dataset.filter === "kind" && chip.dataset.value === guardados.kind)) filters.kind = guardados.kind
+if (typeof guardados.busca === "string" && guardados.busca) {
+  $("search").value = guardados.busca
+  filters.words = fold(guardados.busca).split(/\s+/).filter(Boolean)
+}
+const anotarFiltros = () => {
+  const dados = { stage: filters.stage, kind: filters.kind, busca: $("search").value.trim() }
+  Lembrar.guardar("biblioteca", dados)
+  const endereco = new URLSearchParams()
+  if (dados.stage) endereco.set("etapa", dados.stage)
+  if (dados.kind) endereco.set("tipo", dados.kind)
+  if (dados.busca) endereco.set("busca", dados.busca)
+  history.replaceState(null, "", endereco.size ? "?" + endereco : location.pathname)
+}
+const filtrar = applyFilters
+applyFilters = (animate = true) => { filtrar(animate); anotarFiltros() }
 applyFilters(false)
 </script>
 </body>

@@ -77,7 +77,7 @@
       .medalha { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
-<script src="/identidade-visual/js/barra.js" defer></script>
+<script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
 </head>
 <body>
   <div class="cenario cenario--fixo" aria-hidden="true">
@@ -128,6 +128,7 @@
 
   <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
 
+<script src="/identidade-visual/js/lembrar.js"></script>
   <script>
     const $ = (selector) => document.querySelector(selector);
 
@@ -145,6 +146,9 @@
     const porFolha = 12;
     const maximo = 48;
     const quantas = Object.fromEntries(medalhas.map((m) => [m.id, m.sugestao]));
+    // O site lembra as quantidades e o preto e branco da última vez, neste aparelho
+    const lembrado = Lembrar.ler('medalhas', {});
+    medalhas.forEach((m) => { if (Number.isInteger(lembrado.quantas?.[m.id])) quantas[m.id] = Math.max(0, Math.min(48, lembrado.quantas[m.id])); });
     const imagem = (pose) => `/identidade-visual/mascote/${pose}.svg`;
 
     const total = () => Object.values(quantas).reduce((soma, n) => soma + n, 0);
@@ -176,6 +180,7 @@
       document.querySelectorAll('[data-menos]').forEach((b) => { b.disabled = quantas[b.dataset.menos] === 0; });
       document.querySelectorAll('[data-mais]').forEach((b) => { b.disabled = n >= maximo; });
       medalhas.forEach((m) => { $(`#n-${m.id}`).value = quantas[m.id]; });
+      Lembrar.guardar('medalhas', { quantas, pb: $('#pb').checked });
     };
 
     // Uma linha por medalha, com o desenho, o nome e os botões de menos e mais.
@@ -194,7 +199,9 @@
     }));
 
     $('#sugestao').addEventListener('click', () => { medalhas.forEach((m) => { quantas[m.id] = m.sugestao; }); desenharFolhas(); });
-    $('#pb').addEventListener('change', (event) => $('#folhas').classList.toggle('pb', event.target.checked));
+    $('#pb').checked = Boolean(lembrado.pb);
+    $('#folhas').classList.toggle('pb', $('#pb').checked);
+    $('#pb').addEventListener('change', (event) => { $('#folhas').classList.toggle('pb', event.target.checked); desenharFolhas(); });
     $('#imprimir').addEventListener('click', () => print());
     desenharFolhas();
   </script>

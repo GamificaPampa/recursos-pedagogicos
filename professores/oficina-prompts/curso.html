@@ -394,7 +394,7 @@
     .comp { position: relative; width: 297mm; height: 210mm; transform: none !important; break-inside: avoid; page-break-inside: avoid }
   }
 </style>
-<script src="/identidade-visual/js/barra.js" defer></script>
+<script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
 </head>
 <body data-view="inicio">
 
@@ -963,6 +963,7 @@
   <symbol id="c-gem" viewBox="0 0 100 100"><polygon points="14,38 32,14 68,14 86,38 50,88" fill="#4fd6a6" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M14 38 H86 M32 14 L40 38 L50 88 L60 38 L68 14" fill="none" stroke="#1d2a44" stroke-width="3.5" stroke-linejoin="round"/><polygon points="36,20 46,20 41,32" fill="#c9f5e3"/></symbol>
 </svg>
 
+<script src="/identidade-visual/js/copiar.js"></script>
 <script>
 "use strict"
 
@@ -1101,27 +1102,10 @@ function say(element, text, mood = "") {
   element.classList.add("pop")
 }
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch (error) {
-    try {
-      const box = document.createElement("textarea")
-      box.value = text
-      box.setAttribute("readonly", "")
-      box.style.position = "fixed"
-      box.style.opacity = "0"
-      document.body.append(box)
-      box.select()
-      const done = document.execCommand("copy")
-      box.remove()
-      return done
-    } catch (fallbackError) {
-      return false
-    }
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 
 function confetti() {
