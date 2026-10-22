@@ -319,6 +319,7 @@
   </symbol>
 </svg>
 
+<script src="/identidade-visual/js/copiar.js"></script>
 <script>
 // The four parts of a prompt, in the order they are written
 const PARTS = [
@@ -562,21 +563,10 @@ function place(block) {
 // The finished prompt as one text, the same order the teacher would paste into Gemini
 const promptText = () => PARTS.map(part => filled[part.id]).join(" ")
 
-// Copying with the clipboard API, and with a hidden text box when the page was opened from a file
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    const box = Object.assign(document.createElement("textarea"), { value: text })
-    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
-    document.body.append(box)
-    box.select()
-    let copied = false
-    try { copied = document.execCommand("copy") } catch {}
-    box.remove()
-    return copied
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 
 // Sending the finished prompt: a short wait, the complete answer, then the stars of the round

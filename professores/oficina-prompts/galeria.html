@@ -422,6 +422,7 @@
   <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M3.5 21 Q12 11 20.5 21" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
 </svg>
 
+<script src="/identidade-visual/js/copiar.js"></script>
 <script>
 // Listing the games of the gallery. The facilitator edits this list by hand: one object per game,
 // in the order they should appear on the page. To add a game, copy the example below into the list,
@@ -582,25 +583,13 @@ function toast(text) {
   toastTimer = setTimeout(() => $("toast").classList.remove("show"), 1800)
 }
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file.
-// Returns whether it worked, so the page only says "copiado" when the text really is in the clipboard
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    const box = Object.assign(document.createElement("textarea"), { value: text })
-    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
-    document.body.append(box)
-    box.select()
-    let ok = false
-    try { ok = document.execCommand("copy") } catch {}
-    box.remove()
-    return ok
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 async function copy(text, done) {
-  toast(await copyText(text) ? done : "Não deu para copiar. Selecione o texto e copie à mão.")
+  if (await copyText(text)) Copiar.avisar(done)
 }
 
 

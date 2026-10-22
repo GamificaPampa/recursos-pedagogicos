@@ -300,7 +300,7 @@
       <path d="M30 62 L26 72 H70 L66 62" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
     </svg>
     <div><span class="solo-tag">Não pode ir aos encontros?</span><h3>Faça o curso online, no seu ritmo</h3><p>Os 4 encontros em módulos curtos, com prática na própria página, teste final e comprovante de conclusão.</p></div>
-    <span class="btn loud" style="--c: var(--yellow)">Começar</span>
+    <span class="btn loud" style="--c: var(--yellow)" id="curso-botao">Começar</span>
   </a>
 </section>
 
@@ -391,5 +391,16 @@
     <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/>
   </symbol>
 </svg>
+<script>
+// Quem já começou o curso online vê no cartão onde parou (o curso guarda o progresso neste aparelho)
+try {
+  const curso = JSON.parse(localStorage.getItem("gamificapampa-curso-prompts") || "null")
+  const feitos = Array.isArray(curso?.modules) ? curso.modules.filter(Boolean).length : 0
+  const botao = document.getElementById("curso-botao")
+  if (curso?.quizPassed) botao.textContent = "Ver o comprovante"
+  else if (feitos === 4) botao.textContent = "Fazer o teste final"
+  else if (feitos > 0) botao.textContent = `Continuar: módulo ${curso.modules.indexOf(false) + 1}`
+} catch {}
+</script>
 </body>
 </html>

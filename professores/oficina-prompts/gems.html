@@ -137,6 +137,7 @@
 
 <footer>Oficina de Prompts para Professores · Engenharia de Software · UNIPAMPA</footer>
 
+<script src="/identidade-visual/js/copiar.js"></script>
 <script>
 // The ready-made Gems: what each one is for, its instructions to copy and a first request to test it
 const GEMS = [
@@ -275,22 +276,10 @@ document.getElementById("gems").innerHTML = GEMS.map((gem, index) => `
     <div class="row"><button class="btn" type="button" data-index="${index}" style="--c: var(--mint)">${COPY}Copiar instruções</button><span class="done" aria-live="polite"></span></div>
   </article>`).join("")
 
-// Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file.
-// Returns whether it worked, so the page only says "copiado" when the text really is in the clipboard
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    const box = Object.assign(document.createElement("textarea"), { value: text })
-    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
-    document.body.append(box)
-    box.select()
-    let ok = false
-    try { ok = document.execCommand("copy") } catch {}
-    box.remove()
-    return ok
-  }
+// Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
+// mostra o texto selecionado para copiar à mão. A página continua dizendo o próximo passo
+function copyText(text) {
+  return Copiar.texto(text, { avisar: false })
 }
 
 document.getElementById("gems").addEventListener("click", async event => {
@@ -298,7 +287,7 @@ document.getElementById("gems").addEventListener("click", async event => {
   if (!button) return
   const ok = await copyText(GEMS[button.dataset.index].text)
   const done = button.parentElement.querySelector(".done")
-  done.textContent = ok ? "Copiado! Agora cole nas instruções do Gem." : "Não deu para copiar. Selecione as instruções e copie à mão."
+  done.textContent = ok ? "Copiado! Agora cole nas instruções do Gem." : ""
   setTimeout(() => { done.textContent = "" }, 4000)
 })
 </script>

@@ -60,7 +60,7 @@
     .cert:last-child { break-after: auto; page-break-after: auto }
   }
 </style>
-<script src="/identidade-visual/js/barra.js" defer></script>
+<script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
 </head>
 <body>
 
@@ -84,6 +84,7 @@
 
 <main id="certificates"></main>
 
+<script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Measuring the certificate in tenths of a millimetre, the size of a landscape A4 sheet
 const WIDTH = 2970, HEIGHT = 2100
@@ -298,6 +299,9 @@ async function downloadPdf() {
   }
 }
 
+// O site lembra a escola e quem apresentou, e a data já vem com o dia de hoje. Os nomes das crianças nunca são guardados
+Lembrar.campos("certificado", [document.getElementById("school"), document.getElementById("presenter")])
+if (!document.getElementById("date").value) document.getElementById("date").value = new Date().toLocaleDateString("pt-BR")
 fields.forEach(field => field.addEventListener("input", render))
 document.getElementById("pdf").addEventListener("click", downloadPdf)
 render()
