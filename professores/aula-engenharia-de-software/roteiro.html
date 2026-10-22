@@ -5,13 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roteiro da aula</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --line: #cfcbe6;
-    --ink: #2f2a4a; --soft: #5d5880;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  :root { --risco: #cfcbe6;
   }
   * { box-sizing: border-box }
   body { margin: 0; padding: 24px 16px 40px; background: linear-gradient(180deg, var(--sky1) 0, var(--sky2) 520px) no-repeat var(--sky2); color: var(--ink); font-family: var(--font); font-size: 16.5px; line-height: 1.45 }
@@ -33,7 +30,7 @@
   ul.check { margin: 0; padding: 0; list-style: none }
   ul.check li { position: relative; padding-left: 36px; margin-bottom: 9px }
   ul.check li::before { content: ""; position: absolute; left: 0; top: 1px; width: 22px; height: 22px; background: #c9f5e3; border: 3px solid var(--ink); border-radius: 7px }
-  .step { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px 16px; padding: 16px 0; border-top: 3px dashed var(--line); break-inside: avoid; page-break-inside: avoid }
+  .step { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px 16px; padding: 16px 0; border-top: 3px dashed var(--risco); break-inside: avoid; page-break-inside: avoid }
   .step:first-of-type { border-top: none; padding-top: 4px }
   .time { grid-row: span 4; align-self: start; padding: 8px 0 6px; background: var(--c, var(--blue)); border: 3px solid var(--ink); border-radius: 16px; box-shadow: 0 3px 0 var(--ink); color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-align: center; font-weight: 700; font-size: 21px; line-height: 1.05 }
   .time small { display: block; font-size: 13px; -webkit-text-stroke: 0; color: var(--ink); font-weight: 600 }
@@ -46,7 +43,7 @@
   .idea { position: relative; padding: 8px 12px 8px 74px; background: #fff1a8; border: 2px dashed var(--ink); border-radius: 14px; font-weight: 500 }
   .idea::before { content: "Ideia"; position: absolute; left: 10px; top: 8px; padding: 0 8px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 999px; font-size: 13px; font-weight: 700 }
   table { width: 100%; border-collapse: collapse }
-  th, td { padding: 9px 10px; border-bottom: 3px dashed var(--line); text-align: left; vertical-align: top }
+  th, td { padding: 9px 10px; border-bottom: 3px dashed var(--risco); text-align: left; vertical-align: top }
   th { font-weight: 700 }
   .lvl { display: inline-block; padding: 1px 12px; background: var(--c); border: 2px solid var(--ink); border-radius: 999px; font-weight: 600 }
   dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px }
@@ -84,6 +81,7 @@
 <script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
 </head>
 <body>
+<script src="/identidade-visual/js/icones.js" data-simbolos></script>
 <div class="doc">
 
 <div class="bar"><button type="button" onclick="print()"><svg viewBox="0 0 24 24"><path d="M7 9 V3 H17 V9 M7 18 H4 V10 H20 V18 H17 M7 14 H17 V21 H7 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Imprimir</button></div>
@@ -217,7 +215,7 @@
     <div><b>→</b></div><div><b>↓</b></div><div><b>↓</b></div>
     <div><b>↓</b></div><div><b>↑</b></div><div><b>↑</b></div>
     <div><b>←</b></div><div><b>←</b></div>
-    <div><svg viewBox="0 0 100 100"><use href="#star"/></svg>CHEGADA</div>
+    <div><svg viewBox="0 0 100 100"><use href="#icone-estrela"/></svg>CHEGADA</div>
   </div>
 </section>
 
@@ -243,18 +241,7 @@
 </div>
 
 <svg width="0" height="0" style="position:absolute">
-  <symbol id="bot" viewBox="0 0 100 100">
-    <line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
-    <circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/>
-    <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-  </symbol>
-  <symbol id="star" viewBox="0 0 100 100">
-    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/>
-  </symbol>
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
   <symbol id="rock" viewBox="0 0 100 100">
     <path d="M12 78 L22 40 L44 22 L70 28 L88 52 L84 80 Z" fill="#9aa3ad" stroke="#5b6570" stroke-width="5" stroke-linejoin="round"/>
     <path d="M40 40 L52 50 M62 60 L70 66" stroke="#5b6570" stroke-width="4"/>

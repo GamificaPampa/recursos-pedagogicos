@@ -7,13 +7,11 @@
 <meta name="description" content="Os jogos que os professores criaram com o Gemini na Oficina de Prompts. Jogue, copie o link ou envie o seu jogo.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880; --line: #cfcbe6;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  :root { --risco: #cfcbe6;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
   [hidden] { display: none !important }
@@ -25,22 +23,7 @@
   .g { transform-box: fill-box; transform-origin: center }
 
   /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
-  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
-  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
-  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
-  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
-  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
-  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
-  .c2 { width: 92px; height: 26px; top: 36%; animation-duration: 60s; animation-delay: -30s }
-  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
-  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
-  .bit { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
-  .b1 { left: 5%; top: 20% } .b2 { right: 7%; top: 13%; animation-delay: -2s } .b3 { left: 10%; top: 62%; animation-delay: -4s } .b4 { right: 12%; top: 48%; animation-delay: -1s }
   @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
-  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
-  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
-  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
-  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   .page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 30px }
 
   /* Buttons: thick outline and a hard shadow, like the buttons of the games */
@@ -70,10 +53,6 @@
   .bot { width: clamp(88px, 24vw, 124px); flex: none; overflow: visible }
   .bot-body { animation: bob 2.6s ease-in-out infinite }
   @keyframes bob { 50% { transform: translateY(-5px) } }
-  .bot-eyes { animation: blink 4.2s infinite }
-  @keyframes blink { 0%, 91%, 97%, 100% { transform: scaleY(1) } 94% { transform: scaleY(.1) } }
-  .cap { animation: cap 3s ease-in-out infinite }
-  @keyframes cap { 50% { transform: rotate(-7deg) translateY(-2px) } }
   .bubble { position: relative; margin: 0; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font-size: clamp(16px, 4.3vw, 21px); font-weight: 600; text-align: left }
   .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
   .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
@@ -162,7 +141,7 @@
   .badge svg { width: 26px; height: 26px }
   label { display: block; margin-bottom: 14px; font-weight: 600 }
   label small { font-weight: 500 }
-  select, input[type=text], input[type=url], textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--line); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
+  select, input[type=text], input[type=url], textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--risco); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
   select:focus, input:focus, textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(77, 163, 255, .35) }
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px }
   .missing { border-color: var(--pink) !important; background: #fff4f7 }
@@ -211,12 +190,15 @@
 </style>
 <script src="/identidade-visual/js/barra.js" defer></script>
 </head>
-<body>
+<body class="ceu">
+<script src="/identidade-visual/js/icones.js" data-simbolos></script>
 
-<div class="sky" aria-hidden="true">
-  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-  <span class="bit b1">&lt;/&gt;</span><span class="bit b2">{ }</span><span class="bit b3">01</span><span class="bit b4">if</span>
-  <div class="hills"></div>
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="nuvem" style="top: 4%; --w: 210px; --t: 90s; --d: -60s"></span>
+  <span class="simbolo" style="left: 5%; top: 20%">&lt;/&gt;</span><span class="simbolo" style="right: 7%; top: 13%; --d: -2s">{ }</span><span class="simbolo" style="left: 10%; top: 62%; --d: -4s">01</span><span class="simbolo" style="right: 12%; top: 48%; --d: -1s">if</span>
+  <span class="morros" style="--altura: 17vh"></span>
 </div>
 
 <div class="page">
@@ -225,17 +207,7 @@
   <p class="tagline">feitos pelos professores na oficina</p>
   <div class="hello">
     <svg class="bot" viewBox="0 0 100 110" aria-hidden="true">
-      <g class="bot-body">
-        <g transform="translate(0 10)">
-          <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-          <g class="g bot-eyes"><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/></g>
-          <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-          <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-        </g>
-        <g class="g cap"><path d="M12 22 L50 6 L88 22 L50 38 Z" fill="#2f2a4a"/><path d="M30 28 V38 Q50 47 70 38 V28" fill="#2f2a4a"/><path d="M80 25 V44" stroke="#ffd23f" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="46" r="5" fill="#ffd23f"/></g>
-      </g>
-    </svg>
+      <g class="bot-body"><image href="/identidade-visual/mascote/bit-formatura.svg" width="100" height="110"/></g></svg>
     <p class="bubble">Aqui ficam os jogos que os professores criaram com o Gemini. Toque em Jogar para abrir um jogo.</p>
   </div>
   <nav class="nav">
@@ -255,8 +227,8 @@
 
   <div class="empty" id="empty" hidden>
     <svg viewBox="0 0 260 170" aria-hidden="true">
-      <g class="g twinkle"><use href="#star" x="8" y="10" width="34" height="34"/></g>
-      <g class="g twinkle late"><use href="#star" x="214" y="2" width="26" height="26"/></g>
+      <g class="g twinkle"><use href="#icone-estrela" x="8" y="10" width="34" height="34"/></g>
+      <g class="g twinkle late"><use href="#icone-estrela" x="214" y="2" width="26" height="26"/></g>
       <g class="frame-swing">
         <path d="M120 8 L70 40 M120 8 L170 40" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/>
         <circle cx="120" cy="8" r="6" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="3"/>
@@ -343,11 +315,11 @@
   <p class="sec-sub">Quatro jogos para crianças, para ter ideias do que pedir ao Gemini.</p>
   <div class="tools">
     <a class="tool" href="../../criancas/robo/">
-      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--blue)"><use href="#bot" x="0" y="12" width="40" height="40"/><g class="g r-star"><use href="#star" x="32" y="28" width="28" height="28"/></g></svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--blue)"><use href="#bot" x="0" y="12" width="40" height="40"/><g class="g r-star"><use href="#icone-estrela" x="32" y="28" width="28" height="28"/></g></svg>
       <div><h3>Robô pega a estrela</h3><p>Monte as setas e leve o robô até a estrela.</p></div>
     </a>
     <a class="tool" href="../../criancas/ninja/">
-      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--pink)"><use href="#bug" x="12" y="12" width="40" height="40"/><path class="n-slash" d="M8 52 L56 10" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--pink)"><use href="#icone-bug" x="12" y="12" width="40" height="40"/><path class="n-slash" d="M8 52 L56 10" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>
       <div><h3>Ninja dos Bugs</h3><p>Deslize o dedo para cortar os bugs, sem cortar o robô.</p></div>
     </a>
     <a class="tool" href="../../criancas/dupla/">
@@ -355,7 +327,7 @@
       <div><h3>Programação em Dupla</h3><p>Um pilota o robô e o outro mostra o caminho.</p></div>
     </a>
     <a class="tool" href="../../criancas/conecta/">
-      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--orange)"><path d="M12 40 H52" stroke="#1d2a44" stroke-width="6" stroke-linecap="round"/><path class="c-flow" d="M52 40 H12" stroke="#fff" stroke-width="2" stroke-linecap="round"/><use href="#cellphone" x="-2" y="18" width="28" height="40"/><use href="#server" x="18" y="12" width="28" height="48"/><use href="#database" x="40" y="22" width="26" height="34"/></svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true" style="--c: var(--orange)"><path d="M12 40 H52" stroke="#1d2a44" stroke-width="6" stroke-linecap="round"/><path class="c-flow" d="M52 40 H12" stroke="#fff" stroke-width="2" stroke-linecap="round"/><use href="#icone-app" x="-2" y="18" width="28" height="40"/><use href="#icone-servidor" x="18" y="12" width="28" height="48"/><use href="#icone-banco-de-dados" x="40" y="22" width="26" height="34"/></svg>
       <div><h3>Conecta o Sistema</h3><p>Ligue o celular ao servidor e ao banco de dados.</p></div>
     </a>
   </div>
@@ -371,48 +343,7 @@
 <div id="toast" role="status"></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="bot" viewBox="0 0 100 100">
-    <line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
-    <circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/>
-    <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-  </symbol>
-  <symbol id="star" viewBox="0 0 100 100">
-    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="bug" viewBox="0 0 100 100">
-    <path d="M26 54 10 46M24 67 8 70M29 81 17 93M74 54 90 46M76 67 92 70M71 81 83 93M43 18 35 6M57 18 65 6" stroke="#1d2a44" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <circle cx="35" cy="6" r="5" fill="#ff4d4d" stroke="#1d2a44" stroke-width="3"/><circle cx="65" cy="6" r="5" fill="#ff4d4d" stroke="#1d2a44" stroke-width="3"/>
-    <ellipse cx="50" cy="64" rx="30" ry="29" fill="#ff4d4d" stroke="#1d2a44" stroke-width="5"/>
-    <path d="M50 40V91" stroke="#b52a2a" stroke-width="4"/>
-    <circle cx="38" cy="58" r="6" fill="#b52a2a"/><circle cx="63" cy="56" r="5" fill="#b52a2a"/><circle cx="62" cy="78" r="6" fill="#b52a2a"/><circle cx="38" cy="79" r="4" fill="#b52a2a"/>
-    <circle cx="50" cy="30" r="17" fill="#1d2a44"/>
-    <circle cx="43" cy="29" r="6.5" fill="#fff"/><circle cx="57" cy="29" r="6.5" fill="#fff"/>
-    <circle cx="44" cy="30" r="3" fill="#1d2a44"/><circle cx="58" cy="30" r="3" fill="#1d2a44"/>
-    <path d="M45 39q5 4 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="cellphone" viewBox="0 0 100 100">
-    <rect x="26" y="6" width="48" height="88" rx="10" fill="#fff" stroke="#1d2a44" stroke-width="5"/>
-    <rect x="33" y="16" width="34" height="58" rx="4" fill="#8cc4ff"/>
-    <circle cx="57" cy="30" r="7" fill="#ffd84d"/>
-    <path d="M33 74 V58 Q42 46 50 56 Q58 48 67 58 V74 Z" fill="#3cc26b"/>
-    <circle cx="50" cy="84" r="4" fill="#1d2a44"/>
-  </symbol>
-  <symbol id="server" viewBox="0 0 100 100">
-    <rect x="18" y="8" width="64" height="84" rx="10" fill="#ff9a3c" stroke="#1d2a44" stroke-width="5"/>
-    <rect x="28" y="20" width="44" height="15" rx="4" fill="#fff" stroke="#1d2a44" stroke-width="4"/>
-    <rect x="28" y="43" width="44" height="15" rx="4" fill="#fff" stroke="#1d2a44" stroke-width="4"/>
-    <rect x="28" y="66" width="44" height="15" rx="4" fill="#fff" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="62" cy="27.5" r="4" fill="#3cc26b"/><circle cx="62" cy="50.5" r="4" fill="#3cc26b"/><circle cx="62" cy="73.5" r="4" fill="#3cc26b"/>
-  </symbol>
-  <symbol id="database" viewBox="0 0 100 100">
-    <path d="M20 22 V78 A30 12 0 0 0 80 78 V22" fill="#ffd84d" stroke="#1d2a44" stroke-width="5"/>
-    <path d="M20 41 A30 12 0 0 0 80 41 M20 60 A30 12 0 0 0 80 60" fill="none" stroke="#1d2a44" stroke-width="4"/>
-    <ellipse cx="50" cy="22" rx="30" ry="12" fill="#ffe88a" stroke="#1d2a44" stroke-width="5"/>
-  </symbol>
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
   <!-- Small icons for the buttons, drawn with the same thick lines -->
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -475,7 +406,7 @@ const SCENES = {
     <g class="g s-pulse"><rect x="154" y="40" width="40" height="40" rx="10" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-dasharray="7 5"/><text x="174" y="70" text-anchor="middle" font-size="28" font-weight="700" fill="#2f2a4a">?</text></g></svg>`,
   letras: `<svg viewBox="0 0 200 120">
     ${[["A", "#ff5f8f", 30, 0], ["B", "#ffd23f", 80, .2], ["C", "#4da3ff", 130, .4]].map(([letter, color, x, delay]) => `<g class="g s-hop" style="animation-delay: ${delay}s"><rect x="${x}" y="44" width="42" height="42" rx="8" fill="${color}" stroke="#2f2a4a" stroke-width="4"/><text x="${x + 21}" y="76" text-anchor="middle" font-size="30" font-weight="700" fill="#fff" stroke="#2f2a4a" stroke-width="5" paint-order="stroke">${letter}</text></g>`).join("")}
-    <g class="g twinkle"><use href="#star" x="168" y="10" width="24" height="24"/></g></svg>`,
+    <g class="g twinkle"><use href="#icone-estrela" x="168" y="10" width="24" height="24"/></g></svg>`,
   ciencias: `<svg viewBox="0 0 200 120">
     <path d="M92 14 V44 L66 94 Q62 104 72 104 H128 Q138 104 134 94 L108 44 V14 Z" fill="#fff"/>
     <path d="M75.4 76 H124.6 L134 94 Q138 104 128 104 H72 Q62 104 66 94 Z" fill="#4fd6a6"/>
@@ -492,8 +423,8 @@ const SCENES = {
       <path d="M86 98 Q90 84 100 80 Q110 84 114 98 Z" fill="#ffd23f"/>
       <rect x="74" y="12" width="52" height="10" rx="4" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="4"/>
       <rect x="74" y="98" width="52" height="10" rx="4" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="4"/></g>
-    <g class="g twinkle"><use href="#star" x="30" y="70" width="28" height="28"/></g>
-    <g class="g twinkle late"><use href="#star" x="148" y="66" width="24" height="24"/></g></svg>`,
+    <g class="g twinkle"><use href="#icone-estrela" x="30" y="70" width="28" height="28"/></g>
+    <g class="g twinkle late"><use href="#icone-estrela" x="148" y="66" width="24" height="24"/></g></svg>`,
   geografia: `<svg viewBox="0 0 200 120">
     <circle cx="96" cy="64" r="42" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/>
     <path d="M66 50 Q74 36 90 40 Q98 50 88 58 Q82 70 70 64 Q60 58 66 50 Z M102 74 Q116 66 128 76 Q128 92 112 98 Q100 92 102 74 Z M100 30 Q112 26 120 36 Q110 42 100 30 Z" fill="#6cc653" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>
@@ -509,8 +440,8 @@ const SCENES = {
     <path d="M30 108 H170" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round" opacity=".35"/>
     <ellipse class="g s-shadow" cx="100" cy="106" rx="24" ry="5" fill="#2f2a4a" opacity=".25"/>
     <g class="s-bounce"><circle cx="100" cy="80" r="22" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M100 70 L109.5 77 L106 88 L94 88 L90.5 77 Z" fill="#2f2a4a"/><path d="M100 70 V59 M109.5 77 L120 73 M106 88 L112 97 M94 88 L88 97 M90.5 77 L80 73" stroke="#2f2a4a" stroke-width="3"/></g>
-    <g class="g twinkle"><use href="#star" x="30" y="62" width="26" height="26"/></g>
-    <g class="g twinkle late"><use href="#star" x="148" y="26" width="22" height="22"/></g></svg>`,
+    <g class="g twinkle"><use href="#icone-estrela" x="30" y="62" width="26" height="26"/></g>
+    <g class="g twinkle late"><use href="#icone-estrela" x="148" y="26" width="22" height="22"/></g></svg>`,
   ingles: `<svg viewBox="0 0 200 120">
     <g class="g s-hop"><path d="M22 20 H96 Q104 20 104 28 V60 Q104 68 96 68 H52 L38 82 V68 H30 Q22 68 22 60 V28 Q22 20 30 20 Z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><text x="63" y="54" text-anchor="middle" font-size="26" font-weight="700" fill="#2f2a4a">Hi!</text></g>
     <g class="g s-hop" style="animation-delay: .9s"><path d="M98 50 H170 Q178 50 178 58 V90 Q178 98 170 98 H162 V112 L148 98 H106 Q98 98 98 90 V58 Q98 50 106 50 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><text x="138" y="84" text-anchor="middle" font-size="26" font-weight="700" fill="#2f2a4a">Olá!</text></g></svg>`,
@@ -522,8 +453,8 @@ const SCENES = {
     <g class="g s-wiggle" style="animation-duration: 2.2s"><rect x="50" y="38" width="100" height="52" rx="26" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
       <path d="M76 52 V76 M64 64 H88" stroke="#2f2a4a" stroke-width="6" stroke-linecap="round"/>
       <circle cx="122" cy="56" r="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><circle cx="134" cy="70" r="6" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/></g>
-    <g class="g twinkle"><use href="#star" x="160" y="10" width="28" height="28"/></g>
-    <g class="g twinkle late"><use href="#star" x="156" y="72" width="26" height="26"/></g></svg>`,
+    <g class="g twinkle"><use href="#icone-estrela" x="160" y="10" width="28" height="28"/></g>
+    <g class="g twinkle late"><use href="#icone-estrela" x="156" y="72" width="26" height="26"/></g></svg>`,
 }
 const SCENE_RULES = [
   [/matem|quantidade|numero/, "numeros"],

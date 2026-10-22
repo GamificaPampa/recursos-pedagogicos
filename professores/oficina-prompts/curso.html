@@ -7,14 +7,12 @@
 <meta name="description" content="A Oficina de Prompts para fazer sozinho(a), no seu ritmo: 4 módulos com prática na própria página, tarefas no Gemini, teste final e comprovante de conclusão.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <script>document.documentElement.classList.add("js")</script>
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880; --line: #cfcbe6; --ok: #17694a;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #8c73ff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  :root { --risco: #cfcbe6; --ok: #17694a;
     --shadow: 0 7px 0 rgba(47, 42, 74, .25);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
@@ -29,22 +27,7 @@
   .g { transform-box: fill-box; transform-origin: center }
 
   /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
-  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
-  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
-  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
-  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
-  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
-  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
-  .c2 { width: 92px; height: 26px; top: 36%; animation-duration: 60s; animation-delay: -30s }
-  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
-  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
-  .bit { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
-  .b1 { left: 5%; top: 20% } .b2 { right: 7%; top: 13%; animation-delay: -2s } .b3 { left: 9%; top: 62%; animation-delay: -4s } .b4 { right: 10%; top: 50%; animation-delay: -1s }
   @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
-  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 15vh }
-  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
-  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
-  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   .page { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: max(12px, env(safe-area-inset-top)) 16px 30px }
 
   /* Top bar: back to the workshop, back to the start of the course, and the progress */
@@ -89,10 +72,6 @@
   .bot { width: clamp(84px, 24vw, 124px); flex: none; overflow: visible }
   .bot-body { animation: bob 2.6s ease-in-out infinite }
   @keyframes bob { 50% { transform: translateY(-5px) } }
-  .bot-eyes { animation: blink 4.2s infinite }
-  @keyframes blink { 0%, 91%, 97%, 100% { transform: scaleY(1) } 94% { transform: scaleY(.1) } }
-  .cap { animation: cap 3s ease-in-out infinite }
-  @keyframes cap { 50% { transform: rotate(-7deg) translateY(-2px) } }
   .bubble { position: relative; margin: 0; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font-size: clamp(16px, 4.3vw, 20px); font-weight: 600; text-align: left }
   .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
   .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
@@ -386,7 +365,6 @@
   @media print {
     html, body { background: #fff !important }
     *, *::before, *::after { animation: none !important; transition: none !important }
-    .sky, .top, footer, .confetti-box, .no-print { display: none !important }
     body:not([data-view="comprovante"]) .page { padding: 12mm }
     body[data-view="comprovante"] .page { max-width: none; margin: 0; padding: 0 }
     body[data-view="comprovante"] #v-comprovante > :not(.comp-wrap) { display: none !important }
@@ -396,12 +374,14 @@
 </style>
 <script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
 </head>
-<body data-view="inicio">
+<body class="ceu" data-view="inicio">
 
-<div class="sky" aria-hidden="true">
-  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-  <span class="bit b1">&lt;/&gt;</span><span class="bit b2">{ }</span><span class="bit b3">01</span><span class="bit b4">if</span>
-  <div class="hills"></div>
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="nuvem" style="top: 4%; --w: 210px; --t: 90s; --d: -60s"></span>
+  <span class="simbolo" style="left: 5%; top: 20%">&lt;/&gt;</span><span class="simbolo" style="right: 7%; top: 13%; --d: -2s">{ }</span><span class="simbolo" style="left: 10%; top: 62%; --d: -4s">01</span><span class="simbolo" style="right: 12%; top: 48%; --d: -1s">if</span>
+  <span class="morros" style="--altura: 15vh"></span>
 </div>
 
 <div class="page">
@@ -419,17 +399,7 @@
     <p class="tagline">curso online para professores</p>
     <div class="hello">
       <svg class="bot" viewBox="0 0 100 110" aria-hidden="true">
-        <g class="bot-body">
-          <g transform="translate(0 10)">
-            <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-            <g class="g bot-eyes"><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/></g>
-            <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-            <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-          </g>
-          <g class="g cap"><path d="M12 22 L50 6 L88 22 L50 38 Z" fill="#2f2a4a"/><path d="M30 28 V38 Q50 47 70 38 V28" fill="#2f2a4a"/><path d="M80 25 V44" stroke="#ffd23f" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="46" r="5" fill="#ffd23f"/></g>
-        </g>
-      </svg>
+        <g class="bot-body"><image href="/identidade-visual/mascote/bit-formatura.svg" width="100" height="110"/></g></svg>
       <p class="bubble">Aqui você faz a Oficina sozinho(a), no seu ritmo: lê cartões curtos, pratica nesta página e testa tudo no Gemini.</p>
     </div>
     <ul class="chips">
@@ -891,7 +861,7 @@
           <text x="150" y="172" text-anchor="middle" font-family="Fredoka, 'Comic Sans MS', sans-serif" font-size="110" font-weight="700" fill="#1d2a44">4</text>
           <text x="150" y="212" text-anchor="middle" font-family="Fredoka, 'Comic Sans MS', sans-serif" font-size="32" font-weight="700" fill="#1d2a44">módulos</text>
         </svg>
-        <svg class="cp-bot" viewBox="0 0 100 106" aria-hidden="true"><use href="#c-capbot"/></svg>
+        <svg class="cp-bot" viewBox="0 0 100 110" aria-hidden="true"><use href="#c-capbot"/></svg>
         <p class="cp-note">Comprovante gerado ao concluir o curso online. Não substitui certificado institucional.</p>
         <p class="cp-foot">Material do curso de Engenharia de Software · UNIPAMPA · Campus Alegrete</p>
       </div>
@@ -908,16 +878,7 @@
 <div class="confetti-box" id="confetti" aria-hidden="true"></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="bot" viewBox="0 0 100 100">
-    <line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
-    <circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/>
-    <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-    <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-  </symbol>
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
   <!-- Icons, all drawn by hand in the same style -->
   <symbol id="i-spark" viewBox="0 0 64 64"><path d="M32 4 C34 22 42 30 60 32 C42 34 34 42 32 60 C30 42 22 34 4 32 C22 30 30 22 32 4 Z" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></symbol>
   <symbol id="i-yes" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4"/><path d="M19 33 L28 42 L46 22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -954,9 +915,8 @@
   <!-- Drawings for the certificate of completion, the same as in the workshop certificate -->
   <symbol id="c-star" viewBox="0 0 100 100"><polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/></symbol>
   <symbol id="c-medal" viewBox="0 0 100 100"><path d="M30 4 H48 L58 40 H40 Z" fill="#4da3ff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M70 4 H52 L42 40 H60 Z" fill="#ff4d4d" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><circle cx="50" cy="66" r="28" fill="#ffd84d" stroke="#1d2a44" stroke-width="5"/><polygon points="50,50 55,61 67,62 58,70 61,82 50,75 39,82 42,70 33,62 45,61" fill="#e0a800"/></symbol>
-  <symbol id="c-bot" viewBox="0 0 100 100"><line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/><circle cx="50" cy="8" r="6" fill="#ff4d4d"/><rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/><path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/></symbol>
-  <symbol id="c-capbot" viewBox="0 0 100 106"><rect x="18" y="32" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/><circle cx="38" cy="54" r="9" fill="#fff"/><circle cx="62" cy="54" r="9" fill="#fff"/><circle cx="40" cy="55" r="4" fill="#1d2a44"/><circle cx="64" cy="55" r="4" fill="#1d2a44"/><circle cx="27" cy="67" r="4" fill="#ff8fb0"/><circle cx="73" cy="67" r="4" fill="#ff8fb0"/><path d="M40 70 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="82" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/><path d="M12 22 L50 6 L88 22 L50 38 Z" fill="#1d2a44"/><path d="M30 28 V38 Q50 47 70 38 V28" fill="#1d2a44"/><path d="M80 25 V44" stroke="#ffd84d" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="46" r="5" fill="#ffd84d"/></symbol>
-  <symbol id="c-chat" viewBox="0 0 100 100"><path d="M50 40 H84 Q96 40 96 52 V68 Q96 80 84 80 H82 L88 94 L70 80 H50 Q38 80 38 68 V52 Q38 40 50 40 Z" fill="#4da3ff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><circle cx="54" cy="61" r="5" fill="#fff"/><circle cx="67" cy="61" r="5" fill="#fff"/><circle cx="80" cy="61" r="5" fill="#fff"/><path d="M16 6 H60 Q72 6 72 18 V36 Q72 48 60 48 H30 L14 62 L18 48 H16 Q4 48 4 36 V18 Q4 6 16 6 Z" fill="#fff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M16 21 H58 M16 33 H44" stroke="#ff5f8f" stroke-width="5" stroke-linecap="round"/></symbol>
+  <symbol id="c-bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
+<symbol id="c-capbot" viewBox="0 0 100 110"><image href="/identidade-visual/mascote/bit-formatura.svg" width="100" height="110"/></symbol>  <symbol id="c-chat" viewBox="0 0 100 100"><path d="M50 40 H84 Q96 40 96 52 V68 Q96 80 84 80 H82 L88 94 L70 80 H50 Q38 80 38 68 V52 Q38 40 50 40 Z" fill="#4da3ff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><circle cx="54" cy="61" r="5" fill="#fff"/><circle cx="67" cy="61" r="5" fill="#fff"/><circle cx="80" cy="61" r="5" fill="#fff"/><path d="M16 6 H60 Q72 6 72 18 V36 Q72 48 60 48 H30 L14 62 L18 48 H16 Q4 48 4 36 V18 Q4 6 16 6 Z" fill="#fff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M16 21 H58 M16 33 H44" stroke="#ff5f8f" stroke-width="5" stroke-linecap="round"/></symbol>
   <symbol id="c-sheet" viewBox="0 0 100 100"><path d="M18 6 H62 L82 26 V94 H18 Z" fill="#fff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M62 6 V26 H82" fill="#e8f4ff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M30 28 H50" stroke="#ff5f8f" stroke-width="6" stroke-linecap="round"/><path d="M30 44 H70 M30 58 H70 M30 72 H56" stroke="#4da3ff" stroke-width="5" stroke-linecap="round"/></symbol>
   <symbol id="c-pencil" viewBox="0 0 100 100"><g transform="rotate(35 50 50)" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"><rect x="40" y="6" width="20" height="16" rx="5" fill="#ff8fb0"/><rect x="40" y="22" width="20" height="50" fill="#ffd84d"/><polygon points="40,72 60,72 50,94" fill="#ffe2b8"/><polygon points="46.4,86 53.6,86 50,94" fill="#1d2a44"/></g></symbol>
   <symbol id="c-gamepad" viewBox="0 0 100 100"><path d="M30 28 H70 Q92 28 95 54 Q98 80 82 82 Q72 83 64 68 H36 Q28 83 18 82 Q2 80 5 54 Q8 28 30 28 Z" fill="#8c73ff" stroke="#1d2a44" stroke-width="5" stroke-linejoin="round"/><path d="M20 50 H40 M30 40 V60" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="67" cy="45" r="6.5" fill="#ffd84d" stroke="#1d2a44" stroke-width="3.5"/><circle cx="79" cy="56" r="6.5" fill="#4fd6a6" stroke="#1d2a44" stroke-width="3.5"/></symbol>
