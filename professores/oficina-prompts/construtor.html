@@ -11,7 +11,7 @@
 <style>
   :root {
     --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880; --line: #cfcbe6;
+    --ink: #2f2a4a; --soft: #5d5880; --line: #cfcbe6; --field: #8a85ad;
     --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
     --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
 
@@ -52,10 +52,6 @@
   @keyframes hop { 0%, 78%, 100% { transform: translateY(0) } 86% { transform: translateY(-9px) rotate(-3deg) } 93% { transform: translateY(0) rotate(1deg) } }
   header p { margin: 12px 0 14px; font-size: 19px; font-weight: 600 }
   .bot { width: 104px; flex: none; overflow: visible }
-  .bot-body { animation: bob 2.6s ease-in-out infinite }
-  @keyframes bob { 50% { transform: translateY(-5px) } }
-  .bot-eyes { animation: blink 4.2s infinite }
-  @keyframes blink { 0%, 91%, 97%, 100% { transform: scaleY(1) } 94% { transform: scaleY(.1) } }
   .parts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none }
   .parts li, .part b { display: inline-flex; align-items: center; gap: 6px; padding: 2px 12px 2px 3px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; font-weight: 600 }
   .parts i, .part b i { display: grid; place-items: center; width: 24px; height: 24px; background: #fff; border: 2px solid var(--ink); border-radius: 50%; font-style: normal; font-weight: 700; font-size: 14px }
@@ -71,7 +67,7 @@
   label { display: block; margin-bottom: 14px; font-weight: 600 }
   label small { font-weight: 500 }
   input[type=checkbox] { width: 24px; height: 24px; flex: none; accent-color: #2470c4 }
-  select, input[type=text], textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--line); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
+  select, input[type=text], textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--field); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
   select:focus, input:focus, textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(77, 163, 255, .35) }
   textarea { min-height: 72px; resize: vertical }
   .kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px }
@@ -83,7 +79,7 @@
   @keyframes wiggle { 25% { transform: rotate(-10deg) scale(1.1) } 75% { transform: rotate(8deg) scale(1.1) } }
   .needs-title { display: block; margin-bottom: 4px; font-weight: 600 }
   .checks { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 14px }
-  .checks label { display: flex; align-items: center; gap: 8px; margin: 0; padding: 5px 12px; background: var(--sky2); border: 2px solid transparent; border-radius: 999px; font-weight: 500; cursor: pointer }
+  .checks label { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; padding: 5px 14px; background: var(--sky2); border: 2px solid transparent; border-radius: 999px; font-weight: 500; cursor: pointer }
   .checks label:has(input:checked) { background: var(--yellow); border-color: var(--ink) }
   .checks input, .ask input { width: 20px; height: 20px; accent-color: var(--ink) }
   .ask { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; background: var(--sky2); border-radius: 16px; font-weight: 600; cursor: pointer }
@@ -108,15 +104,26 @@
   .open .btn { padding: 8px 14px; text-align: center }
   #open-chatgpt { --c: var(--purple) }
   #open-gemini { --c: var(--blue) }
-  #copied { font-weight: 700; color: #1f8a60 }
+  #copy2 { --c: var(--mint) }
+  #copied { flex-basis: 100%; margin: 0; font-weight: 700; color: #1f8a60 }
+  #copied.bad { color: #c92a62 }
   .tip { margin-top: 10px; padding: 12px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 500 }
   .next { margin: 0; padding: 0; list-style: none }
   .next li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 3px dashed var(--line); font-weight: 500 }
   .next li:first-child { border-top: none }
-  .next button { flex: none; padding: 4px 14px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font: 600 15px var(--font); color: var(--ink); cursor: pointer }
+  .next button { flex: none; min-height: 44px; padding: 4px 16px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font: 600 15px var(--font); color: var(--ink); cursor: pointer }
   .next button:active { transform: translateY(3px); box-shadow: none }
   .spin { animation: spin 7s linear infinite }
   @keyframes spin { to { transform: rotate(360deg) } }
+
+  /* A game goes to Gemini in two messages: a divider shows where the second one starts */
+  .step { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px; font-weight: 700; font-size: 15px; color: var(--soft) }
+  .step::after { content: ""; flex: 1; border-top: 3px dashed var(--field) }
+  .part.off { border-style: dashed; color: var(--soft); font-weight: 500 }
+  /* Warnings about data that looks like a student's, shown next to the copy button and under the needs */
+  .alert { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0 0; padding: 10px 14px; background: #ffd6e3; border: 3px solid var(--ink); border-radius: 16px; font-weight: 600 }
+  .alert svg { width: 28px; height: 28px; flex: none }
+  .note { margin: -6px 0 14px; color: var(--soft); font-size: 15px; font-weight: 500 }
 
   @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr }
@@ -139,18 +146,8 @@
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="hills"></div></div>
 
 <div class="page">
-<header>
-  <svg class="bot" viewBox="0 0 100 100" aria-hidden="true">
-    <g class="bot-body">
-      <line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/>
-      <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-      <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-      <g class="g bot-eyes"><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/></g>
-      <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-      <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-    </g>
-  </svg>
+<header data-bit-pose="acenando" data-bit-dica="Oi! Escolha as opções e eu monto o prompt com Papel, Tarefa, Contexto e Formato. Depois é só copiar.">
+  <svg class="bot" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="48" width="48" height="12" rx="4" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="3"/><rect x="8" y="35" width="48" height="12" rx="4" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><rect x="8" y="22" width="48" height="12" rx="4" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3"/><rect x="8" y="9" width="48" height="12" rx="4" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3"/></svg>
   <div>
     <a class="back" href="index.html"><svg viewBox="0 0 24 24"><path d="M15 4.5 L7.5 12 L15 19.5" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Oficina de Prompts</a>
     <h1><span class="w1">Construtor</span> <span class="w2">de</span> <span class="w3">prompts</span></h1>
@@ -161,12 +158,12 @@
 
 <div class="layout">
   <form id="form" autocomplete="off">
-    <section class="card">
+    <section class="card" data-bit-dica="Cada tipo já vem com as frases que evitam os erros da IA, como o teste interativo no quiz e o bloco de código na folha.">
       <h2><span class="number" style="--c: var(--blue)">1</span>O que você quer criar?</h2>
       <div class="kinds" id="kinds"></div>
     </section>
 
-    <section class="card">
+    <section class="card" data-bit-dica="A turma vira o Papel e o Contexto do prompt: com a idade certa, a IA acerta a linguagem e o tamanho.">
       <h2><span class="number" style="--c: var(--pink)">2</span>Para quem?</h2>
       <label>Turma
         <select id="stage"></select>
@@ -176,7 +173,7 @@
       </label>
     </section>
 
-    <section class="card">
+    <section class="card" data-bit-pose="feliz" data-bit-dica="Um tema concreto funciona melhor: animais do Pampa rende mais que natureza.">
       <h2><span class="number" style="--c: var(--mint)">3</span>Sobre o quê?</h2>
       <label>Tema
         <input type="text" id="topic" placeholder="Por exemplo: animais do Pampa, frações, o ciclo da água">
@@ -187,9 +184,10 @@
       <label id="paste-box" hidden>Material para adaptar <small>(cole aqui o texto ou a atividade)</small>
         <textarea id="paste" placeholder="Cole aqui o texto, a atividade ou a prova que você quer adaptar"></textarea>
       </label>
+      <p class="note" id="paste-note" hidden>Antes de colar, apague nomes, turma e notas dos alunos.</p>
     </section>
 
-    <section class="card">
+    <section class="card" data-bit-pose="ops" data-bit-dica="Marque só a necessidade. Nome, turma ou nota de aluno nunca vão para a IA.">
       <h2><span class="number" style="--c: var(--orange)">4</span>Detalhes <small>(opcional)</small></h2>
       <label>Tempo
         <select id="time">
@@ -209,6 +207,7 @@
       </label>
       <span class="needs-title">Na turma há crianças com:</span>
       <div class="checks" id="needs"></div>
+      <p class="note">Marque só a necessidade. Nunca escreva o nome ou a turma da criança.</p>
       <label>Algo mais que a IA precisa saber? <small>(opcional)</small>
         <textarea id="extra" placeholder="Por exemplo: a turma adora futebol; não temos impressora colorida"></textarea>
       </label>
@@ -221,9 +220,11 @@
     <section class="card">
       <h2><svg viewBox="0 0 64 64" aria-hidden="true"><g class="g spin"><path d="M32 4 C34 22 42 30 60 32 C42 34 34 42 32 60 C30 42 22 34 4 32 C22 30 30 22 32 4 Z" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></g></svg>Seu prompt</h2>
       <div class="prompt" id="prompt"></div>
+      <p class="alert" id="alert" hidden></p>
       <div class="actions">
-        <button class="btn" type="button" id="copy"><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar prompt</button>
-        <span id="copied"></span>
+        <button class="btn" type="button" id="copy"><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Copiar prompt</span></button>
+        <button class="btn" type="button" id="copy2" hidden><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>2. Copiar a 2ª mensagem</span></button>
+        <p id="copied" role="status"></p>
         <div class="open">
           <a class="btn" id="open-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 5 H20 A1.5 1.5 0 0 1 21.5 6.5 V15.5 A1.5 1.5 0 0 1 20 17 H11 L6 21 V17 H4 A1.5 1.5 0 0 1 2.5 15.5 V6.5 A1.5 1.5 0 0 1 4 5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o ChatGPT</a>
           <a class="btn" id="open-gemini" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
@@ -276,7 +277,15 @@ const AREAS = {
   fundamental: ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos"],
 }
 
-const NEEDS = ["autismo (TEA)", "TDAH", "deficiência visual", "deficiência auditiva", "dificuldade de leitura", "altas habilidades"]
+// Each need brings a concrete adaptation, so Gemini knows what to change and not only that something must change
+const NEEDS = {
+  "autismo (TEA)": "instruções literais, uma de cada vez, e uma rotina previsível",
+  "TDAH": "tarefas curtas, uma instrução por vez e pausas para se mexer",
+  "deficiência visual": "letra grande, bom contraste e imagens descritas em palavras",
+  "deficiência auditiva": "instruções escritas e apoio visual, sem depender de som",
+  "dificuldade de leitura": "frases curtas, palavras simples e apoio de imagens",
+  "altas habilidades": "um desafio extra para ir além",
+}
 
 // The pictures of each kind of material, drawn instead of emojis
 const KIND_ICONS = {
@@ -288,7 +297,9 @@ const KIND_ICONS = {
   adaptar: '<path d="M8 20 H24 A7 7 0 1 1 38 20 H54 V34 A7 7 0 1 0 54 48 V58 H8 V46 A7 7 0 1 0 8 32 Z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>',
 }
 
-// Each kind of material brings its own wording for the four parts and its own follow-up requests
+// Each kind of material brings its own wording for the four parts, its own follow-up requests and its own tip.
+// The formats carry the sentences that worked in the Gemini tests of 13/10/2026: no code block, images described
+// in parentheses, no interactive quiz and no BNCC codes, which the fast model invents.
 const KINDS = {
   atividade: {
     label: "Atividade para imprimir", maker: "atividades impressas",
@@ -296,22 +307,25 @@ const KINDS = {
     format: early => [
       "Uma folha A4 com título, espaço para o nome e uma instrução curta para a criança.",
       early ? "De 3 a 4 exercícios com desenhos e quase sem texto (ligar, circular, pintar, desenhar), com instruções que o professor lê em voz alta." : "De 3 a 5 exercícios variados (ligar, completar, circular, desenhar, marcar X), do mais fácil para o mais difícil.",
+      "Descreva cada desenho entre parênteses, sem desenhar com letras ou símbolos.",
+      "Escreva a folha em texto normal, fora de bloco de código.",
       "No fim, separado, o gabarito e uma dica para o professor.",
     ],
     next: ["Crie mais 3 exercícios no mesmo estilo.", "Transforme essa atividade em um jogo no Canvas, com estrelas no final."],
+    tip: "O Gemini às vezes põe a folha inteira num bloco de código. O prompt já pede para escrever fora dele.",
   },
   jogo: {
     label: "Jogo interativo", maker: "jogos educativos digitais",
-    task: topic => `Crie um jogo educativo interativo sobre "${topic}", para jogar no navegador.`,
+    // The Canvas refuses a game asked in one long message: the first message is only the short idea
+    task: topic => `Crie uma página HTML interativa sobre "${topic}": aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, visual de desenho, em português do Brasil.`,
     format: early => [
-      "Um único arquivo HTML que funcione no navegador do celular e do computador, sem instalar nada.",
-      "Botões grandes e fáceis de tocar, cores alegres e visual de desenho.",
+      "Funcione no celular e no computador, sem instalar nada.",
       "Uma tela inicial com o nome do jogo e instruções bem curtas.",
       "3 fases, da mais fácil para a mais difícil.",
       "Retorno na hora a cada resposta: verde e um som alegre no acerto, vermelho e uma dica no erro.",
       "No fim, estrelas pelo desempenho e um botão para jogar de novo.",
       ...(early ? ["Instruções faladas em voz alta pela voz do navegador, e nada que dependa de saber ler para jogar."] : []),
-      "Tudo em português do Brasil, sem anúncios, sem links para outros sites e sem pedir dados das crianças.",
+      "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
     next: ["Testei e encontrei um problema: quando eu [o que você fez], acontece [o que aconteceu], mas deveria [o que você esperava]. Conserte só isso.", "Troque as perguntas do jogo por estas: [cole as suas perguntas].", "Adicione narração em voz alta das instruções."],
   },
@@ -321,50 +335,70 @@ const KINDS = {
     format: early => [
       `Um título e ${early ? "de 5 a 7 parágrafos bem curtos" : "de 6 a 10 parágrafos curtos"}, para ler em voz alta em poucos minutos.`,
       "Personagens com nomes brasileiros e um problema que eles resolvem juntos.",
+      "Se sugerir imagens, descreva cada uma entre parênteses, sem desenhar com letras ou símbolos.",
       "No fim, 3 perguntas para conversar com a turma e uma sugestão de desenho ou brincadeira.",
     ],
     next: ["Transforme a história em um teatrinho para 5 crianças.", "Sugira 4 cenas da história para as crianças desenharem."],
+    tip: "Se o Gemini desenhar com letras e símbolos, peça de novo: descreva as imagens entre parênteses.",
   },
   plano: {
     label: "Plano de aula", maker: "planos de aula",
     task: topic => `Crie um plano de aula sobre "${topic}".`,
     format: () => [
-      "Uma tabela com objetivos, habilidades da BNCC, materiais e tempo total.",
+      "Uma tabela com objetivos, materiais e tempo total.",
       "O passo a passo da aula com o tempo de cada parte: abertura, desenvolvimento e fechamento.",
       "Como perceber se as crianças aprenderam.",
       "Uma adaptação para quem tiver dificuldade e um desafio extra para quem terminar antes.",
     ],
     next: ["Crie a atividade impressa que acompanha esse plano.", "Sugira uma brincadeira de 5 minutos para começar a aula."],
+    tip: "O modelo rápido do Gemini inventa códigos da BNCC e nomes de músicas. Por isso o prompt pede para não citar.",
   },
   quiz: {
     label: "Quiz ou avaliação", maker: "quizzes e avaliações",
     task: topic => `Crie um quiz de 8 perguntas sobre "${topic}".`,
-    format: early => early ? [
-      "8 perguntas para o professor fazer em voz alta, com 3 respostas que as crianças mostram apontando para desenhos.",
-      "Sugira o desenho de cada resposta.",
-      "No fim, a resposta certa de cada pergunta e uma explicação simples.",
-    ] : [
-      "8 perguntas de múltipla escolha, com 3 alternativas cada, da mais fácil para a mais difícil.",
-      "Linguagem simples e alternativas do mesmo tamanho, para a resposta certa não ficar óbvia.",
-      "No fim, o gabarito com uma explicação curta de cada resposta.",
+    format: early => [
+      ...(early ? [
+        "8 perguntas para o professor fazer em voz alta, com 3 respostas que as crianças mostram apontando para desenhos.",
+        "Descreva entre parênteses o desenho de cada resposta.",
+        "No fim, a resposta certa de cada pergunta e uma explicação simples.",
+      ] : [
+        "8 perguntas de múltipla escolha, com 3 alternativas cada, da mais fácil para a mais difícil.",
+        "Linguagem simples e alternativas do mesmo tamanho, para a resposta certa não ficar óbvia.",
+        "No fim, o gabarito com uma explicação curta de cada resposta.",
+      ]),
+      "Escreva o quiz em texto, sem usar o teste interativo.",
     ],
     next: ["Transforme esse quiz em um jogo no Canvas, com estrelas no final.", "Crie mais 8 perguntas no mesmo nível."],
+    tip: "O teste interativo do Gemini não dá para imprimir nem passar para o Google Forms. O prompt já pede para não usar.",
   },
   adaptar: {
     label: "Adaptar um material", maker: "materiais adaptados para inclusão",
     task: topic => `Adapte o material que está no fim desta mensagem${topic ? `, sobre "${topic}"` : ""}.`,
     format: () => [
-      "Mantenha o conteúdo e os objetivos do material original.",
-      "Use frases curtas, palavras simples e sugira imagens ou ícones de apoio.",
+      "Mantenha o conteúdo, os objetivos e as palavras importantes do original, explicando as difíceis.",
+      "Use frases curtas, palavras simples e sugira imagens ou ícones de apoio, descritos entre parênteses.",
       "Divida em partes pequenas, com instruções numeradas.",
       "No fim, liste o que você mudou e por quê.",
     ],
     next: ["Crie também uma versão com letras maiores e mais espaço entre as linhas.", "Sugira como apresentar esse material para a turma inteira."],
+    tip: "Antes de colar o material, apague nomes, turma e notas dos alunos.",
   },
 }
 
 // Asking the same final checks of every material, the habit the workshop wants teachers to keep
-const COMMON_NEXT = ["Deixe mais simples, para crianças com dificuldade.", "Revise o que você escreveu: tem algum erro de conteúdo ou palavra difícil para essa idade?"]
+const COMMON_NEXT = ["Deixe mais simples, para crianças com dificuldade.", "Revise o que você escreveu: tem algum erro de conteúdo ou palavra difícil para essa idade?", "Escreva tudo em português do Brasil."]
+
+// Things that look like a student's data. They only warn, because a topic can look like a name by chance.
+const PRIVACY = [
+  [/\bnome\s*(do aluno|da aluna|completo)?\s*:/i, "um campo de nome"],
+  [/\b(alun[oa]s?|menin[oa]s?|crian[cç]as?|estudantes?)\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+/, "um nome perto de aluno ou criança"],
+  [/(\b[Tt]urma[ \t]+\d{1,2}[ \t]?[A-H]|\b\d{1,2}[ \t]?[ºo°][ \t]?(ano[ \t])?[A-H])(?![\w)])/, "o nome de uma turma, como 3º B"],
+  [/\(?\b\d{2}\)?\s?9?\d{4}[-\s]?\d{4}\b/, "um telefone"],
+  [/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/, "um CPF"],
+  [/[\w.+-]+@[\w-]+\.[\w.]+/, "um e-mail"],
+  [/\bmatr[ií]cula\b/i, "uma matrícula"],
+]
+const FIELDS = [["topic", "Tema"], ["goal", "O que devem aprender"], ["extra", "Algo mais"], ["paste", "Material para adaptar"]]
 
 const $ = id => document.getElementById(id)
 let kind = "atividade"
@@ -376,72 +410,142 @@ const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<"
 function buildPrompt() {
   const [, label, age, group, reading] = stageOf($("stage").value)
   const early = group === "infantil", details = KINDS[kind], area = $("area").value
+  const students = group === "finais" ? "alunos" : "crianças"
   const topic = $("topic").value.trim() || "[escreva o tema]"
   const role = early
-    ? `Você é um(a) professor(a) de Educação Infantil experiente, que conhece a BNCC e sabe criar ${details.maker} para crianças pequenas.`
-    : `Você é um(a) professor(a) experiente de ${area === "Vários componentes juntos" ? "vários componentes" : area} do ${label} do Ensino Fundamental, que conhece a BNCC e sabe criar ${details.maker}.`
+    ? `Você é um(a) professor(a) de Educação Infantil experiente, que sabe criar ${details.maker} para crianças pequenas.`
+    : `Você é um(a) professor(a) experiente de ${area === "Vários componentes juntos" ? "vários componentes" : area} do ${label} do Ensino Fundamental, que sabe criar ${details.maker}.`
+  const needs = selectedNeeds()
 
   const context = [
-    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".` : `A turma é do ${label} do Ensino Fundamental, com crianças de ${age}, e o componente é ${area}.`,
+    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".` : `A turma é do ${label} do Ensino Fundamental, com ${students} de ${age}, e o componente é ${area}.`,
     READING[reading],
-    $("goal").value.trim() && `As crianças devem aprender: ${$("goal").value.trim().replace(/\.$/, "")}.`,
+    $("goal").value.trim() && `${group === "finais" ? "Os alunos" : "As crianças"} devem aprender:${$("goal").value.trim().replace(/\.$/, "")}.`,
     $("time").value && `O tempo disponível é ${$("time").value}.`,
     (kind === "jogo" || kind === "quiz") && `Vai ser usado ${$("place").value}.`,
-    selectedNeeds().length && `Na turma há crianças com ${joinList(selectedNeeds())}: inclua adaptações para elas.`,
-    (kind === "plano" || kind === "atividade") && "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
-    "Use português do Brasil e exemplos do dia a dia das crianças brasileiras.",
+    needs.length && `Na turma há ${students} com ${joinList(needs)}. Inclua adaptações: ${needs.map(need => `para ${need}, ${NEEDS[need]}`).join("; ")}.`,
+    (kind === "plano" || kind === "atividade") && "Não cite códigos de habilidades da BNCC.",
+    (kind === "plano" || kind === "historia") && "Não cite músicas nem livros que você não tenha certeza de que existem.",
+    `Responda em português do Brasil, com exemplos do dia a dia ${group === "finais" ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
     $("extra").value.trim(),
   ].filter(Boolean)
 
-  const format = details.format(early)
-  if (kind === "adaptar") format.push(`MATERIAL ORIGINAL:\n${$("paste").value.trim() || "[cole aqui o texto ou a atividade]"}`)
-  return { role, task: details.task(kind === "adaptar" ? $("topic").value.trim() : topic), context, format, ask: $("ask").checked }
+  return {
+    role, task: details.task(kind === "adaptar" ? $("topic").value.trim() : topic), context, format: details.format(early),
+    ask: $("ask").checked, material: kind === "adaptar" ? $("paste").value.trim() || "[cole aqui o texto ou a atividade]" : "",
+  }
 }
 
 const selectedNeeds = () => [...document.querySelectorAll("#needs input:checked")].map(input => input.value)
 const joinList = list => list.length < 2 ? list.join("") : `${list.slice(0, -1).join(", ")} e ${list.at(-1)}`
+const bulleted = lines => lines.map(line => `- ${line}`).join("\n")
+const ASK = "Antes de criar, me faça até 3 perguntas para entender melhor o que eu preciso. Só comece depois das minhas respostas."
+const ASK_GAME = "Antes de mudar a página, me faça até 3 perguntas para entender melhor o que eu preciso. Só mude depois das minhas respostas."
 
-// Writing the prompt as plain text with labelled parts, which is what gets copied into the AI chat
-function toText(prompt) {
-  return [
+// Writing the prompt as plain text with labelled parts, which is what gets copied into the AI chat.
+// The question comes before the material, and the material goes last between two lines, so Gemini never reads
+// the question as part of the text to adapt. A game is two messages: the short idea, then the rest.
+function toMessages(prompt) {
+  if (kind === "jogo") return [
+    prompt.task,
+    [
+      "Agora melhore a página para a minha turma.",
+      `Contexto:\n${bulleted(prompt.context)}`,
+      `Formato:\n${bulleted(prompt.format)}`,
+      prompt.ask && ASK_GAME,
+    ].filter(Boolean).join("\n\n"),
+  ]
+  return [[
     `Papel: ${prompt.role}`,
     `Tarefa: ${prompt.task}`,
-    `Contexto:\n${prompt.context.map(line => `- ${line}`).join("\n")}`,
-    `Formato:\n${prompt.format.map(line => line.startsWith("MATERIAL ORIGINAL") ? `\n${line}` : `- ${line}`).join("\n")}`,
-    prompt.ask && "Antes de criar, me faça até 3 perguntas para entender melhor o que eu preciso. Só comece depois das minhas respostas.",
-  ].filter(Boolean).join("\n\n")
+    `Contexto:\n${bulleted(prompt.context)}`,
+    `Formato:\n${bulleted(prompt.format)}`,
+    prompt.ask && ASK,
+    prompt.material && `---\nMATERIAL ORIGINAL:\n${prompt.material}\n---`,
+  ].filter(Boolean).join("\n\n")]
 }
 
 function render() {
-  const prompt = buildPrompt(), details = KINDS[kind]
-  const list = lines => `<ul>${lines.map(line => `<li>${escape(line).replace(/\n/g, "<br>")}</li>`).join("")}</ul>`
-  $("prompt").innerHTML = `
-    <div class="part role-part"><b class="role"><i>P</i>Papel</b><p>${escape(prompt.role)}</p></div>
-    <div class="part task-part"><b class="task"><i>T</i>Tarefa</b><p>${escape(prompt.task)}</p></div>
-    <div class="part context-part"><b class="context"><i>C</i>Contexto</b>${list(prompt.context)}</div>
-    <div class="part format-part"><b class="format"><i>F</i>Formato</b>${list(prompt.format)}</div>
-    ${prompt.ask ? `<div class="part ask-part"><b style="--c: #e2dbff"><i>?</i>Antes de começar</b><p>Antes de criar, me faça até 3 perguntas para entender melhor o que eu preciso. Só comece depois das minhas respostas.</p></div>` : ""}`
-  $("tip").innerHTML = kind === "jogo"
-    ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Se ele disser que não consegue, mande primeiro só a ideia do jogo, em uma frase, e o resto na mensagem seguinte. No ChatGPT, se a resposta mostrar só o código, peça na conversa para ver o jogo funcionando."
-    : "<b>Dica:</b> leia a resposta com atenção antes de usar com a turma. A IA pode errar fatos, trocar códigos da BNCC e inventar nomes de livros e músicas."
+  const prompt = buildPrompt(), details = KINDS[kind], game = kind === "jogo"
+  const list = lines => `<ul>${lines.map(line => `<li>${escape(line)}</li>`).join("")}</ul>`
+  const part = (id, letter, name, body) => `<div class="part ${id}-part"><b class="${id}"><i>${letter}</i>${name}</b>${body}</div>`
+  $("prompt").innerHTML = [
+    game ? '<p class="step">1ª mensagem, com o Canvas ligado</p>' : "",
+    game ? '<div class="part role-part off"><b class="role"><i>P</i>Papel</b><p>No jogo, o Papel fica de fora: o Canvas aceita melhor um pedido curto.</p></div>' : part("role", "P", "Papel", `<p>${escape(prompt.role)}</p>`),
+    part("task", "T", "Tarefa", `<p>${escape(prompt.task)}</p>`),
+    game ? '<p class="step">2ª mensagem, depois que a página aparecer</p>' : "",
+    part("context", "C", "Contexto", list(prompt.context)),
+    part("format", "F", "Formato", list(prompt.format)),
+    prompt.ask ? `<div class="part ask-part"><b style="--c: #e2dbff"><i>?</i>Antes de começar</b><p>${game ? ASK_GAME : ASK}</p></div>` : "",
+    prompt.material ? `<div class="part ask-part"><b style="--c: #e2dbff"><i>+</i>Material, no fim</b><p>${escape(prompt.material).replace(/\n/g, "<br>")}</p></div>` : "",
+  ].join("")
+  $("copy").lastChild.textContent = game ? "1. Copiar a 1ª mensagem" : "Copiar prompt"
+  $("copy2").hidden = !game
+  $("tip").innerHTML = game
+    ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Mande a 1ª mensagem, espere a página aparecer e mande a 2ª. Se ele recusar, toque em <b>Refazer</b>."
+    : `<b>Dica:</b> ${details.tip} Leia a resposta antes de usar com a turma: a IA pode errar fatos.`
   $("next").innerHTML = details.next.concat(COMMON_NEXT).map(text =>
     `<li><span>${escape(text)}</span><button type="button" data-copy="${escape(text)}">Copiar</button></li>`).join("")
-  $("paste-box").hidden = kind !== "adaptar"
+  $("paste-box").hidden = $("paste-note").hidden = kind !== "adaptar"
   $("place-box").hidden = kind !== "jogo" && kind !== "quiz"
+  checkPrivacy()
+}
+
+// Looking for a student's data in what the teacher typed, and saying where it is
+function checkPrivacy() {
+  const found = FIELDS.flatMap(([id, name]) => {
+    const text = $(id).value
+    if (!text || (id === "paste" && kind !== "adaptar")) return []
+    return PRIVACY.filter(([pattern]) => pattern.test(text)).map(([, what]) => `${what} em "${name}"`)
+  })
+  const alert = $("alert")
+  alert.hidden = found.length === 0
+  if (!found.length) return
+  alert.innerHTML = `<svg viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="16" width="22" height="17" rx="4" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg><span>Parece que há dado de aluno: ${escape(joinList(found))}. Apague antes de copiar. Se não for, pode seguir.</span>`
+}
+
+// What still needs to be filled before the prompt is worth copying
+function missingField() {
+  if (kind !== "adaptar" && !$("topic").value.trim()) return ["topic", "Falta escrever o tema."]
+  if (kind === "adaptar" && !$("paste").value.trim()) return ["paste", "Falta colar o material que você quer adaptar."]
+  return null
 }
 
 // Copying with the clipboard API, and falling back to a hidden text box when the page was opened from a file
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text)
+    return true
   } catch {
-    const box = document.createElement("textarea")
-    box.value = text
+    const box = Object.assign(document.createElement("textarea"), { value: text })
+    box.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0"
     document.body.append(box)
     box.select()
-    document.execCommand("copy")
+    let copied = false
+    try { copied = document.execCommand("copy") } catch {}
     box.remove()
+    return copied
   }
+}
+
+let copiedTimer
+function tell(text, bad = false) {
+  $("copied").textContent = text
+  $("copied").className = bad ? "bad" : ""
+  clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => { $("copied").textContent = "" }, 5000)
+}
+
+async function copyMessage(index) {
+  const missing = missingField()
+  if (missing) {
+    tell(missing[1], true)
+    window.Bit?.diz("ops", missing[1], 4000)
+    return $(missing[0]).focus()
+  }
+  const messages = toMessages(buildPrompt())
+  if (!await copyText(messages[index])) return tell("Não deu para copiar. Selecione o texto do prompt e copie.", true)
+  tell(kind !== "jogo" ? "Copiado! Agora cole no ChatGPT ou no Gemini." : index === 0 ? "Copiado! Cole no Gemini com o Canvas ligado e espere a página aparecer." : "Copiado! Cole no Gemini, na mesma conversa.")
 }
 
 function fillAreas() {
@@ -453,36 +557,37 @@ function fillAreas() {
 }
 
 $("kinds").innerHTML = Object.entries(KINDS).map(([id, details]) =>
-  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}"><svg viewBox="0 0 64 64" aria-hidden="true">${KIND_ICONS[id]}</svg>${details.label}</button>`).join("")
+  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}"><svg viewBox="0 0 64 64" aria-hidden="true">${KIND_ICONS[id]}</svg>${details.label}</button>`).join("")
 $("stage").innerHTML = STAGES.map(group => `<optgroup label="${group.group}">${group.items.map(([id, label]) => `<option value="${id}">${label}</option>`).join("")}</optgroup>`).join("")
 $("stage").value = "f2"
-$("needs").innerHTML = NEEDS.map(need => `<label><input type="checkbox" value="${need}">${need}</label>`).join("")
+$("needs").innerHTML = Object.keys(NEEDS).map(need => `<label><input type="checkbox" value="${need}">${need}</label>`).join("")
 fillAreas()
 
 $("kinds").addEventListener("click", event => {
   const button = event.target.closest("button")
   if (!button) return
   kind = button.dataset.kind
-  document.querySelectorAll("#kinds button").forEach(other => other.classList.toggle("chosen", other === button))
+  document.querySelectorAll("#kinds button").forEach(other => {
+    other.classList.toggle("chosen", other === button)
+    other.setAttribute("aria-pressed", other === button)
+  })
   render()
 })
 $("stage").addEventListener("change", () => { fillAreas(); render() })
 $("form").addEventListener("input", render)
 $("form").addEventListener("change", render)
 $("form").addEventListener("submit", event => event.preventDefault())
-$("copy").addEventListener("click", async () => {
-  await copyText(toText(buildPrompt()))
-  $("copied").textContent = "Copiado! Agora cole no ChatGPT ou no Gemini."
-  setTimeout(() => { $("copied").textContent = "" }, 4000)
-})
+$("copy").addEventListener("click", () => copyMessage(0))
+$("copy2").addEventListener("click", () => copyMessage(1))
 $("next").addEventListener("click", async event => {
   const button = event.target.closest("button")
   if (!button) return
-  await copyText(button.dataset.copy)
-  button.textContent = "Copiado!"
+  const copied = await copyText(button.dataset.copy)
+  button.textContent = copied ? "Copiado!" : "Não deu"
   setTimeout(() => { button.textContent = "Copiar" }, 2500)
 })
 render()
 </script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
 </html>
