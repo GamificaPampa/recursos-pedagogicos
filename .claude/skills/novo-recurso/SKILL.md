@@ -28,6 +28,7 @@ Cada recurso nasce de `modelos/recurso/`, vive numa pasta própria e abre direto
 - O céu, as nuvens, os símbolos de código e os morros vêm do cenário do modelo (`.cenario`, `.nuvem`, `.simbolo`, `.morros`), e o movimento vem das classes `.anima-*`. Mude posição e tamanho pelos atributos `style`, sem desenhar outro céu nem escrever `@keyframes` que já existem. A vitrine em `https://gamificapampa.github.io/identidade-visual/` mostra cada peça com o código.
 - Escreva o CSS e o JavaScript próprios do recurso no próprio `index.html`. Imagens e sons ficam na pasta do recurso.
 - O Bit, o robô do modelo, é o guia. Ele fala em primeira pessoa, no balão, para dar instruções e comemorar acertos.
+- Num jogo, use o kit de jogo do modelo (`/identidade-visual/js/jogo.js`): `Jogo.botao('casa')`, `Jogo.botao('tela-cheia')` e o som por `Jogo.som`, que vale para todos os jogos. Na tela final, `Jogo.acoesDoFim(jogarDeNovo)` põe Jogar de novo e Outros jogos; tocar no fundo não reinicia nada. Num material para professores, troque o kit pela barra comum (`/identidade-visual/js/barra.js`).
 - Alvos de toque têm pelo menos 48 px. O texto tem contraste alto sobre o fundo. Imagens têm `alt`, e o recurso funciona só com teclado.
 
 ## Conteúdo

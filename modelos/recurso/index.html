@@ -69,5 +69,15 @@ p, li, blockquote {
   </main>
 
   <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <!-- TROCAR: num jogo para crianças, o kit de jogo troca o Voltar por Outros jogos e põe tela cheia e som no topo,
+       iguais em todos os jogos (Jogo.som guarda o som para todos). Num recurso para professores, apague os dois
+       scripts abaixo e o Voltar do topo, e carregue a barra comum: /identidade-visual/js/barra.js -->
+  <script src="/identidade-visual/js/jogo.js"></script>
+  <script>
+    const topo = document.querySelector('.topo')
+    topo.querySelector('a.btn').replaceWith(Jogo.botao('casa', { classe: 'btn btn--small', texto: true }))
+    topo.append(Jogo.botao('tela-cheia', { classe: 'btn btn--small' }), Jogo.botao('som', { classe: 'btn btn--small' }))
+  </script>
 </body>
 </html>

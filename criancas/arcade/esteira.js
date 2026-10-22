@@ -116,7 +116,8 @@
     card.style.setProperty('--app', col);
     card.innerHTML =
       '<div class="es-phone" style="background:' + tint(col, 0.78) + '">' +
-        '<div class="es-bar"></div>' +
+        // O nome da cor fica escrito na barra do app, para quem não distingue as cores também conseguir comparar
+        '<div class="es-bar">' + COLORS[cur.color].n + '</div>' +
         '<div class="es-pet">' + A.iconHtml(PETS[cur.pet]) + '</div>' +
         '<div class="es-btn">' + A.iconHtml(BTNS[cur.btn].i) + ' ' + BTNS[cur.btn].n + '</div>' +
         (cur.bug ? '<div class="es-bug ' + (Math.random() < 0.5 ? 'l' : 'r') + '">' + A.monsterSVG('#ff8a3d') + '</div>' : '') +

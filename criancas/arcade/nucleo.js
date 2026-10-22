@@ -859,7 +859,14 @@
     cv = $('confetti'); cx = cv.getContext('2d');
     // Os ícones fixos da página (data-icone) entram antes do texto de cada elemento
     document.querySelectorAll('[data-icone]').forEach(function(el){ el.insertAdjacentHTML('afterbegin', A.iconHtml(el.dataset.icone) + (el.textContent.trim() ? ' ' : '')); });
-    setMuted(muted);
+    // Kit de jogo do identidade-visual: o som vale para todos os jogos, e o menu ganha Outros jogos e tela cheia
+    if(window.Jogo){
+      Jogo.som.aoMudar(function(ligado){ setMuted(!ligado); });
+      var topo = document.createElement('div');
+      topo.className = 'menu-topo';
+      topo.append(Jogo.botao('casa'), Jogo.botao('tela-cheia'));
+      $('scr-menu').prepend(topo);
+    } else setMuted(muted);
     buildMenu();
     bindPractice();
     $('mascot').addEventListener('click', pokeMascot);
@@ -874,8 +881,9 @@
     $('btn-home').addEventListener('click', function(){ A.sfx.click(); goMenu(); });
     $('btn-again').addEventListener('click', function(){ startGame(); });
     $('btn-menu').addEventListener('click', function(){ A.sfx.click(); goMenu(); });
-    $('mute').addEventListener('click', function(){ setMuted(!muted); });
-    $('mute-menu').addEventListener('click', function(){ setMuted(!muted); });
+    var trocarSom = function(){ if(window.Jogo) Jogo.som.mudar(); else setMuted(!muted); };
+    $('mute').addEventListener('click', trocarSom);
+    $('mute-menu').addEventListener('click', trocarSom);
     $('send-form').addEventListener('submit', sendScore);
     document.addEventListener('visibilitychange', function(){ if(document.hidden && api.running) finish('time'); });
     window.addEventListener('resize', function(){

@@ -60,6 +60,9 @@
   header, #dots { display: flex; gap: 14px; align-items: center }
   .dot { width: 26px; height: 26px; border-radius: 50%; border: 4px solid var(--ink); background: #fff; transition: transform .2s }
   .dot.done { background: var(--yellow) }
+  /* A fase feita tem um visto, além da cor, e a fase atual é maior: a cor não é a única pista */
+  .dot { position: relative }
+  .dot.done::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 3px 3px 0; transform: translate(-50%, -50%) rotate(45deg) }
   .dot.now { background: var(--pink); transform: scale(1.25) }
   #mute { display: grid; place-items: center; width: 52px; height: 52px; flex: none; margin-left: 24px; padding: 0; background: #fff; border: 3px solid var(--ink); border-radius: 50%; box-shadow: 0 4px 0 var(--ink); cursor: pointer }
   #mute svg { width: 28px; height: 28px; pointer-events: none }
@@ -225,7 +228,7 @@
     .dot { width: 22px; height: 22px }
     #budget { margin-left: 10px; padding: 1px 10px 1px 6px; font-size: 18px; border-width: 3px }
     #budget .plug { width: 20px; height: 20px }
-    #mute { margin-left: 10px; width: 38px; height: 38px }
+    #mute { margin-left: 10px; width: 44px; height: 44px }
     #mute svg { width: 22px; height: 22px }
     html, body { overflow: auto }
   }
@@ -269,7 +272,6 @@
     <div><svg viewBox="0 0 41 41" shape-rendering="crispEdges"><rect width="41" height="41" fill="#fff"/><path stroke="#000" d="M4 4.5h7m3 0h1m6 0h1m3 0h1m4 0h7m-33 1h1m5 0h1m1 0h2m2 0h3m2 0h1m2 0h1m5 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m4 0h1m1 0h4m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m4 0h2m1 0h3m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m2 0h1m2 0h1m2 0h1m3 0h5m2 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m3 0h4m4 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m1 0h1m1 0h1m5 0h3m1 0h1m1 0h1m-25 1h1m5 0h1m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m3 0h4m2 0h3m-31 1h1m2 0h1m2 0h2m2 0h2m1 0h2m2 0h2m2 0h2m4 0h4m-32 1h2m2 0h5m2 0h1m3 0h1m4 0h1m4 0h1m2 0h1m1 0h2m-32 1h6m1 0h1m1 0h1m4 0h3m1 0h1m4 0h3m1 0h5m-32 1h1m3 0h1m1 0h1m1 0h1m4 0h2m1 0h1m2 0h2m2 0h2m1 0h2m4 0h1m-32 1h2m2 0h1m4 0h3m1 0h1m4 0h3m1 0h1m2 0h2m2 0h3m-27 1h3m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m2 0h1m-31 1h2m1 0h1m3 0h2m1 0h1m1 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h1m1 0h2m1 0h1m-33 1h1m3 0h1m1 0h1m5 0h3m2 0h2m3 0h2m1 0h1m1 0h3m2 0h1m-33 1h2m1 0h3m1 0h2m1 0h2m3 0h1m2 0h6m2 0h1m2 0h4m-33 1h1m4 0h3m1 0h5m1 0h1m3 0h6m2 0h1m1 0h2m1 0h1m-33 1h1m2 0h3m1 0h2m1 0h2m1 0h1m2 0h1m5 0h3m1 0h1m1 0h5m-33 1h1m1 0h2m2 0h3m3 0h1m2 0h1m1 0h1m2 0h1m1 0h1m1 0h2m1 0h3m-30 1h1m2 0h2m2 0h2m1 0h1m2 0h7m2 0h2m4 0h1m1 0h1m-31 1h1m3 0h1m1 0h2m2 0h1m1 0h2m1 0h3m2 0h3m5 0h2m1 0h1m-32 1h1m4 0h1m1 0h2m3 0h1m3 0h1m1 0h1m1 0h1m1 0h1m2 0h2m2 0h4m-33 1h3m1 0h5m2 0h2m2 0h1m3 0h1m3 0h7m1 0h1m-24 1h1m1 0h1m2 0h1m1 0h2m1 0h3m2 0h2m3 0h1m1 0h1m1 0h1m-33 1h7m2 0h7m2 0h1m1 0h2m1 0h2m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m2 0h2m1 0h2m6 0h1m2 0h2m3 0h4m-32 1h1m1 0h3m1 0h1m2 0h2m1 0h4m1 0h1m1 0h1m2 0h1m1 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m2 0h1m1 0h6m2 0h3m1 0h3m1 0h3m1 0h2m-33 1h1m1 0h3m1 0h1m2 0h1m1 0h2m2 0h3m1 0h2m3 0h1m2 0h2m2 0h2m-33 1h1m5 0h1m2 0h4m1 0h2m4 0h1m4 0h1m1 0h4m-31 1h7m1 0h1m3 0h1m2 0h1m1 0h1m4 0h6m1 0h1m1 0h1"/></svg>
 <b>Conheça o curso</b><span>cursos.unipampa.edu.br/cursos/engenhariadesoftware</span></div>
   </div>
-  <a class="also" href="https://gamificapampa.github.io/turma/">Ver todos os jogos</a>
 </div>
 
 <div id="phone" class="overlay">
@@ -321,6 +323,7 @@
   </symbol>
 </svg>
 
+<script src="/identidade-visual/js/jogo.js"></script>
 <script>
 // Drawing the three difficulties: a sprout, a lightning bolt and a flame
 const LEVEL_ICONS = {
@@ -566,6 +569,19 @@ board.addEventListener("pointerdown", event => {
   const cell = cellAt(event)
   if (!cell) return
 
+  // Toque a toque, para quem não consegue arrastar: com um cabo começado por um toque, cada toque seguinte leva o
+  // cabo até a casa tocada, e tocar de novo na máquina do começo desiste do cabo
+  if (drawing?.armed) {
+    if (drawing.cells.length === 1 && same(drawing.cells[0], cell)) {
+      drawing = null
+      render()
+      return draw()
+    }
+    walkTo(cell)
+    render()
+    return
+  }
+
   // Tapping a cable removes it, so a wrong cable is easy to redo
   const touched = cables.find(cable => cable.cells.slice(1, -1).some(part => same(part, cell)))
   if (touched) {
@@ -585,20 +601,28 @@ board.addEventListener("pointerdown", event => {
 })
 
 // Walking one cell at a time towards the finger, so a fast drag does not skip cells
-board.addEventListener("pointermove", event => {
-  const target = drawing && cellAt(event)
-  if (!target) return
+function walkTo(target) {
   for (let guard = 0; drawing && !same(drawing.cells.at(-1), target) && guard < 20; guard++) {
     const [row, column] = drawing.cells.at(-1)
     const step = Math.abs(target[0] - row) >= Math.abs(target[1] - column) ? [row + Math.sign(target[0] - row), column] : [row, column + Math.sign(target[1] - column)]
     if (!extend(step)) break
   }
+}
+board.addEventListener("pointermove", event => {
+  const target = drawing && !drawing.armed && cellAt(event)
+  if (!target) return
+  walkTo(target)
   render()
 })
 
-// Dropping a cable that did not reach a machine
+// Dropping a cable that did not reach a machine. A touch that did not leave the machine keeps the cable started,
+// waiting for the next touch
 function release() {
-  if (!drawing) return
+  if (!drawing || drawing.armed) return
+  if (drawing.cells.length === 1) {
+    drawing.armed = true
+    return render()
+  }
   drawing = null
   render()
 }
@@ -776,18 +800,30 @@ const SOUND = '<svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" f
 const SILENT = '<svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#cfcbe6" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9.5 L21.5 14.5 M21.5 9.5 L16.5 14.5" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>'
 
 function toggleMute() {
-  muted = !muted
-  document.getElementById("mute").innerHTML = muted ? SILENT : SOUND
+  Jogo.som.mudar()
 }
+
+// Kit de jogo do identidade-visual: casa para voltar ao menu da turma e tela cheia no topo, som guardado para todos
+// os jogos, e a tela final com Jogar de novo e Outros jogos
+document.querySelector("header").prepend(Jogo.botao("casa"))
+document.getElementById("mute").before(Jogo.botao("tela-cheia"))
+Jogo.som.aoMudar(ligado => {
+  muted = !ligado
+  document.getElementById("mute").innerHTML = muted ? SILENT : SOUND
+})
+document.querySelector("#final p").after(Jogo.acoesDoFim(() => press("Enter")))
+
 
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
+  // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
+  if (/^F\d{1,2}$/.test(event.key)) return
   event.preventDefault()
   press(event.key)
 })
 document.querySelector("nav").addEventListener("click", event => event.target.dataset.key && press(event.target.dataset.key))
 document.getElementById("mute").addEventListener("click", toggleMute)
-document.querySelectorAll("#win, #final, #phone").forEach(overlay => overlay.addEventListener("click", () => press("Enter")))
+document.querySelectorAll("#win, #phone").forEach(overlay => overlay.addEventListener("click", () => press("Enter")))
 
 // Building the difficulty buttons of the first screen
 document.getElementById("difficulties").innerHTML = DIFFICULTIES.map((choice, index) =>
@@ -796,7 +832,6 @@ document.getElementById("difficulties").addEventListener("click", event => {
   const button = event.target.closest("button")
   if (button) press(String(Number(button.dataset.difficulty) + 1))
 })
-document.querySelector("#final .also").addEventListener("click", event => event.stopPropagation())
 addEventListener("resize", resize)
 loadLevel(0)
 </script>

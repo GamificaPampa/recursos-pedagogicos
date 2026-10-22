@@ -94,7 +94,10 @@
     .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
     .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
     .placar li.feito { background: var(--mint); }
-    .placar li.agora { background: var(--yellow); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A fase feita tem um visto, além da cor, e a atual é maior: a cor não é a única pista */
+    .placar li { position: relative; }
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
     .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
 
     /* End of a phase */
@@ -265,6 +268,7 @@ p, li, blockquote {
     <symbol id="qr-jogo" viewBox="0 0 49 49"><rect width="49" height="49" fill="#fff"/><path stroke="#000" d="M4 4.5h7m1 0h1m1 0h2m6 0h1m2 0h1m1 0h1m1 0h6m3 0h7m-41 1h1m5 0h1m2 0h1m2 0h2m1 0h1m2 0h2m1 0h2m2 0h2m2 0h1m1 0h1m2 0h1m5 0h1m-41 1h1m1 0h3m1 0h1m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m1 0h3m1 0h4m1 0h1m1 0h1m1 0h1m5 0h6m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h4m3 0h1m1 0h1m3 0h1m2 0h1m3 0h1m1 0h3m1 0h1m-41 1h1m5 0h1m1 0h7m3 0h2m2 0h1m2 0h2m1 0h2m1 0h1m2 0h1m5 0h1m-41 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-33 1h1m4 0h1m3 0h3m1 0h1m1 0h1m2 0h1m1 0h4m-32 1h1m3 0h1m1 0h4m1 0h3m2 0h2m1 0h4m1 0h1m4 0h1m1 0h7m2 0h1m-40 1h4m2 0h1m3 0h1m3 0h1m1 0h1m4 0h2m2 0h3m1 0h1m3 0h4m2 0h1m-40 1h1m2 0h3m4 0h1m1 0h2m1 0h1m1 0h1m1 0h1m2 0h2m1 0h5m1 0h5m3 0h1m-41 1h4m1 0h1m2 0h4m4 0h6m1 0h1m2 0h1m2 0h4m3 0h2m2 0h1m-41 1h1m1 0h2m1 0h2m1 0h1m1 0h1m2 0h1m2 0h2m1 0h4m6 0h1m-30 1h1m3 0h1m2 0h4m3 0h1m4 0h1m1 0h1m2 0h2m2 0h2m1 0h2m1 0h1m1 0h5m-40 1h1m1 0h1m2 0h1m3 0h3m3 0h4m3 0h2m3 0h3m1 0h3m1 0h1m1 0h1m1 0h1m-41 1h1m2 0h3m2 0h2m1 0h1m2 0h1m2 0h5m1 0h1m2 0h1m2 0h1m6 0h1m-37 1h1m1 0h3m1 0h1m4 0h1m1 0h1m1 0h1m1 0h1m2 0h2m2 0h1m2 0h3m1 0h2m2 0h1m1 0h1m-38 1h3m1 0h2m2 0h3m2 0h3m1 0h1m2 0h1m2 0h1m3 0h2m1 0h1m1 0h7m1 0h1m-41 1h1m1 0h2m2 0h2m2 0h1m3 0h1m1 0h1m1 0h1m1 0h4m1 0h3m1 0h1m2 0h1m2 0h1m2 0h1m1 0h1m-41 1h2m1 0h1m3 0h1m4 0h1m1 0h3m3 0h2m3 0h1m3 0h3m3 0h1m1 0h1m2 0h1m-40 1h4m1 0h1m2 0h3m7 0h2m3 0h2m1 0h2m1 0h4m1 0h1m1 0h1m1 0h1m-39 1h1m3 0h1m3 0h2m2 0h1m2 0h1m1 0h1m3 0h2m1 0h4m4 0h6m1 0h1m-41 1h2m1 0h1m1 0h2m1 0h1m2 0h4m2 0h2m1 0h4m1 0h1m1 0h1m1 0h1m2 0h3m2 0h2m1 0h1m-41 1h2m2 0h2m8 0h4m3 0h4m1 0h1m2 0h2m1 0h1m4 0h1m1 0h1m-38 1h2m2 0h2m2 0h3m1 0h1m1 0h2m2 0h3m1 0h1m2 0h1m1 0h1m1 0h3m3 0h1m1 0h1m-40 1h1m1 0h3m2 0h1m1 0h2m1 0h2m1 0h2m1 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m-40 1h1m1 0h1m1 0h6m2 0h2m8 0h1m3 0h1m4 0h1m7 0h1m-37 1h1m5 0h6m1 0h5m1 0h1m3 0h3m1 0h2m2 0h1m1 0h1m2 0h1m-40 1h3m2 0h2m2 0h1m2 0h1m2 0h3m2 0h2m1 0h1m2 0h3m2 0h1m6 0h1m-40 1h1m1 0h2m1 0h1m1 0h1m4 0h1m2 0h1m2 0h4m3 0h2m4 0h1m3 0h2m3 0h1m-39 1h1m2 0h5m1 0h2m1 0h1m2 0h1m2 0h2m4 0h2m1 0h1m1 0h1m1 0h1m4 0h1m1 0h1m-32 1h2m5 0h3m2 0h1m2 0h1m2 0h7m1 0h3m-38 1h7m2 0h6m1 0h2m1 0h5m5 0h1m2 0h6m1 0h2m-33 1h1m1 0h1m1 0h5m4 0h1m1 0h1m1 0h6m1 0h1m3 0h2m1 0h2m-41 1h7m1 0h3m1 0h1m2 0h1m1 0h1m5 0h2m2 0h2m1 0h3m1 0h1m1 0h2m2 0h1m-41 1h1m5 0h1m2 0h1m2 0h2m3 0h2m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h2m3 0h2m1 0h2m-41 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m2 0h3m1 0h5m4 0h7m2 0h1m-41 1h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m1 0h1m6 0h1m1 0h1m1 0h4m1 0h1m2 0h1m3 0h1m-40 1h1m1 0h3m1 0h1m3 0h7m1 0h1m1 0h5m2 0h1m1 0h2m2 0h1m3 0h2m1 0h1m-41 1h1m5 0h1m3 0h3m2 0h2m2 0h3m1 0h2m1 0h1m1 0h3m1 0h4m1 0h1m1 0h2m-41 1h7m1 0h2m2 0h2m1 0h7m7 0h1m2 0h1m1 0h4m1 0h1"/></symbol>
   </svg>
 
+<script src="/identidade-visual/js/jogo.js"></script>
 <script>
   // Name and colors of each element: [name, fill, text]
   const ELEMENTOS = {
@@ -373,7 +377,6 @@ p, li, blockquote {
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
-  try { comSom = localStorage.getItem("laboratorio-som") !== "0" } catch {}
   function tocar(notas, tipoOnda = "triangle") {
     if (!comSom) return
     try {
@@ -401,11 +404,12 @@ p, li, blockquote {
     $("som").setAttribute("aria-pressed", String(comSom))
     $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
   }
-  $("som").onclick = () => {
-    comSom = !comSom
-    try { localStorage.setItem("laboratorio-som", comSom ? "1" : "0") } catch {}
-    desenharSom()
-  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Counting the atoms of each side with the current coefficients
   function balanco() {

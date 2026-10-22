@@ -43,6 +43,9 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
 .enter{ animation:screenIn .35s cubic-bezier(.2,.9,.3,1.2); }
 @keyframes screenIn{ from{ opacity:0; transform:translateY(18px) scale(.98); } }
 
+/* Outros jogos e tela cheia no alto do menu do Arcade */
+.menu-topo{ display:flex; justify-content:space-between; width:100%; }
+
 /* ---------- botões ---------- */
 /* verde para jogar e branco para a ação secundária, com o contorno e a sombra dura da identidade visual */
 .btn{
@@ -51,7 +54,7 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
 }
 .btn:active{ transform:translateY(5px); box-shadow:inset 0 -6px 0 rgba(47,42,74,.16), inset 0 4px 0 rgba(255,255,255,.55), 0 2px 0 var(--ink); }
 .btn.ghost{ background:#fff; }
-.round{ width:40px; height:40px; border-radius:50%; background:var(--paper); font-size:1.1rem; flex:none; transition:transform .08s; display:grid; place-items:center; }
+.round{ width:44px; height:44px; border-radius:50%; background:var(--paper); font-size:1.1rem; flex:none; transition:transform .08s; display:grid; place-items:center; }
 /* Ícones desenhados do identidade-visual: crescem com o tamanho do texto, como os emojis */
 .icone{ display:inline-block; width:1.15em; height:1.15em; vertical-align:-.22em; flex:none; }
 .round .icone{ width:24px; height:24px; vertical-align:0; }
@@ -113,11 +116,12 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
 .g-play:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--cd); }
 .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .dots{ display:flex; justify-content:center; gap:0; margin-top:-12px; }
-.dot{ position:relative; width:24px; height:24px; border-radius:99px; transition:width .25s; }
-.dot::before{ content:""; position:absolute; inset:6px; border-radius:99px; background:rgba(255,255,255,.7); box-shadow:0 2px 0 rgba(47,42,74,.15); transition:background .25s; }
-.dot.on{ width:42px; }
+/* A bolinha desenhada é pequena, mas a área de toque tem 44 px */
+.dot{ position:relative; width:44px; height:44px; border-radius:99px; transition:width .25s; }
+.dot::before{ content:""; position:absolute; inset:16px; border-radius:99px; background:rgba(255,255,255,.7); box-shadow:0 2px 0 rgba(47,42,74,.15); transition:background .25s; }
+.dot.on{ width:62px; }
 .dot.on::before{ background:var(--ink); }
-.mute-menu{ align-self:center; background:rgba(255,255,255,.75); border-radius:99px; padding:5px 16px; font-weight:600; font-size:.9rem; }
+.mute-menu{ min-height:44px; align-self:center; background:rgba(255,255,255,.75); border-radius:99px; padding:5px 16px; font-weight:600; font-size:.9rem; }
 
 /* ---------- como jogar ---------- */
 .overlay{ position:fixed; inset:0; z-index:30; background:rgba(47,42,74,.5); display:grid; place-items:center; padding:16px; animation:fade .2s; }
@@ -149,12 +153,12 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
 .mode-box{ background:var(--paper); border-radius:18px; padding:10px; margin-bottom:16px; }
 .mode-label{ font-weight:700; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); margin-bottom:6px; }
 .modes{ display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
-.mode{ background:#fff; border:3px solid transparent; border-radius:14px; padding:8px 2px; font-weight:700; font-size:clamp(.78rem, 3.6vw, .95rem); white-space:nowrap; box-shadow:0 3px 0 rgba(47,42,74,.12); transition:transform .1s; }
+.mode{ min-height:44px; background:#fff; border:3px solid transparent; border-radius:14px; padding:8px 2px; font-weight:700; font-size:clamp(.78rem, 3.6vw, .95rem); white-space:nowrap; box-shadow:0 3px 0 rgba(47,42,74,.12); transition:transform .1s; }
 .mode:active{ transform:scale(.95); }
 .mode.on{ border-color:var(--ink); box-shadow:0 3px 0 var(--ink); }
 .mode-facil.on{ background:#dff7e9; } .mode-normal.on{ background:#fff4c2; } .mode-dificil.on{ background:#ffe0e8; }
 .mode-hint{ margin-top:7px; font-size:.88rem; font-weight:500; color:var(--soft); line-height:1.3; min-height:2.6em; }
-.ht-back{ display:block; margin:12px auto 0; color:var(--soft); font-weight:600; text-decoration:underline; }
+.ht-back{ display:block; min-height:44px; line-height:44px; margin:4px auto 0; color:var(--soft); font-weight:600; text-decoration:underline; }
 
 /* ---------- jogo ---------- */
 .game{ flex:1; display:flex; flex-direction:column; min-height:0; }
@@ -219,7 +223,7 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
 .es-card.dragging{ cursor:grabbing; }
 @keyframes esEnter{ from{ transform:translateX(-170%) rotate(-10deg); } }
 .es-phone{ position:absolute; inset:0; border:5px solid var(--ink); border-radius:24px; display:flex; flex-direction:column; align-items:center; padding:10% 8% 12%; gap:6%; overflow:hidden; box-shadow:0 8px 0 rgba(47,42,74,.25); }
-.es-bar{ width:100%; height:11%; border-radius:10px; background:var(--app); border:3px solid var(--ink); flex:none; }
+.es-bar{ width:100%; height:11%; border-radius:10px; background:var(--app); border:3px solid var(--ink); flex:none; display:grid; place-items:center; color:#fff; font-weight:700; font-size:.95rem; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; }
 .es-pet{ flex:1; min-height:0; display:grid; place-items:center; font-size:clamp(2.6rem, 11vh, 5rem); line-height:1; }
 .es-btn{ background:var(--app); color:#fff; -webkit-text-stroke:1px var(--ink); paint-order:stroke fill; font-weight:700; font-size:1.05rem; border:3px solid var(--ink); border-radius:99px; padding:5px 14px; white-space:nowrap; }
 .es-bug{ position:absolute; width:32%; bottom:22%; animation:peek .9s ease-in-out infinite alternate; }
@@ -291,6 +295,24 @@ button:focus-visible, canvas:focus-visible{ outline:4px solid var(--ink); outlin
   .bubble{ font-size:.92rem; min-height:0; padding:8px 12px; }
   .logo{ font-size:1.9rem; }
   .g-body p{ display:none; }
+}
+/* No projetor (a partir de 1024 px), o Arcade usa mais da tela e as letras pequenas crescem */
+@media (min-width:1024px){
+  .app{ max-width:760px; }
+  .hud-score small{ font-size:.8rem; }
+  .hud-title{ font-size:1.1rem; }
+  .chip{ font-size:.95rem; }
+  .p-title{ font-size:1rem; }
+  .mode-label{ font-size:.9rem; }
+  .mode-hint{ font-size:1rem; }
+  .g-body p{ font-size:1.08rem; }
+  .ht-concept{ font-size:.9rem; }
+  .ht-say{ font-size:1.05rem; }
+  .es-bubble small{ font-size:.85rem; }
+  .es-req{ font-size:1.2rem; }
+  .es-bin span{ font-size:.9rem; }
+  .stats{ font-size:1.05rem; }
+  .time{ height:12px; }
 }
 @media (prefers-reduced-motion: reduce){
   .cloud, .bit, .logo span, .medal, .rays, .ht-hand, .es-belt, .es-bug, .g-play, #ht-go.ready{ animation:none !important; }
