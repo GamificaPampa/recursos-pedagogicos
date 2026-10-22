@@ -9,14 +9,10 @@
 <meta property="og:description" content="Oficina de Prompts para professores planejarem aulas e criarem conteúdos de todas as matérias com o Gemini, da Educação Infantil ao Ensino Médio.">
 <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
-  }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
   html { scroll-behavior: smooth }
   body { margin: 0; min-height: 100vh; background: var(--sky2); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.45 }
@@ -25,22 +21,7 @@
   :focus-visible { outline: 4px solid var(--purple); outline-offset: 3px }
 
   /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
-  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
-  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
-  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
-  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
-  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
-  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
-  .c2 { width: 92px; height: 26px; top: 34%; animation-duration: 60s; animation-delay: -30s }
-  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
-  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
-  .code { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
-  .k1 { left: 5%; top: 20% } .k2 { right: 7%; top: 13%; animation-delay: -2s } .k3 { left: 10%; top: 62%; animation-delay: -4s } .k4 { right: 12%; top: 48%; animation-delay: -1s }
   @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
-  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
-  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
-  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
-  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   .page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 40px }
 
   /* Title and Bit the robot talking */
@@ -197,12 +178,15 @@ p, li, blockquote {
 </style>
 <script src="/identidade-visual/js/barra.js" defer></script>
 </head>
-<body>
+<body class="ceu">
+<script src="/identidade-visual/js/icones.js" data-simbolos></script>
 
-<div class="sky" aria-hidden="true">
-  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-  <span class="code k1">&lt;/&gt;</span><span class="code k2">{ }</span><span class="code k3">01</span><span class="code k4">if</span>
-  <div class="hills"></div>
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="nuvem" style="top: 4%; --w: 210px; --t: 90s; --d: -60s"></span>
+  <span class="simbolo" style="left: 5%; top: 20%">&lt;/&gt;</span><span class="simbolo" style="right: 7%; top: 13%; --d: -2s">{ }</span><span class="simbolo" style="left: 10%; top: 62%; --d: -4s">01</span><span class="simbolo" style="right: 12%; top: 48%; --d: -1s">if</span>
+  <span class="morros" style="--altura: 17vh"></span>
 </div>
 
 <div class="page">
@@ -446,7 +430,7 @@ p, li, blockquote {
       <a class="card game" href="criancas/robo/" style="--c: var(--blue)">
         <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
           <path d="M37 31 H107 V83 H133" stroke="#fff" stroke-width="5" stroke-dasharray="1 10" stroke-linecap="round" fill="none" opacity=".85"/>
-          <g class="g r-star"><use href="#star" x="134" y="58" width="48" height="48"/></g>
+          <g class="g r-star"><use href="#icone-estrela" x="134" y="58" width="48" height="48"/></g>
           <g class="r-walk"><use href="#bot-art" width="46" height="46"/></g></svg></div>
         <div class="body">
           <h3>Robô pega a estrela</h3>
@@ -457,8 +441,8 @@ p, li, blockquote {
       </a>
       <a class="card game" href="criancas/ninja/" style="--c: var(--pink)">
         <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
-          <g class="g n1"><use href="#bug" width="42" height="42"/></g>
-          <g class="g n2"><use href="#bug" width="34" height="34"/></g>
+          <g class="g n1"><use href="#icone-bug" width="42" height="42"/></g>
+          <g class="g n2"><use href="#icone-bug" width="34" height="34"/></g>
           <path class="n-slash" d="M34 78 L140 -7" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg></div>
         <div class="body">
           <h3>Ninja dos Bugs</h3>
@@ -487,9 +471,9 @@ p, li, blockquote {
           <path d="M36 70 H86 M114 70 H162" stroke="#2f2a4a" stroke-width="10" stroke-linecap="round"/>
           <path class="c-flow" d="M162 70 H114 M86 70 H36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
           <rect x="-8" y="-7" width="16" height="13" rx="3" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite" path="M172 70 H24"/></rect>
-          <use href="#cellphone" x="2" y="34" width="46" height="70"/>
-          <use href="#server" x="72" y="20" width="56" height="88"/>
-          <use href="#database" x="146" y="40" width="50" height="58"/></svg></div>
+          <use href="#icone-app" x="2" y="34" width="46" height="70"/>
+          <use href="#icone-servidor" x="72" y="20" width="56" height="88"/>
+          <use href="#icone-banco-de-dados" x="146" y="40" width="50" height="58"/></svg></div>
         <div class="body">
           <h3>Conecta o Sistema</h3>
           <p>Ligue os cabos e faça a foto chegar do banco de dados até o celular.</p>
@@ -506,8 +490,8 @@ p, li, blockquote {
           <text x="100" y="94" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="24" fill="#2f2a4a">1</text>
           <text x="146" y="110" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#2f2a4a">3</text>
           <g class="g a-hop"><use href="#bot-art" x="78" y="10" width="44" height="44"/></g>
-          <g class="g a-tw"><use href="#star" x="36" y="40" width="24" height="24"/></g>
-          <g class="g a-tw2"><use href="#star" x="142" y="52" width="22" height="22"/></g></svg></div>
+          <g class="g a-tw"><use href="#icone-estrela" x="36" y="40" width="24" height="24"/></g>
+          <g class="g a-tw2"><use href="#icone-estrela" x="142" y="52" width="22" height="22"/></g></svg></div>
         <div class="body">
           <h3>Arcade do Código</h3>
           <p>Três jogos rápidos com o robô Bit e um placar para a turma.</p>
@@ -517,10 +501,10 @@ p, li, blockquote {
       </a>
       <a class="card game" href="criancas/caca-bugs/" style="--c: var(--yellow)">
         <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
-          <use href="#cellphone" x="64" y="4" width="72" height="112"/>
+          <use href="#icone-app" x="64" y="4" width="72" height="112"/>
           <circle class="g k-tap" cx="44" cy="46" r="20" fill="none" stroke="#fff" stroke-width="5"/>
-          <g class="g k-pop"><use href="#bug" x="26" y="28" width="36" height="36"/></g>
-          <g class="g k-pop2"><use href="#bug" x="140" y="56" width="32" height="32"/></g></svg></div>
+          <g class="g k-pop"><use href="#icone-bug" x="26" y="28" width="36" height="36"/></g>
+          <g class="g k-pop2"><use href="#icone-bug" x="140" y="56" width="32" height="32"/></g></svg></div>
         <div class="body">
           <h3>Caça aos Bugs!</h3>
           <p>Toque nos insetos para consertar o app da escola em 30 segundos.</p>
@@ -530,8 +514,8 @@ p, li, blockquote {
       </a>
       <a class="card game" href="criancas/missao-dev/" style="--c: #8cc4ff">
         <div class="stage" aria-hidden="true"><svg viewBox="0 0 200 120">
-          <g class="g a-tw"><use href="#star" x="30" y="18" width="20" height="20"/></g>
-          <g class="g a-tw2"><use href="#star" x="152" y="72" width="18" height="18"/></g>
+          <g class="g a-tw"><use href="#icone-estrela" x="30" y="18" width="20" height="20"/></g>
+          <g class="g a-tw2"><use href="#icone-estrela" x="152" y="72" width="18" height="18"/></g>
           <text x="150" y="38" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="22" fill="#fff">{ }</text>
           <text x="46" y="96" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#fff">if</text>
           <g class="m-fly">
@@ -565,49 +549,7 @@ p, li, blockquote {
 </div>
 
 <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-  <symbol id="bot-art" viewBox="0 0 100 100">
-    <line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/>
-    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/>
-    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
-    <circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/>
-    <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-    <path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/>
-  </symbol>
-  <symbol id="star" viewBox="0 0 100 100">
-    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="bug" viewBox="0 0 100 100">
-    <path d="M26 54 10 46M24 67 8 70M29 81 17 93M74 54 90 46M76 67 92 70M71 81 83 93M43 18 35 6M57 18 65 6" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <circle cx="35" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/><circle cx="65" cy="6" r="5" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="3"/>
-    <ellipse cx="50" cy="64" rx="30" ry="29" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="5"/>
-    <path d="M50 40V91" stroke="#b52a2a" stroke-width="4"/>
-    <circle cx="38" cy="58" r="6" fill="#b52a2a"/><circle cx="63" cy="56" r="5" fill="#b52a2a"/><circle cx="62" cy="78" r="6" fill="#b52a2a"/><circle cx="38" cy="79" r="4" fill="#b52a2a"/>
-    <circle cx="50" cy="30" r="17" fill="#2f2a4a"/>
-    <circle cx="43" cy="29" r="6.5" fill="#fff"/><circle cx="57" cy="29" r="6.5" fill="#fff"/>
-    <circle cx="44" cy="30" r="3" fill="#2f2a4a"/><circle cx="58" cy="30" r="3" fill="#2f2a4a"/>
-    <path d="M45 39q5 4 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="cellphone" viewBox="0 0 100 100">
-    <rect x="26" y="6" width="48" height="88" rx="10" fill="#fff" stroke="#2f2a4a" stroke-width="5"/>
-    <rect x="33" y="16" width="34" height="58" rx="4" fill="#8cc4ff"/>
-    <circle cx="57" cy="30" r="7" fill="#ffd84d"/>
-    <path d="M33 74 V58 Q42 46 50 56 Q58 48 67 58 V74 Z" fill="#3cc26b"/>
-    <circle cx="50" cy="84" r="4" fill="#2f2a4a"/>
-  </symbol>
-  <symbol id="server" viewBox="0 0 100 100">
-    <rect x="18" y="8" width="64" height="84" rx="10" fill="#ff9a3c" stroke="#2f2a4a" stroke-width="5"/>
-    <rect x="28" y="20" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
-    <rect x="28" y="43" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
-    <rect x="28" y="66" width="44" height="15" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="4"/>
-    <circle cx="62" cy="27.5" r="4" fill="#3cc26b"/><circle cx="62" cy="50.5" r="4" fill="#3cc26b"/><circle cx="62" cy="73.5" r="4" fill="#3cc26b"/>
-  </symbol>
-  <symbol id="database" viewBox="0 0 100 100">
-    <path d="M20 22 V78 A30 12 0 0 0 80 78 V22" fill="#ffd84d" stroke="#2f2a4a" stroke-width="5"/>
-    <path d="M20 41 A30 12 0 0 0 80 41 M20 60 A30 12 0 0 0 80 60" fill="none" stroke="#2f2a4a" stroke-width="4"/>
-    <ellipse cx="50" cy="22" rx="30" ry="12" fill="#ffe88a" stroke="#2f2a4a" stroke-width="5"/>
-  </symbol>
+  <symbol id="bot-art" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
 </svg>
 
 <script>

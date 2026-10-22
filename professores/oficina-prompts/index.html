@@ -7,14 +7,11 @@
 <meta name="description" content="Uma formação em encontros para professores da Educação Infantil ao Ensino Médio planejarem aulas e criarem atividades, avaliações, textos e jogos com o Gemini.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
-  }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
   body { margin: 0; min-height: 100vh; background: var(--sky2); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.5 }
   a { color: inherit; font-weight: 600 }
@@ -22,28 +19,9 @@
   .i { width: 1.2em; height: 1.2em; flex: none }
 
   /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
-  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
-  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
-  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
-  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
-  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
-  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
-  .c2 { width: 92px; height: 26px; top: 34%; animation-duration: 60s; animation-delay: -30s }
-  .c3 { width: 160px; height: 42px; top: 4%; animation-duration: 75s; animation-delay: -50s; opacity: .7 }
-  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
-  .bit { position: absolute; font-weight: 700; color: rgba(255, 255, 255, .6); font-size: 24px; animation: float 9s ease-in-out infinite }
-  .b1 { left: 5%; top: 20% } .b2 { right: 7%; top: 13%; animation-delay: -2s } .b3 { left: 10%; top: 62%; animation-delay: -4s } .b4 { right: 12%; top: 48%; animation-delay: -1s }
   @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
-  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
-  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
-  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
-  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   .page { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 30px }
 
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 8px 26px; background: var(--c, #fff); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: 22px; font-weight: 700; text-decoration: none; transition: transform .1s, box-shadow .1s }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink) }
-  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
-  .loud { color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill }
 
   /* Top: title, Bit the robot with his graduation cap, and the main button */
   .hero { text-align: center }
@@ -60,10 +38,6 @@
   .bot { width: clamp(92px, 25vw, 130px); flex: none; overflow: visible }
   .bot-body { animation: bob 2.6s ease-in-out infinite }
   @keyframes bob { 50% { transform: translateY(-5px) } }
-  .bot-eyes { animation: blink 4.2s infinite }
-  @keyframes blink { 0%, 91%, 97%, 100% { transform: scaleY(1) } 94% { transform: scaleY(.1) } }
-  .cap { animation: cap 3s ease-in-out infinite }
-  @keyframes cap { 50% { transform: rotate(-7deg) translateY(-2px) } }
   .bubble { position: relative; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font-size: clamp(16px, 4.3vw, 21px); font-weight: 600; text-align: left }
   .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
   .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
@@ -124,12 +98,12 @@
   .tools { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)) }
   .solo { display: flex; align-items: center; gap: 20px; padding: 20px 24px; background: #fff; border: 4px solid var(--ink); border-radius: 28px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25); text-decoration: none; transition: transform .25s cubic-bezier(.3, 1.5, .6, 1) }
   .solo:hover { transform: translateY(-4px) rotate(-.5deg) }
-  .solo svg { width: 110px; flex: none; overflow: visible }
+  .solo > svg { width: 110px; flex: none; overflow: visible }
   .solo h3 { margin: 4px 0; font-size: 26px; font-weight: 700 }
   .solo p { margin: 0; font-weight: 500 }
   .solo .btn { flex: none }
   .solo-tag { display: inline-block; padding: 2px 12px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 999px; font-size: 15px; font-weight: 700 }
-  @media (max-width: 700px) { .solo { flex-direction: column; text-align: center } .solo svg { width: 90px } }
+  @media (max-width: 700px) { .solo { flex-direction: column; text-align: center } .solo > svg { width: 90px } }
   .mini.n { justify-content: center; min-width: 46px; padding: 4px 0 }
   .gem-shine { animation: gem-shine 3s ease-in-out infinite }
   @keyframes gem-shine { 0%, 70%, 100% { opacity: 0 } 80% { opacity: 1 } }
@@ -156,7 +130,6 @@
     .compare { grid-template-columns: 1fr }
     .meeting { grid-template-columns: 1fr }
     .meeting .n { grid-row: auto; width: 62px; height: 62px; font-size: 34px }
-    .btn { font-size: 19px; padding: 8px 18px }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important }
@@ -164,12 +137,14 @@
 </style>
 <script src="/identidade-visual/js/barra.js" defer></script>
 </head>
-<body>
+<body class="ceu">
 
-<div class="sky" aria-hidden="true">
-  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-  <span class="bit b1">&lt;/&gt;</span><span class="bit b2">{ }</span><span class="bit b3">01</span><span class="bit b4">if</span>
-  <div class="hills"></div>
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="nuvem" style="top: 4%; --w: 210px; --t: 90s; --d: -60s"></span>
+  <span class="simbolo" style="left: 5%; top: 20%">&lt;/&gt;</span><span class="simbolo" style="right: 7%; top: 13%; --d: -2s">{ }</span><span class="simbolo" style="left: 10%; top: 62%; --d: -4s">01</span><span class="simbolo" style="right: 12%; top: 48%; --d: -1s">if</span>
+  <span class="morros" style="--altura: 17vh"></span>
 </div>
 
 <div class="page">
@@ -178,17 +153,7 @@
   <p class="tagline">para professores</p>
   <div class="hello">
     <svg class="bot" viewBox="0 0 100 110" aria-hidden="true">
-      <g class="bot-body">
-        <g transform="translate(0 10)">
-          <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-          <g class="g bot-eyes"><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/></g>
-          <circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/>
-          <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-        </g>
-        <g class="g cap"><path d="M12 22 L50 6 L88 22 L50 38 Z" fill="#2f2a4a"/><path d="M30 28 V38 Q50 47 70 38 V28" fill="#2f2a4a"/><path d="M80 25 V44" stroke="#ffd23f" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="46" r="5" fill="#ffd23f"/></g>
-      </g>
-    </svg>
+      <g class="bot-body"><image href="/identidade-visual/mascote/bit-formatura.svg" width="100" height="110"/></g></svg>
     <p class="bubble">Aprenda a conversar com o Gemini para planejar aulas e criar atividades, avaliações, textos e até jogos para as suas turmas, de qualquer matéria, sem precisar saber programar.</p>
   </div>
   <ul class="chips">
@@ -198,8 +163,8 @@
     <li style="--c: #fff">Gemini</li>
   </ul>
   <div class="ctas">
-    <a class="btn loud" href="jogo.html" style="--c: var(--mint)"><svg class="i" viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Jogar o Jogo do Prompt</a>
-    <a class="btn loud" href="construtor.html" style="--c: var(--yellow)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2"/><rect x="3" y="9.5" width="18" height="5" rx="1.5" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="2"/><rect x="3" y="4" width="18" height="5" rx="1.5" fill="#4da3ff" stroke="#2f2a4a" stroke-width="2"/></svg>Construtor de prompts</a>
+    <a class="btn btn--jogar btn--big" href="jogo.html"><svg width="22" height="22" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg>Jogar o Jogo do Prompt</a>
+    <a class="btn btn--conhecer btn--big" href="construtor.html"><svg width="22" height="22" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Construtor de prompts</a>
   </div>
 </header>
 
@@ -300,7 +265,7 @@
       <path d="M30 62 L26 72 H70 L66 62" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
     </svg>
     <div><span class="solo-tag">Não pode ir aos encontros?</span><h3>Faça o curso online, no seu ritmo</h3><p>Os 4 encontros em módulos curtos, com prática na própria página, teste final e comprovante de conclusão.</p></div>
-    <span class="btn loud" style="--c: var(--yellow)" id="curso-botao">Começar</span>
+    <span class="btn btn--conhecer"><svg width="22" height="22" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg><span id="curso-botao">Começar</span></span>
   </a>
 </section>
 
@@ -359,7 +324,7 @@
       <g class="g wiggle"><path d="M48 10 V0 M48 0 H62 L58 5 L62 10 H48" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></g>
     </svg>
     <div><span class="solo-tag">Para escolas e secretarias</span><h3>Leve a oficina para a sua escola</h3><p>A equipe do GamificaPampa conduz os encontros e leva o roteiro, os slides, o caderno para imprimir e o certificado. Fale com a gente para combinar as datas.</p></div>
-    <span class="btn loud" style="--c: var(--pink)">Falar com a equipe</span>
+    <span class="btn btn--falar"><svg width="22" height="22" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4.5h16a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-9l-5 4v-4H4A1.5 1.5 0 0 1 2.5 15V6A1.5 1.5 0 0 1 4 4.5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/><circle cx="8" cy="10.5" r="1.4" fill="#2f2a4a"/><circle cx="12" cy="10.5" r="1.4" fill="#2f2a4a"/><circle cx="16" cy="10.5" r="1.4" fill="#2f2a4a"/></svg>Falar com a equipe</span>
   </a>
 </section>
 
@@ -378,18 +343,6 @@
 <footer>Curso de Engenharia de Software · UNIPAMPA · Campus Alegrete</footer>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="bot" viewBox="0 0 100 100">
-    <line x1="50" y1="8" x2="50" y2="22" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="50" cy="8" r="6" fill="#ff4d4d"/>
-    <rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#1d2a44" stroke-width="4"/>
-    <circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/>
-    <circle cx="40" cy="45" r="4" fill="#1d2a44"/><circle cx="64" cy="45" r="4" fill="#1d2a44"/>
-    <path d="M40 60 q10 7 20 0" stroke="#1d2a44" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#1d2a44" stroke-width="4"/>
-  </symbol>
-  <symbol id="star" viewBox="0 0 100 100">
-    <polygon points="50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38" fill="#ffd84d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/>
-  </symbol>
 </svg>
 <script>
 // Quem já começou o curso online vê no cartão onde parou (o curso guarda o progresso neste aparelho)

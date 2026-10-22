@@ -7,13 +7,11 @@
 <meta name="description" content="Monte em um minuto um bom pedido para o ChatGPT ou o Gemini criar atividades, jogos, histórias e planos de aula para a sua turma.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
-<style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <style>
-  :root {
-    --sky1: #5fbcff; --sky2: #cdeeff; --hill: #8ddf6a; --hill2: #6cc653;
-    --ink: #2f2a4a; --soft: #5d5880; --line: #cfcbe6; --field: #8a85ad;
-    --blue: #4da3ff; --pink: #ff5f8f; --mint: #4fd6a6; --orange: #ff8a3d; --purple: #a08bff; --yellow: #ffd23f;
-    --font: "Fredoka", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  :root { --risco: #cfcbe6; --field: #8a85ad;
 
     /* One colour per part of the prompt, the same in the legend, the labels and the result */
     --role: #4da3ff;
@@ -28,18 +26,6 @@
   .g { transform-box: fill-box; transform-origin: center }
 
   /* The scenery behind everything: sky, drifting clouds and two hills */
-  .sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%) }
-  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .92; animation: drift 46s linear infinite }
-  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
-  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
-  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
-  .c1 { width: 130px; height: 36px; top: 9%; animation-delay: -8s }
-  .c2 { width: 92px; height: 26px; top: 40%; animation-duration: 60s; animation-delay: -30s }
-  @keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(130vw) } }
-  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 17vh }
-  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
-  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
-  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   .page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 48px }
 
   /* Top: back link, title, Bit and the four colours */
@@ -71,7 +57,7 @@
   select:focus, input:focus, textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(77, 163, 255, .35) }
   textarea { min-height: 72px; resize: vertical }
   .kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px }
-  .kinds button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px 10px; background: #fff; border: 3px solid var(--line); border-radius: 20px; font: 600 15px var(--font); color: var(--ink); line-height: 1.2; cursor: pointer; transition: transform .2s cubic-bezier(.3, 1.5, .6, 1) }
+  .kinds button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px 10px; background: #fff; border: 3px solid var(--risco); border-radius: 20px; font: 600 15px var(--font); color: var(--ink); line-height: 1.2; cursor: pointer; transition: transform .2s cubic-bezier(.3, 1.5, .6, 1) }
   .kinds button:hover { transform: translateY(-3px) rotate(-2deg); border-color: var(--ink) }
   .kinds svg { width: 52px; height: 52px; overflow: visible }
   .kinds button.chosen { background: var(--yellow); border-color: var(--ink); box-shadow: 0 5px 0 var(--ink); transform: translateY(-3px) }
@@ -109,7 +95,7 @@
   #copied.bad { color: #c92a62 }
   .tip { margin-top: 10px; padding: 12px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 500 }
   .next { margin: 0; padding: 0; list-style: none }
-  .next li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 3px dashed var(--line); font-weight: 500 }
+  .next li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 3px dashed var(--risco); font-weight: 500 }
   .next li:first-child { border-top: none }
   .next button { flex: none; min-height: 44px; padding: 4px 16px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font: 600 15px var(--font); color: var(--ink); cursor: pointer }
   .next button:active { transform: translateY(3px); box-shadow: none }
@@ -142,9 +128,13 @@
 </style>
 <script src="/identidade-visual/js/barra.js" defer></script>
 </head>
-<body>
+<body class="ceu">
 
-<div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="hills"></div></div>
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="morros" style="--altura: 17vh"></span>
+</div>
 
 <div class="page">
 <header data-bit-pose="acenando" data-bit-dica="Oi! Escolha as opções e eu monto o prompt com Papel, Tarefa, Contexto e Formato. Depois é só copiar.">
@@ -242,6 +232,7 @@
 </div>
 
 <script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/icones.js"></script>
 <script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Describing every class the teacher can pick: its age, its stage and how well the children read
@@ -295,15 +286,6 @@ const NEEDS = {
   "altas habilidades": "um desafio extra para ir além",
 }
 
-// The pictures of each kind of material, drawn instead of emojis
-const KIND_ICONS = {
-  atividade: '<rect x="8" y="6" width="38" height="52" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M16 19 H38 M16 28 H38 M16 37 H30" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><g transform="rotate(32 48 36)"><rect x="43" y="14" width="11" height="34" rx="2" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M43 48 L48.5 59 L54 48 Z" fill="#ffe1b0" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><rect x="43" y="9" width="11" height="7" rx="2" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/></g>',
-  jogo: '<rect x="4" y="18" width="56" height="30" rx="15" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4"/><path d="M18 26 V40 M11 33 H25" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="42" cy="28" r="4.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="50" cy="37" r="4.5" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5"/>',
-  historia: '<path d="M32 16 Q20 8 6 12 V52 Q20 48 32 56 Q44 48 58 52 V12 Q44 8 32 16 Z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M32 16 V56" stroke="#2f2a4a" stroke-width="3"/><path d="M12 24 Q19 22 26 25 M12 33 Q19 31 26 34 M38 25 Q45 22 52 24 M38 34 Q45 31 52 33" stroke="#ff5f8f" stroke-width="3" fill="none" stroke-linecap="round"/>',
-  plano: '<rect x="12" y="10" width="40" height="50" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="22" y="4" width="20" height="11" rx="3" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M19 27 l4 4 l7 -8 M19 43 l4 4 l7 -8" stroke="#4fd6a6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 28 H45 M35 44 H45" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/>',
-  quiz: '<path d="M6 10 H58 V42 H30 L17 55 V42 H6 Z" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><text x="32" y="36" text-anchor="middle" font-size="28" font-weight="700" fill="#fff" stroke="#2f2a4a" stroke-width="5" paint-order="stroke">?</text>',
-  adaptar: '<path d="M8 20 H24 A7 7 0 1 1 38 20 H54 V34 A7 7 0 1 0 54 48 V58 H8 V46 A7 7 0 1 0 8 32 Z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>',
-}
 
 // Each kind of material brings its own wording for the four parts, its own follow-up requests and its own tip.
 // The formats carry the sentences that worked in the Gemini tests of 13/10/2026: no code block, images described
@@ -560,7 +542,7 @@ function fillAreas() {
 const lembrado = Lembrar.ler("construtor", {})
 if (KINDS[lembrado.kind]) kind = lembrado.kind
 $("kinds").innerHTML = Object.entries(KINDS).map(([id, details]) =>
-  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}"><svg viewBox="0 0 64 64" aria-hidden="true">${KIND_ICONS[id]}</svg>${details.label}</button>`).join("")
+  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}">${Icones.svg(id)}${details.label}</button>`).join("")
 $("stage").innerHTML = STAGES.map(group => `<optgroup label="${group.group}">${group.items.map(([id, label]) => `<option value="${id}">${label}</option>`).join("")}</optgroup>`).join("")
 $("stage").value = "f2"
 $("needs").innerHTML = Object.keys(NEEDS).map(need => `<label><input type="checkbox" value="${need}">${need}</label>`).join("")
