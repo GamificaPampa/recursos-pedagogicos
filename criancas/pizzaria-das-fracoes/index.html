@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
   <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
   <style>
+    .btn[hidden] { display: none; }
+    #proxima svg { width: 22px; height: 22px; }
     /* Page in one central column that fits the phone and the projector */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
     .topo .lado { display: flex; gap: 10px; }
@@ -179,6 +181,7 @@ p, li, blockquote {
           <div class="acoes">
             <button class="btn btn--jogar btn--big" type="button" id="entregar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg>Entregar</button>
             <button class="btn" type="button" id="limpar">Limpar</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
           </div>
           <ol class="placar" id="placar" aria-label="Pedidos da fase"></ol>
         </div>
@@ -358,6 +361,9 @@ p, li, blockquote {
 
   // Showing the order on the ticket and a new pizza in the oven
   function mostrarPedido() {
+    $("proxima").hidden = true
+    $("entregar").hidden = false
+    $("limpar").hidden = false
     const [a, b, n] = FASES[fase].pedidos[pedido]
     $("numero").textContent = pedido + 1
     $("fase-nome").textContent = FASES[fase].nome
@@ -373,6 +379,23 @@ p, li, blockquote {
       `<li class="${i < pedido ? "feito" : i === pedido ? "agora" : ""}"></li>`).join("")
   }
 
+  // After a right answer the round stays on screen with the Bit's explanation, until the child taps Próxima questão
+  function mostrarProxima() {
+    ocupado = true
+    $("entregar").hidden = true
+    $("limpar").hidden = true
+    $("proxima").querySelector("span").textContent = pedido === FASES[fase].pedidos.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    $("proxima").hidden = true
+    ocupado = false
+    pedido++
+    if (pedido < FASES[fase].pedidos.length) mostrarPedido()
+    else terminarFase()
+  }
+
   function entregar() {
     if (ocupado) return
     const [a, b, n] = FASES[fase].pedidos[pedido], k = escolhidos()
@@ -384,13 +407,7 @@ p, li, blockquote {
         ? `Isso! ${k}/${n} é ${NOMES[`${a}/${b}`]}.`
         : `Isso! ${k}/${n} é o mesmo que ${a}/${b}: a mesma quantidade de pizza, em pedaços menores.`, 3500)
       pizza.querySelectorAll(".pedaco.is-escolhido").forEach(pedaco => pedaco.classList.add("is-entregue"))
-      setTimeout(() => {
-        ocupado = false
-        pedido++
-        if (pedido < FASES[fase].pedidos.length) mostrarPedido()
-        else terminarFase()
-      }, 1100)
-      return
+      return mostrarProxima()
     }
     erros++
     errosPedido++

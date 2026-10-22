@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
   <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
   <style>
+    .btn[hidden] { display: none; }
+    #proxima svg { width: 22px; height: 22px; }
     /* Page in one central column that fits the phone and the projector */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
     .topo svg { width: 22px; height: 22px; }
@@ -163,6 +165,7 @@ p, li, blockquote {
         </div>
         <ol class="caixas" id="caixas" aria-label="Palavra"></ol>
         <div class="silabas" id="silabas" role="group" aria-label="Sílabas"></div>
+        <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
         <ol class="placar" id="placar" aria-label="Palavras da fase"></ol>
       </div>
 
@@ -377,6 +380,7 @@ p, li, blockquote {
   }
 
   function mostrarPalavra() {
+    $("proxima").hidden = true
     const f = FASES[fase], p = atual()
     passo = 0
     errosAqui = 0
@@ -478,12 +482,21 @@ p, li, blockquote {
     window.Bit?.diz("feliz", `Isso! ${p.silabas.join(" + ")} = ${p.palavra}`, 3200)
     // A leitura automática respeita o Sem som; o botão Ouvir e a Dica falam sempre, porque a criança pediu
     setTimeout(() => comSom && falar(p.palavra), 350)
-    setTimeout(() => {
-      ocupado = false
-      item++
-      if (item < f.palavras.length) mostrarPalavra()
-      else terminarFase()
-    }, 2300)
+    mostrarProxima()
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the child taps Próxima questão
+  function mostrarProxima() {
+    ocupado = true
+    $("proxima").querySelector("span").textContent = item === FASES[fase].palavras.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    $("proxima").hidden = true
+    ocupado = false
+    item++
+    if (item < FASES[fase].palavras.length) mostrarPalavra()
+    else terminarFase()
   }
 
   // Stars by how many mistakes the class made in the phase, and confetti
