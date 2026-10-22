@@ -102,10 +102,10 @@
   #copy { --c: var(--mint) }
   .open { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-basis: 100% }
   .open .btn { padding: 8px 14px; text-align: center }
-  #open-chatgpt { --c: var(--purple) }
-  #open-gemini { --c: var(--blue) }
+  /* Copiar é a ação principal (verde); abrir o assistente vem depois, em branco */
+  #open-chatgpt, #open-gemini { --c: #fff; color: var(--ink); -webkit-text-stroke: 0 }
   #copy2 { --c: var(--mint) }
-  #copied { flex-basis: 100%; margin: 0; font-weight: 700; color: #1f8a60 }
+  #copied { flex-basis: 100%; margin: 0; font-weight: 700; color: #17694a }
   #copied.bad { color: #c92a62 }
   .tip { margin-top: 10px; padding: 12px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 500 }
   .next { margin: 0; padding: 0; list-style: none }

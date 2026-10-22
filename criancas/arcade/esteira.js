@@ -173,7 +173,7 @@
   }
 
   function explain(choice){
-    if(choice === 'timeout') return '⏰ O app passou sem ser testado!';
+    if(choice === 'timeout') return 'O app passou sem ser testado!';
     if(choice === 'fix') return 'Esse app estava certinho! Era só aprovar.';
     if(cur.bug) return 'Tinha um bug escondido no app!';
     if(cur.pet !== order.pet) return 'O cliente pediu ' + PET_NAMES[order.pet] + ', mas o app tinha ' + PET_NAMES[cur.pet] + '!';
