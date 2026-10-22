@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Genética do Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Biologia para o ensino médio: genótipo e fenótipo, quadro de Punnett e a chance de cada filhote, com as ervilhas de Mendel e o gado do pampa.">
+  <meta property="og:title" content="Genética do Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Biologia: a primeira lei de Mendel com ervilhas e gado.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the parents and the Punnett square on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao quadro" "controles quadro"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__pergunta { margin: 6px 0 4px !important; font-size: clamp(22px, 3.4vw, 28px); font-weight: 700; line-height: 1.2; }
+    .missao__texto { font-size: 16px; font-weight: 600; color: var(--soft); }
+    .legenda { display: inline-block; margin-top: 8px !important; padding: 6px 12px; background: #f4f1ff; border: 3px solid var(--ink); border-radius: 14px; font-size: 15px; font-weight: 600; color: var(--ink); }
+    .legenda b { font-size: 18px; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .opcao { min-width: 84px; min-height: 60px; padding: 6px 18px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 24px var(--font); color: var(--ink); cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcoes[hidden], .btn[hidden] { display: none; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* The parents, the single organism of phase 1 and the Punnett square */
+    .quadro { grid-area: quadro; display: grid; justify-items: center; align-content: start; gap: 14px; padding: 16px 12px; background: linear-gradient(#eaf8e4, #fff); border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .pais { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .ser { display: grid; justify-items: center; gap: 2px; margin: 0; font-weight: 700; text-align: center; }
+    .ser svg { width: 92px; height: 92px; }
+    .ser figcaption { font-size: 15px; color: var(--soft); }
+    .ser .gen { font-size: 26px; color: var(--ink); letter-spacing: .04em; }
+    .ser--grande svg { width: min(200px, 60vw); height: auto; }
+    .ser--grande .gen { font-size: 44px; }
+    .vezes { font-size: 34px; font-weight: 700; color: #7b5cff; }
+    .punnett { display: grid; grid-template-columns: 44px repeat(2, minmax(74px, 104px)); grid-template-rows: 44px repeat(2, minmax(74px, 96px)); gap: 6px; }
+    .gameta { display: grid; place-items: center; align-self: center; justify-self: center; width: 42px; height: 42px; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 22px; font-weight: 700; }
+    .canto { display: grid; place-items: center; font-size: 26px; font-weight: 700; color: #7b5cff; }
+    .celula { display: grid; place-items: center; align-content: center; gap: 2px; padding: 4px; background: var(--white); border: 4px solid var(--ink); border-radius: 16px; font: 700 28px var(--font); color: var(--ink); }
+    button.celula { cursor: pointer; box-shadow: 0 5px 0 var(--ink); }
+    button.celula:hover { background: #fff6cf; }
+    button.celula:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .celula.vazia { color: #b9b4cc; }
+    .celula.errada { background: #ffe1e7; border-color: #e53950; }
+    .celula.certa { background: #e3fbef; }
+    .celula.alvo { background: #fff2b8; }
+    .celula svg { width: 34px; height: 34px; }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "quadro" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .quadro { padding: 12px 6px; }
+      .ser svg { width: 76px; height: 76px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcao { min-width: 72px; font-size: 21px; padding: 6px 12px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete { animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">Aa</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">×</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">25%</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Genética</span> do <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Biologia</li>
+        <li class="pill" style="--c: var(--yellow)">3º ano do ensino médio</li>
+        <li class="pill">1ª lei de Mendel</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Genótipo e fenótipo · pergunta 1 de 5</p>
+          <p class="missao__pergunta" id="pergunta"></p>
+          <p class="missao__texto" id="texto"></p>
+          <p class="legenda" id="legenda"></p>
+        </div>
+        <div class="quadro" id="quadro" aria-live="polite"></div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="conferir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11" fill="none" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Conferir o quadro</button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          </div>
+          <p class="nota" id="nota"></p>
+          <ol class="placar" id="placar" aria-label="Perguntas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A primeira lei de Mendel: genótipo e fenótipo, alelo dominante e recessivo, homozigoto e heterozigoto, o quadro de Punnett e a chance de cada característica nos filhotes. Os exemplos são as ervilhas de Mendel e duas características do gado de corte, comum no pampa: o gado sem chifre (mocho) e a pelagem preta ou vermelha do Angus.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> a turma monta o quadro de Punnett no caderno antes de cada toque e confere com o jogo.</li>
+            <li><b>No celular:</b> cada estudante joga as três fases e anota a proporção de cada cruzamento da fase 2.</li>
+            <li><b>Depois:</b> a turma simula um cruzamento Pp × Pp com duas moedas (cara é P, coroa é p), anota 40 filhotes e compara com os 25% do quadro.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [genética, primeira lei de Mendel] para estudantes do [3º ano do ensino médio]: um quadro de Punnett com os gametas do pai e da mãe nas bordas, e o estudante toca em cada quadrinho para escolher o genótipo do filhote.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: genótipo e fenótipo, montar o quadro de Punnett, calcular a chance de cada característica], exemplos com [ervilhas e gado], desenhos simples de cada filhote, um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Sem exemplos de características de pessoas. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h5m3 0h3m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h1m4 0h1m5 0h3m1 0h1m2 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m3 0h3m4 0h1m4 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m4 0h1m1 0h2m1 0h1m2 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h1m2 0h1m2 0h3m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h2m2 0h1m1 0h2m5 0h1m3 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m2 0h2m3 0h1m1 0h2m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h1m5 0h4m3 0h2m1 0h3m2 0h5m-32 1h1m1 0h1m4 0h1m1 0h1m2 0h1m2 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h1m1 0h7m1 0h2m3 0h4m2 0h1m5 0h6m2 0h2m-37 1h2m2 0h2m3 0h1m1 0h5m3 0h1m1 0h1m5 0h1m1 0h1m1 0h2m3 0h1m-37 1h2m2 0h1m1 0h4m1 0h1m3 0h3m2 0h1m1 0h1m1 0h4m1 0h2m1 0h5m-37 1h1m1 0h1m6 0h2m5 0h2m1 0h5m4 0h1m2 0h1m-32 1h1m3 0h3m1 0h1m2 0h3m1 0h3m2 0h1m6 0h2m1 0h4m1 0h2m-37 1h4m3 0h2m2 0h2m1 0h3m2 0h5m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h1m1 0h5m3 0h1m3 0h1m3 0h2m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h3m1 0h2m1 0h2m1 0h1m3 0h3m1 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-36 1h1m1 0h1m2 0h3m2 0h3m7 0h3m1 0h1m2 0h2m1 0h3m1 0h3m-35 1h1m1 0h2m1 0h1m1 0h3m2 0h1m1 0h1m3 0h4m2 0h2m1 0h2m5 0h1m-36 1h3m1 0h5m3 0h1m3 0h1m1 0h1m2 0h5m2 0h2m1 0h3m-34 1h1m1 0h3m2 0h2m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-30 1h4m3 0h1m1 0h1m1 0h3m2 0h2m2 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-33 1h2m2 0h1m4 0h1m3 0h7m2 0h1m1 0h2m1 0h2m2 0h2m-35 1h2m2 0h4m1 0h2m2 0h2m2 0h1m3 0h3m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h6m3 0h1m2 0h2m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m2 0h2m1 0h2m5 0h4m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m4 0h1m3 0h4m2 0h1m2 0h4m4 0h1m2 0h2m1 0h1m-33 1h1m1 0h2m2 0h1m3 0h1m2 0h5m1 0h1m4 0h12m-28 1h2m2 0h1m3 0h1m2 0h2m2 0h6m3 0h2m-34 1h7m2 0h2m1 0h2m1 0h2m1 0h1m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m2 0h1m3 0h1m4 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m8 0h2m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h6m1 0h2m2 0h2m2 0h1m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h4m2 0h1m2 0h2m3 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m2 0h3m1 0h2m1 0h1m3 0h2m1 0h1m4 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h1m1 0h1m3 0h1m2 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script>
+  // Drawings: a pea, and the front of a cow's head with or without horns
+  const ervilha = cor => `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 16q4-10 14-10-2 9-12 12z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="56" r="34" fill="${cor}" stroke="#2f2a4a" stroke-width="4"/><ellipse cx="38" cy="42" rx="10" ry="7" fill="#fff" opacity=".55" transform="rotate(-30 38 42)"/></svg>`
+  const vaca = (cor, chifre) => `<svg viewBox="0 0 100 100" aria-hidden="true">
+    ${chifre ? '<path d="M32 30q-16-2-20-20 9 9 22 11zM68 30q16-2 20-20-9 9-22 11z" fill="#f3e3c0" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>' : ""}
+    <ellipse cx="17" cy="42" rx="14" ry="7" fill="${cor}" stroke="#2f2a4a" stroke-width="3" transform="rotate(-18 17 42)"/>
+    <ellipse cx="83" cy="42" rx="14" ry="7" fill="${cor}" stroke="#2f2a4a" stroke-width="3" transform="rotate(18 83 42)"/>
+    <path d="M30 26Q50 16 70 26Q78 52 68 76Q50 86 32 76Q22 52 30 26z" fill="${cor}" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M42 24q8 8 16 0" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="40" cy="46" r="6" fill="#fff" stroke="#2f2a4a" stroke-width="2"/><circle cx="60" cy="46" r="6" fill="#fff" stroke="#2f2a4a" stroke-width="2"/>
+    <circle cx="41" cy="47" r="3" fill="#2f2a4a"/><circle cx="61" cy="47" r="3" fill="#2f2a4a"/>
+    <ellipse cx="50" cy="72" rx="19" ry="12" fill="#f4b6a6" stroke="#2f2a4a" stroke-width="3"/>
+    <ellipse cx="43" cy="72" rx="3" ry="4" fill="#2f2a4a"/><ellipse cx="57" cy="72" rx="3" ry="4" fill="#2f2a4a"/></svg>`
+
+  // Each trait: the letter, the dominant and recessive characteristics and how to draw them
+  const TRACOS = {
+    ervilha: { letra: "A", dom: "amarela", rec: "verde", domP: "amarelas", recP: "verdes", domF: "semente amarela", recF: "semente verde", ser: ["Planta 1", "Planta 2", "semente"],
+      desenho: d => ervilha(d ? "#ffd23f" : "#8ddf6a") },
+    mocho: { letra: "P", dom: "sem chifre", rec: "com chifre", domP: "sem chifre", recP: "com chifre", domF: "bezerro sem chifre", recF: "bezerro com chifre", ser: ["Touro", "Vaca", "bezerro"],
+      desenho: d => vaca("#3b3548", !d) },
+    angus: { letra: "B", dom: "preta", rec: "vermelha", domP: "pretos", recP: "vermelhos", domF: "pelagem preta", recF: "pelagem vermelha", ser: ["Touro", "Vaca", "bezerro"],
+      desenho: d => vaca(d ? "#3b3548" : "#b4532f", false) },
+  }
+  const LEGENDAS = {
+    ervilha: "<b>A</b> = semente amarela (dominante) · <b>a</b> = verde (recessivo)",
+    mocho: "<b>P</b> = sem chifre, o gado mocho (dominante) · <b>p</b> = com chifre (recessivo)",
+    angus: "<b>B</b> = pelagem preta (dominante) · <b>b</b> = vermelha (recessivo)",
+  }
+
+  const FASES = [
+    { nome: "Genótipo e fenótipo", tipo: "conceito",
+      abertura: "Oi! Eu sou o Bit. Cada ser tem duas letras para uma característica, uma do pai e uma da mãe: é o genótipo. O que a gente vê é o fenótipo.",
+      rodadas: [
+        { traco: "ervilha", gen: "Aa", pergunta: "fenotipo" },
+        { traco: "ervilha", gen: "aa", pergunta: "fenotipo" },
+        { traco: "mocho", gen: "Pp", pergunta: "tipo" },
+        { traco: "mocho", gen: "Pp", pergunta: "fenotipo" },
+        { traco: "angus", gen: "bb", pergunta: "genotipo" },
+      ] },
+    { nome: "Quadro de Punnett", tipo: "punnett",
+      abertura: "Cada pai passa uma das suas letras para o filhote. No quadro de Punnett, cada quadrinho junta a letra da linha com a letra da coluna. Toque para mudar.",
+      rodadas: [
+        { traco: "ervilha", pai: "Aa", mae: "Aa" },
+        { traco: "ervilha", pai: "AA", mae: "aa" },
+        { traco: "mocho", pai: "Pp", mae: "pp" },
+        { traco: "angus", pai: "BB", mae: "Bb" },
+        { traco: "mocho", pai: "Pp", mae: "Pp" },
+      ] },
+    { nome: "Chance de cada filhote", tipo: "chance",
+      abertura: "Agora é prever. Cada quadrinho do quadro de Punnett vale 25% de chance. Se precisar, a Dica monta o quadro.",
+      rodadas: [
+        { traco: "mocho", pai: "Pp", mae: "Pp", alvo: "rec", pergunta: "Qual é a chance de o bezerro nascer com chifre?" },
+        { traco: "mocho", pai: "Pp", mae: "pp", alvo: "dom", pergunta: "Qual é a chance de o bezerro nascer mocho, sem chifre?" },
+        { traco: "angus", pai: "BB", mae: "bb", alvo: "rec", pergunta: "Qual é a chance de o bezerro nascer vermelho?" },
+        { traco: "ervilha", pai: "Aa", mae: "Aa", alvo: "dom", pergunta: "Qual é a chance de a semente ser amarela?" },
+        { traco: "angus", pai: "Bb", mae: "bb", descobrir: true, pergunta: "Um touro preto cruzou com uma vaca vermelha e nasceu um bezerro vermelho. Qual é o genótipo do touro?" },
+      ] },
+  ]
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, celulas = [], dicas = 0
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+  const traco = () => TRACOS[atual().traco]
+
+  // Genetics: the capital letter comes first, and one capital letter is enough for the dominant trait
+  const juntar = (x, y) => x === x.toUpperCase() || y !== y.toUpperCase() ? x + y : y + x
+  const dominante = gen => gen !== gen.toLowerCase()
+  const quadro = (pai, mae) => [0, 1].map(l => [0, 1].map(c => juntar(mae[l], pai[c])))
+  const opcoesGen = t => [t.letra + t.letra, t.letra + t.letra.toLowerCase(), t.letra.toLowerCase() + t.letra.toLowerCase()]
+  const fenotipo = (t, gen) => dominante(gen) ? t.dom : t.rec
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  try { comSom = localStorage.getItem("genetica-som") !== "0" } catch {}
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  $("som").onclick = () => {
+    comSom = !comSom
+    try { localStorage.setItem("genetica-som", comSom ? "1" : "0") } catch {}
+    desenharSom()
+  }
+
+  // The parents side by side, with the father's letter hidden when the question asks for it
+  function pais(r, esconderPai = false) {
+    const t = TRACOS[r.traco]
+    const ser = (nome, gen, oculto) => `<figure class="ser">${t.desenho(dominante(gen))}<figcaption>${nome}</figcaption><span class="gen">${oculto ? gen[0] + "?" : gen}</span></figure>`
+    return `<div class="pais">${ser(t.ser[0], r.pai, esconderPai)}<span class="vezes" aria-label="cruza com">×</span>${ser(t.ser[1], r.mae)}</div>`
+  }
+  function grade(r, conteudo) {
+    return `<div class="punnett">
+      <span class="canto" aria-hidden="true">×</span>
+      <span class="gameta">${r.pai[0]}</span><span class="gameta">${r.pai[1]}</span>
+      <span class="gameta">${r.mae[0]}</span>${conteudo(0, 0)}${conteudo(0, 1)}
+      <span class="gameta">${r.mae[1]}</span>${conteudo(1, 0)}${conteudo(1, 1)}
+    </div><p class="nota">Em cima, as letras ${r.traco === "ervilha" ? "da Planta 1" : "do touro"}. Do lado, as ${r.traco === "ervilha" ? "da Planta 2" : "da vaca"}.</p>`
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrarOpcoes(lista) {
+    $("opcoes").innerHTML = lista.map(op => `<button class="opcao" type="button" data-v="${op}">${op}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
+  }
+  function mostrarRodada() {
+    const r = atual(), t = traco()
+    dicas = 0
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${tipo() === "punnett" ? "cruzamento" : "pergunta"} ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    $("legenda").innerHTML = LEGENDAS[r.traco]
+    $("opcoes").hidden = tipo() === "punnett"
+    $("conferir").hidden = tipo() !== "punnett"
+    $("nota").textContent = ""
+
+    if (tipo() === "conceito") {
+      const oculto = r.pergunta === "genotipo"
+      $("quadro").innerHTML = `<figure class="ser ser--grande">${t.desenho(dominante(r.gen))}<figcaption>${t.ser[2] === "semente" ? "Ervilha" : "Bezerro"}</figcaption><span class="gen">${oculto ? "?" : r.gen}</span></figure>`
+      if (r.pergunta === "fenotipo") {
+        $("pergunta").textContent = `Com o genótipo ${r.gen}, ${t.ser[2] === "semente" ? "de que cor é a semente" : r.traco === "mocho" ? "o bezerro tem chifre" : "de que cor é o bezerro"}?`
+        $("texto").textContent = "O desenho só aparece depois da resposta."
+        $("quadro").querySelector("svg").style.filter = "grayscale(1) brightness(1.6) contrast(.5)"
+        mostrarOpcoes([t.dom, t.rec].map(s => s[0].toUpperCase() + s.slice(1)))
+      } else if (r.pergunta === "tipo") {
+        $("pergunta").textContent = `O genótipo ${r.gen} é homozigoto ou heterozigoto?`
+        $("texto").textContent = "Olhe se as duas letras são iguais."
+        mostrarOpcoes(["Homozigoto", "Heterozigoto"])
+      } else {
+        $("pergunta").textContent = `Este bezerro tem a pelagem ${fenotipo(t, r.gen)}. Qual é o genótipo dele?`
+        $("texto").textContent = "Pense em quantas letras b precisa para a característica recessiva aparecer."
+        mostrarOpcoes(opcoesGen(t))
+      }
+      return
+    }
+
+    if (tipo() === "punnett") {
+      $("pergunta").textContent = `${t.ser[0]} ${r.pai} × ${t.ser[1]} ${r.mae}`
+      $("texto").textContent = "Complete o quadro com o genótipo de cada filhote."
+      $("nota").textContent = "Toque num quadrinho para trocar o genótipo."
+      celulas = [[null, null], [null, null]]
+      const opcoes = opcoesGen(t)
+      $("quadro").innerHTML = pais(r) + grade(r, (l, c) => `<button class="celula vazia" type="button" data-l="${l}" data-c="${c}" aria-label="Filhote da linha ${r.mae[l]} com a coluna ${r.pai[c]}: vazio">?</button>`)
+      $("quadro").querySelectorAll("button.celula").forEach(botao => botao.onclick = () => {
+        if (ocupado) return
+        const l = Number(botao.dataset.l), c = Number(botao.dataset.c), agora = celulas[l][c]
+        celulas[l][c] = opcoes[(opcoes.indexOf(agora) + 1) % opcoes.length]
+        botao.textContent = celulas[l][c]
+        botao.className = "celula"
+        botao.setAttribute("aria-label", `Filhote da linha ${r.mae[l]} com a coluna ${r.pai[c]}: ${celulas[l][c]}`)
+        somClique()
+      })
+      return
+    }
+
+    $("pergunta").textContent = r.pergunta
+    $("texto").textContent = r.descobrir ? "Pense de onde veio cada letra do bezerro." : `${t.ser[0]} ${r.pai} × ${t.ser[1]} ${r.mae}`
+    if (r.descobrir) {
+      $("quadro").innerHTML = pais(r, true) + `<figure class="ser">${t.desenho(false)}<figcaption>Bezerro</figcaption><span class="gen">bb</span></figure>`
+      mostrarOpcoes(opcoesGen(t))
+    } else {
+      $("quadro").innerHTML = pais(r) + grade(r, () => '<span class="celula vazia">?</span>')
+      mostrarOpcoes(["0%", "25%", "50%", "75%", "100%"])
+    }
+  }
+
+  // Phases 1 and 3: answer buttons. A wrong answer explains the rule
+  function responder(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), t = traco(), v = botao.dataset.v
+    let certo, porque
+    if (tipo() === "conceito" && r.pergunta === "fenotipo") {
+      certo = v.toLowerCase() === fenotipo(t, r.gen)
+      porque = dominante(r.gen)
+        ? `Basta um ${t.letra} maiúsculo para a característica dominante aparecer. ${r.gen} dá ${t.ser[2] === "semente" ? "semente" : "bezerro"} ${t.dom}.`
+        : `Sem nenhum ${t.letra} maiúsculo, aparece a característica recessiva: ${r.gen} dá ${t.ser[2] === "semente" ? "semente" : "bezerro"} ${t.rec}.`
+    } else if (tipo() === "conceito" && r.pergunta === "tipo") {
+      const homo = r.gen[0] === r.gen[1]
+      certo = v === (homo ? "Homozigoto" : "Heterozigoto")
+      porque = `Homozigoto tem as duas letras iguais, como ${t.letra}${t.letra} ou ${t.letra.toLowerCase()}${t.letra.toLowerCase()}. Heterozigoto tem uma de cada, como ${r.gen}.`
+    } else if (tipo() === "conceito") {
+      certo = v === r.gen
+      porque = `A característica recessiva só aparece quando as duas letras são minúsculas. Por isso, todo bezerro de pelagem ${t.rec} é ${r.gen}.`
+    } else if (r.descobrir) {
+      certo = v === r.pai
+      porque = `O bezerro vermelho é bb: recebeu um b da vaca e um b do touro. Como o touro é preto, ele também tem um B. Então ele é ${r.pai}.`
+    } else {
+      const q = quadro(r.pai, r.mae).flat(), n = q.filter(g => dominante(g) === (r.alvo === "dom")).length
+      certo = v === `${n * 25}%`
+      porque = `No quadro, ${n === 0 ? "nenhum" : n} dos 4 quadrinhos ${n > 1 ? "dão" : "dá"} ${r.alvo === "dom" ? t.domF : t.recF}. Cada um vale 25%: ${n} × 25% = ${n * 25}%.`
+    }
+    if (certo) {
+      botao.classList.add("certa")
+      if (tipo() === "conceito") $("quadro").querySelector("svg").style.filter = ""
+      if (tipo() === "chance" && !r.descobrir) preencherQuadro(true)
+      if (tipo() === "conceito" && r.pergunta === "genotipo") $("quadro").querySelector(".gen").textContent = r.gen
+      return acertou(`Isso! ${porque}`, tipo() === "chance" ? 3800 : 3200)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    if (tipo() === "chance" && !r.descobrir) return window.Bit?.diz("ops", "Ainda não. Monte o quadro de Punnett no caderno, ou aperte a Dica para eu montar aqui.")
+    window.Bit?.diz("ops", porque)
+  }
+
+  // Phase 3: the hint fills the square and marks the cells that answer the question
+  function preencherQuadro(marcar) {
+    const r = atual(), t = traco(), q = quadro(r.pai, r.mae)
+    $("quadro").querySelector(".punnett").nextElementSibling.remove()
+    $("quadro").querySelector(".punnett").outerHTML = grade(r, (l, c) => {
+      const gen = q[l][c], alvo = marcar && dominante(gen) === (r.alvo === "dom")
+      return `<span class="celula${alvo ? " alvo" : ""}">${t.desenho(dominante(gen))}${gen}</span>`
+    })
+  }
+
+  // Phase 2: checking the square
+  $("conferir").onclick = () => {
+    if (ocupado) return
+    const r = atual(), t = traco(), q = quadro(r.pai, r.mae)
+    if (celulas.flat().includes(null)) return window.Bit?.diz("pensando", "Ainda tem quadrinho com ?. Toque nele para escolher o genótipo.")
+    const botoes = [...$("quadro").querySelectorAll("button.celula")]
+    const erradas = botoes.filter(b => celulas[b.dataset.l][b.dataset.c] !== q[b.dataset.l][b.dataset.c])
+    if (erradas.length) {
+      erros++
+      somErro()
+      erradas.forEach(b => b.classList.add("errada"))
+      const b = erradas[0]
+      return window.Bit?.diz("ops", `O quadrinho em vermelho está na linha ${r.mae[b.dataset.l]} e na coluna ${r.pai[b.dataset.c]}. Junte as duas letras, com a maiúscula na frente.`)
+    }
+    botoes.forEach(b => {
+      const gen = celulas[b.dataset.l][b.dataset.c]
+      b.className = "celula certa"
+      b.innerHTML = t.desenho(dominante(gen)) + gen
+    })
+    const lista = q.flat(), conta = {}
+    lista.forEach(g => conta[g] = (conta[g] || 0) + 1)
+    const genotipos = Object.entries(conta).map(([g, n]) => `${n} ${g}`).join(", ").replace(/, ([^,]*)$/, " e $1")
+    const nDom = lista.filter(dominante).length
+    const fenotipos = [nDom && `${nDom * 25}% ${t.domP}`, nDom < 4 && `${(4 - nDom) * 25}% ${t.recP}`].filter(Boolean).join(" e ")
+    acertou(`Quadro certo! ${genotipos}: ${fenotipos}.`, 3800)
+  }
+
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual(), t = traco()
+    dicas++
+    if (tipo() === "conceito") {
+      if (r.pergunta === "tipo") return window.Bit?.diz("pensando", "Homo quer dizer igual, e hetero quer dizer diferente. As duas letras são iguais?")
+      return window.Bit?.diz("pensando", `A letra maiúscula, ${t.letra}, é a dominante: se ela aparecer uma vez, ganha. A minúscula só aparece quando vem em dobro.`)
+    }
+    if (tipo() === "punnett") {
+      const q = quadro(r.pai, r.mae)
+      for (const b of $("quadro").querySelectorAll("button.celula")) {
+        const l = b.dataset.l, c = b.dataset.c
+        if (celulas[l][c] !== q[l][c]) {
+          $("quadro").querySelectorAll("button.celula").forEach(outra => outra.classList.remove("alvo"))
+          b.classList.add("alvo")
+          return window.Bit?.diz("pensando", `Veja o quadrinho amarelo, da linha ${r.mae[l]} com a coluna ${r.pai[c]}: ele recebe ${r.mae[l]} de um e ${r.pai[c]} do outro.`)
+        }
+      }
+      return window.Bit?.diz("pensando", "O quadro está completo. Aperte Conferir o quadro!")
+    }
+    if (r.descobrir) return window.Bit?.diz("pensando", "Para ser vermelho, o bezerro precisa de dois b. Um veio da vaca. De onde veio o outro?")
+    preencherQuadro(false)
+    window.Bit?.diz("pensando", `Montei o quadro. Conte quantos quadrinhos dão ${r.alvo === "dom" ? t.domF : t.recF}: cada um vale 25%.`)
+  }
+
+  function acertou(frase, espera = 3000) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    setTimeout(() => {
+      ocupado = false
+      rodada++
+      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+      else terminarFase()
+    }, espera)
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Geneticista!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você previu os filhotes${comoFoi}. É assim que um criador escolhe o touro para ter bezerros sem chifre, usando a lei que Mendel descobriu com ervilhas.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você domina a primeira lei de Mendel! Cada filhote recebe uma letra de cada um." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

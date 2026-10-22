@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="64" y="22" width="34" height="34" rx="7" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><rect x="102" y="22" width="34" height="34" rx="7" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/>
+          <rect x="64" y="60" width="34" height="34" rx="7" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><rect x="102" y="60" width="34" height="34" rx="7" fill="#fff2b8" stroke="#2f2a4a" stroke-width="3.5"/>
+          <g font-family='Fredoka, "Trebuchet MS", "Arial Rounded MT Bold", sans-serif' font-weight="700" font-size="15" fill="#2f2a4a" text-anchor="middle"><text x="81" y="44">AA</text><text x="119" y="44">Aa</text><text x="81" y="82">Aa</text><text x="119" y="82">aa</text></g>
+          <circle cx="34" cy="62" r="18" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><ellipse cx="28" cy="55" rx="6" ry="4" fill="#fff" opacity=".55"/>
+          <g class="g a-tw"><circle cx="166" cy="62" r="18" fill="#8ddf6a" stroke="#2f2a4a" stroke-width="4"/><ellipse cx="160" cy="55" rx="6" ry="4" fill="#fff" opacity=".55"/></g>
+</svg>
