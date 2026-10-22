@@ -51,6 +51,10 @@
     .lei { margin: 8px 0 6px !important; font-size: clamp(34px, 5.6vw, 50px); font-weight: 700; line-height: 1.1; white-space: nowrap; }
     .lei .a { color: #e5398a; }
     .lei .b { color: #2f7de0; }
+    .legenda-ab { margin: 0 0 8px !important; font-size: 15px; font-weight: 600; color: var(--soft); }
+    .legenda-ab b { font-size: 18px; }
+    .legenda-ab .a { color: #e5398a; }
+    .legenda-ab .b { color: #2f7de0; }
     .missao__texto { font-size: 17px; font-weight: 600; color: var(--soft); }
     .missao__texto.problema { color: var(--ink); font-size: 18px; text-align: left; }
 
@@ -178,6 +182,7 @@ p, li, blockquote {
         <div class="missao">
           <p class="missao__topo" id="topo">Ler o gráfico · reta 1 de 5</p>
           <p class="lei" id="lei" aria-live="polite">y = ax + b</p>
+          <p class="legenda-ab" id="legenda-ab"></p>
           <p class="missao__texto" id="texto">Qual é a lei desta reta?</p>
         </div>
         <div class="grafico-area">
@@ -203,6 +208,7 @@ p, li, blockquote {
           <div class="acoes">
             <button class="btn btn--jogar" type="button" id="conferir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Lançar o Bit</span></button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
           </div>
           <ol class="placar" id="placar" aria-label="Retas da fase"></ol>
         </div>
@@ -320,7 +326,7 @@ p, li, blockquote {
     cala() {},
   }
 
-  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0, revelar = false
   let a = 0, b = 0, extras = ""
   const atual = () => FASES[fase].rodadas[rodada]
   const tipo = () => FASES[fase].tipo
@@ -395,6 +401,26 @@ p, li, blockquote {
     return ini < fim ? [ini, fim] : null
   }
 
+  // The a and the b on the graph: the blue point is b, where the line crosses the y axis, and the pink step is a,
+  // how much the line goes up or down when x moves 1 (or 2, when a is a half). In phase 1 the values only show after the answer
+  function marcas() {
+    const j = janela(), passo = Number.isInteger(a) ? 1 : 2, comValor = tipo() !== "ler" || revelar
+    if (b < j.y0 || b > j.y1) return ["", ""]
+    const x0 = px(0), y0 = py(b), x1 = px(passo), y1 = py(b + a * passo)
+    const dentro = y => Math.max(T + 16, Math.min(T + H - 6, y))
+    const texto = (x, y, conteudo, cor, ancora = "start") => `<text x="${x}" y="${dentro(y)}" text-anchor="${ancora}" font-size="20" font-weight="700" fill="${cor}" stroke="#fff" stroke-width="6" stroke-linejoin="round" paint-order="stroke">${conteudo}</text>`
+    const degrau = `<path d="M${x0} ${y0}H${x1}" stroke="#5b5675" stroke-width="3" stroke-dasharray="6 5"/>`
+      + (a ? `<path d="M${x1} ${y0}V${y1}" stroke="#e5398a" stroke-width="4" stroke-dasharray="6 5"/>` : "")
+      + `<circle cx="${x0}" cy="${y0}" r="7" fill="#2f7de0" stroke="#2f2a4a" stroke-width="2.5"/>`
+    const valorA = !comValor ? "?" : passo === 1 ? num(a) : `${num(a * passo)} ÷ ${passo} = ${num(a)}`
+    const centrado = j.x0 < 0
+    let rotulos = texto(x1 + 8, (y0 + y1) / 2 + 6, `a = ${valorA}`, "#e5398a")
+    rotulos += centrado
+      ? texto(x0 - 10, y0 + 6, `b = ${comValor ? num(b) : "?"}`, "#2f7de0", "end") + texto((x0 + x1) / 2, a > 0 ? y0 + 20 : y0 - 10, String(passo), "#5b5675", "middle")
+      : texto(x0 + 10, a >= 0 ? y0 + 26 : y0 - 14, `b = ${num(b)}`, "#2f7de0")
+    return [degrau, rotulos]
+  }
+
   function desenharGrafico() {
     const j = janela()
     let s = `<defs><clipPath id="area"><rect x="${L}" y="${T}" width="${W}" height="${H}"/></clipPath></defs>`
@@ -411,10 +437,9 @@ p, li, blockquote {
     s += `<text x="${L}" y="${T - 12}" font-size="16" font-weight="700" fill="#2f2a4a">${j.nomeY}</text>`
     s += `<rect x="${L}" y="${T}" width="${W}" height="${H}" fill="none" stroke="#2f2a4a" stroke-width="2"/>`
     s += `<g clip-path="url(#area)">${extras}`
-    const t = trecho(a, b)
+    const t = trecho(a, b), [degrau, rotulos] = marcas()
     if (t) s += `<path class="reta" d="M${px(t[0])} ${py(a * t[0] + b)}L${px(t[1])} ${py(a * t[1] + b)}" stroke="#7b5cff" stroke-width="6" stroke-linecap="round"/>`
-    if (tipo() !== "problema" && (a !== 0 || b !== 0 || tipo() === "ler")) s += `<circle cx="${px(0)}" cy="${py(b)}" r="6" fill="#2f7de0" stroke="#2f2a4a" stroke-width="2.5"/>`
-    s += "</g>"
+    s += degrau + "</g>" + rotulos
     if (tipo() === "ajustar") atual().pontos.forEach(([x, y], i) => {
       s += `<g class="alvo" data-i="${i}" transform="translate(${px(x)} ${py(y)})"><use href="#estrela" x="-17" y="-17" width="34" height="34" style="transform-box: fill-box; transform-origin: center"/></g>`
     })
@@ -426,7 +451,7 @@ p, li, blockquote {
   }
 
   function desenharLei() {
-    if (tipo() === "ler") $("lei").innerHTML = 'y = <span class="a">?</span>x + <span class="b">?</span>'
+    if (tipo() === "ler" && !revelar) $("lei").innerHTML = 'y = <span class="a">?</span>x + <span class="b">?</span>'
     else $("lei").innerHTML = lei(a, b, tipo() === "problema" ? "f(x)" : "y")
     $("val-a").textContent = num(a)
     $("val-b").textContent = num(b)
@@ -437,6 +462,8 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
   function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
     const r = atual()
     dicas = 0
     extras = ""
@@ -453,7 +480,7 @@ p, li, blockquote {
       a = r.a
       b = r.b
       $("texto").textContent = "Qual é a lei desta reta?"
-      $("nota").textContent = "O ponto azul é onde a reta corta o eixo y."
+      $("nota").textContent = "O ponto azul mostra o b. O degrau rosa mostra o a."
       $("opcoes").innerHTML = r.opcoes.map(([oa, ob], i) => `<button class="opcao" type="button" data-i="${i}">${lei(oa, ob, "y", false)}</button>`).join("")
       $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
     } else {
@@ -464,6 +491,10 @@ p, li, blockquote {
         ? (r.passoA === 1 ? "Os botões mudam o a e o b de 1 em 1." : "Agora o a muda de meio em meio: 0,5, 1, 1,5…")
         : `O a muda de ${num(r.passoA)} em ${num(r.passoA)}, e o b de ${num(r.passoB)} em ${num(r.passoB)}.`
     }
+    $("legenda-ab").innerHTML = tipo() === "problema"
+      ? '<b class="a">a</b> é quanto o valor muda a cada 1 de x · <b class="b">b</b> é o valor no começo, quando x = 0'
+      : '<b class="a">a</b> é quanto a reta sobe ou desce quando o x anda 1 · <b class="b">b</b> é onde ela corta o eixo y'
+    revelar = false
     desenhar()
   }
 
@@ -473,6 +504,8 @@ p, li, blockquote {
     const r = atual(), [oa, ob] = r.opcoes[botao.dataset.i]
     if (oa === r.a && ob === r.b) {
       botao.classList.add("certa")
+      revelar = true
+      desenhar()
       const passo = Number.isInteger(r.a) ? 1 : 2
       return acertou(`Isso! A reta corta o eixo y em (0, ${num(r.b)}), então b = ${num(r.b)}. E quando o x anda ${passo}, ela ${r.a > 0 ? "sobe" : "desce"} ${num(Math.abs(r.a * passo))}, então a = ${num(r.a)}.`)
     }
@@ -567,9 +600,8 @@ p, li, blockquote {
     dicas++
     if (tipo() === "ler") {
       const passo = Number.isInteger(r.a) ? 1 : 2
-      extras = `<path d="M${px(0)} ${py(r.b)}H${px(passo)}V${py(r.b + r.a * passo)}" fill="none" stroke="#ff8a3d" stroke-width="4" stroke-dasharray="7 6"/>`
-      desenharGrafico()
-      return window.Bit?.diz("pensando", `O ponto azul mostra o b. A linha laranja anda ${passo} para a direita e vai até a reta: o tanto que ela ${r.a > 0 ? "sobe" : "desce"} mostra o a.`)
+      if (dicas === 1) return window.Bit?.diz("pensando", "Comece pelo b: veja em que número do eixo y está o ponto azul. É ali que a reta corta o eixo.")
+      return window.Bit?.diz("pensando", `Agora o a: o degrau anda ${passo} para a direita. Conte quantos quadradinhos a linha rosa ${r.a > 0 ? "sobe" : "desce"}${passo === 2 ? " e divida por 2" : ""}.`)
     }
     if (tipo() === "ajustar") {
       const [[x1, y1], [x2, y2]] = r.pontos, dx = x2 - x1, dy = y2 - y1
@@ -581,16 +613,21 @@ p, li, blockquote {
     window.Bit?.diz("pensando", dicas % 2 === 1 ? r.dicaB : r.dicaA)
   }
 
-  function acertou(frase, espera = 3000) {
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase) {
     ocupado = true
     somAcerto()
     window.Bit?.diz("comemorando", frase)
-    setTimeout(() => {
-      ocupado = false
-      rodada++
-      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
-      else terminarFase()
-    }, espera)
+    for (const id of ["conferir", "dica", "zerar"]) if ($(id)) $(id).hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
   }
 
   // Stars by how many mistakes were made in the phase, and confetti

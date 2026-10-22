@@ -192,6 +192,7 @@ p, li, blockquote {
           <div class="acoes">
             <button class="btn btn--jogar" type="button" id="conferir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11" fill="none" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Conferir o quadro</button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
           </div>
           <p class="nota" id="nota"></p>
           <ol class="placar" id="placar" aria-label="Perguntas da fase"></ol>
@@ -394,6 +395,8 @@ p, li, blockquote {
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
   }
   function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
     const r = atual(), t = traco()
     dicas = 0
     desenharPlacar()
@@ -555,16 +558,21 @@ p, li, blockquote {
     window.Bit?.diz("pensando", `Montei o quadro. Conte quantos quadrinhos dão ${r.alvo === "dom" ? t.domF : t.recF}: cada um vale 25%.`)
   }
 
-  function acertou(frase, espera = 3000) {
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase) {
     ocupado = true
     somAcerto()
     window.Bit?.diz("comemorando", frase)
-    setTimeout(() => {
-      ocupado = false
-      rodada++
-      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
-      else terminarFase()
-    }, espera)
+    for (const id of ["conferir", "dica", "zerar"]) if ($(id)) $(id).hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
   }
 
   // Stars by how many mistakes were made in the phase, and confetti
