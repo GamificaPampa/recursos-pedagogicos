@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,6 62,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 38,38' fill='%23ffd84d' stroke='%23e0a800' stroke-width='5'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
 <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
 <style>
   :root {
     --risco: #cfcbe6;
@@ -34,9 +35,7 @@
   .form .row { display: flex; gap: 14px; flex-wrap: wrap }
   .form .row label { flex: 1; min-width: 200px }
   .actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center }
-  .form button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: var(--orange); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; font: 700 22px var(--font); cursor: pointer }
   .form button svg { width: 24px; height: 24px }
-  .form button:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
   .form button:disabled { opacity: .6; cursor: wait }
   #pdf { background: var(--orange) }
   #count { font-size: 17px; font-weight: 600 }
@@ -69,8 +68,8 @@
     <label>Quem apresentou <input id="presenter" placeholder="Seu nome"></label>
   </div>
   <div class="actions">
-    <button type="button" onclick="print()"><svg viewBox="0 0 24 24"><path d="M7 9 V3 H17 V9 M7 18 H4 V10 H20 V18 H17 M7 14 H17 V21 H7 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Imprimir</button>
-    <button type="button" id="pdf"><svg viewBox="0 0 24 24"><path d="M6 3 H14 L19 8 V21 H6 Z M14 3 V8 H19" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span id="pdf-label">Baixar PDF</span></button>
+    <button class="btn btn--baixar" type="button" onclick="print()"><svg viewBox="0 0 24 24"><path d="M7 9 V3 H17 V9 M7 18 H4 V10 H20 V18 H17 M7 14 H17 V21 H7 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Imprimir</button>
+    <button class="btn btn--baixar" type="button" id="pdf"><svg viewBox="0 0 24 24"><path d="M6 3 H14 L19 8 V21 H6 Z M14 3 V8 H19" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span id="pdf-label">Baixar PDF</span></button>
     <span id="count"></span>
   </div>
 </section>

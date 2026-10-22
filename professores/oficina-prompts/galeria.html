@@ -9,8 +9,10 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
 <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
 <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <style>
+  .btn { white-space: nowrap }
   :root { --risco: #cfcbe6;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
@@ -27,14 +29,11 @@
   .page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 30px }
 
   /* Buttons: thick outline and a hard shadow, like the buttons of the games */
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 8px 20px; background: var(--c, #fff); color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-weight: 700; font-size: 19px; text-decoration: none; white-space: nowrap; transition: transform .1s, box-shadow .1s }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink) }
-  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink) }
   .btn.white { background: #fff }
-  .btn.small { min-height: 44px; padding: 5px 14px; font-size: 16px; box-shadow: 0 4px 0 var(--ink) }
+  .btn.small { --drop-y: 5px; min-height: 44px; padding: 4px 14px; font-size: 16px }
   .btn.whatsapp { --c: var(--purple) }
   /* Jogar é sempre verde, como em todo o site */
-  a.btn.loud.grow { --c: var(--mint) }
+  a.btn.grow { --c: var(--mint) }
   .btn.off { background: rgba(255, 255, 255, .6); border-style: dashed; box-shadow: none; color: var(--soft); font-size: 16px; cursor: default; transform: none }
   .loud { color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; letter-spacing: .3px }
   .loud .i { filter: drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink)) }
@@ -181,7 +180,6 @@
     .empty > svg { width: 220px; margin: 0 auto }
     .card { padding: 18px 16px }
     .pair { grid-template-columns: 1fr }
-    .btn { font-size: 18px }
     .stage { height: 138px }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -241,7 +239,7 @@
     <div>
       <h3>Ainda não tem jogos aqui.</h3>
       <p>Os primeiros aparecem depois do Encontro 3. Fez um jogo com o Gemini? Envie o link para ele entrar na galeria.</p>
-      <a class="btn loud" href="#enviar" style="--c: var(--pink)"><svg class="i"><use href="#i-send"/></svg>Enviar o meu jogo</a>
+      <a class="btn" href="#enviar" style="--c: var(--pink)"><svg class="i"><use href="#i-send"/></svg>Enviar o meu jogo</a>
     </div>
   </div>
 </section>
@@ -485,7 +483,7 @@ function gameCard(game) {
       ${meta ? `<p class="meta"><span class="dot"></span>${escape(meta)}</p>` : ""}
       ${by ? `<p class="by">${icon("person")}${escape(by)}</p>` : ""}
       <div class="row">${link
-        ? `<a class="btn loud grow" href="${escape(link)}" target="_blank" rel="noopener">${icon("play")}Jogar</a><button class="btn white small" type="button" data-copy="${escape(link)}">${icon("copy")}Copiar link</button>`
+        ? `<a class="btn grow" href="${escape(link)}" target="_blank" rel="noopener">${icon("play")}Jogar</a><button class="btn white small" type="button" data-copy="${escape(link)}">${icon("copy")}Copiar link</button>`
         : `<span class="btn off grow">Link em breve</span>`}</div>
     </div>
   </article>`
