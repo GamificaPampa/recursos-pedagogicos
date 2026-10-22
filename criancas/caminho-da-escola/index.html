@@ -15,6 +15,10 @@
   <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
   <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
   <style>
+    .btn[hidden] { display: none; }
+    #proxima svg { width: 22px; height: 22px; }
+    .seguir-rodada { display: flex; justify-content: center; margin-top: 16px; }
+    .seguir-rodada:has(#proxima[hidden]) { display: none; }
     /* Page in one central column that fits the phone and the projector */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
     .topo svg { width: 22px; height: 22px; }
@@ -203,6 +207,7 @@ p, li, blockquote {
           </div>
         </div>
       </div>
+      <div class="seguir-rodada"><button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button></div>
       <ol class="placar" id="placar" aria-label="Rodadas da fase" style="justify-content: center; margin-top: 14px"></ol>
 
       <div class="fim" id="fim" hidden>
@@ -450,6 +455,9 @@ p, li, blockquote {
   }
 
   function mostrarRodada() {
+    $("proxima").hidden = true
+    $("ir").hidden = false
+    $("apagar").hidden = false
     const f = FASES[fase], r = f.rodadas[rodada]
     errosAqui = 0
     programa = []
@@ -480,15 +488,25 @@ p, li, blockquote {
     window.Bit?.diz("ops", frase)
   }
   function acertar(frase) {
-    ocupado = true
     somAcerto()
     window.Bit?.diz("feliz", frase)
-    setTimeout(() => {
-      ocupado = false
-      rodada++
-      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
-      else terminarFase()
-    }, 2200)
+    mostrarProxima()
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the child taps Próxima questão
+  function mostrarProxima() {
+    ocupado = true
+    $("ir").hidden = true
+    $("apagar").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    $("proxima").hidden = true
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
   }
 
   // Phases 1 and 3: the child taps a place on the map

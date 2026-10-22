@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
   <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
   <style>
+    .btn[hidden] { display: none; }
+    #proxima svg { width: 22px; height: 22px; }
     /* Page in one central column that fits the phone and the projector */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
     .topo svg { width: 22px; height: 22px; }
@@ -170,6 +172,7 @@ p, li, blockquote {
             <button class="btn btn--jogar" type="button" id="dividir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="6" r="2.4" fill="#2f2a4a"/><circle cx="12" cy="18" r="2.4" fill="#2f2a4a"/></svg><span>Dividir os dois lados</span></button>
           </div>
           <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
             <button class="btn btn--small" type="button" id="desfazer">Desfazer</button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
           </div>
@@ -336,6 +339,9 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
   function mostrarRodada() {
+    $("proxima").hidden = true
+    $("desfazer").hidden = false
+    $("dica").hidden = false
     ;[a, b, c, xv] = FASES[fase].rodadas[rodada]
     historico = []
     desenharPlacar()
@@ -401,12 +407,23 @@ p, li, blockquote {
     somAcerto()
     const [a0, b0, c0] = FASES[fase].rodadas[rodada]
     window.Bit?.diz("comemorando", `x = ${c}! Confira: ${a0 === 1 ? "" : `${a0} × `}${c}${b0 ? ` + ${b0}` : ""} = ${c0}.`)
-    setTimeout(() => {
-      ocupado = false
-      rodada++
-      if (rodada < FASES[fase].rodadas.length) mostrarRodada()
-      else terminarFase()
-    }, 2600)
+    mostrarProxima()
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the child taps Próxima questão
+  function mostrarProxima() {
+    ocupado = true
+    $("desfazer").hidden = true
+    $("dica").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    $("proxima").hidden = true
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
   }
 
   // Stars by how many mistakes were made in the phase, and confetti
