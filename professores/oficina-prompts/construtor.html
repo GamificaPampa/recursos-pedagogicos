@@ -178,7 +178,7 @@
       <label>Tema
         <input type="text" id="topic" placeholder="Por exemplo: animais do Pampa, frações, o ciclo da água">
       </label>
-      <label>O que as crianças devem aprender? <small>(opcional)</small>
+      <label>O que a turma deve aprender? <small>(opcional)</small>
         <textarea id="goal" placeholder="Por exemplo: reconhecer metades e quartos em situações do dia a dia"></textarea>
       </label>
       <label id="paste-box" hidden>Material para adaptar <small>(cole aqui o texto ou a atividade)</small>
@@ -264,6 +264,11 @@ const STAGES = [
     ["f8", "8º ano", "13 e 14 anos", "finais", "fluent"],
     ["f9", "9º ano", "14 e 15 anos", "finais", "fluent"],
   ] },
+  { group: "Ensino Médio", items: [
+    ["em1", "1ª série do Ensino Médio", "15 e 16 anos", "medio", "fluent"],
+    ["em2", "2ª série do Ensino Médio", "16 e 17 anos", "medio", "fluent"],
+    ["em3", "3ª série do Ensino Médio", "17 e 18 anos", "medio", "fluent"],
+  ] },
 ]
 
 const READING = {
@@ -277,6 +282,7 @@ const READING = {
 const AREAS = {
   infantil: ["O eu, o outro e o nós", "Corpo, gestos e movimentos", "Traços, sons, cores e formas", "Escuta, fala, pensamento e imaginação", "Espaços, tempos, quantidades, relações e transformações"],
   fundamental: ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos"],
+  medio: ["Língua Portuguesa", "Matemática", "Física", "Química", "Biologia", "História", "Geografia", "Filosofia", "Sociologia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos"],
 }
 
 // Each need brings a concrete adaptation, so Gemini knows what to change and not only that something must change
@@ -349,7 +355,7 @@ const KINDS = {
     format: () => [
       "Uma tabela com objetivos, materiais e tempo total.",
       "O passo a passo da aula com o tempo de cada parte: abertura, desenvolvimento e fechamento.",
-      "Como perceber se as crianças aprenderam.",
+      "Como perceber se a turma aprendeu.",
       "Uma adaptação para quem tiver dificuldade e um desafio extra para quem terminar antes.",
     ],
     next: ["Crie a atividade impressa que acompanha esse plano.", "Sugira uma brincadeira de 5 minutos para começar a aula."],
@@ -412,23 +418,26 @@ const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<"
 function buildPrompt() {
   const [, label, age, group, reading] = stageOf($("stage").value)
   const early = group === "infantil", details = KINDS[kind], area = $("area").value
-  const students = group === "finais" ? "alunos" : "crianças"
+  const older = group === "finais" || group === "medio"
+  const students = older ? "alunos" : "crianças"
+  // "do 6º ano do Ensino Fundamental" or "da 1ª série do Ensino Médio"
+  const classLabel = group === "medio" ? `da ${label}` : `do ${label} do Ensino Fundamental`
   const topic = $("topic").value.trim() || "[escreva o tema]"
   const role = early
     ? `Você é um(a) professor(a) de Educação Infantil experiente, que sabe criar ${details.maker} para crianças pequenas.`
-    : `Você é um(a) professor(a) experiente de ${area === "Vários componentes juntos" ? "vários componentes" : area} do ${label} do Ensino Fundamental, que sabe criar ${details.maker}.`
+    : `Você é um(a) professor(a) experiente de ${area === "Vários componentes juntos" ? "vários componentes" : area} ${classLabel}, que sabe criar ${details.maker}.`
   const needs = selectedNeeds()
 
   const context = [
-    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".` : `A turma é do ${label} do Ensino Fundamental, com ${students} de ${age}, e o componente é ${area}.`,
+    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".` : `A turma é ${classLabel}, com ${students} de ${age}, e o componente é ${area}.`,
     READING[reading],
-    $("goal").value.trim() && `${group === "finais" ? "Os alunos" : "As crianças"} devem aprender:${$("goal").value.trim().replace(/\.$/, "")}.`,
+    $("goal").value.trim() && `${older ? "Os alunos" : "As crianças"} devem aprender: ${$("goal").value.trim().replace(/\.$/, "")}.`,
     $("time").value && `O tempo disponível é ${$("time").value}.`,
     (kind === "jogo" || kind === "quiz") && `Vai ser usado ${$("place").value}.`,
     needs.length && `Na turma há ${students} com ${joinList(needs)}. Inclua adaptações: ${needs.map(need => `para ${need}, ${NEEDS[need]}`).join("; ")}.`,
     (kind === "plano" || kind === "atividade") && "Não cite códigos de habilidades da BNCC.",
     (kind === "plano" || kind === "historia") && "Não cite músicas nem livros que você não tenha certeza de que existem.",
-    `Responda em português do Brasil, com exemplos do dia a dia ${group === "finais" ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
+    `Responda em português do Brasil, com exemplos do dia a dia ${older ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
     $("extra").value.trim(),
   ].filter(Boolean)
 
@@ -541,7 +550,7 @@ async function copyMessage(index) {
 
 function fillAreas() {
   const group = stageOf($("stage").value)[3], early = group === "infantil", previous = $("area").value
-  const areas = AREAS[early ? "infantil" : "fundamental"]
+  const areas = AREAS[early ? "infantil" : group === "medio" ? "medio" : "fundamental"]
   $("area-label").textContent = early ? "Campo de experiência (BNCC)" : "Componente curricular"
   $("area").innerHTML = areas.map(area => `<option>${area}</option>`).join("")
   if (areas.includes(previous)) $("area").value = previous
