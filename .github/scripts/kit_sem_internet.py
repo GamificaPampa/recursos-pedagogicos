@@ -21,7 +21,8 @@ RAIZ = Path(__file__).resolve().parents[2]
 RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conecta", "criancas/arcade",
             "criancas/caca-bugs", "criancas/missao-dev", "criancas/pizzaria-das-fracoes", "criancas/balanca-do-bit",
             "criancas/fabrica-de-silabas", "criancas/detetive-da-noticia", "criancas/ciclo-da-agua",
-            "criancas/caminho-da-escola", "criancas/reta-do-bit", "criancas/laboratorio-de-equacoes",
+            "criancas/caminho-da-escola", "criancas/linha-do-tempo", "criancas/atelie-das-cores",
+            "criancas/circuito-do-bit", "criancas/ingles-com-o-bit", "criancas/reta-do-bit", "criancas/laboratorio-de-equacoes",
             "criancas/genetica-do-bit", "professores/aula-engenharia-de-software"]
 FONTE = "identidade-visual/fontes/fredoka/fredoka.woff2"
 # Pastas do identidade-visual que as páginas do kit carregam: CSS, scripts (Bit que fala e ícones), poses do Bit e logos

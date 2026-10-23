@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circuito do Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Educação Física: a turma faz um aquecimento de verdade com o Bit, aprende quantos jogadores tem cada esporte e entende o que acontece com o corpo quando se mexe.">
+  <meta property="og:title" content="Circuito do Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Educação Física: aquecimento com cronômetro, regras dos esportes e o corpo em movimento.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    .btn[hidden] { display: none; }
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(36px, 7.4vw, 68px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the scene on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__pergunta { margin: 6px 0 4px !important; font-size: clamp(22px, 3.4vw, 28px); font-weight: 700; line-height: 1.2; }
+    .missao__texto { font-size: 16px; font-weight: 600; color: var(--soft); }
+    .cena-area { grid-area: cena; display: grid; gap: 8px; align-content: start; }
+    .cena { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .cena text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 420px; }
+    .opcoes:empty { display: none; }
+    .opcoes--linha { display: flex; flex-wrap: wrap; justify-content: center; }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--c, var(--white)); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 19px/1.25 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao:hover:not([disabled]) { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao[disabled] { cursor: default; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; }
+    .opcao.certa { background: var(--mint); opacity: 1; }
+    .opcao.treme { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .fim .btn svg { width: 22px; height: 22px; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+    .pose-a, .pose-b { animation: troca-pose 1s steps(1) infinite; }
+    .pose-b { animation-delay: -.5s; }
+    @keyframes troca-pose { 0% { opacity: 1; } 50% { opacity: 0; } }
+    .parado .pose-a, .parado .pose-b { animation-play-state: paused; }
+    .bate { transform-box: fill-box; transform-origin: center; animation: bate .7s ease-in-out infinite; }
+    @keyframes bate { 30% { transform: scale(1.12); } }
+    .opcoes--numeros { display: flex; flex-wrap: wrap; justify-content: center; }
+    .opcoes--numeros .opcao { min-width: 84px; font-size: 30px; }
+    @media (prefers-reduced-motion: reduce) { .pose-b { display: none; } .pose-a { animation: none; } .bate { animation: none; } }
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcao { font-size: 17px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .opcao, .anima { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">20s</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">1, 2</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">!</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Circuito</span> do <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Educação Física</li>
+        <li class="pill" style="--c: var(--yellow)">8 a 11 anos</li>
+        <li class="pill">Corpo e movimento</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" id="jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__pergunta" id="pergunta"></p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <div class="cena-area">
+          <svg class="cena" id="cena" viewBox="0 0 300 260" role="img" aria-label="Quadra"></svg>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A aquecer o corpo antes da atividade, com polichinelo, corrida parada, agachamento, equilíbrio e alongamento; quantos jogadores tem cada time no futebol, no futsal, no vôlei, no basquete e no handebol; e o que acontece com o corpo quando se mexe: o coração acelera, o suor pede água, o alongamento relaxa e a criança precisa de pelo menos uma hora de movimento por dia.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> a fase 1 é para fazer de verdade. A turma fica de pé, com espaço em volta, e segue o Bit durante os 20 segundos de cada exercício.</li>
+            <li><b>Na quadra:</b> antes das fases 2 e 3, a turma mede os batimentos com a mão no pescoço, faz o aquecimento e mede de novo para comparar.</li>
+            <li><b>Depois:</b> cada grupo inventa um exercício novo para o circuito, desenha o boneco nas duas posições e ensina para a turma.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [aquecimento] para crianças de [8 a 11 anos]: aparece um exercício com um boneco desenhado nas duas posições e um cronômetro de 20 segundos, e a turma faz o exercício de verdade junto com a tela.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: aquecimento com 5 exercícios, quantos jogadores tem cada esporte com a quadra desenhada, perguntas sobre o corpo em movimento], um botão de pausar, um som nos 3 últimos segundos, uma explicação curta a cada acerto, botões grandes e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m2 0h2m1 0h1m3 0h2m2 0h2m3 0h7m-37 1h1m5 0h1m1 0h1m5 0h3m3 0h1m1 0h1m7 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h5m1 0h2m5 0h1m4 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m5 0h1m1 0h3m3 0h1m1 0h2m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m2 0h1m2 0h2m1 0h1m2 0h3m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m2 0h2m1 0h1m12 0h1m2 0h1m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h4m1 0h2m1 0h2m2 0h1m1 0h1m1 0h2m-28 1h1m5 0h1m1 0h2m5 0h4m3 0h2m1 0h3m1 0h2m2 0h3m-34 1h1m1 0h1m2 0h4m3 0h1m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h2m-36 1h1m3 0h3m3 0h3m2 0h4m2 0h1m5 0h6m2 0h2m-37 1h6m1 0h2m3 0h3m4 0h1m3 0h2m4 0h1m1 0h3m2 0h1m-37 1h1m4 0h2m2 0h3m1 0h3m3 0h1m3 0h2m2 0h2m1 0h2m1 0h1m2 0h1m-37 1h1m1 0h3m4 0h2m4 0h3m1 0h2m1 0h2m3 0h2m2 0h1m1 0h1m-34 1h1m3 0h1m1 0h1m1 0h2m1 0h2m2 0h3m2 0h3m4 0h2m1 0h4m1 0h2m-36 1h1m2 0h1m2 0h1m1 0h5m5 0h1m2 0h2m4 0h2m1 0h1m1 0h2m1 0h1m-37 1h4m1 0h2m3 0h1m1 0h1m1 0h1m3 0h2m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h2m1 0h2m2 0h3m2 0h1m3 0h1m1 0h3m2 0h1m2 0h3m2 0h1m1 0h1m1 0h1m-36 1h3m1 0h1m1 0h1m1 0h1m4 0h2m1 0h2m1 0h1m1 0h1m1 0h5m1 0h2m5 0h1m-35 1h1m1 0h2m4 0h3m1 0h3m3 0h1m1 0h3m1 0h1m2 0h2m2 0h1m2 0h1m-36 1h1m1 0h1m1 0h2m1 0h2m3 0h1m3 0h1m1 0h1m2 0h1m1 0h3m2 0h2m1 0h3m-34 1h2m2 0h1m3 0h3m1 0h1m1 0h3m1 0h5m2 0h2m4 0h1m1 0h1m-35 1h2m2 0h1m1 0h2m3 0h1m2 0h4m2 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-37 1h1m2 0h1m1 0h1m2 0h1m5 0h2m1 0h4m1 0h2m2 0h4m1 0h3m1 0h2m-34 1h1m2 0h1m1 0h1m5 0h2m1 0h1m2 0h1m1 0h1m3 0h3m1 0h2m4 0h1m-37 1h2m2 0h2m2 0h1m1 0h4m4 0h2m3 0h1m1 0h1m1 0h2m2 0h1m1 0h2m-35 1h1m1 0h1m2 0h2m2 0h1m1 0h1m3 0h4m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m2 0h3m1 0h2m3 0h1m1 0h1m1 0h1m1 0h2m2 0h1m1 0h1m2 0h4m2 0h2m-35 1h1m1 0h2m2 0h1m3 0h2m1 0h5m1 0h1m3 0h13m-28 1h1m3 0h2m1 0h2m2 0h3m1 0h4m1 0h1m3 0h1m-33 1h7m4 0h3m1 0h1m1 0h3m1 0h1m1 0h1m4 0h1m1 0h1m1 0h1m3 0h1m-37 1h1m5 0h1m5 0h5m5 0h1m1 0h1m1 0h3m3 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m2 0h1m4 0h1m3 0h2m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m3 0h1m1 0h3m4 0h1m1 0h3m2 0h5m2 0h2m1 0h1m-37 1h1m1 0h3m1 0h1m2 0h2m1 0h1m1 0h1m2 0h2m3 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m3 0h2m1 0h4m3 0h1m2 0h2m2 0h2m1 0h1m1 0h2m2 0h1m-37 1h7m1 0h1m4 0h1m2 0h1m2 0h2m2 0h2m3 0h1m2 0h1m1 0h1m2 0h1"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // The stick figure's joints in each pose: head, neck, hip, then elbow and hand, knee and foot of each side
+  const P = (cabeca, pescoco, quadril, bE, bD, pE, pD) => ({ cabeca, pescoco, quadril, bE, bD, pE, pD })
+  const EM_PE = { pE: [[142, 190], [140, 235]], pD: [[158, 190], [160, 235]] }
+  const EXERCICIOS = {
+    polichinelo: { nome: "Polichinelo", como: "Pule abrindo braços e pernas, e pule de novo fechando.", trabalha: "O polichinelo aquece o corpo todo e faz o coração bater mais rápido.",
+      poses: [P([150, 50], [150, 72], [150, 145], [[127, 102], [117, 138]], [[173, 102], [183, 138]], [[143, 190], [140, 235]], [[157, 190], [160, 235]]),
+        P([150, 42], [150, 64], [150, 137], [[122, 48], [104, 22]], [[178, 48], [196, 22]], [[125, 182], [108, 227]], [[175, 182], [192, 227]])] },
+    corrida: { nome: "Corrida parada", como: "Corra sem sair do lugar, levantando bem os joelhos.", trabalha: "A corrida parada esquenta as pernas e acelera a respiração.",
+      poses: [P([150, 50], [150, 72], [150, 145], [[170, 100], [186, 84]], [[132, 104], [122, 128]], [[172, 168], [160, 204]], [[152, 190], [150, 235]]),
+        P([150, 50], [150, 72], [150, 145], [[132, 104], [122, 128]], [[170, 100], [186, 84]], [[148, 190], [150, 235]], [[128, 168], [140, 204]])] },
+    agachamento: { nome: "Agachamento", como: "Desça como se fosse sentar numa cadeira e suba de novo, com as costas retas.", trabalha: "O agachamento fortalece as pernas e o bumbum, que a gente usa para correr e pular.",
+      poses: [P([150, 50], [150, 72], [150, 145], [[128, 90], [104, 92]], [[172, 90], [196, 92]], ...Object.values(EM_PE)),
+        P([150, 92], [150, 114], [150, 180], [[126, 124], [102, 124]], [[174, 124], [198, 124]], [[116, 198], [132, 235]], [[184, 198], [168, 235]])] },
+    equilibrio: { nome: "Equilíbrio num pé só", como: "Fique num pé só com os braços abertos. Na metade do tempo, troque de pé.", trabalha: "Ficar num pé só treina o equilíbrio e a concentração.",
+      poses: [P([150, 50], [150, 72], [150, 145], [[124, 82], [98, 80]], [[176, 82], [202, 80]], [[150, 190], [150, 235]], [[174, 176], [154, 186]]),
+        P([150, 50], [150, 72], [150, 145], [[124, 88], [100, 96]], [[176, 76], [200, 66]], [[150, 190], [150, 235]], [[174, 176], [154, 186]])] },
+    alongamento: { nome: "Alongamento dos braços", como: "Estique os braços para cima e incline devagar para um lado e para o outro.", trabalha: "Alongar deixa os músculos mais soltos e ajuda a evitar machucados.",
+      poses: [P([150, 50], [150, 72], [150, 145], [[144, 40], [146, 12]], [[156, 40], [154, 12]], ...Object.values(EM_PE)),
+        P([162, 54], [157, 76], [150, 145], [[170, 44], [190, 20]], [[178, 50], [198, 28]], ...Object.values(EM_PE))] },
+  }
+  const FASES = [
+    { nome: "Aquecimento", tipo: "mexer", rotulo: "exercício", fim: "Você fez o aquecimento inteiro!",
+      abertura: "Oi! Eu sou o Bit. Todo mundo de pé, com espaço em volta! Cada exercício dura 20 segundos. Aperte Começar e faça junto comigo.",
+      rodadas: ["polichinelo", "corrida", "agachamento", "equilibrio", "alongamento"] },
+    { nome: "Regras da quadra", tipo: "quadra", rotulo: "esporte",
+      abertura: "Agora, um pouco de regra. Quantos jogadores de cada time ficam jogando em cada esporte?",
+      rodadas: [
+        { esporte: "futebol", nome: "futebol de campo", onde: "em campo", certo: 11, opcoes: [7, 11, 9], explica: "No futebol de campo são 11 de cada time: o goleiro e mais 10." },
+        { esporte: "futsal", nome: "futsal", onde: "em quadra", certo: 5, opcoes: [5, 6, 11], explica: "No futsal são 5: o goleiro e mais 4 na linha. A quadra é menor, então o time também é." },
+        { esporte: "volei", nome: "vôlei", onde: "em quadra", certo: 6, opcoes: [4, 5, 6], explica: "No vôlei são 6 de cada lado da rede: 3 na frente, perto da rede, e 3 atrás." },
+        { esporte: "basquete", nome: "basquete", onde: "em quadra", certo: 5, opcoes: [5, 7, 6], explica: "No basquete são 5 de cada time em quadra." },
+        { esporte: "handebol", nome: "handebol", onde: "em quadra", certo: 7, opcoes: [6, 11, 7], explica: "No handebol são 7: o goleiro e mais 6 jogadores na linha." },
+      ] },
+    { nome: "Corpo em movimento", tipo: "corpo", rotulo: "pergunta",
+      abertura: "Por último: o que acontece com o corpo quando a gente se mexe?",
+      rodadas: [
+        { desenho: "coracao", pergunta: "Depois de correr, o coração bate…", opcoes: ["Mais rápido", "Mais devagar", "Igual a antes"], certa: 0,
+          explica: "Os músculos precisam de mais oxigênio, e o coração bate mais rápido para levar o sangue até eles. Ponha a mão no peito depois de correr e sinta!" },
+        { desenho: "aquecer", pergunta: "Por que aquecer antes de jogar?", opcoes: ["Para cansar antes do jogo", "Para preparar os músculos e evitar machucados", "Não precisa aquecer"], certa: 1,
+          explica: "O aquecimento esquenta os músculos e as articulações, e o corpo fica pronto para correr e pular sem se machucar." },
+        { desenho: "agua", pergunta: "Durante a atividade física, o que é melhor beber?", opcoes: ["Refrigerante", "Água", "Nada, só no fim do dia"], certa: 1,
+          explica: "No suor, o corpo perde água. Beber água aos poucos, antes, durante e depois, repõe o que saiu." },
+        { desenho: "relogio", pergunta: "Quanto tempo de atividade física uma criança deve fazer por dia?", opcoes: ["5 minutos", "Pelo menos 1 hora, somando tudo", "Só no fim de semana"], certa: 1,
+          explica: "O recomendado é pelo menos 1 hora por dia, somando tudo: recreio, brincadeiras, bicicleta e a aula de Educação Física." },
+        { desenho: "alongar", pergunta: "Para que serve alongar depois do exercício?", opcoes: ["Para relaxar os músculos e manter o corpo flexível", "Para ficar com mais fome", "Para o coração bater mais rápido"], certa: 0,
+          explica: "O alongamento, feito devagar, relaxa os músculos que trabalharam e mantém o corpo flexível." },
+      ] },
+  ]
+  const FIM = { titulo: "Circuito completo!", texto: "Aquecer, conhecer as regras e cuidar do corpo: é assim que se joga bem e sem se machucar.",
+    fala: "Que time! Agora é levar tudo isso para a quadra." }
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
+  function mostrarOpcoes(lista, aoEscolher, classe = "") {
+    $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
+    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
+      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+    })
+  }
+  function errar(frase, botao, riscar = true) {
+    erros++
+    somErro()
+    if (botao && riscar) {
+      botao.disabled = true
+      botao.classList.add("errada")
+    } else if (botao) {
+      botao.classList.remove("treme")
+      void botao.offsetWidth
+      botao.classList.add("treme")
+    }
+    window.Bit?.diz("ops", frase)
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase, botao) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    if (botao) botao.classList.add("certa")
+    $("dica").hidden = true
+    $("acao").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrar()
+    else terminarFase()
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrar() {
+    if (typeof pararRodada === "function") pararRodada()
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("acao").hidden = true
+    $("opcoes").innerHTML = ""
+    dicas = 0
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].rotulo} ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    mostrarRodada()
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    dicas++
+    window.Bit?.diz("pensando", dica())
+  }
+
+  const I = "#2f2a4a"
+  // The stick figure: thick limbs, a colored body and the head
+  function boneco(p, cor = "#4da3ff") {
+    const linha = pts => `<polyline points="${pts.map(q => q.join(",")).join(" ")}" fill="none" stroke="${I}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>`
+    const ombro = [p.pescoco[0], p.pescoco[1] + 8]
+    return linha([p.quadril, ...p.pE]) + linha([p.quadril, ...p.pD])
+      + `<path d="M${p.pescoco.join(" ")}L${p.quadril.join(" ")}" stroke="${I}" stroke-width="24" stroke-linecap="round"/><path d="M${p.pescoco.join(" ")}L${p.quadril.join(" ")}" stroke="${cor}" stroke-width="16" stroke-linecap="round"/>`
+      + linha([ombro, ...p.bE]) + linha([ombro, ...p.bD])
+      + `<circle cx="${p.cabeca[0]}" cy="${p.cabeca[1]}" r="18" fill="#ffd9b8" stroke="${I}" stroke-width="4"/><circle cx="${p.cabeca[0] - 6}" cy="${p.cabeca[1] - 2}" r="2.5" fill="${I}"/><circle cx="${p.cabeca[0] + 6}" cy="${p.cabeca[1] - 2}" r="2.5" fill="${I}"/><path d="M${p.cabeca[0] - 6} ${p.cabeca[1] + 7}q6 5 12 0" fill="none" stroke="${I}" stroke-width="2.5" stroke-linecap="round"/>`
+  }
+  const chao = `<rect x="0" y="236" width="300" height="24" fill="#8ddf6a"/><path d="M0 236H300" stroke="${I}" stroke-width="4"/>`
+
+  // Phase 1: the exercise in two poses, the clock and the Começar / Pausar button
+  const DURACAO = 20
+  let restante = DURACAO, relogio = null
+  function cenaExercicio(ex) {
+    const volta = 2 * Math.PI * 30, feito = 1 - restante / DURACAO
+    return `${chao}<g class="pose-a">${boneco(ex.poses[0])}</g><g class="pose-b">${boneco(ex.poses[1])}</g>
+      <circle cx="252" cy="48" r="30" fill="#fff" stroke="#e6e3f2" stroke-width="9"/>
+      <circle cx="252" cy="48" r="30" fill="none" stroke="#4fd6a6" stroke-width="9" stroke-dasharray="${(volta * feito).toFixed(1)} ${volta.toFixed(1)}" transform="rotate(-90 252 48)"/>
+      <circle cx="252" cy="48" r="35" fill="none" stroke="${I}" stroke-width="3"/>
+      <text x="252" y="58" text-anchor="middle" font-size="28" font-weight="700" fill="${I}">${restante}</text>`
+  }
+  function pararRodada() {
+    clearInterval(relogio)
+    relogio = null
+  }
+  function tique() {
+    const ex = EXERCICIOS[atual()]
+    restante--
+    $("cena").innerHTML = cenaExercicio(ex)
+    if (restante === DURACAO / 2 && atual() === "equilibrio") {
+      tocar([[660, 0, .15]])
+      window.Bit?.diz("feliz", "Troque de pé! Agora o outro.")
+    }
+    if (restante > 0 && restante <= 3) tocar([[880, 0, .12]])
+    if (restante > 0) return
+    pararRodada()
+    $("cena").classList.add("parado")
+    acertou(`Muito bem! ${ex.trabalha}`)
+  }
+  $("acao").onclick = () => {
+    if (ocupado) return
+    if (relogio) {
+      pararRodada()
+      $("cena").classList.add("parado")
+      $("acao").querySelector("span").textContent = "Continuar"
+      return
+    }
+    $("cena").classList.remove("parado")
+    $("acao").querySelector("span").textContent = "Pausar"
+    if (restante === DURACAO) window.Bit?.diz("feliz", `Valendo! ${EXERCICIOS[atual()].como}`)
+    relogio = setInterval(tique, 1000)
+  }
+
+  // Phase 2: the court of each sport, with its lines and its ball
+  function quadra(esporte) {
+    const linhas = `fill="none" stroke="#fff" stroke-width="4"`
+    const bola = (cor, extra = "") => `<g transform="translate(150 132)"><circle r="15" fill="${cor}" stroke="${I}" stroke-width="3"/>${extra}</g>`
+    const fundo = cor => `<rect x="20" y="30" width="260" height="200" rx="10" fill="${cor}" stroke="${I}" stroke-width="5"/>`
+    if (esporte === "futebol" || esporte === "futsal") {
+      const cor = esporte === "futebol" ? "#4fb84f" : "#e8a774"
+      return fundo(cor) + `<rect x="32" y="42" width="236" height="176" ${linhas}/><path d="M150 42V218" ${linhas}/><circle cx="150" cy="130" r="30" ${linhas}/>
+        <rect x="32" y="${esporte === "futebol" ? 86 : 96}" width="${esporte === "futebol" ? 40 : 30}" height="${esporte === "futebol" ? 88 : 68}" ${linhas}/><rect x="${esporte === "futebol" ? 228 : 238}" y="${esporte === "futebol" ? 86 : 96}" width="${esporte === "futebol" ? 40 : 30}" height="${esporte === "futebol" ? 88 : 68}" ${linhas}/>
+        <rect x="14" y="112" width="18" height="36" fill="#fff" stroke="${I}" stroke-width="3"/><rect x="268" y="112" width="18" height="36" fill="#fff" stroke="${I}" stroke-width="3"/>` +
+        bola("#fff", `<path d="M0-6l6 4-2 7h-8l-2-7z" fill="${I}"/>`)
+    }
+    if (esporte === "volei") return fundo("#f2c46b") + `<rect x="40" y="50" width="220" height="160" ${linhas}/><path d="M100 50V210M200 50V210" ${linhas} stroke-dasharray="6 6"/>
+      <path d="M150 34V226" stroke="${I}" stroke-width="7"/><path d="M150 34V226" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/><circle cx="150" cy="34" r="6" fill="${I}"/><circle cx="150" cy="226" r="6" fill="${I}"/>` +
+      `<g transform="translate(120 100)"><circle r="15" fill="#fff" stroke="${I}" stroke-width="3"/><path d="M-14 -4q14 6 28 0M-8 -12q6 14 0 24" fill="none" stroke="#2f6fd6" stroke-width="3"/></g>`
+    if (esporte === "basquete") return fundo("#e3a94f") + `<rect x="32" y="42" width="236" height="176" ${linhas}/><path d="M150 42V218" ${linhas}/><circle cx="150" cy="130" r="24" ${linhas}/>
+      <rect x="32" y="100" width="50" height="60" ${linhas}/><rect x="218" y="100" width="50" height="60" ${linhas}/><path d="M32 70q90 60 0 120M268 70q-90 60 0 120" ${linhas}/>
+      <circle cx="44" cy="130" r="8" fill="none" stroke="#ff5f3d" stroke-width="4"/><circle cx="256" cy="130" r="8" fill="none" stroke="#ff5f3d" stroke-width="4"/>` +
+      bola("#ff8a3d", `<path d="M-15 0h30M0-15v30M-10-11q8 11 0 22M10-11q-8 11 0 22" fill="none" stroke="${I}" stroke-width="2"/>`)
+    return fundo("#4da3ff") + `<rect x="32" y="42" width="236" height="176" ${linhas}/><path d="M150 42V218" ${linhas}/>
+      <path d="M32 80a50 50 0 0 1 0 100M268 80a50 50 0 0 0 0 100" ${linhas}/><path d="M32 66a64 64 0 0 1 0 128M268 66a64 64 0 0 0 0 128" ${linhas} stroke-dasharray="8 6"/>
+      <rect x="14" y="112" width="18" height="36" fill="#fff" stroke="${I}" stroke-width="3"/><rect x="268" y="112" width="18" height="36" fill="#fff" stroke="${I}" stroke-width="3"/>` +
+      bola("#ffd23f", `<path d="M-15 0h30M0-15q8 15 0 30" fill="none" stroke="${I}" stroke-width="2"/>`)
+  }
+
+  // Phase 3: a drawing for each question
+  function desenhoCorpo(id) {
+    if (id === "coracao") return `<g class="bate anima"><path d="M150 214C90 170 60 140 60 104c0-26 20-44 44-44 20 0 36 12 46 28 10-16 26-28 46-28 24 0 44 18 44 44 0 36-30 66-90 110z" fill="#ff5f8f" stroke="${I}" stroke-width="5" stroke-linejoin="round"/></g>
+      <path d="M40 140h50l12-26 18 52 14-36 10 10h116" fill="none" stroke="#fff" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/><path d="M40 140h50l12-26 18 52 14-36 10 10h116" fill="none" stroke="${I}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>`
+    if (id === "agua") return `<rect x="112" y="28" width="76" height="20" rx="6" fill="#2f6fd6" stroke="${I}" stroke-width="4"/><path d="M114 48h72l10 30v140q0 14-14 14h-64q-14 0-14-14V78z" fill="#cfe6ff" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M106 130h88v88q0 14-14 14h-60q-14 0-14-14z" fill="#4da3ff"/><path d="M114 48h72l10 30v140q0 14-14 14h-64q-14 0-14-14V78z" fill="none" stroke="${I}" stroke-width="5" stroke-linejoin="round"/><path d="M126 96v24" stroke="#fff" stroke-width="6" stroke-linecap="round"/>`
+    if (id === "relogio") return `<circle cx="150" cy="130" r="92" fill="#fff" stroke="${I}" stroke-width="6"/><path d="M150 130V62A68 68 0 1 1 82 130z" fill="#c9f5e3"/>
+      <path d="M150 50v14M150 196v14M70 130h14M216 130h14" stroke="${I}" stroke-width="5" stroke-linecap="round"/><path d="M150 130V70M150 130h44" stroke="${I}" stroke-width="7" stroke-linecap="round"/><circle cx="150" cy="130" r="8" fill="${I}"/>
+      <text x="150" y="254" text-anchor="middle" font-size="22" font-weight="700" fill="${I}">60 minutos</text>`
+    return `${chao}${boneco(EXERCICIOS.alongamento.poses[id === "aquecer" ? 0 : 1], id === "aquecer" ? "#ff8a3d" : "#4fd6a6")}`
+  }
+
+  function mostrarRodada() {
+    const r = atual()
+    $("cena").classList.remove("parado")
+    if (tipo() === "mexer") {
+      const ex = EXERCICIOS[r]
+      restante = DURACAO
+      $("pergunta").textContent = ex.nome
+      $("texto").textContent = ex.como
+      $("nota").textContent = "O boneco mostra o movimento. Faça junto!"
+      $("cena").innerHTML = cenaExercicio(ex)
+      $("cena").classList.add("parado")
+      $("acao").querySelector("span").textContent = "Começar"
+      $("acao").hidden = false
+      return
+    }
+    if (tipo() === "quadra") {
+      $("pergunta").textContent = `No ${r.nome}, quantos jogadores de cada time ficam ${r.onde}?`
+      $("texto").textContent = "Conte só um time."
+      $("nota").textContent = ""
+      $("cena").innerHTML = quadra(r.esporte)
+      return mostrarOpcoes(r.opcoes.map(String), (botao, i) => {
+        if (r.opcoes[i] !== r.certo) return errar(`Não são ${r.opcoes[i]}. ${dica()}`, botao)
+        acertou(`Isso! ${r.explica}`, botao)
+      }, "opcoes--numeros")
+    }
+    $("pergunta").textContent = r.pergunta
+    $("texto").textContent = "Escolha a melhor resposta."
+    $("nota").textContent = ""
+    $("cena").innerHTML = desenhoCorpo(r.desenho)
+    mostrarOpcoes(r.opcoes, (botao, i) => {
+      if (i !== r.certa) return errar(`Essa não. ${dica()}`, botao)
+      acertou(`Isso! ${r.explica}`, botao)
+    })
+  }
+
+  function dica() {
+    const r = atual()
+    if (tipo() === "mexer") return EXERCICIOS[r].como
+    if (tipo() === "quadra") return ({ futebol: "O futebol de campo tem o time maior de todos: o goleiro e mais dez.", futsal: "O futsal é o futebol da quadra, com bem menos gente que no campo.",
+      volei: "No vôlei, cada time tem duas fileiras de 3: uma perto da rede e outra atrás.", basquete: "No basquete, conte uma mão: um jogador para cada dedo.",
+      handebol: "O handebol tem um jogador a mais que o vôlei." })[r.esporte]
+    return ["Lembre de como você fica depois de correr no recreio.", "Pense num carro: no frio, ele precisa esquentar antes de andar.", "O que sai do corpo no suor?",
+      "Some o recreio, as brincadeiras e a aula de Educação Física.", "Depois do esforço, os músculos querem relaxar."][rodada]
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    if (typeof pararRodada === "function") pararRodada()
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? FIM.titulo : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
+    $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrar()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
