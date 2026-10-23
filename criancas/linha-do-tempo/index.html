@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linha do Tempo · GamificaPampa</title>
+  <meta name="description" content="Um jogo de História: descubra o que veio primeiro, em que século aconteceu cada fato e monte a linha do tempo, do antes de Cristo até hoje.">
+  <meta property="og:title" content="Linha do Tempo · GamificaPampa">
+  <meta property="og:description" content="Um jogo de História: a.C. e d.C., séculos em algarismos romanos e linha do tempo.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    .btn[hidden] { display: none; }
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(36px, 7.4vw, 68px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the scene on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__pergunta { margin: 6px 0 4px !important; font-size: clamp(22px, 3.4vw, 28px); font-weight: 700; line-height: 1.2; }
+    .missao__texto { font-size: 16px; font-weight: 600; color: var(--soft); }
+    .cena-area { grid-area: cena; display: grid; gap: 8px; align-content: start; }
+    .cena { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .cena text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 420px; }
+    .opcoes:empty { display: none; }
+    .opcoes--linha { display: flex; flex-wrap: wrap; justify-content: center; }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--c, var(--white)); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 19px/1.25 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao:hover:not([disabled]) { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao[disabled] { cursor: default; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; }
+    .opcao.certa { background: var(--mint); opacity: 1; }
+    .opcao.treme { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .fim .btn svg { width: 22px; height: 22px; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+    .opcao.evento { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 4px 12px; text-align: left; font-size: 17px; }
+    .opcao.evento svg { grid-row: span 2; width: 56px; height: 56px; }
+    .opcao.evento small { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .opcao.evento .ordem { grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; }
+    .opcao.romano { min-width: 90px; font-size: 26px; }
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcao { font-size: 17px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .opcao, .anima { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">XV</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">a.C.</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">1500</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Linha</span> do <span class="pink">Tempo</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">História</li>
+        <li class="pill" style="--c: var(--yellow)">11 e 12 anos</li>
+        <li class="pill">Tempo histórico</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" id="jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__pergunta" id="pergunta"></p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <div class="cena-area">
+          <svg class="cena" id="cena" viewBox="0 0 600 270" role="img" aria-label="Linha do tempo"></svg>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>A ler e organizar o tempo histórico: que antes de Cristo os anos contam para trás (3500 a.C. é mais antigo que 753 a.C.), como descobrir o século de um ano e escrever em algarismos romanos, e como montar uma linha do tempo com fatos da história do mundo, do Brasil e do Rio Grande do Sul.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de cada toque, a turma diz qual fato veio primeiro ou qual é o século, e explica como pensou.</li>
+            <li><b>No celular:</b> cada estudante joga as três fases e copia no caderno a linha do tempo da fase 3.</li>
+            <li><b>Depois:</b> a turma monta uma linha do tempo no varal da sala, com fatos da história da escola, da cidade e da família.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [linha do tempo] para estudantes de [11 e 12 anos]: aparecem fatos históricos com o ano, e o estudante toca neles na ordem certa, do mais antigo ao mais recente, para montar a linha do tempo.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: qual fato veio primeiro, com anos antes e depois de Cristo; em que século aconteceu, com algarismos romanos; montar a linha do tempo], fatos [da história do Brasil e do Rio Grande do Sul], com o ano certo de cada um, um botão de dica, botões grandes para o celular, uma explicação a cada resposta e estrelas no fim de cada fase. Confira se todas as datas estão certas. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m2 0h1m1 0h1m3 0h1m2 0h2m1 0h1m1 0h2m3 0h1m1 0h7m-37 1h1m5 0h1m3 0h1m2 0h1m2 0h1m3 0h3m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m2 0h3m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m5 0h1m2 0h1m1 0h1m2 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h4m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h2m5 0h1m1 0h1m3 0h2m2 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m3 0h1m6 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h1m2 0h3m3 0h1m3 0h6m2 0h5m-35 1h3m2 0h1m1 0h2m1 0h2m1 0h1m1 0h2m1 0h3m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h2m2 0h3m1 0h1m1 0h2m1 0h1m3 0h2m2 0h1m2 0h1m2 0h6m2 0h2m-37 1h3m1 0h1m3 0h2m3 0h2m1 0h1m4 0h1m2 0h1m2 0h1m1 0h1m1 0h2m3 0h1m-34 1h1m2 0h1m3 0h2m1 0h1m2 0h2m2 0h1m1 0h6m1 0h2m1 0h5m-37 1h1m2 0h1m7 0h2m3 0h2m1 0h5m4 0h1m2 0h1m-32 1h5m1 0h1m1 0h2m3 0h1m1 0h3m2 0h3m4 0h2m1 0h4m1 0h2m-36 1h1m6 0h3m2 0h1m1 0h7m1 0h1m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h1m1 0h2m2 0h1m2 0h1m1 0h1m4 0h1m2 0h2m1 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h2m1 0h3m1 0h1m1 0h3m1 0h3m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-36 1h2m4 0h1m1 0h3m3 0h3m3 0h3m1 0h1m2 0h2m1 0h3m1 0h3m-37 1h1m3 0h1m4 0h4m1 0h2m4 0h4m2 0h2m1 0h2m5 0h1m-37 1h2m1 0h1m2 0h2m1 0h3m1 0h3m1 0h1m1 0h1m2 0h5m2 0h2m1 0h3m-33 1h2m1 0h1m1 0h2m2 0h2m1 0h1m4 0h1m3 0h1m4 0h1m4 0h1m-34 1h3m2 0h3m3 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-37 1h1m2 0h1m1 0h1m1 0h7m5 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h2m4 0h1m2 0h3m3 0h1m2 0h2m3 0h3m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h1m1 0h3m4 0h4m1 0h3m2 0h3m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h5m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m5 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m2 0h2m4 0h5m2 0h1m1 0h1m1 0h2m2 0h1m1 0h1m2 0h2m1 0h1m2 0h2m-37 1h1m5 0h1m2 0h1m1 0h4m1 0h2m5 0h13m-28 1h1m1 0h3m1 0h1m1 0h2m1 0h2m2 0h6m3 0h2m-34 1h7m3 0h1m1 0h1m2 0h3m2 0h3m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m1 0h1m1 0h2m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m4 0h1m2 0h1m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m2 0h3m1 0h2m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m3 0h6m3 0h1m1 0h1m2 0h2m5 0h3m-37 1h1m5 0h1m3 0h1m1 0h1m1 0h2m4 0h2m6 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h1m1 0h3m2 0h1m1 0h1m4 0h5m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // Each fact: what happened, the year (negative is before Christ), how to read the year and its drawing
+  const FATOS = {
+    escrita: ["Invenção da escrita, na Mesopotâmia", -3500, "cerca de 3500 a.C.", "tabua"],
+    piramides: ["Construção das grandes pirâmides do Egito", -2500, "cerca de 2500 a.C.", "piramide"],
+    olimpiadas: ["Primeiros Jogos Olímpicos, na Grécia", -776, "776 a.C.", "tocha"],
+    roma: ["Fundação de Roma", -753, "753 a.C.", "coluna"],
+    imprensa: ["Gutenberg cria a imprensa", 1450, "por volta de 1450", "livro"],
+    brasil: ["Chegada dos portugueses ao Brasil", 1500, "1500", "caravela"],
+    independencia: ["Independência do Brasil", 1822, "1822", "coroa"],
+    farroupilha: ["Começo da Revolução Farroupilha, no Rio Grande do Sul", 1835, "1835", "farrapos"],
+    abolicao: ["Lei Áurea: fim da escravidão no Brasil", 1888, "1888", "corrente"],
+    republica: ["Proclamação da República no Brasil", 1889, "1889", "bandeira"],
+    brasilia: ["Inauguração de Brasília", 1960, "1960", "congresso"],
+    lua: ["Primeira pessoa a pisar na Lua", 1969, "1969", "lua"],
+    constituicao: ["Constituição atual do Brasil", 1988, "1988", "lei"],
+    hoje: ["O ano em que estamos", 2026, "2026", "calendario"],
+  }
+  const FASES = [
+    { nome: "O que veio primeiro?", tipo: "primeiro", rotulo: "pergunta",
+      abertura: "Oi! Eu sou o Bit, e hoje a gente viaja no tempo. O ano 1 fica no meio da linha: antes dele é antes de Cristo, a.C., e depois é d.C. Toque no fato que aconteceu primeiro.",
+      rodadas: [["roma", "escrita"], ["olimpiadas", "piramides"], ["brasil", "roma"], ["farroupilha", "independencia"], ["roma", "olimpiadas"]] },
+    { nome: "Em que século?", tipo: "seculo", rotulo: "pergunta",
+      abertura: "Cada século tem 100 anos, e a gente escreve o número dele em algarismos romanos. Em que século aconteceu cada fato?",
+      rodadas: [["brasil", ["XV", "XVI", "XIV"]], ["independencia", ["XVIII", "XIX", "XX"]], ["lua", ["XIX", "XX", "XXI"]], ["imprensa", ["XIV", "XV", "XVI"]], ["hoje", ["XX", "XXI", "XXII"]]] },
+    { nome: "Monte a linha do tempo", tipo: "ordem", rotulo: "linha",
+      abertura: "Agora é você quem monta a linha do tempo. Toque nos fatos do mais antigo para o mais recente.",
+      rodadas: [["lua", "independencia", "brasil", "republica"], ["imprensa", "roma", "brasil", "piramides"], ["brasilia", "abolicao", "constituicao", "farroupilha"],
+        ["independencia", "olimpiadas", "escrita", "roma"], ["republica", "farroupilha", "abolicao", "independencia"]] },
+  ]
+  const FIM = { titulo: "Viagem completa!", texto: "Antes de Cristo, os anos contam para trás; depois, para a frente. E todo fato tem o seu lugar na linha do tempo.",
+    fala: "Você é um viajante do tempo! Agora monte a linha do tempo da sua família." }
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
+  function mostrarOpcoes(lista, aoEscolher, classe = "") {
+    $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
+    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
+      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+    })
+  }
+  function errar(frase, botao, riscar = true) {
+    erros++
+    somErro()
+    if (botao && riscar) {
+      botao.disabled = true
+      botao.classList.add("errada")
+    } else if (botao) {
+      botao.classList.remove("treme")
+      void botao.offsetWidth
+      botao.classList.add("treme")
+    }
+    window.Bit?.diz("ops", frase)
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase, botao) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    if (botao) botao.classList.add("certa")
+    $("dica").hidden = true
+    $("acao").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrar()
+    else terminarFase()
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrar() {
+    if (typeof pararRodada === "function") pararRodada()
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("acao").hidden = true
+    $("opcoes").innerHTML = ""
+    dicas = 0
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].rotulo} ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    mostrarRodada()
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    dicas++
+    window.Bit?.diz("pensando", dica())
+  }
+
+  // Drawings of the facts, in a box of 60 by 60
+  const I = "#2f2a4a"
+  const DESENHOS = {
+    tabua: `<rect x="12" y="8" width="36" height="44" rx="6" fill="#e3b77a" stroke="${I}" stroke-width="3"/><path d="M19 18l4 3-4 3M27 18h8M19 30l4 3-4 3M29 30l4 3M38 30v6M19 44h20" fill="none" stroke="${I}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+    piramide: `<circle cx="46" cy="14" r="7" fill="#ffd23f" stroke="${I}" stroke-width="2.5"/><path d="M4 52L26 16 48 52z" fill="#f2c46b" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M26 16l6 36" stroke="${I}" stroke-width="2"/><path d="M34 52l12-18 12 18z" fill="#e3a94f" stroke="${I}" stroke-width="3" stroke-linejoin="round"/>`,
+    tocha: `<path d="M30 6c8 8 9 14 4 20-1-5-4-7-4-7s-6 4-5 11c-6-6-3-16 5-24z" fill="#ff8a3d" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 30h20l-6 24h-8z" fill="#ffd23f" stroke="${I}" stroke-width="3" stroke-linejoin="round"/>`,
+    coluna: `<rect x="14" y="8" width="32" height="8" rx="2" fill="#eef1f7" stroke="${I}" stroke-width="3"/><rect x="18" y="16" width="24" height="30" fill="#fff" stroke="${I}" stroke-width="3"/><path d="M24 18v26M30 18v26M36 18v26" stroke="${I}" stroke-width="2"/><rect x="12" y="46" width="36" height="8" rx="2" fill="#eef1f7" stroke="${I}" stroke-width="3"/>`,
+    livro: `<path d="M30 16C22 10 12 10 6 12v34c6-2 16-2 24 4 8-6 18-6 24-4V12c-6-2-16-2-24 4z" fill="#fff" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M30 16v34M12 20h12M12 27h12M36 20h12M36 27h12" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/>`,
+    caravela: `<path d="M8 40h44l-6 12H14z" fill="#a0522d" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M30 8v32" stroke="${I}" stroke-width="3"/><path d="M31 10h14q2 12-2 22H31zM29 14H17q-2 9 2 18h10z" fill="#fff" stroke="${I}" stroke-width="2.6" stroke-linejoin="round"/><path d="M38 16v8M34 20h8" stroke="#e53950" stroke-width="3"/>`,
+    coroa: `<path d="M8 44l-2-26 12 10 12-18 12 18 12-10-2 26z" fill="#ffd23f" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><rect x="8" y="44" width="44" height="8" rx="2" fill="#ffb800" stroke="${I}" stroke-width="3"/><circle cx="30" cy="34" r="4" fill="#4fd6a6" stroke="${I}" stroke-width="2"/>`,
+    farrapos: `<rect x="8" y="10" width="44" height="32" fill="#e53950" stroke="${I}" stroke-width="3"/><path d="M8 10h12l32 24v8H40L8 18z" fill="#4fb84f"/><path d="M8 42l44-32" stroke="#ffd23f" stroke-width="7"/><rect x="8" y="10" width="44" height="32" fill="none" stroke="${I}" stroke-width="3"/><path d="M8 10v44" stroke="${I}" stroke-width="4" stroke-linecap="round"/>`,
+    corrente: `<rect x="4" y="22" width="20" height="14" rx="7" fill="none" stroke="#9aa3c2" stroke-width="5"/><rect x="36" y="22" width="20" height="14" rx="7" fill="none" stroke="#9aa3c2" stroke-width="5"/><path d="M26 18l4-8M32 40l4 8M28 44l-4 6M34 14l4-6" stroke="#ffb800" stroke-width="3" stroke-linecap="round"/>`,
+    bandeira: `<rect x="6" y="14" width="48" height="32" rx="3" fill="#4fb84f" stroke="${I}" stroke-width="3"/><path d="M30 18l20 12-20 12-20-12z" fill="#ffd23f" stroke="${I}" stroke-width="2"/><circle cx="30" cy="30" r="7" fill="#2f6fd6" stroke="${I}" stroke-width="2"/>`,
+    congresso: `<rect x="25" y="8" width="5" height="32" fill="#fff" stroke="${I}" stroke-width="2.5"/><rect x="31" y="8" width="5" height="32" fill="#fff" stroke="${I}" stroke-width="2.5"/><path d="M6 40q8-12 16 0zM38 40q8 12 16 0z" fill="#eef1f7" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><rect x="4" y="40" width="52" height="8" rx="2" fill="#cfd8e6" stroke="${I}" stroke-width="2.5"/>`,
+    lua: `<circle cx="30" cy="32" r="22" fill="#eef1f7" stroke="${I}" stroke-width="3"/><circle cx="22" cy="26" r="4" fill="#cfd8e6"/><circle cx="36" cy="40" r="5" fill="#cfd8e6"/><path d="M38 24V8" stroke="${I}" stroke-width="2.5"/><path d="M38 8h12v8H38z" fill="#4da3ff" stroke="${I}" stroke-width="2"/>`,
+    lei: `<path d="M14 6h26l8 8v40H14z" fill="#fff" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M20 20h20M20 28h20M20 36h14" stroke="#9aa3c2" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="46" r="7" fill="#ffd23f" stroke="${I}" stroke-width="2.5"/>`,
+    calendario: `<rect x="8" y="12" width="44" height="40" rx="6" fill="#fff" stroke="${I}" stroke-width="3"/><path d="M8 24h44" stroke="${I}" stroke-width="3"/><rect x="8" y="12" width="44" height="12" rx="6" fill="#ff5f8f" stroke="${I}" stroke-width="3"/><path d="M20 6v10M40 6v10" stroke="${I}" stroke-width="3.4" stroke-linecap="round"/><text x="30" y="45" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="${I}">2026</text>`,
+  }
+  const desenho = (id, tamanho = 56) => `<svg viewBox="0 0 60 60" width="${tamanho}" height="${tamanho}" aria-hidden="true">${DESENHOS[FATOS[id][3]]}</svg>`
+  const romano = n => [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]].reduce((s, [v, l]) => { while (n >= v) { s += l; n -= v } return s }, "")
+  const seculo = ano => Math.ceil(ano / 100)
+  const cartao = (id, ordem) => `${ordem ? `<span class="ordem">${ordem}</span>` : desenho(id)}<b>${FATOS[id][0]}</b><small>${FATOS[id][2]}</small>`
+
+  // The time line: the year 1 in the middle, before Christ on the left. Distances are squeezed so 3500 a.C. fits
+  const X = ano => 300 + Math.sign(ano) * 270 * Math.sqrt(Math.abs(ano) / 4000)
+  function eixo() {
+    return `<path d="M20 150H584" stroke="${I}" stroke-width="5" stroke-linecap="round"/><path d="M572 140l14 10-14 10" fill="none" stroke="${I}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="296" y="132" width="8" height="36" rx="3" fill="#ffd23f" stroke="${I}" stroke-width="2.5"/>
+      <text x="300" y="192" text-anchor="middle" font-size="16" font-weight="700" fill="${I}">ano 1</text>
+      <text x="150" y="228" text-anchor="middle" font-size="20" font-weight="700" fill="#c2264a">antes de Cristo (a.C.)</text>
+      <text x="450" y="228" text-anchor="middle" font-size="20" font-weight="700" fill="#2f7de0">depois de Cristo (d.C.)</text>
+      <text x="40" y="256" font-size="18" font-weight="600" fill="#5b5675">← mais antigo</text>
+      <text x="560" y="256" text-anchor="end" font-size="18" font-weight="600" fill="#5b5675">mais recente →</text>`
+  }
+  function marca(id, alto) {
+    const x = X(FATOS[id][1]), y = alto ? 40 : 76
+    return `<path d="M${x} ${y + 52}V150" stroke="${I}" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="${x}" cy="150" r="8" fill="#ff5f8f" stroke="${I}" stroke-width="3"/>
+      <g transform="translate(${x - 26} ${y})"><rect width="52" height="52" rx="12" fill="#fff" stroke="${I}" stroke-width="3"/><g transform="translate(4 4) scale(.733)">${DESENHOS[FATOS[id][3]]}</g></g>
+      <text x="${x}" y="${y - 6}" text-anchor="middle" font-size="19" font-weight="700" fill="${I}" stroke="#fff" stroke-width="4" paint-order="stroke">${FATOS[id][2].replace("cerca de ", "").replace("por volta de ", "")}</text>`
+  }
+
+  // The centuries from XV to XXI, each one a band of 100 years
+  function seculos(id, mostrarNomes, destacar = false) {
+    const x = ano => 30 + (ano - 1400) / 700 * 540
+    let s = ""
+    for (let n = 15; n <= 21; n++) {
+      const ini = x((n - 1) * 100), fim = x(n * 100), alvo = id && seculo(FATOS[id][1]) === n && destacar
+      s += `<rect x="${ini}" y="96" width="${fim - ini}" height="56" fill="${alvo ? "#ffd23f" : n % 2 ? "#eef6ff" : "#dcecff"}" stroke="${I}" stroke-width="2"/>`
+      if (mostrarNomes) s += `<text x="${(ini + fim) / 2}" y="132" text-anchor="middle" font-size="22" font-weight="700" fill="${I}">${romano(n)}</text>`
+    }
+    for (let ano = 1400; ano <= 2100; ano += 100) s += `<path d="M${x(ano)} 152v14" stroke="${I}" stroke-width="2.5"/><text x="${x(ano)}" y="186" text-anchor="middle" font-size="14" font-weight="600" fill="#5b5675">${ano}</text>`
+    if (id) {
+      const xa = x(FATOS[id][1])
+      s += `<path d="M${xa} 60V150" stroke="#ff5f8f" stroke-width="4"/><circle cx="${xa}" cy="150" r="7" fill="#ff5f8f" stroke="${I}" stroke-width="2.5"/>
+        <text x="${xa}" y="50" text-anchor="middle" font-size="20" font-weight="700" fill="${I}" stroke="#fff" stroke-width="5" paint-order="stroke">${FATOS[id][1]}</text>`
+    }
+    s += `<text x="300" y="226" text-anchor="middle" font-size="16" font-weight="600" fill="#5b5675">${mostrarNomes ? "Cada faixa é um século: o XV vai de 1401 a 1500." : "Cada faixa é um século, de 100 anos."}</text>`
+    return s
+  }
+
+  // Phase 3: the slots of the line, filled as the student taps the facts in order
+  let colocados = []
+  function slots(ids) {
+    const ordem = [...ids].sort((p, q) => FATOS[p][1] - FATOS[q][1])
+    let s = `<path d="M20 190H584" stroke="${I}" stroke-width="5" stroke-linecap="round"/><path d="M572 180l14 10-14 10" fill="none" stroke="${I}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`
+    ordem.forEach((id, i) => {
+      const x = 90 + i * 140, cheio = colocados.includes(id)
+      s += `<path d="M${x} 150v40" stroke="${I}" stroke-width="3"/><circle cx="${x}" cy="190" r="8" fill="${cheio ? "#ff5f8f" : "#fff"}" stroke="${I}" stroke-width="3"/>`
+      s += `<g transform="translate(${x - 56} 20)"><rect width="112" height="130" rx="16" fill="${cheio ? "#fff" : "#f4f1ff"}" stroke="${I}" stroke-width="3" ${cheio ? "" : 'stroke-dasharray="8 6"'}/>`
+      s += cheio
+        ? `<g transform="translate(24 10) scale(1.07)">${DESENHOS[FATOS[id][3]]}</g><text x="56" y="104" text-anchor="middle" font-size="22" font-weight="700" fill="${I}">${FATOS[id][2].replace("cerca de ", "~").replace("por volta de ", "~")}</text>`
+        : `<text x="56" y="76" text-anchor="middle" font-size="30" font-weight="700" fill="#b9b4cc">${i + 1}º</text>`
+      s += `</g>`
+    })
+    s += `<text x="40" y="240" font-size="18" font-weight="600" fill="#5b5675">← mais antigo</text><text x="560" y="240" text-anchor="end" font-size="18" font-weight="600" fill="#5b5675">mais recente →</text>`
+    return s
+  }
+
+  function mostrarRodada() {
+    const r = atual()
+    if (tipo() === "primeiro") {
+      $("pergunta").textContent = "Qual destes aconteceu primeiro?"
+      $("texto").textContent = "Olhe os anos: a.C. ou d.C.?"
+      $("nota").textContent = "Na linha do tempo, o ano 1 fica no meio."
+      $("cena").innerHTML = eixo()
+      mostrarOpcoes(r.map(id => cartao(id)), (botao, i) => {
+        const certo = FATOS[r[i]][1] < FATOS[r[1 - i]][1]
+        const [velho, novo] = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1])
+        const [av, an] = [FATOS[velho][1], FATOS[novo][1]]
+        const porque = av < 0 && an < 0
+          ? `Antes de Cristo, os anos contam para trás: ${-av} a.C. está mais longe do ano 1 do que ${-an} a.C.`
+          : av < 0 ? `Tudo o que é antes de Cristo vem antes do ano 1, e ${an} d.C. vem depois dele.`
+          : `Depois de Cristo, quanto menor o número, mais antigo: ${av} veio antes de ${an}.`
+        if (!certo) return errar(`Ainda não. ${porque}`, botao)
+        $("cena").innerHTML = eixo() + marca(velho, true) + marca(novo, false)
+        acertou(`Isso! O mais antigo é: ${FATOS[velho][0]} (${FATOS[velho][2]}). ${porque}`, botao)
+      })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("evento"))
+    } else if (tipo() === "seculo") {
+      const [id, opcoes] = r, ano = FATOS[id][1], n = seculo(ano)
+      $("pergunta").innerHTML = `${FATOS[id][0]}: <span style="white-space: nowrap">em ${ano}.</span> Em que século?`
+      $("texto").textContent = "Escolha o século em algarismos romanos."
+      $("nota").textContent = ""
+      $("cena").innerHTML = seculos(id, false)
+      mostrarOpcoes(opcoes, (botao, i) => {
+        const porque = ano % 100 === 0
+          ? `${ano} termina em 00, então é o último ano do século ${romano(n)}, que vai de ${ano - 99} a ${ano}.`
+          : `Tire os dois últimos números de ${ano} e some 1: ${Math.floor(ano / 100)} + 1 = ${n}, que em romanos é ${romano(n)}.`
+        if (opcoes[i] !== romano(n)) return errar(`Ainda não. ${porque}`, botao)
+        $("cena").innerHTML = seculos(id, true, true)
+        acertou(`Isso! ${porque}`, botao)
+      }, "opcoes--linha")
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("romano"))
+    } else {
+      colocados = []
+      $("pergunta").textContent = "Monte a linha do tempo"
+      $("texto").textContent = "Toque nos fatos do mais antigo para o mais recente."
+      $("nota").textContent = ""
+      $("cena").innerHTML = slots(r)
+      const ordem = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1])
+      mostrarOpcoes(r.map(id => cartao(id)), (botao, i) => {
+        const id = r[i], proximo = ordem[colocados.length]
+        if (id !== proximo) {
+          const antes = FATOS[id][1] > FATOS[proximo][1]
+          return errar(`Ainda não. ${antes ? "Tem um fato mais antigo que esse esperando." : "Esse ainda não."} ${FATOS[proximo][1] < 0 && FATOS[id][1] > 0 ? "Lembre: tudo o que é a.C. vem antes." : "Compare os anos com calma."}`, botao, false)
+        }
+        colocados.push(id)
+        somClique()
+        botao.disabled = true
+        botao.innerHTML = cartao(id, colocados.length)
+        $("cena").innerHTML = slots(r)
+        if (colocados.length < r.length) return window.Bit?.diz("feliz", `${FATOS[id][0]}: ${FATOS[id][2]}. Qual vem depois?`)
+        acertou(`Linha do tempo montada! ${ordem.map(o => FATOS[o][2].replace("cerca de ", "").replace("por volta de ", "")).join(", ")}.`)
+      })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("evento"))
+    }
+  }
+
+  function dica() {
+    if (tipo() === "primeiro") return "Antes de Cristo, quanto maior o número, mais antigo. Depois de Cristo, quanto menor, mais antigo. E todo a.C. vem antes de todo d.C."
+    if (tipo() === "seculo") {
+      if (dicas === 1) return "Tire os dois últimos números do ano e some 1. Se o ano terminar em 00, não some nada."
+      $("cena").innerHTML = seculos(atual()[0], true)
+      return "Mostrei o nome de cada faixa. Veja em que faixa o ano está."
+    }
+    return "Comece pelos anos a.C., do maior para o menor. Depois vêm os d.C., do menor para o maior."
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    if (typeof pararRodada === "function") pararRodada()
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? FIM.titulo : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
+    $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrar()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

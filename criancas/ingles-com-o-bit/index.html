@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inglês com o Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Língua Inglesa: ouça e toque na palavra, leia frases com cores e números e responda ao Bit numa conversa simples.">
+  <meta property="og:title" content="Inglês com o Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Língua Inglesa: vocabulário, cores, números e uma conversa com o Bit.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    .btn[hidden] { display: none; }
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(36px, 7.4vw, 68px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the scene on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__pergunta { margin: 6px 0 4px !important; font-size: clamp(22px, 3.4vw, 28px); font-weight: 700; line-height: 1.2; }
+    .missao__texto { font-size: 16px; font-weight: 600; color: var(--soft); }
+    .cena-area { grid-area: cena; display: grid; gap: 8px; align-content: start; }
+    .cena { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .cena text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 420px; }
+    .opcoes:empty { display: none; }
+    .opcoes--linha { display: flex; flex-wrap: wrap; justify-content: center; }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--c, var(--white)); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 19px/1.25 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao:hover:not([disabled]) { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao[disabled] { cursor: default; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; }
+    .opcao.certa { background: var(--mint); opacity: 1; }
+    .opcao.treme { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .fim .btn svg { width: 22px; height: 22px; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+    .cena--texto { display: grid; place-items: center; align-content: center; gap: 10px; min-height: 260px; padding: 22px; text-align: center; background: linear-gradient(#f4f1ff, #fff); }
+    .cena--texto .grande { margin: 0; font-size: clamp(30px, 5vw, 46px); font-weight: 700; line-height: 1.15; color: var(--ink); }
+    .cena--texto .traducao { margin: 0; font-size: 19px; font-weight: 600; color: var(--soft); }
+    .cena--texto .alto-falante { width: 96px; height: 96px; }
+    .cena--texto .fala-en { position: relative; max-width: 420px; padding: 16px 20px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .opcoes--desenhos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opcao.desenho { display: grid; place-items: center; min-height: 110px; padding: 6px; }
+    .opcao.desenho svg { width: 84px; height: 84px; }
+    .opcao.grupo { display: grid; place-items: center; padding: 6px 10px; }
+    .opcao.grupo svg { width: 100%; max-width: 230px; height: auto; }
+    .opcao.frase-en { font-size: 20px; text-align: left; }
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcao { font-size: 17px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .opcao, .anima { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">Hi!</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">ABC</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">?</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Inglês</span> com o <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Língua Inglesa</li>
+        <li class="pill" style="--c: var(--yellow)">11 e 12 anos</li>
+        <li class="pill">Vocabulário e diálogo</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" id="jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__pergunta" id="pergunta"></p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <div class="cena-area">
+          <div class="cena cena--texto" id="cena" aria-live="polite"></div>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>Vocabulário do dia a dia em inglês (animais, objetos da escola e da casa), cores e números de 1 a 5 numa frase, com a cor antes da coisa (red apples), e respostas para perguntas de uma conversa simples: nome, idade, como você está, a cor de algo e a despedida. O jogo fala cada palavra e cada frase em inglês, para a turma ouvir a pronúncia.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> a turma repete em voz alta cada palavra e cada frase que o Bit fala, antes de alguém tocar na resposta.</li>
+            <li><b>No celular:</b> em dupla, um lê a frase da fase 2 em voz alta e o outro escolhe o desenho, e depois trocam.</li>
+            <li><b>Depois:</b> as duplas fazem a conversa da fase 3 de verdade, com os próprios nomes e idades, e apresentam para a turma.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [inglês] para estudantes de [11 e 12 anos]: o jogo fala uma palavra em inglês, como cat, e o estudante toca no desenho certo entre quatro opções.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: ouvir e tocar no desenho, ler frases com cores e números como two red apples, responder a perguntas simples como What's your name?], com a pronúncia em inglês, a tradução depois de cada resposta, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. As explicações em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m3 0h2m3 0h1m2 0h6m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h3m1 0h2m1 0h1m4 0h2m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h2m3 0h1m1 0h1m4 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h2m1 0h2m4 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h8m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h3m4 0h2m1 0h1m6 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h3m2 0h2m2 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h2m6 0h1m5 0h5m2 0h5m-30 1h1m1 0h1m1 0h1m2 0h2m1 0h2m2 0h2m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h7m2 0h1m7 0h2m1 0h2m2 0h1m2 0h6m2 0h2m-37 1h2m1 0h1m1 0h1m1 0h1m1 0h2m1 0h2m2 0h1m3 0h2m5 0h1m1 0h1m1 0h2m3 0h1m-36 1h2m2 0h3m2 0h3m1 0h1m1 0h2m1 0h2m1 0h6m1 0h2m1 0h5m-37 1h1m2 0h1m3 0h4m2 0h2m1 0h1m2 0h2m1 0h2m4 0h1m2 0h1m-32 1h8m3 0h2m2 0h2m3 0h3m4 0h2m1 0h4m1 0h2m-37 1h1m1 0h1m1 0h2m1 0h4m1 0h1m1 0h3m1 0h6m2 0h2m1 0h1m1 0h2m3 0h1m-31 1h1m2 0h1m1 0h2m3 0h4m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h1m1 0h1m4 0h3m2 0h4m2 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-34 1h1m3 0h2m2 0h1m1 0h2m1 0h2m3 0h3m4 0h2m1 0h3m1 0h3m-37 1h2m1 0h3m1 0h3m5 0h1m3 0h5m2 0h2m1 0h2m5 0h1m-36 1h1m1 0h2m1 0h1m3 0h3m1 0h2m1 0h1m1 0h1m2 0h1m1 0h3m2 0h2m1 0h3m-33 1h1m1 0h1m3 0h1m1 0h1m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-34 1h1m4 0h3m1 0h9m2 0h1m3 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-36 1h1m1 0h1m3 0h1m1 0h2m1 0h1m6 0h5m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h3m1 0h6m2 0h1m1 0h2m2 0h2m2 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h1m3 0h2m1 0h1m2 0h1m2 0h4m1 0h4m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m2 0h1m1 0h3m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m3 0h1m1 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m6 0h3m1 0h1m4 0h1m1 0h1m1 0h2m1 0h1m2 0h1m2 0h2m1 0h1m2 0h1m-36 1h1m3 0h3m1 0h2m1 0h1m4 0h2m1 0h1m3 0h13m-28 1h2m1 0h2m1 0h1m1 0h2m1 0h2m2 0h6m3 0h2m-34 1h7m4 0h3m1 0h3m2 0h1m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h5m1 0h1m1 0h3m2 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h1m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h3m2 0h2m3 0h1m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h5m1 0h1m1 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m2 0h1m5 0h1m4 0h2m2 0h1m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h8m1 0h1m1 0h1m2 0h5m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const CORES = { red: ["vermelho", "#e53950", "vermelhas"], blue: ["azul", "#2f6fd6", "azuis"], yellow: ["amarelo", "#ffd23f", "amarelas"], green: ["verde", "#3fae4f", "verdes"], pink: ["rosa", "#ff8fb8", "cor-de-rosa"], orange: ["laranja", "#ff8a3d", "laranja"] }
+  const NUMEROS = ["", "one", "two", "three", "four", "five"]
+  const PALAVRAS = { cat: "gato", dog: "cachorro", fish: "peixe", sun: "sol", apple: "maçã", ball: "bola", book: "livro", house: "casa", pencil: "lápis", star: "estrela", flower: "flor" }
+  const FASES = [
+    { nome: "Listen and tap", tipo: "ouvir", rotulo: "palavra",
+      abertura: "Hello! Eu sou o Bit. Vou falar uma palavra em inglês. Ouça e toque no desenho certo. Para ouvir de novo, aperte Ouvir.",
+      rodadas: [["cat", ["dog", "cat", "fish", "sun"]], ["apple", ["apple", "ball", "book", "house"]], ["book", ["pencil", "star", "book", "cat"]], ["house", ["sun", "fish", "dog", "house"]], ["pencil", ["ball", "pencil", "apple", "flower"]]] },
+    { nome: "Colors and numbers", tipo: "frase", rotulo: "frase",
+      abertura: "Agora leia a frase, com número e cor, e toque no desenho que combina com ela.",
+      rodadas: [
+        { frase: "two red apples", pt: "duas maçãs vermelhas", obj: "apple", certo: [2, "red"], opcoes: [[2, "red"], [2, "green"], [3, "red"]] },
+        { frase: "three blue balls", pt: "três bolas azuis", obj: "ball", certo: [3, "blue"], opcoes: [[3, "yellow"], [3, "blue"], [2, "blue"]] },
+        { frase: "four yellow stars", pt: "quatro estrelas amarelas", obj: "star", certo: [4, "yellow"], opcoes: [[5, "yellow"], [4, "red"], [4, "yellow"]] },
+        { frase: "one green book", pt: "um livro verde", obj: "book", certo: [1, "green"], opcoes: [[1, "green"], [1, "blue"], [2, "green"]] },
+        { frase: "five pink flowers", pt: "cinco flores cor-de-rosa", obj: "flower", certo: [5, "pink"], opcoes: [[4, "pink"], [5, "pink"], [5, "orange"]] },
+      ] },
+    { nome: "Hello, Bit!", tipo: "conversa", rotulo: "pergunta",
+      abertura: "Agora a gente conversa em inglês. Eu pergunto, e você escolhe a melhor resposta.",
+      rodadas: [
+        { en: "Hello! What's your name?", pt: "Olá! Qual é o seu nome?", opcoes: ["My name is Ana.", "I'm eleven years old.", "Goodbye!"], opcoesPt: ["Meu nome é Ana.", "Eu tenho onze anos.", "Tchau!"], certa: 0,
+          explica: "\"What's your name?\" pergunta o nome, e a resposta começa com \"My name is\", meu nome é." },
+        { en: "How old are you?", pt: "Quantos anos você tem?", opcoes: ["I'm fine, thanks.", "I'm twelve years old.", "It's blue."], opcoesPt: ["Estou bem, obrigado.", "Eu tenho doze anos.", "É azul."], certa: 1,
+          explica: "\"How old\" pergunta a idade. Em inglês, a gente diz \"I'm twelve years old\": eu tenho doze anos." },
+        { en: "How are you?", pt: "Como você está?", opcoes: ["My name is Leo.", "Three apples.", "I'm fine, thank you!"], opcoesPt: ["Meu nome é Leo.", "Três maçãs.", "Estou bem, obrigado!"], certa: 2,
+          explica: "\"How are you?\" pergunta como você está, e \"I'm fine, thank you!\" quer dizer: estou bem, obrigado!" },
+        { en: "What color is the sky?", pt: "De que cor é o céu?", opcoes: ["It's blue.", "It's Monday.", "Yes, I do."], opcoesPt: ["É azul.", "É segunda-feira.", "Sim, eu faço."], certa: 0,
+          explica: "\"What color\" pergunta a cor, e \"It's blue\" quer dizer: é azul." },
+        { en: "Goodbye! See you tomorrow!", pt: "Tchau! Até amanhã!", opcoes: ["Good morning!", "Bye! See you!", "I'm ten."], opcoesPt: ["Bom dia!", "Tchau! Até mais!", "Eu tenho dez."], certa: 1,
+          explica: "Para se despedir: \"Bye! See you!\", tchau, até mais!" },
+      ] },
+  ]
+  const FIM = { titulo: "Great job!", texto: "Palavras, cores, números e uma conversa inteira: você já fala um pouco de inglês.",
+    fala: "Great job! Agora treine a conversa com um colega. See you!" }
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
+  function mostrarOpcoes(lista, aoEscolher, classe = "") {
+    $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
+    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
+      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+    })
+  }
+  function errar(frase, botao, riscar = true) {
+    erros++
+    somErro()
+    if (botao && riscar) {
+      botao.disabled = true
+      botao.classList.add("errada")
+    } else if (botao) {
+      botao.classList.remove("treme")
+      void botao.offsetWidth
+      botao.classList.add("treme")
+    }
+    window.Bit?.diz("ops", frase)
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase, botao) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    if (botao) botao.classList.add("certa")
+    $("dica").hidden = true
+    $("acao").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrar()
+    else terminarFase()
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrar() {
+    if (typeof pararRodada === "function") pararRodada()
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("acao").hidden = true
+    $("opcoes").innerHTML = ""
+    dicas = 0
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].rotulo} ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    mostrarRodada()
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    dicas++
+    window.Bit?.diz("pensando", dica())
+  }
+
+  const I = "#2f2a4a"
+  // Drawings of the words, in a box of 60 by 60; the colored ones take the color as a parameter
+  const DESENHOS = {
+    cat: () => `<path d="M14 22L16 6l12 10M46 22L44 6 32 16" fill="#ffb15c" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><circle cx="30" cy="32" r="20" fill="#ffb15c" stroke="${I}" stroke-width="3"/><circle cx="23" cy="29" r="3" fill="${I}"/><circle cx="37" cy="29" r="3" fill="${I}"/><path d="M27 36l3 3 3-3M8 34h12M8 40h12M40 34h12M40 40h12" fill="none" stroke="${I}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+    dog: () => `<circle cx="30" cy="32" r="19" fill="#c98a5a" stroke="${I}" stroke-width="3"/><path d="M13 20q-8 4-6 22 6 2 10-6zM47 20q8 4 6 22-6 2-10-6z" fill="#8b5a2b" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="29" r="3" fill="${I}"/><circle cx="36" cy="29" r="3" fill="${I}"/><ellipse cx="30" cy="38" rx="5" ry="4" fill="${I}"/><path d="M30 42v4" stroke="${I}" stroke-width="2.5"/>`,
+    fish: () => `<path d="M6 30q14-18 34-10l12-8v36l-12-8Q20 48 6 30z" fill="#4da3ff" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><circle cx="18" cy="27" r="3" fill="${I}"/><path d="M26 22q4 8 0 16" fill="none" stroke="${I}" stroke-width="2.5"/>`,
+    sun: () => `<path d="M30 4v8M30 48v8M4 30h8M48 30h8M11 11l6 6M43 43l6 6M49 11l-6 6M17 43l-6 6" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round"/><circle cx="30" cy="30" r="14" fill="#ffd23f" stroke="${I}" stroke-width="3"/>`,
+    apple: (cor = "#e53950") => `<path d="M30 16q-2-8 4-12" fill="none" stroke="${I}" stroke-width="3" stroke-linecap="round"/><path d="M33 12q8-6 14 0-6 6-14 0z" fill="#4fd6a6" stroke="${I}" stroke-width="2.4"/><path d="M30 18c-6-6-24-4-22 14 2 16 12 24 22 20 10 4 20-4 22-20 2-18-16-20-22-14z" fill="${cor}" stroke="${I}" stroke-width="3"/><ellipse cx="20" cy="28" rx="4" ry="6" fill="#fff" opacity=".5"/>`,
+    ball: (cor = "#ff8a3d") => `<circle cx="30" cy="30" r="22" fill="${cor}" stroke="${I}" stroke-width="3"/><path d="M8 30q22 10 44 0M30 8q-10 22 0 44" fill="none" stroke="#fff" stroke-width="4"/><circle cx="30" cy="30" r="22" fill="none" stroke="${I}" stroke-width="3"/>`,
+    book: (cor = "#2f6fd6") => `<rect x="12" y="8" width="36" height="44" rx="4" fill="${cor}" stroke="${I}" stroke-width="3"/><rect x="16" y="44" width="32" height="8" fill="#fff" stroke="${I}" stroke-width="2.5"/><path d="M20 18h20M20 25h14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+    house: () => `<path d="M8 30L30 10l22 20" fill="#e53950" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M14 26v26h32V26L30 12z" fill="#ffd23f" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><rect x="25" y="36" width="10" height="16" fill="#8b5a2b" stroke="${I}" stroke-width="2.5"/><path d="M8 30L30 10l22 20" fill="none" stroke="${I}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`,
+    pencil: () => `<g transform="rotate(-45 30 30)"><rect x="10" y="24" width="32" height="12" fill="#ffd23f" stroke="${I}" stroke-width="3"/><path d="M42 24l12 6-12 6z" fill="#f2c9a0" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M50 28l4 2-4 2z" fill="${I}"/><rect x="4" y="24" width="7" height="12" rx="2" fill="#ff8fb8" stroke="${I}" stroke-width="3"/></g>`,
+    star: (cor = "#ffd23f") => `<path d="M30 6l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="${cor}" stroke="${I}" stroke-width="3" stroke-linejoin="round"/>`,
+    flower: (cor = "#ff8fb8") => `<path d="M30 34v22" stroke="#3fae4f" stroke-width="4"/><path d="M30 48q-10-6-14 0 8 6 14 0z" fill="#4fd6a6" stroke="${I}" stroke-width="2"/>${[0, 72, 144, 216, 288].map(a => `<ellipse cx="30" cy="12" rx="8" ry="11" fill="${cor}" stroke="${I}" stroke-width="2.5" transform="rotate(${a} 30 24)"/>`).join("")}<circle cx="30" cy="24" r="7" fill="#ffd23f" stroke="${I}" stroke-width="2.5"/>`,
+  }
+  const desenho = (id, cor) => `<svg viewBox="0 0 60 60" aria-hidden="true">${DESENHOS[id](cor)}</svg>`
+  // A group of n things of one color, side by side
+  function grupo(obj, n, cor) {
+    const tam = n <= 3 ? 44 : 32, passo = n <= 3 ? 48 : 36, inicio = (200 - passo * (n - 1)) / 2
+    return `<svg viewBox="0 0 200 64" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<svg x="${inicio + i * passo - tam / 2}" y="${32 - tam / 2}" width="${tam}" height="${tam}" viewBox="0 0 60 60">${DESENHOS[obj](CORES[cor][1])}</svg>`).join("")}</svg>`
+  }
+  const ALTO_FALANTE = `<svg class="alto-falante" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="${I}" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/></svg>`
+
+  // English voice of the browser. The automatic reading follows Sem som; the Ouvir button always speaks
+  const temVoz = "speechSynthesis" in window
+  function falar(texto) {
+    if (!temVoz) return
+    try {
+      speechSynthesis.cancel()
+      const fala = new SpeechSynthesisUtterance(texto)
+      fala.lang = "en-US"
+      fala.rate = .85
+      const voz = speechSynthesis.getVoices().find(v => v.lang.startsWith("en"))
+      if (voz) fala.voice = voz
+      speechSynthesis.speak(fala)
+    } catch {}
+  }
+  const textoParaOuvir = () => tipo() === "ouvir" ? atual()[0] : tipo() === "frase" ? atual().frase : atual().en
+  $("acao").onclick = () => falar(textoParaOuvir())
+  function pararRodada() {
+    if (temVoz) try { speechSynthesis.cancel() } catch {}
+  }
+
+  function mostrarRodada() {
+    const r = atual()
+    $("acao").innerHTML = ALTO_FALANTE.replace('class="alto-falante" ', "") + "<span>Ouvir</span>"
+    $("acao").hidden = !temVoz
+    setTimeout(() => { if (comSom && !ocupado) falar(textoParaOuvir()) }, 500)
+    if (tipo() === "ouvir") {
+      const [palavra, opcoes] = r
+      $("pergunta").textContent = "Ouça e toque no desenho"
+      $("texto").textContent = temVoz ? "Aperte Ouvir para escutar de novo." : "Leia a palavra e toque no desenho."
+      $("nota").textContent = ""
+      $("cena").innerHTML = temVoz ? `${ALTO_FALANTE}<p class="traducao">Que palavra o Bit falou?</p>` : `<p class="grande">${palavra}</p>`
+      mostrarOpcoes(opcoes.map(id => desenho(id)), (botao, i) => {
+        if (opcoes[i] !== palavra) {
+          errar(`Esse é ${opcoes[i]}, que quer dizer ${PALAVRAS[opcoes[i]]}. Ouça de novo: ${palavra}.`, botao)
+          if (comSom) falar(palavra)
+          return
+        }
+        $("cena").innerHTML = `<p class="grande">${palavra}</p><p class="traducao">${palavra} = ${PALAVRAS[palavra]}</p>`
+        acertou(`Isso! ${palavra.toUpperCase()} quer dizer ${PALAVRAS[palavra]}.`, botao)
+      }, "opcoes--desenhos")
+      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("desenho"); b.setAttribute("aria-label", opcoes[i]) })
+    } else if (tipo() === "frase") {
+      $("pergunta").textContent = "Leia e toque no desenho certo"
+      $("texto").textContent = "Olhe o número e a cor."
+      $("nota").textContent = ""
+      $("cena").innerHTML = `${ALTO_FALANTE}<p class="grande">${r.frase}</p>`
+      mostrarOpcoes(r.opcoes.map(([n, cor]) => grupo(r.obj, n, cor)), (botao, i) => {
+        const [n, cor] = r.opcoes[i], [nc, corc] = r.certo
+        if (n !== nc || cor !== corc) {
+          const partes = []
+          if (n !== nc) partes.push(`aí tem ${NUMEROS[n]} (${n}), mas a frase diz ${NUMEROS[nc]} (${nc})`)
+          if (cor !== corc) partes.push(`aí a cor é ${cor} (${CORES[cor][0]}), mas a frase diz ${corc} (${CORES[corc][0]})`)
+          return errar(`Quase: ${partes.join(", e ")}.`, botao)
+        }
+        $("cena").innerHTML = `${ALTO_FALANTE}<p class="grande">${r.frase}</p><p class="traducao">${r.pt}</p>`
+        acertou(`Isso! "${r.frase}" quer dizer ${r.pt}. Em inglês, a cor vem antes da coisa: ${corc} ${r.obj}${nc > 1 ? "s" : ""}.`, botao)
+      })
+      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("grupo"); b.setAttribute("aria-label", `${r.opcoes[i][0]} ${r.opcoes[i][1]}`) })
+    } else {
+      $("pergunta").textContent = "Responda ao Bit"
+      $("texto").textContent = "Escolha a melhor resposta em inglês."
+      $("nota").textContent = ""
+      $("cena").innerHTML = `<p class="fala-en grande">${r.en}</p><p class="traducao">&nbsp;</p>`
+      mostrarOpcoes(r.opcoes, (botao, i) => {
+        if (i !== r.certa) return errar(`Essa resposta quer dizer: ${r.opcoesPt[i]} Ela não combina com a pergunta. ${dica()}`, botao)
+        $("cena").innerHTML = `<p class="fala-en grande">${r.en}</p><p class="traducao">${r.pt}</p><p class="grande" style="font-size: 26px">${r.opcoes[i]}</p><p class="traducao">${r.opcoesPt[i]}</p>`
+        acertou(`Isso! ${r.explica}`, botao)
+      })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("frase-en"))
+    }
+  }
+
+  function dica() {
+    const r = atual()
+    if (tipo() === "ouvir") {
+      if (!temVoz) return `${r[0]} quer dizer ${PALAVRAS[r[0]]}.`
+      falar(r[0])
+      return dicas > 1 ? `A palavra é ${r[0]}, que quer dizer ${PALAVRAS[r[0]]}.` : "Ouça com atenção. Vou falar mais uma vez."
+    }
+    if (tipo() === "frase") return `Primeiro o número: ${NUMEROS[r.certo[0]]} é ${r.certo[0]}. Depois a cor: ${r.certo[1]} é ${CORES[r.certo[1]][0]}.`
+    return `O Bit perguntou: "${r.pt}"`
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    if (typeof pararRodada === "function") pararRodada()
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? FIM.titulo : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
+    $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrar()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

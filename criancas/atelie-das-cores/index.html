@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ateliê das Cores · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Artes: misture tintas para criar cores secundárias, separe cores quentes e frias e ache a cor complementar no círculo cromático.">
+  <meta property="og:title" content="Ateliê das Cores · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Artes: cores primárias e secundárias, quentes e frias, e o círculo cromático.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    .btn[hidden] { display: none; }
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(36px, 7.4vw, 68px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the scene on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__pergunta { margin: 6px 0 4px !important; font-size: clamp(22px, 3.4vw, 28px); font-weight: 700; line-height: 1.2; }
+    .missao__texto { font-size: 16px; font-weight: 600; color: var(--soft); }
+    .cena-area { grid-area: cena; display: grid; gap: 8px; align-content: start; }
+    .cena { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .cena text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 420px; }
+    .opcoes:empty { display: none; }
+    .opcoes--linha { display: flex; flex-wrap: wrap; justify-content: center; }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--c, var(--white)); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 19px/1.25 var(--font); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+    .opcao:hover:not([disabled]) { transform: translateY(2px); box-shadow: 0 4px 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao[disabled] { cursor: default; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; }
+    .opcao.certa { background: var(--mint); opacity: 1; }
+    .opcao.treme { animation: tremida .35s; }
+    @keyframes tremida { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .fim .btn svg { width: 22px; height: 22px; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start; }
+    .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+    .qr svg { width: 150px; height: 150px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+    .opcao.pote { display: grid; justify-items: center; gap: 4px; min-width: 92px; padding: 8px 10px; font-size: 16px; }
+    .pote__tinta { display: block; width: 42px; height: 42px; background: var(--tinta); border: 4px solid var(--ink); border-radius: 50% 50% 46% 46%; box-shadow: inset -6px -6px 0 rgb(0 0 0 / .12); }
+    .opcoes--potes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 520px; }
+    .opcoes--duas { grid-template-columns: 1fr 1fr; }
+    .opcoes--duas .opcao { min-height: 64px; font-size: 22px; }
+    .fatia { cursor: pointer; outline: none; }
+    .fatia:hover path, .fatia:focus-visible path { stroke-width: 6; }
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcao { font-size: 17px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .usos { grid-template-columns: minmax(0, 1fr); }
+      .qr { display: none; }
+      .opcao.pote { min-width: 0; width: calc(33% - 8px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .opcao, .anima { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">+</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">=</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">*</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Ateliê</span> das <span class="pink">Cores</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Artes</li>
+        <li class="pill" style="--c: var(--yellow)">8 a 10 anos</li>
+        <li class="pill">Teoria das cores</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" id="jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__pergunta" id="pergunta"></p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <div class="cena-area">
+          <svg class="cena" id="cena" viewBox="0 0 400 300" role="img" aria-label="Ateliê"></svg>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Rodadas da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <div class="usos">
+        <div>
+          <h3>O que a turma aprende</h3>
+          <p>Teoria das cores: as primárias (vermelho, amarelo e azul) e as secundárias que nascem da mistura delas (laranja, verde e roxo), como o branco clareia e o preto escurece, cores quentes e frias, e as complementares, que ficam frente a frente no círculo cromático e se destacam uma ao lado da outra.</p>
+          <h3>Como jogar com a turma</h3>
+          <ul>
+            <li><b>No projetor:</b> antes de cada mistura, a turma diz que cor vai sair; depois, alguém confere com guache de verdade.</li>
+            <li><b>No celular:</b> cada estudante joga as três fases e pinta no caderno um círculo cromático com as seis cores.</li>
+            <li><b>Depois:</b> cada criança faz um desenho só com cores quentes e outro só com cores frias, e a turma conversa sobre o que cada um faz sentir.</li>
+          </ul>
+        </div>
+        <div class="qr">
+          <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+          Jogue no celular
+        </div>
+      </div>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [mistura de cores] para crianças de [8 a 10 anos]: o jogo pede uma cor, como laranja, e a criança toca em duas tintas para misturar numa paleta até chegar nela.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: misturar as primárias para fazer as secundárias, separar cores quentes e frias, achar a cor complementar no círculo cromático], uma explicação curta a cada acerto, um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+    <!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+    <symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m4 0h1m3 0h2m1 0h4m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h3m1 0h4m4 0h2m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h2m3 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m4 0h2m1 0h2m4 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m1 0h4m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m1 0h1m3 0h3m4 0h2m2 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h2m1 0h3m1 0h2m2 0h1m1 0h2m1 0h1m1 0h1m-27 1h1m1 0h5m2 0h2m1 0h2m3 0h1m2 0h1m2 0h5m2 0h5m-32 1h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h2m2 0h2m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m-36 1h2m2 0h4m1 0h1m2 0h1m4 0h2m1 0h2m2 0h1m2 0h6m2 0h2m-37 1h2m1 0h1m1 0h1m3 0h3m1 0h1m2 0h1m2 0h3m5 0h1m1 0h1m1 0h2m3 0h1m-36 1h2m2 0h3m2 0h1m1 0h1m1 0h1m1 0h2m1 0h2m1 0h6m1 0h2m1 0h5m-37 1h1m2 0h2m2 0h2m1 0h1m3 0h1m1 0h1m2 0h2m1 0h2m4 0h1m2 0h1m-32 1h8m1 0h4m2 0h4m1 0h3m4 0h2m1 0h4m1 0h2m-37 1h3m4 0h4m1 0h5m2 0h5m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h2m1 0h1m1 0h2m2 0h3m1 0h2m1 0h4m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-37 1h1m1 0h2m3 0h1m1 0h5m1 0h1m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-34 1h1m3 0h3m1 0h1m1 0h2m1 0h2m3 0h3m4 0h2m1 0h3m1 0h3m-37 1h3m1 0h2m3 0h1m5 0h1m3 0h1m1 0h2m3 0h2m1 0h2m5 0h1m-36 1h1m1 0h2m1 0h2m2 0h1m1 0h1m1 0h2m1 0h1m4 0h1m1 0h3m2 0h2m1 0h3m-33 1h1m1 0h1m3 0h1m1 0h1m1 0h1m4 0h1m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-34 1h1m4 0h3m1 0h4m2 0h3m2 0h3m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-34 1h2m2 0h1m1 0h2m1 0h2m5 0h3m1 0h1m2 0h1m1 0h2m1 0h2m2 0h2m-36 1h2m1 0h1m1 0h4m2 0h1m1 0h2m2 0h2m2 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h6m1 0h1m2 0h4m1 0h2m1 0h4m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h1m2 0h2m1 0h1m3 0h1m1 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m2 0h1m5 0h1m6 0h1m1 0h1m1 0h2m4 0h1m2 0h2m1 0h1m2 0h1m-36 1h1m1 0h1m1 0h6m1 0h1m4 0h2m1 0h1m4 0h12m-28 1h1m2 0h4m1 0h2m1 0h3m1 0h6m3 0h2m-34 1h7m3 0h3m1 0h4m2 0h2m3 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m1 0h2m3 0h3m2 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h1m2 0h1m2 0h1m2 0h8m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h3m2 0h2m2 0h2m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h5m1 0h1m1 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m2 0h1m5 0h1m3 0h1m1 0h1m2 0h1m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h8m1 0h1m4 0h1m1 0h3m2 0h1m2 0h5"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const TINTAS = { vermelho: "#e53950", amarelo: "#ffd23f", azul: "#2f6fd6", branco: "#ffffff", preto: "#2f2a3a" }
+  const MISTURAS = {
+    "amarelo+vermelho": ["laranja", "#ff8a3d"], "amarelo+azul": ["verde", "#3fae4f"], "azul+vermelho": ["roxo", "#8a4fd6"],
+    "branco+vermelho": ["rosa", "#ff9fc0"], "branco+preto": ["cinza", "#a3a1b0"], "azul+branco": ["azul-claro", "#9fd0ff"],
+    "amarelo+branco": ["amarelo-claro", "#fff1a0"], "preto+vermelho": ["vermelho-escuro", "#8a1f2a"], "azul+preto": ["azul-escuro", "#1f2a6a"],
+    "amarelo+preto": ["amarelo bem escuro, quase verde-oliva", "#8a8a2a"],
+  }
+  const RODA = [["vermelho", "#e53950"], ["laranja", "#ff8a3d"], ["amarelo", "#ffd23f"], ["verde", "#3fae4f"], ["azul", "#2f6fd6"], ["roxo", "#8a4fd6"]]
+  const FASES = [
+    { nome: "Misturar as tintas", tipo: "misturar", rotulo: "cor",
+      abertura: "Oi! Eu sou o Bit, e este é o meu ateliê. Vermelho, amarelo e azul são as cores primárias. Toque em duas tintas para misturar na paleta e fazer a cor que eu pedir.",
+      rodadas: [
+        { alvo: "laranja", dica: "O laranja é a cor do fogo e do pôr do sol. Junte duas primárias quentes.", explica: "Vermelho e amarelo dão laranja. Duas primárias misturadas fazem uma cor secundária." },
+        { alvo: "verde", dica: "O verde fica entre o amarelo e o azul no círculo das cores.", explica: "Amarelo e azul dão verde, outra cor secundária." },
+        { alvo: "roxo", dica: "O roxo é a cor da uva. Junte uma primária quente e uma fria.", explica: "Vermelho e azul dão roxo. Agora você conhece as três secundárias: laranja, verde e roxo." },
+        { alvo: "rosa", dica: "O rosa é um vermelho mais clarinho. Que tinta deixa uma cor mais clara?", explica: "Vermelho e branco dão rosa. O branco clareia a cor sem trocar o tom." },
+        { alvo: "cinza", dica: "O cinza é a cor da nuvem de chuva. Ele fica entre o preto e o branco.", explica: "Preto e branco dão cinza. Com mais branco ele fica claro; com mais preto, escuro." },
+      ] },
+    { nome: "Quentes ou frias?", tipo: "temperatura", rotulo: "pergunta",
+      abertura: "As cores também passam sensação. Umas lembram o calor do sol, outras lembram a água e o frio. Esta é quente ou fria?",
+      rodadas: [
+        { cor: "#e53950", nome: "vermelho", quente: true },
+        { cor: "#2f6fd6", nome: "azul", quente: false },
+        { cena: "sol", nome: "o pôr do sol", quente: true },
+        { cor: "#3fae4f", nome: "verde", quente: false },
+        { cena: "mar", nome: "o mar à noite", quente: false },
+      ] },
+    { nome: "Círculo cromático", tipo: "roda", rotulo: "pergunta",
+      abertura: "Este é o círculo cromático, com as primárias e as secundárias. A cor complementar fica bem na frente, do outro lado. Toque nela.",
+      rodadas: [0, 4, 2, 3, 5] },
+  ]
+  const FIM = { titulo: "Artista das cores!", texto: "Primárias, secundárias, quentes, frias e complementares: agora você escolhe as cores de propósito.",
+    fala: "Você domina as cores! Agora é pegar a tinta de verdade e pintar." }
+  const $ = id => document.getElementById(id)
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
+  function mostrarOpcoes(lista, aoEscolher, classe = "") {
+    $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
+    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
+      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+    })
+  }
+  function errar(frase, botao, riscar = true) {
+    erros++
+    somErro()
+    if (botao && riscar) {
+      botao.disabled = true
+      botao.classList.add("errada")
+    } else if (botao) {
+      botao.classList.remove("treme")
+      void botao.offsetWidth
+      botao.classList.add("treme")
+    }
+    window.Bit?.diz("ops", frase)
+  }
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima questão
+  function acertou(frase, botao) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    if (botao) botao.classList.add("certa")
+    $("dica").hidden = true
+    $("acao").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima questão"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrar()
+    else terminarFase()
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrar() {
+    if (typeof pararRodada === "function") pararRodada()
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("acao").hidden = true
+    $("opcoes").innerHTML = ""
+    dicas = 0
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].rotulo} ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    mostrarRodada()
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    dicas++
+    window.Bit?.diz("pensando", dica())
+  }
+
+  const I = "#2f2a4a"
+  const maiuscula = s => s[0].toUpperCase() + s.slice(1)
+  const misturar = (a, b) => a === b ? [a, TINTAS[a]] : MISTURAS[[a, b].sort().join("+")]
+
+  // Phase 1: the palette with two spots of paint and the mix in the middle
+  let escolhidas = [], errosAqui = 0
+  function paleta(mistura) {
+    const gota = (x, nome) => nome
+      ? `<circle cx="${x}" cy="118" r="36" fill="${TINTAS[nome]}" stroke="${I}" stroke-width="4"/><text x="${x}" y="176" text-anchor="middle" font-size="17" font-weight="700" fill="${I}">${nome}</text>`
+      : `<circle cx="${x}" cy="118" r="36" fill="#fff8ec" stroke="${I}" stroke-width="3" stroke-dasharray="7 6"/>`
+    let s = `<path d="M60 60C110 10 300 6 360 70c40 44 20 130-50 170-60 34-170 40-240 0C10 206 10 110 60 60z" fill="#f2d3a2" stroke="${I}" stroke-width="5"/>
+      <ellipse cx="96" cy="210" rx="20" ry="15" fill="#fff" stroke="${I}" stroke-width="4"/>
+      ${gota(130, escolhidas[0])}${gota(270, escolhidas[1])}
+      <text x="200" y="126" text-anchor="middle" font-size="34" font-weight="700" fill="${I}">+</text>`
+    if (mistura) s += `<path d="M200 186c30 0 52 14 50 34-2 22-30 30-50 28-24-2-48-10-46-30 2-20 22-32 46-32z" fill="${mistura[1]}" stroke="${I}" stroke-width="4"/>
+      <text x="200" y="282" text-anchor="middle" font-size="20" font-weight="700" fill="${I}" stroke="#fff" stroke-width="5" paint-order="stroke">${mistura[0]}</text>`
+    return s
+  }
+
+  // Phase 2: a big splash of paint, or a small painting
+  function quadro(r) {
+    if (r.cor) return `<path d="M200 46c40-10 62 30 96 30 40 0 58 40 40 74-14 26 20 50 0 80-22 32-70 12-100 26-34 16-82 10-96-24-12-28-58-30-50-70 8-38 46-28 60-58 12-28 22-52 50-58z" fill="${r.cor}" stroke="${I}" stroke-width="5"/>
+      <circle cx="320" cy="56" r="12" fill="${r.cor}" stroke="${I}" stroke-width="3"/><circle cx="76" cy="236" r="9" fill="${r.cor}" stroke="${I}" stroke-width="3"/>`
+    if (r.cena === "sol") return `<defs><linearGradient id="ceu-sol" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ffd23f"/></linearGradient></defs>
+      <rect x="20" y="20" width="360" height="260" rx="14" fill="url(#ceu-sol)" stroke="${I}" stroke-width="5"/>
+      <circle cx="200" cy="190" r="70" fill="#e53950" stroke="${I}" stroke-width="4"/>
+      <path d="M22 200q90-40 178 0t178-10V266q0 12-12 12H34q-12 0-12-12z" fill="#c2410c" stroke="${I}" stroke-width="4"/>
+      <path d="M22 236q100-30 200 0t156 0V266q0 12-12 12H34q-12 0-12-12z" fill="#8a1f2a" stroke="${I}" stroke-width="4"/>
+      <path d="M90 80q10-10 20 0q10-10 20 0M250 60q8-8 16 0q8-8 16 0" fill="none" stroke="${I}" stroke-width="3" stroke-linecap="round"/>`
+    return `<rect x="20" y="20" width="360" height="260" rx="14" fill="#1f2a6a" stroke="${I}" stroke-width="5"/>
+      <circle cx="300" cy="74" r="30" fill="#cfe6ff" stroke="${I}" stroke-width="4"/><circle cx="290" cy="66" r="6" fill="#9fc0e6"/>
+      <circle cx="80" cy="60" r="3" fill="#fff"/><circle cx="150" cy="90" r="2.5" fill="#fff"/><circle cx="210" cy="48" r="3" fill="#fff"/>
+      <path d="M22 170q45-24 90 0t90 0 90 0 86-6V266q0 12-12 12H34q-12 0-12-12z" fill="#2f6fd6" stroke="${I}" stroke-width="4"/>
+      <path d="M22 210q45-24 90 0t90 0 90 0 86-6V266q0 12-12 12H34q-12 0-12-12z" fill="#2aa198" stroke="${I}" stroke-width="4"/>
+      <path d="M22 246q45-20 90 0t90 0 90 0 86-6V266q0 12-12 12H34q-12 0-12-12z" fill="#6a4fc6" stroke="${I}" stroke-width="4"/>`
+  }
+
+  // Phase 3: the color wheel; each slice is a button
+  function roda(base, resposta) {
+    const C = [200, 150], R = 124, r0 = 44
+    const ponto = (ang, raio) => [C[0] + raio * Math.cos(ang), C[1] + raio * Math.sin(ang)].map(v => v.toFixed(1)).join(" ")
+    let s = ""
+    RODA.forEach(([nome, cor], i) => {
+      const a0 = (i * 60 - 120) * Math.PI / 180, a1 = ((i + 1) * 60 - 120) * Math.PI / 180, meio = (a0 + a1) / 2
+      const marcada = i === base
+      s += `<g class="fatia" data-i="${i}" tabindex="0" role="button" aria-label="${nome}">
+        <path d="M${ponto(a0, r0)}L${ponto(a0, R)}A${R} ${R} 0 0 1 ${ponto(a1, R)}L${ponto(a1, r0)}A${r0} ${r0} 0 0 0 ${ponto(a0, r0)}z" fill="${cor}" stroke="${I}" stroke-width="4" stroke-linejoin="round"/>
+        <text transform="translate(${ponto(meio, 86).replace(" ", " ")})" x="0" y="6" text-anchor="middle" font-size="16" font-weight="700" fill="${i === 2 ? I : "#fff"}" stroke="${i === 2 ? "#fff8" : I}" stroke-width="${i === 2 ? 0 : 3}" paint-order="stroke">${nome}</text></g>`
+      if (marcada) s += `<path d="M${ponto(a0, R + 8)}A${R + 8} ${R + 8} 0 0 1 ${ponto(a1, R + 8)}" fill="none" stroke="${I}" stroke-width="6" stroke-linecap="round"/>`
+    })
+    if (resposta !== undefined) {
+      const a0 = (resposta * 60 - 120) * Math.PI / 180, a1 = ((resposta + 1) * 60 - 120) * Math.PI / 180
+      s += `<path d="M${ponto(a0, R + 8)}A${R + 8} ${R + 8} 0 0 1 ${ponto(a1, R + 8)}" fill="none" stroke="#ff5f8f" stroke-width="6" stroke-linecap="round"/>`
+    }
+    s += `<circle cx="200" cy="150" r="${r0 - 6}" fill="#fff" stroke="${I}" stroke-width="3"/>`
+    if (resposta !== undefined) s += `<text x="200" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="${I}">frente a</text><text x="200" y="160" text-anchor="middle" font-size="12" font-weight="700" fill="${I}">frente</text>`
+    return s
+  }
+  function ligarRoda() {
+    $("cena").querySelectorAll(".fatia").forEach(g => {
+      const tocar = () => escolherFatia(Number(g.dataset.i))
+      g.onclick = tocar
+      g.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tocar() } }
+    })
+  }
+  const EXEMPLOS = { "0+3": "como um morango vermelho entre folhas verdes", "1+4": "como um pôr do sol laranja num céu azul", "2+5": "como uma flor amarela num vaso roxo" }
+  function escolherFatia(i) {
+    if (ocupado) return
+    const base = atual(), certa = (base + 3) % 6, [nomeBase] = RODA[base]
+    if (i === certa) {
+      $("cena").innerHTML = roda(base, certa)
+      const par = [base, certa].sort((p, q) => p - q).join("+")
+      return acertou(`Isso! ${maiuscula(nomeBase)} e ${RODA[certa][0]} ficam frente a frente. Lado a lado, uma faz a outra brilhar mais, ${EXEMPLOS[par]}.`)
+    }
+    if (i === base) return errar("Essa é a própria cor marcada. A complementar fica do outro lado do círculo.")
+    const vizinha = Math.abs(i - base) === 1 || Math.abs(i - base) === 5
+    errar(vizinha ? `O ${RODA[i][0]} é vizinho do ${nomeBase}: fica do lado, não na frente. Procure bem do outro lado.` : `Quase! A complementar fica bem na frente do ${nomeBase}, passando pelo meio do círculo.`)
+  }
+
+  function mostrarRodada() {
+    const r = atual()
+    if (tipo() === "misturar") {
+      escolhidas = []
+      errosAqui = 0
+      $("pergunta").innerHTML = `Faça a cor <b>${r.alvo}</b>`
+      $("texto").textContent = "Toque em duas tintas para misturar na paleta."
+      $("nota").textContent = "Pode usar a mesma tinta duas vezes."
+      $("cena").innerHTML = paleta()
+      const nomes = Object.keys(TINTAS)
+      mostrarOpcoes(nomes.map(n => `<span class="pote__tinta" style="--tinta: ${TINTAS[n]}"></span>${maiuscula(n)}`), (botao, i) => {
+        escolhidas.push(nomes[i])
+        somClique()
+        $("cena").innerHTML = paleta()
+        if (escolhidas.length < 2) return
+        ocupado = true
+        const mistura = misturar(...escolhidas)
+        setTimeout(() => {
+          $("cena").innerHTML = paleta(mistura)
+          if (mistura[0] === r.alvo) return acertou(`Isso! ${r.explica}`)
+          errosAqui++
+          errar(`${maiuscula(escolhidas[0])} com ${escolhidas[1]} dá ${mistura[0]}, não ${r.alvo}. ${errosAqui > 1 ? r.dica : "Tente outra dupla."}`)
+          setTimeout(() => {
+            escolhidas = []
+            ocupado = false
+            $("cena").innerHTML = paleta()
+          }, 1800)
+        }, 450)
+      }, "opcoes--potes")
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("pote"))
+    } else if (tipo() === "temperatura") {
+      $("pergunta").textContent = r.cor ? `O ${r.nome} é uma cor quente ou fria?` : "Esta pintura usa cores quentes ou frias?"
+      $("texto").textContent = "Pense no que a cor lembra."
+      $("nota").textContent = r.cor ? "" : `A pintura mostra ${r.nome}.`
+      $("cena").innerHTML = quadro(r)
+      mostrarOpcoes(["Quente", "Fria"], (botao, i) => {
+        const porque = r.quente
+          ? `${r.cor ? `O ${r.nome}` : "Vermelho, laranja e amarelo"} ${r.cor ? "lembra" : "lembram"} o sol, o fogo e o calor. Cores quentes passam energia e parecem chegar mais perto.`
+          : `${r.cor ? `O ${r.nome}` : "Azul, verde e roxo"} ${r.cor ? "lembra" : "lembram"} a água, a sombra e o frio. Cores frias passam calma e parecem ficar mais longe.`
+        if ((i === 0) !== r.quente) return errar(`Olhe de novo. ${porque}`, botao)
+        acertou(`Isso! ${porque}`, botao)
+      }, "opcoes--duas")
+      const [quente, fria] = $("opcoes").querySelectorAll(".opcao")
+      quente.style.setProperty("--c", "#ffd0a8")
+      fria.style.setProperty("--c", "#cfe6ff")
+    } else {
+      $("pergunta").innerHTML = `Qual é a complementar do <b>${RODA[r][0]}</b>?`
+      $("texto").textContent = "Toque na cor do círculo."
+      $("nota").textContent = `O ${RODA[r][0]} está marcado com a borda escura.`
+      $("cena").innerHTML = roda(r)
+      ligarRoda()
+    }
+  }
+
+  function dica() {
+    const r = atual()
+    if (tipo() === "misturar") return r.dica
+    if (tipo() === "temperatura") return "Quentes lembram o sol e o fogo: vermelho, laranja e amarelo. Frias lembram a água e o gelo: azul, verde e roxo."
+    if (dicas === 1) return "A complementar fica do outro lado do círculo, bem na frente da cor marcada."
+    $("cena").innerHTML = roda(r, (r + 3) % 6)
+    ligarRoda()
+    return "Marquei de rosa a cor que fica bem na frente."
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    if (typeof pararRodada === "function") pararRodada()
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? FIM.titulo : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
+    $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrar()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
