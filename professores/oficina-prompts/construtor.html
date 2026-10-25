@@ -370,6 +370,20 @@ const KINDS = {
     next: ["Crie também uma versão com letras maiores e mais espaço entre as linhas.", "Sugira como apresentar esse material para a turma inteira."],
     tip: "Antes de colar o material, apague nomes, turma e notas dos alunos.",
   },
+  enem: {
+    label: "Questões do Enem", maker: "questões no estilo do Enem",
+    task: topic => `Crie 5 questões no estilo do Enem sobre "${topic}".`,
+    format: () => [
+      "Cada questão com um texto-base curto, ligado a uma situação real, um comando claro e 5 alternativas, de A a E.",
+      "As questões vão da mais fácil para a mais difícil.",
+      "Se a questão tiver gráfico ou tabela, monte a tabela no texto ou descreva o gráfico entre parênteses.",
+      "Escreva tudo em texto normal, fora de bloco de código e sem usar o teste interativo.",
+      "No fim, separado, o gabarito com a resolução e o motivo de cada alternativa errada.",
+      "Não diga que as questões são de provas reais do Enem e não invente o ano de uma prova.",
+    ],
+    next: ["Crie mais 5 questões no mesmo estilo, um pouco mais difíceis.", "Transforme essas questões num simulado de 30 minutos, com folha de respostas."],
+    tip: "Confira as contas e os dados de cada questão antes de aplicar: o modelo rápido do Gemini às vezes erra uma conta no meio da resolução.",
+  },
 }
 
 // Asking the same final checks of every material, the habit the workshop wants teachers to keep
