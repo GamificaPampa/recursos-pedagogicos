@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dados em Jogo · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Sociologia para o ensino médio: leia gráficos e tabelas sobre a sociedade, descubra os que enganam e ligue cada dado a um conceito, como desigualdade social e mobilidade social.">
+  <meta property="og:title" content="Dados em Jogo · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Sociologia: ler gráficos e interpretar com conceitos.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The chart on the left, the question and the answers on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: "fala fala" "grafico missao" "grafico controles"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: clamp(19px, 2.6vw, 24px); font-weight: 700; line-height: 1.25; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 600 18px/1.25 var(--font); color: var(--ink); text-align: left; cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .6; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); cursor: default; }
+    .opcao.certa::after { content: " ✓"; font-weight: 700; }
+    .opcao[disabled]:not(.errada):not(.certa) { opacity: .6; cursor: default; }
+    .btn[hidden] { display: none; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* The chart */
+    .grafico-area { grid-area: grafico; display: grid; align-content: start; margin: 0; }
+    .grafico-caixa { padding: 12px 12px 8px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .grafico-caixa figcaption, .grafico-caixa .titulo { margin: 0 0 6px; font-size: clamp(17px, 2.2vw, 20px); font-weight: 700; line-height: 1.2; text-align: center; }
+    .grafico-caixa svg { display: block; width: 100%; height: auto; }
+    .grafico-caixa svg text { font-family: var(--font); }
+    .fonte { margin: 8px 0 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+    .tabela { width: 100%; border-collapse: collapse; font-size: 17px; }
+    .tabela th, .tabela td { padding: 10px 8px; border: 3px solid var(--ink); text-align: center; font-weight: 600; }
+    .tabela th { background: var(--sky2); font-weight: 700; }
+    .tabela td:first-child { text-align: left; }
+    .manchete { margin: 10px 0 0; padding: 10px 12px; background: #fff6cf; border: 3px solid var(--ink); border-radius: 14px; font-size: 18px; font-weight: 700; text-align: center; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul, .aula ol { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "grafico" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .tabela { font-size: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .fala-bit__bit img, .fala-bit__balao { animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">%</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">n</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">?</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Dados</span> em <span class="pink">Jogo</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Sociologia</li>
+        <li class="pill" style="--c: var(--yellow)">2º ano do ensino médio</li>
+        <li class="pill">Leitura de dados</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Leia o gráfico · desafio 1 de 5</p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <figure class="grafico-area">
+          <div class="grafico-caixa">
+            <figcaption id="legenda"></figcaption>
+            <div id="grafico"></div>
+          </div>
+          <p class="fonte" id="nota"></p>
+        </figure>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha a resposta"></div>
+          <div class="acoes">
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A ler gráficos e tabelas sobre a sociedade (maior valor, diferença, porcentagem), a desconfiar de gráficos que enganam (eixo que não começa no zero, amostra pequena, porcentagens que não fecham 100, falta de unidade e fonte, correlação confundida com causa) e a ligar um dado a um conceito da Sociologia: desigualdade social, mobilidade social, trabalho informal, êxodo rural e envelhecimento da população.</p>
+      <p><b>Atenção:</b> todos os números do jogo são inventados e se passam em Vila Umbu, uma cidade imaginária. Eles servem para treinar a leitura e não valem como dado real.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> antes de cada resposta, a turma vota e uma pessoa explica o que no gráfico a levou a essa escolha.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota, no caderno, um conceito que ainda não conhecia com um exemplo da sua cidade.</li>
+        <li><b>Depois:</b> em duplas, a turma procura um gráfico em jornal ou site, diz se ele engana e a qual conceito ele se liga.</li>
+      </ul>
+      <h3>Troque pelos dados reais do IBGE</h3>
+      <ol>
+        <li>Abra o site <b>ibge.gov.br</b>, entre em <b>Cidades e Estados</b> e escolha a sua cidade.</li>
+        <li>Pegue números de um tema: população por idade, trabalho e rendimento, ou população urbana e rural. Anote o ano e a fonte.</li>
+        <li>Copie os números para uma tabela e confira se as partes somam o total (ou 100%).</li>
+        <li>Peça ao Gemini para montar as perguntas com esses números, como nas mensagens abaixo, e confira cada conta antes de usar com a turma.</li>
+      </ol>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Sociologia] para estudantes do [2º ano do ensino médio]: aparece um gráfico de barras com dados de exemplo de uma cidade imaginária, uma pergunta com três respostas, e o jogo explica por que a resposta está certa ou errada.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: ler gráficos de barras, setores e linhas com perguntas de maior valor, diferença e porcentagem; achar o que engana em um gráfico, como eixo cortado, amostra pequena e porcentagens que somam mais de 100; ligar o dado a um conceito como desigualdade social, mobilidade social, trabalho informal, êxodo rural ou envelhecimento da população], um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Avise na tela que os dados são de exemplo. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // Todos os dados abaixo sao inventados (cidade imaginaria de Vila Umbu). Nao citar como dado real.
+  const CONCEITOS = {
+    desigualdade: ["Desigualdade social", "é quando renda, bens e oportunidades se dividem de forma muito desigual entre os grupos."],
+    mobilidade: ["Mobilidade social", "é mudar de posição na sociedade, por exemplo de faixa de renda em relação aos pais."],
+    informal: ["Trabalho informal", "é trabalhar sem carteira assinada e sem os direitos que ela garante."],
+    exodo: ["Êxodo rural", "é a saída de moradores do campo para a cidade."],
+    envelhecimento: ["Envelhecimento da população", "é o aumento da parcela de idosos, com a queda da parcela de crianças e jovens."],
+  }
+  const conceito = (chave, certa) => ({ t: CONCEITOS[chave][0], conceito: chave, certa })
+
+  const FASES = [
+    { nome: "Leia o gráfico",
+      abertura: "Oi! Eu sou o Bit. Antes de interpretar um dado, é preciso ler direito. Olhe o título, os números e o tamanho de cada parte. Os dados são de exemplo, de uma cidade imaginária.",
+      desafios: [
+        { grafico: { tipo: "barras-h", titulo: "Como a turma vai para a escola (40 estudantes)", max: 20, un: " estudantes",
+            itens: [{ n: "A pé", v: 12 }, { n: "Ônibus", v: 16 }, { n: "Bicicleta", v: 4 }, { n: "Carona", v: 8 }] },
+          nota: "Turma imaginária de uma escola imaginária.",
+          pergunta: "Qual é o meio de transporte mais usado pela turma?",
+          opcoes: [{ t: "A pé", e: "A pé tem 12 estudantes, mas existe uma barra maior. Compare o tamanho das barras." }, { t: "Ônibus", certa: true }, { t: "Carona", e: "Carona tem só 8 estudantes, uma das barras menores." }],
+          ok: "Isso! Ônibus tem 16 estudantes, a maior barra. 16 de 40 é 40% da turma. Ler um gráfico começa por achar o maior e o menor valor.",
+          dica: "Olhe o tamanho das barras e o número no fim de cada uma." },
+        { grafico: { tipo: "barras-h", titulo: "Trabalhadores por setor em Vila Umbu (200 pessoas)", max: 80, un: " pessoas",
+            itens: [{ n: "Agropecuária", v: 50 }, { n: "Comércio", v: 70 }, { n: "Serviços", v: 60 }, { n: "Indústria", v: 20 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Quantos trabalhadores a mais há no comércio do que na agropecuária?",
+          opcoes: [{ t: "120 pessoas", e: "120 é a soma 70 + 50. Para saber quantos a mais, subtraia." }, { t: "20 pessoas", certa: true }, { t: "10 pessoas", e: "Confira: 70 menos 50 não dá 10." }],
+          ok: "Isso! 70 − 50 = 20 trabalhadores a mais no comércio. Uma diferença é a subtração entre dois valores do gráfico.",
+          dica: "Diferença é subtração: o maior valor menos o menor." },
+        { grafico: { tipo: "setores", titulo: "Moradores de Vila Umbu por idade (1.000 pessoas)", un: "%",
+            itens: [{ n: "0 a 14|anos", v: 20 }, { n: "15 a 29|anos", v: 25 }, { n: "30 a 59|anos", v: 40 }, { n: "60 anos|ou mais", v: 15 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Quantas pessoas têm 60 anos ou mais?",
+          opcoes: [{ t: "250 pessoas", e: "250 seria 25% de 1.000, que é a faixa de 15 a 29 anos." }, { t: "15 pessoas", e: "15 é a porcentagem, não o número de pessoas. Falta aplicar os 15% sobre o total de 1.000." }, { t: "150 pessoas", certa: true }],
+          ok: "Isso! 15% de 1.000 é 150 (1.000 ÷ 100 × 15). A porcentagem diz uma parte do total, e é preciso conhecer o total para achar o número de pessoas.",
+          dica: "10% de 1.000 são 100 pessoas. E 5%?" },
+        { grafico: { tipo: "linhas", titulo: "Moradores de Vila Umbu ao longo dos anos", min: 0, max: 1400, ticks: [0, 200, 400, 600, 800, 1000, 1200, 1400],
+            x: ["2010", "2015", "2020", "2025"], series: [{ n: "Moradores", v: [800, 900, 1000, 1200] }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Quantos moradores a cidade ganhou de 2010 a 2025?",
+          opcoes: [{ t: "400 moradores", certa: true }, { t: "1.200 moradores", e: "1.200 é o total em 2025, não o que a cidade ganhou." }, { t: "200 moradores", e: "200 é o que a cidade ganhou só de 2020 a 2025." }],
+          ok: "Isso! 1.200 − 800 = 400 moradores. Isso é 50% a mais do que em 2010 (400 ÷ 800 = 0,5).",
+          dica: "Pegue o valor de 2025 e tire o valor de 2010." },
+        { grafico: { tipo: "barras-h", titulo: "Estudantes com internet em casa, por turma", max: 40, un: "",
+            itens: [{ n: "Turma A", v: 30, r: "30 de 40" }, { n: "Turma B", v: 21, r: "21 de 25" }, { n: "Turma C", v: 24, r: "24 de 32" }] },
+          nota: "Turmas imaginárias. A barra mostra quantos têm internet, e o texto mostra o tamanho da turma.",
+          pergunta: "Qual turma tem a maior proporção de estudantes com internet em casa?",
+          opcoes: [{ t: "Turma A, porque tem mais estudantes com internet", e: "A tem o maior número (30), mas também é a maior turma: 30 de 40 é 75%." }, { t: "Turma B", certa: true }, { t: "Turma C", e: "24 de 32 é 75%, abaixo da turma B. Compare as porcentagens." }],
+          ok: "Isso! Na B, 21 ÷ 25 = 84%. A e C têm 75% (30 ÷ 40 e 24 ÷ 32). Para comparar grupos de tamanhos diferentes, use a porcentagem, não o número.",
+          dica: "Divida quem tem internet pelo tamanho da turma, ou pense em porcentagem." },
+      ] },
+    { nome: "Cuidado com o gráfico",
+      abertura: "Nem todo gráfico conta a verdade inteira. Às vezes o desenho engana, a amostra é pequena ou a conta não fecha. Ache o problema de cada um.",
+      desafios: [
+        { grafico: { tipo: "barras-v", titulo: "Renda média por bairro: o Beira-Rio ganha muito mais?", min: 1900, max: 2100, ticks: [1900, 1950, 2000, 2050, 2100], pre: "R$ ",
+            itens: [{ n: "Centro", v: 2000 }, { n: "Beira-Rio", v: 2100 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "O que faz este gráfico enganar?",
+          opcoes: [{ t: "Faltam bairros no gráfico", e: "Mais bairros ajudariam, mas não é isso que faz as barras enganarem. Olhe os números do eixo." }, { t: "O eixo começa em R$ 1.900, e não em zero", certa: true }, { t: "As barras têm cores diferentes", e: "A cor não muda os dados. O problema está nos números do lado." }],
+          ok: "Isso! A diferença real é de R$ 100 em R$ 2.000, só 5%. Com o eixo cortado, a barra do Beira-Rio parece o dobro da outra. Sempre confira onde o eixo começa.",
+          dica: "Olhe os números do eixo vertical. Em que número ele começa?" },
+        { grafico: { tipo: "barras-h", titulo: "80% aprovam a nova linha de ônibus", max: 100, un: "%",
+            itens: [{ n: "Aprovam", v: 80 }, { n: "Não aprovam", v: 20 }] },
+          nota: "Quem respondeu: 5 pessoas, na fila do ponto da linha nova.",
+          pergunta: "O que há de errado com esta pesquisa?",
+          opcoes: [{ t: "A conta de 80% está errada", e: "4 de 5 é 80%, então a conta está certa. O problema é quem foi ouvido." }, { t: "As barras deveriam ser verticais", e: "A direção da barra não muda os dados. Olhe quem respondeu." }, { t: "Ouviu só 5 pessoas, e todas já usam a linha", certa: true }],
+          ok: "Isso! Com 5 pessoas, uma só muda o resultado em 20 pontos. E quem está na fila já usa a linha. Uma pesquisa séria ouve muita gente, de vários lugares.",
+          dica: "Leia a frase embaixo do gráfico: quem respondeu e quantas pessoas?" },
+        { grafico: { tipo: "setores", titulo: "Atividade favorita da turma (cada estudante escolheu uma só)", un: "%",
+            itens: [{ n: "Redes|sociais", v: 45 }, { n: "Esporte", v: 30 }, { n: "Leitura", v: 20 }, { n: "Jogos", v: 15 }] },
+          nota: "Turma imaginária.",
+          pergunta: "O que há de errado nestas porcentagens?",
+          opcoes: [{ t: "A fatia das redes sociais é grande demais", e: "45% pode ser verdade. O erro está na soma de todas as partes." }, { t: "Faltam fatias no gráfico", e: "Quantas fatias há não é o problema. Some as porcentagens." }, { t: "Elas somam 110%, e deveriam somar 100%", certa: true }],
+          ok: "Isso! 45 + 30 + 20 + 15 = 110. Se cada estudante escolheu uma só atividade, o total tem de dar 100%. Quando não fecha, há contagem repetida ou erro de conta.",
+          dica: "Some todas as porcentagens. Quanto dá?" },
+        { grafico: { tipo: "barras-v", titulo: "O Grupo B disparou!", min: 0, max: 50, ticks: [],
+            itens: [{ n: "Grupo A", v: 30 }, { n: "Grupo B", v: 45 }, { n: "Grupo C", v: 25 }] },
+          nota: "",
+          pergunta: "O que falta neste gráfico para a gente poder confiar nele?",
+          opcoes: [{ t: "Diminuir a barra do Grupo B", e: "Barra alta não é erro, é o dado. O que falta é explicar o que ele mede." }, { t: "Dizer o que os números medem e de onde vêm", certa: true }, { t: "Fazer as barras mais finas", e: "A espessura da barra não muda nada. Procure o que o gráfico não diz." }],
+          ok: "Isso! Sem unidade e sem fonte, ninguém sabe se são pessoas, reais ou por cento, nem quem coletou. Todo gráfico precisa de título claro, unidade e fonte.",
+          dica: "Procure no gráfico: está escrito o que os números medem? E quem coletou?" },
+        { grafico: { tipo: "tabela", titulo: "Sorvete e afogamentos no rio de Vila Umbu",
+            cab: ["Mês", "Sorvetes vendidos (mil)", "Casos de afogamento"],
+            linhas: [["Julho", "10", "1"], ["Outubro", "30", "4"], ["Janeiro", "55", "9"]],
+            manchete: "Manchete: sorvete faz as pessoas se afogarem!" },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual é o erro da manchete?",
+          opcoes: [{ t: "A tabela deveria ter mais colunas", e: "Mais colunas não resolvem. O erro está na conclusão tirada dos números." }, { t: "Os números estão em ordem errada", e: "A ordem não muda a ideia. O erro está na conclusão da manchete." }, { t: "Dois dados que sobem juntos não provam que um causa o outro", certa: true }],
+          ok: "Isso! É confundir correlação com causa. O calor explica os dois: vende mais sorvete e leva mais gente ao rio. Na Sociologia, relacionar dois dados não basta: é preciso buscar outras explicações.",
+          dica: "Pense em algo que aumenta no verão e poderia explicar as duas colunas." },
+      ] },
+    { nome: "O que isso mostra?",
+      abertura: "Agora é a hora da Sociologia. Um dado vira ideia quando a gente liga ele a um conceito. Qual conceito explica o que o gráfico mostra?",
+      desafios: [
+        { grafico: { tipo: "barras-h", titulo: "Parte da renda de Vila Umbu que cada grupo recebe", max: 60, un: "%",
+            itens: [{ n: "20% mais pobres", v: 5 }, { n: "Segundos 20%", v: 8 }, { n: "Terceiros 20%", v: 12 }, { n: "Quartos 20%", v: 20 }, { n: "20% mais ricos", v: 55 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual conceito este dado ajuda a entender?",
+          opcoes: [conceito("exodo"), conceito("desigualdade", true), conceito("envelhecimento")],
+          ok: "Isso! Desigualdade social: os 20% mais ricos ficam com 55% da renda, e os 20% mais pobres, com 5%. Ela mostra quem tem mais ou menos acesso a renda e oportunidades.",
+          dica: "O gráfico compara a renda que cada grupo recebe. As partes são parecidas ou muito diferentes?" },
+        { grafico: { tipo: "barras-h", titulo: "Onde estão hoje 100 filhos de famílias da faixa de renda mais baixa", max: 60, un: " de 100",
+            itens: [{ n: "Seguem na faixa baixa", v: 50 }, { n: "Subiram para a média", v: 35 }, { n: "Chegaram à faixa alta", v: 15 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual conceito este dado ajuda a entender?",
+          opcoes: [conceito("informal"), conceito("envelhecimento"), conceito("mobilidade", true)],
+          ok: "Isso! Mobilidade social: o gráfico compara os filhos com a faixa de renda dos pais. Metade ficou onde os pais estavam e metade subiu (35 + 15 = 50 de 100).",
+          dica: "O gráfico compara os filhos com a faixa de renda dos pais. Eles mudaram de posição?" },
+        { grafico: { tipo: "setores", titulo: "Trabalhadores de Vila Umbu por tipo de vínculo (200 pessoas)", un: "%",
+            itens: [{ n: "Com carteira|assinada", v: 45 }, { n: "Sem|carteira", v: 25 }, { n: "Conta própria|sem CNPJ", v: 20 }, { n: "Servidor|público", v: 10 }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual conceito este dado ajuda a entender?",
+          opcoes: [conceito("informal", true), conceito("exodo"), conceito("mobilidade")],
+          ok: "Isso! Trabalho informal: quem está sem carteira (25%) ou por conta própria sem CNPJ (20%) soma 45% dos trabalhadores. Sem carteira, faltam direitos como férias, 13º e aposentadoria.",
+          dica: "Veja quem tem carteira assinada e quem não tem. Que nome se dá ao trabalho sem carteira?" },
+        { grafico: { tipo: "linhas", titulo: "Moradores da zona rural de Vila Umbu", min: 0, max: 700, ticks: [0, 100, 200, 300, 400, 500, 600, 700],
+            x: ["2000", "2010", "2020", "2025"], series: [{ n: "Zona rural", v: [600, 450, 300, 250] }] },
+          nota: "Enquanto isso, a zona urbana só cresceu. Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual conceito este dado ajuda a entender?",
+          opcoes: [conceito("envelhecimento"), conceito("exodo", true), conceito("desigualdade")],
+          ok: "Isso! Êxodo rural: a zona rural perdeu 350 moradores de 2000 a 2025 (600 − 250), enquanto a cidade crescia. Muita gente sai do campo atrás de emprego, estudo e serviços.",
+          dica: "A linha mostra a zona rural perdendo moradores. Para onde eles podem ter ido?" },
+        { grafico: { tipo: "linhas", titulo: "Parcela dos moradores por faixa de idade (%)", min: 0, max: 40, ticks: [0, 10, 20, 30, 40], un: "%",
+            x: ["2000", "2010", "2025"], series: [{ n: "60 anos|ou mais", v: [8, 11, 18] }, { n: "Até 14|anos", v: [30, 26, 20] }] },
+          nota: "Vila Umbu é uma cidade imaginária.",
+          pergunta: "Qual conceito este dado ajuda a entender?",
+          opcoes: [conceito("mobilidade"), conceito("informal"), conceito("envelhecimento", true)],
+          ok: "Isso! Envelhecimento da população: os idosos foram de 8% para 18%, e os de até 14 anos caíram de 30% para 20%. Isso muda a escola, a saúde e a aposentadoria.",
+          dica: "Compare as duas linhas: uma sobe e a outra desce. De que faixas de idade elas falam?" },
+      ] },
+  ]
+  const $ = id => document.getElementById(id)
+  const fmt = n => n.toLocaleString("pt-BR")
+  const COR = ["#4da3ff", "#ff5f8f", "#ffd23f", "#4fd6a6", "#a08bff"]
+  const INK = "#2f2a4a"
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, travado = false, dicas = 0
+  const atual = () => FASES[fase].desafios[rodada]
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // ---- Charts drawn in SVG: every value is written on the chart, so color is never the only clue ----
+  const nome1 = n => n.replace("|", " ")
+  const rotulo = (g, it) => it.r ?? `${g.pre || ""}${fmt(it.v)}${g.un || ""}`
+  const tx = (x, y, s, o = {}) => `<text x="${x}" y="${y}" text-anchor="${o.a || "start"}" font-size="${o.s || 16}" font-weight="${o.w || 600}" fill="${o.c || INK}">${s}</text>`
+  const quebra = (x, y, nome, o = {}) => nome.split("|").map((linha, i) => tx(x, y + i * 17, linha, o)).join("")
+
+  function barrasH(g) {
+    const L = 128, R = 12, linha = 50, topo = 8, larg = 420 - L - R - 74
+    let s = ""
+    g.itens.forEach((it, i) => {
+      const y = topo + i * linha, w = Math.max(4, it.v / g.max * larg)
+      const nome = it.n.split("|").length
+      s += quebra(L - 10, y + 29 - (nome - 1) * 8, it.n, { a: "end", w: 700 })
+      s += `<rect x="${L}" y="${y + 6}" width="${w}" height="32" rx="6" fill="${COR[i % COR.length]}" stroke="${INK}" stroke-width="3"/>`
+      s += tx(L + w + 8, y + 29, rotulo(g, it), { w: 700 })
+    })
+    s += `<path d="M${L} ${topo}V${topo + g.itens.length * linha}" stroke="${INK}" stroke-width="3"/>`
+    return [`<svg viewBox="0 0 420 ${topo * 2 + g.itens.length * linha - 8}" role="img" aria-label="__ALT__">${s}</svg>`]
+  }
+
+  function barrasV(g) {
+    const L = 70, T = 28, W = 336, H = 190, n = g.itens.length, slot = W / n
+    const y = v => T + H - (v - g.min) / (g.max - g.min) * H
+    let s = ""
+    g.ticks.forEach(t => {
+      s += `<path d="M${L} ${y(t)}H${L + W}" stroke="#d6e3f0" stroke-width="1.5"/>` + tx(L - 8, y(t) + 5, fmt(t), { a: "end", s: 14, c: "#5b5675" })
+    })
+    g.itens.forEach((it, i) => {
+      const bw = Math.min(110, slot * .6), x = L + slot * i + (slot - bw) / 2
+      s += `<rect x="${x}" y="${y(it.v)}" width="${bw}" height="${T + H - y(it.v)}" rx="4" fill="${COR[i % COR.length]}" stroke="${INK}" stroke-width="3"/>`
+      s += tx(x + bw / 2, y(it.v) - 8, rotulo(g, it), { a: "middle", w: 700 })
+      s += quebra(x + bw / 2, T + H + 22, it.n, { a: "middle", w: 700 })
+    })
+    s += `<path d="M${L} ${T}V${T + H}H${L + W}" fill="none" stroke="${INK}" stroke-width="3"/>`
+    return [`<svg viewBox="0 0 420 ${T + H + 36}" role="img" aria-label="__ALT__">${s}</svg>`]
+  }
+
+  function setores(g) {
+    const cx = 210, cy = 150, r = 72, tot = g.itens.reduce((t, it) => t + it.v, 0)
+    let ang = -Math.PI / 2, s = ""
+    g.itens.forEach((it, i) => {
+      const da = it.v / tot * Math.PI * 2, a2 = ang + da
+      const p = a => [cx + r * Math.cos(a), cy + r * Math.sin(a)]
+      const [x1, y1] = p(ang), [x2, y2] = p(a2)
+      s += `<path d="M${cx} ${cy}L${x1.toFixed(1)} ${y1.toFixed(1)}A${r} ${r} 0 ${da > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}Z" fill="${COR[i % COR.length]}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+      const mid = ang + da / 2, c = Math.cos(mid), sn = Math.sin(mid)
+      const lx = cx + c * (r + 12), ly = cy + sn * (r + 12), linhas = it.n.split("|").length + 1
+      const y0 = sn < -.3 ? ly - (linhas - 1) * 17 : sn > .3 ? ly + 14 : ly - (linhas - 1) * 8.5 + 4
+      s += quebra(lx, y0, it.n + "|" + rotulo(g, it), { a: c > .25 ? "start" : c < -.25 ? "end" : "middle", w: 700, s: 17 })
+      ang = a2
+    })
+    return [`<svg viewBox="0 0 420 300" role="img" aria-label="__ALT__">${s}</svg>`]
+  }
+
+  function linhas(g) {
+    const duas = g.series.length > 1, L = 56, R = 16, T = duas ? 52 : 30, H = 190, W = 420 - L - R, n = g.x.length
+    const x = i => L + 28 + i * (W - 56) / (n - 1), y = v => T + H - (v - g.min) / (g.max - g.min) * H
+    let s = ""
+    g.ticks.forEach(t => { s += `<path d="M${L} ${y(t)}H${L + W}" stroke="#d6e3f0" stroke-width="1.5"/>` + tx(L - 8, y(t) + 5, fmt(t), { a: "end", s: 14, c: "#5b5675" }) })
+    g.x.forEach((nome, i) => { s += tx(x(i), T + H + 22, nome, { a: "middle", w: 700 }) })
+    g.series.forEach((se, k) => {
+      const cor = k ? "#e5398a" : "#7b5cff"
+      s += `<path d="${se.v.map((v, i) => `${i ? "L" : "M"}${x(i)} ${y(v)}`).join("")}" fill="none" stroke="${cor}" stroke-width="5" stroke-linejoin="round" ${k ? 'stroke-dasharray="10 6"' : ""}/>`
+      se.v.forEach((v, i) => {
+        const outro = g.series[1 - k]?.v[i], acima = outro === undefined || v >= outro
+        s += k ? `<rect x="${x(i) - 7}" y="${y(v) - 7}" width="14" height="14" fill="${cor}" stroke="${INK}" stroke-width="2.5"/>` : `<circle cx="${x(i)}" cy="${y(v)}" r="7.5" fill="${cor}" stroke="${INK}" stroke-width="2.5"/>`
+        s += tx(x(i), acima ? y(v) - 14 : y(v) + 26, `${fmt(v)}${g.un || ""}`, { a: "middle", w: 700 })
+      })
+      if (duas) {
+        const lx = 70 + k * 170
+        s += k ? `<rect x="${lx}" y="12" width="14" height="14" fill="${cor}" stroke="${INK}" stroke-width="2.5"/>` : `<circle cx="${lx + 7}" cy="19" r="7.5" fill="${cor}" stroke="${INK}" stroke-width="2.5"/>`
+        s += tx(lx + 22, 25, nome1(se.n), { w: 700 })
+      }
+    })
+    s += `<path d="M${L} ${T}V${T + H}H${L + W}" fill="none" stroke="${INK}" stroke-width="3"/>`
+    return [`<svg viewBox="0 0 420 ${T + H + 36}" role="img" aria-label="__ALT__">${s}</svg>`]
+  }
+
+  function tabela(g) {
+    const t = `<table class="tabela"><thead><tr>${g.cab.map(c => `<th scope="col">${c}</th>`).join("")}</tr></thead><tbody>${g.linhas.map(l => `<tr>${l.map((c, i) => i ? `<td>${c}</td>` : `<th scope="row">${c}</th>`).join("")}</tr>`).join("")}</tbody></table>`
+    return [t + (g.manchete ? `<p class="manchete">${g.manchete}</p>` : "")]
+  }
+
+  // The text read by screen readers: the same data, in words
+  function textoAlt(g) {
+    const itens = g.itens?.map(it => `${nome1(it.n)}: ${rotulo(g, it)}`).join("; ")
+    if (g.tipo === "linhas") return `Gráfico de linhas. ${g.titulo}. ` + g.series.map(se => `${nome1(se.n)}: ` + se.v.map((v, i) => `${g.x[i]}, ${fmt(v)}${g.un || ""}`).join("; ")).join(". ") + `. O eixo vertical vai de ${fmt(g.min)} a ${fmt(g.max)}.`
+    const eixo = g.tipo === "barras-v" ? (g.ticks.length ? ` O eixo vertical começa em ${g.pre || ""}${fmt(g.min)}.` : " O gráfico não tem eixo com números.") : ""
+    const tipo = g.tipo === "setores" ? "Gráfico de setores" : "Gráfico de barras"
+    return `${tipo}. ${g.titulo}. ${itens}.${eixo}`
+  }
+
+  function desenharGrafico() {
+    const g = atual().grafico
+    $("legenda").textContent = g.titulo
+    const [html] = { "barras-h": barrasH, "barras-v": barrasV, setores, linhas, tabela }[g.tipo](g)
+    $("grafico").innerHTML = html.replace("__ALT__", textoAlt(g).replace(/"/g, "&quot;"))
+    $("nota").textContent = ["Dados de exemplo, para treinar a leitura.", atual().nota].filter(Boolean).join(" ")
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].desafios.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarRodada() {
+    const d = atual()
+    travado = false
+    dicas = 0
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].desafios.length}`
+    $("texto").textContent = d.pergunta
+    desenharGrafico()
+    $("opcoes").innerHTML = d.opcoes.map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.t}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
+  }
+
+  function escolher(botao) {
+    if (travado || botao.disabled) return
+    const d = atual(), o = d.opcoes[botao.dataset.i]
+    if (o.certa) {
+      travado = true
+      botao.classList.add("certa")
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { if (b !== botao) b.disabled = true })
+      somAcerto()
+      window.Bit.diz("comemorando", d.ok)
+      $("dica").hidden = true
+      $("proxima").querySelector("span").textContent = rodada === FASES[fase].desafios.length - 1 ? "Ver o resultado" : "Próximo desafio"
+      $("proxima").hidden = false
+      $("proxima").focus({ preventScroll: true })
+      return
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    const c = o.conceito ? `${CONCEITOS[o.conceito][0]} ${CONCEITOS[o.conceito][1]} Não é o que este gráfico mostra. Olhe de novo.` : o.e
+    window.Bit.diz("ops", c)
+  }
+
+  $("dica").onclick = () => {
+    if (travado) return
+    dicas++
+    window.Bit.diz("pensando", atual().dica)
+  }
+  $("proxima").onclick = () => {
+    rodada++
+    if (rodada < FASES[fase].desafios.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  const fimExtra = Jogo.acoesDoFim(() => comecar(0))
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Olhar de sociólogo!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou${comoFoi}. Um dado sozinho não explica nada: é preciso ler com cuidado, desconfiar e ligar a um conceito.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").hidden = ultima
+    if (ultima) $("fim-texto").after(fimExtra)
+    else fimExtra.remove()
+    $("seguir").querySelector("span").textContent = "Próxima fase"
+    $("placar").innerHTML = FASES[fase].desafios.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;(ultima ? fimExtra.querySelector("button") : $("seguir")).focus()
+    somFesta()
+    window.Bit.diz(ultima ? "formatura" : "comemorando", ultima ? "Você leu, desconfiou e interpretou! Dado bom é dado que a gente sabe de onde vem e o que diz." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    travado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

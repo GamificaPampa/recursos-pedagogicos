@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escolas Literárias · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Literatura para o ensino médio: descubra a escola literária pela característica, ligue autores às escolas na linha do tempo e leia trechos curtos para reconhecer o estilo.">
+  <meta property="og:title" content="Escolas Literárias · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Língua Portuguesa: do Barroco ao Modernismo, por características, autores e trechos.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Página numa coluna central que cabe no celular e no projetor */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    main { display: grid; gap: 26px; width: min(900px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(36px, 8vw, 68px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Fases: o professor pode pular para qualquer uma */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* O Bit mora dentro do jogo e deixa a última fala na tela */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; gap: 16px; max-width: 800px; margin: 0 auto; }
+    .fala-bit { display: flex; align-items: center; gap: 16px; width: 100%; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 120px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.6em; margin: 0; font-size: clamp(16px, 2.2vw, 20px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    .missao { padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; line-height: 1.3; }
+    .trecho { margin: 10px 0 0; padding: 10px 14px; background: var(--white); border: 3px dashed var(--ink); border-left: 10px solid var(--purple); border-radius: 12px; font-size: clamp(18px, 2.6vw, 22px); font-weight: 500; line-height: 1.4; font-style: italic; }
+    .creditos { margin-top: 8px !important; font-size: 15px; font-weight: 600; color: var(--soft); }
+
+    .opcoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .opcoes.uma { grid-template-columns: minmax(0, 1fr); }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 600 clamp(17px, 2.2vw, 20px) var(--font); color: var(--ink); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible, .item:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .6; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcao[disabled] { cursor: default; }
+
+    /* Fase 2: autores de um lado, a linha do tempo das escolas do outro */
+    .par { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 20px; }
+    .par h3 { margin: 0 0 8px; font-size: 16px; color: var(--soft); }
+    .coluna { display: grid; align-content: start; gap: 10px; }
+    .coluna--tempo { position: relative; }
+    .coluna--tempo::before { content: ""; position: absolute; left: 10px; top: 36px; bottom: 18px; width: 5px; background: var(--ink); border-radius: 3px; opacity: .25; }
+    .item { position: relative; display: block; width: 100%; min-height: 64px; padding: 8px 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 16px; box-shadow: 0 5px 0 var(--ink); font: 700 clamp(15px, 2vw, 19px)/1.15 var(--font); color: var(--ink); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+    .coluna--tempo .item { margin-left: 22px; width: calc(100% - 22px); }
+    .coluna--tempo .item::before { content: ""; position: absolute; left: -22px; top: 50%; width: 18px; height: 18px; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; transform: translateY(-50%); }
+    .item small { display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600; color: var(--soft); }
+    .item[aria-pressed="true"] { background: var(--yellow); transform: translateY(2px); box-shadow: 0 3px 0 var(--ink); }
+    .item.feito { background: var(--mint); cursor: default; }
+    .item.feito::after { content: ""; position: absolute; right: 12px; top: 50%; width: 9px; height: 17px; border: solid var(--ink); border-width: 0 4px 4px 0; transform: translateY(-62%) rotate(45deg); }
+    .item.erro { animation: balanca .4s; background: #ffe1e7; }
+    @keyframes balanca { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .btn[hidden] { display: none; }
+    .placar { display: flex; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A rodada feita tem um visto, além da cor: a cor não é a única pista */
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* Fim da fase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(30px, 6vw, 48px); }
+    .fim p { margin: 0; max-width: 480px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* Para o professor */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 560px) {
+      .fala-bit { gap: 10px; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .missao { padding: 10px 12px 12px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .opcoes { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .par { gap: 10px 12px; }
+      .item { padding: 8px; }
+      .coluna--tempo .item { margin-left: 18px; width: calc(100% - 18px); }
+      .coluna--tempo::before { left: 7px; }
+      .coluna--tempo .item::before { left: -19px; width: 15px; height: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">verso</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">rima</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">prosa</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Escolas</span> <span class="pink">Literárias</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Língua Portuguesa</li>
+        <li class="pill" style="--c: var(--yellow)">2º ano do ensino médio</li>
+        <li class="pill">Literatura brasileira</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__texto" id="texto"></p>
+          <blockquote class="trecho" id="trecho" hidden></blockquote>
+          <p class="creditos" id="creditos" hidden></p>
+        </div>
+        <div id="area"></div>
+        <div class="acoes">
+          <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+        </div>
+        <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes"></div>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A reconhecer as nove escolas literárias brasileiras, do Barroco ao Modernismo, pelas características, pelos autores e pela leitura de trechos curtos. Na fase 1, a turma liga a ideia central ao estilo (por exemplo, idealização da mulher e da natureza é Romantismo). Na fase 2, põe autores e obras na linha do tempo. Na fase 3, lê o trecho, diz a escola e aponta a pista no texto que justifica a resposta.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> a turma vota na escola antes do toque e, na fase 3, diz em voz alta a pista que viu no trecho.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma característica nova de cada escola.</li>
+        <li><b>Depois:</b> cada dupla escolhe um poema ou um trecho de romance do livro didático, descobre a escola e defende a resposta com duas pistas do texto.</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes. Os trechos que o Gemini escreve podem vir errados: peça só obras em domínio público e confira cada verso no livro antes de usar.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [escolas literárias brasileiras] para estudantes do [2º ano do ensino médio]: aparece uma característica de um estilo, e o estudante escolhe a escola literária certa entre quatro opções.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: descobrir a escola pela característica, ligar autores às escolas numa linha do tempo, ler um trecho curto e dizer a escola e a pista], um botão de dica, explicação curta a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Use só trechos curtos de obras em domínio público, com autor e obra. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // As nove escolas, na ordem do tempo. "marca" é a ideia central, usada nas dicas e nos erros.
+  const ESCOLAS = [
+    { id: "barroco", nome: "Barroco", marco: "1601", marca: "conflito entre fé e prazer, contrastes (antíteses) e linguagem rebuscada",
+      carac: "Conflito entre o céu e a terra, a fé e o prazer, a culpa e o desejo. Muitos contrastes (antíteses) e jogo de palavras.",
+      chave: "o conflito e o contraste", explica: "O Barroco vive de contrastes: espírito e matéria, culpa e perdão, vida e morte." },
+    { id: "arcadismo", nome: "Arcadismo", marco: "1768", marca: "vida simples no campo, equilíbrio e razão",
+      carac: "Volta à vida simples do campo. O poeta se imagina pastor, fala com a amada por um nome de pastora e valoriza o equilíbrio e a razão.",
+      chave: "o campo, o pastor e a simplicidade", explica: "O Arcadismo foge da cidade e do exagero: busca a vida simples, o equilíbrio e a razão." },
+    { id: "romantismo", nome: "Romantismo", marco: "1836", marca: "emoção, nacionalismo e idealização da mulher e da natureza",
+      carac: "Idealização da mulher e da natureza, nacionalismo, o índio como herói e a emoção acima da razão.",
+      chave: "a emoção, a pátria e a idealização", explica: "O Romantismo põe o sentimento em primeiro lugar e exalta a pátria, a natureza e o amor idealizado." },
+    { id: "realismo", nome: "Realismo", marco: "1881", marca: "crítica social, ironia e análise psicológica",
+      carac: "Retrato crítico da sociedade, com ironia, adultério e hipocrisia da burguesia e personagens de psicologia complexa. O narrador tem um olhar irônico.",
+      chave: "a crítica e a ironia", explica: "O Realismo mostra a sociedade como ela é, com ironia e olhar crítico sobre as pessoas." },
+    { id: "naturalismo", nome: "Naturalismo", marco: "1881", marca: "o meio, a raça e a hereditariedade explicam o ser humano",
+      carac: "O ser humano é explicado pelo meio, pela raça e pela hereditariedade, como um animal. Cenas fortes de pobreza e instinto, com o coletivo como personagem, como um cortiço.",
+      chave: "o meio e a hereditariedade", explica: "O Naturalismo trata a literatura como ciência: o comportamento vem do meio e da hereditariedade." },
+    { id: "parnasianismo", nome: "Parnasianismo", marco: "1882", marca: "arte pela arte, forma perfeita e rima rica",
+      carac: "Arte pela arte: poesia objetiva, soneto, rima rica, vocabulário culto e muito cuidado com a forma, como no trabalho de um ourives.",
+      chave: "a perfeição da forma", explica: "O Parnasianismo valoriza a forma: versos medidos, rima rica e poesia que parece trabalho de ourives." },
+    { id: "simbolismo", nome: "Simbolismo", marco: "1893", marca: "sugestão, musicalidade e subjetividade",
+      carac: "Sugere em vez de descrever. Musicalidade, sinestesia, misticismo, subjetividade e muitas imagens de brancura, névoa e luz.",
+      chave: "a sugestão e a musicalidade", explica: "O Simbolismo sugere sensações: música, cores, névoa e mistério no lugar de descrições claras." },
+    { id: "premodernismo", nome: "Pré-Modernismo", marco: "1902", marca: "Brasil real, denúncia social e mistura de estilos",
+      carac: "Mostra o Brasil real e esquecido, como o sertão e a pobreza, com denúncia social. Mistura traços antigos e novos, antes da ruptura de 1922.",
+      chave: "o Brasil real e a denúncia", explica: "O Pré-Modernismo olha o Brasil de verdade, com denúncia social, e abre o caminho para 1922." },
+    { id: "modernismo", nome: "Modernismo", marco: "1922", marca: "liberdade de forma, versos livres e linguagem do dia a dia",
+      carac: "Liberdade de forma, versos livres, linguagem do dia a dia, humor e valorização da cultura brasileira. Ruptura com o passado, a partir da Semana de Arte Moderna de 1922.",
+      chave: "a liberdade e a linguagem do dia a dia", explica: "O Modernismo quebra regras, usa a fala do povo e valoriza a cultura brasileira." },
+  ]
+  const ESC = Object.fromEntries(ESCOLAS.map(e => [e.id, e]))
+  const AUTORES = {
+    gregorio: { nome: "Gregório de Matos", obra: "poesia satírica e religiosa" },
+    gonzaga: { nome: "Tomás Antônio Gonzaga", obra: "Marília de Dirceu" },
+    claudio: { nome: "Cláudio Manuel da Costa", obra: "Vila Rica" },
+    gdias: { nome: "Gonçalves Dias", obra: "Canção do Exílio" },
+    alencar: { nome: "José de Alencar", obra: "Iracema" },
+    machado: { nome: "Machado de Assis", obra: "Dom Casmurro" },
+    aluisio: { nome: "Aluísio Azevedo", obra: "O Cortiço" },
+    bilac: { nome: "Olavo Bilac", obra: "Via-Láctea" },
+    cruz: { nome: "Cruz e Sousa", obra: "Broquéis" },
+    anjos: { nome: "Augusto dos Anjos", obra: "Eu" },
+    mario: { nome: "Mário de Andrade", obra: "Macunaíma" },
+    oswald: { nome: "Oswald de Andrade", obra: "Pau-Brasil" },
+  }
+  // Fase 2: cada rodada liga três autores às escolas
+  const PARES = [
+    [["gregorio", "barroco"], ["gonzaga", "arcadismo"], ["gdias", "romantismo"]],
+    [["machado", "realismo"], ["aluisio", "naturalismo"], ["bilac", "parnasianismo"]],
+    [["cruz", "simbolismo"], ["anjos", "premodernismo"], ["mario", "modernismo"]],
+    [["claudio", "arcadismo"], ["alencar", "romantismo"], ["oswald", "modernismo"]],
+  ]
+  // Fase 3: trechos curtos de obras em domínio público no Brasil
+  const TRECHOS = [
+    { esc: "barroco", autor: "Gregório de Matos", obra: "soneto A Jesus Cristo Nosso Senhor",
+      texto: "Pequei, Senhor; mas não porque hei pecado,<br>Da vossa alta clemência me despido",
+      pista: "O poeta confessa a culpa e, ao mesmo tempo, pede perdão: pecado contra clemência",
+      erradas: ["O poeta se imagina pastor e fala com a amada no campo", "Ironia sobre a sociedade e sobre o leitor"] },
+    { esc: "arcadismo", autor: "Tomás Antônio Gonzaga", obra: "Marília de Dirceu",
+      texto: "Eu, Marília, não sou algum vaqueiro,<br>Que viva de guardar alheio gado",
+      pista: "Cenário do campo (vaqueiro, gado) e fala com a amada por um nome de pastora",
+      erradas: ["Linguagem científica e visão sombria do ser humano", "Frases soltas, humor e fala do dia a dia"] },
+    { esc: "romantismo", autor: "Gonçalves Dias", obra: "Canção do Exílio",
+      texto: "Minha terra tem palmeiras,<br>Onde canta o Sabiá;<br>As aves, que aqui gorjeiam,<br>Não gorjeiam como lá.",
+      pista: "Exaltação da natureza da pátria e saudade de casa",
+      erradas: ["Perfeição da forma e descrição objetiva", "Críticas à burguesia, com ironia"] },
+    { esc: "realismo", autor: "Machado de Assis", obra: "Memórias Póstumas de Brás Cubas",
+      texto: "Ao verme que primeiro roeu as frias carnes do meu cadáver dedico como saudosa lembrança estas memórias póstumas.",
+      pista: "Ironia: um narrador morto dedica o livro ao verme e zomba da morte",
+      erradas: ["Idealização da mulher amada e da natureza", "Versos livres e linguagem do dia a dia"] },
+    { esc: "parnasianismo", autor: "Olavo Bilac", obra: "Profissão de Fé",
+      texto: "Invejo o ourives quando escrevo:<br>Imito o amor<br>Com que ele, em ouro, o alto relevo<br>Faz de uma flor.",
+      pista: "O poeta compara escrever ao trabalho do ourives: o que importa é o cuidado com a forma",
+      erradas: ["O poeta mistura culpa, fé e prazer", "Denúncia da pobreza do sertão"] },
+    { esc: "simbolismo", autor: "Cruz e Sousa", obra: "Antífona",
+      texto: "Ó Formas alvas, brancas, Formas claras<br>De luares, de neves, de neblinas!",
+      pista: "Imagens de brancura, luar e névoa, com sons repetidos que sugerem música",
+      erradas: ["Explicação do comportamento pela hereditariedade", "Cenas fortes da vida de um cortiço"] },
+    { esc: "premodernismo", autor: "Augusto dos Anjos", obra: "Psicologia de um Vencido",
+      texto: "Eu, filho do carbono e do amoníaco,<br>Monstro de escuridão e rutilância,",
+      pista: "Vocabulário científico (carbono, amoníaco) e visão sombria do ser humano, fora dos moldes do século 19",
+      erradas: ["Idealização da natureza e da pátria", "Versos soltos com humor e fala do povo"] },
+    { esc: "modernismo", autor: "Oswald de Andrade", obra: "Pronominais",
+      texto: "Dê-me um cigarro<br>Diz a gramática<br>[...]<br>Me dá um cigarro",
+      pista: "Fala do dia a dia, sem seguir a gramática formal, e com humor",
+      erradas: ["Rima rica e soneto perfeito", "Contrastes entre o céu e a terra"] },
+  ]
+  const $ = id => document.getElementById(id)
+  const embaralha = lista => { const c = [...lista]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]] } return c }
+  // As escolas mais próximas no tempo confundem mais: as erradas saem delas
+  const vizinhas = (id, quantas) => {
+    const i = ESCOLAS.findIndex(e => e.id === id)
+    const perto = ESCOLAS.filter(e => e.id !== id).sort((x, y) => Math.abs(ESCOLAS.indexOf(x) - i) - Math.abs(ESCOLAS.indexOf(y) - i)).slice(0, quantas + 2)
+    return embaralha(perto).slice(0, quantas).map(e => e.id)
+  }
+
+  const FASES = [
+    { nome: "Qual escola?", tipo: "carac",
+      abertura: "Oi! Eu sou o Bit. Cada escola literária tem uma ideia central. Leia a característica e escolha a escola certa.",
+      monta: () => embaralha(ESCOLAS).slice(0, 6).map(e => ({ esc: e.id, opcoes: embaralha([e.id, ...vizinhas(e.id, 3)]) })) },
+    { nome: "Autor e escola", tipo: "pares",
+      abertura: "Agora a linha do tempo. Toque num autor e depois na escola dele. As escolas estão em ordem, da mais antiga para a mais nova.",
+      monta: () => PARES.map(pares => ({ pares, autores: embaralha(pares.map(p => p[0])) })) },
+    { nome: "Leia o trecho", tipo: "trecho",
+      abertura: "Hora de ler. Veja o trecho, escolha a escola e depois a pista no texto que mostra isso.",
+      monta: () => embaralha(TRECHOS).slice(0, 6).map(t => ({ ...t, opcoes: embaralha([t.esc, ...vizinhas(t.esc, 2)]), pistas: embaralha([t.pista, ...t.erradas]) })) },
+  ]
+
+  // O Bit dentro do cartão do jogo: o mesmo Bit.diz(pose, texto) dos outros jogos, grande e sempre na tela
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0, rodadas = [], etapa = 0
+  let sel = { autor: null, escola: null }, feitos = new Set()
+  const atual = () => rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+  const fala = (pose, texto) => window.Bit?.diz(pose, texto)
+
+  // Sons curtos feitos no navegador, sem arquivos para baixar
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somPar = () => tocar([[880, 0, .08], [1175, .06, .12]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  const botaoOpcao = (id, rotulo, extra = "") => `<button class="opcao ${extra}" type="button" data-id="${id}">${rotulo}</button>`
+
+  function desenharPlacar() {
+    $("placar").innerHTML = rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    dicas = 0
+    etapa = 0
+    sel = { autor: null, escola: null }
+    feitos = new Set()
+    const r = atual()
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${rodadas.length}`
+    $("trecho").hidden = true
+    $("creditos").hidden = true
+    if (tipo() === "carac") {
+      $("texto").textContent = ESC[r.esc].carac
+      $("area").innerHTML = `<div class="opcoes" id="opcoes" role="group" aria-label="Escolha a escola literária">${r.opcoes.map(id => botaoOpcao(id, ESC[id].nome)).join("")}</div>`
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherEscola(b))
+    } else if (tipo() === "pares") {
+      $("texto").textContent = "Ligue cada autor à sua escola. Toque num autor e depois numa escola."
+      const escolas = r.pares.map(p => p[1]).sort((x, y) => ESCOLAS.indexOf(ESC[x]) - ESCOLAS.indexOf(ESC[y]))
+      $("area").innerHTML = `<div class="par">
+        <div class="coluna"><h3>Autores</h3>${r.autores.map(id => `<button class="item" type="button" data-lado="autor" data-id="${id}" aria-pressed="false">${AUTORES[id].nome}<small>${AUTORES[id].obra}</small></button>`).join("")}</div>
+        <div class="coluna coluna--tempo"><h3>Linha do tempo</h3>${escolas.map(id => `<button class="item" type="button" data-lado="escola" data-id="${id}" aria-pressed="false">${ESC[id].nome}<small>desde ${ESC[id].marco}</small></button>`).join("")}</div>
+      </div>`
+      $("area").querySelectorAll(".item").forEach(b => b.onclick = () => tocarItem(b))
+    } else {
+      $("texto").textContent = "Qual escola literária tem este trecho?"
+      $("trecho").innerHTML = r.texto
+      $("trecho").hidden = false
+      $("area").innerHTML = `<div class="opcoes uma" id="opcoes" role="group" aria-label="Escolha a escola literária">${r.opcoes.map(id => botaoOpcao(id, ESC[id].nome)).join("")}</div>`
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherEscola(b))
+    }
+  }
+
+  // Fases 1 e 3: escolher a escola. Na fase 3, depois vem a pista do texto
+  function escolherEscola(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), id = botao.dataset.id
+    if (id === r.esc) {
+      botao.classList.add("certa")
+      somClique()
+      if (tipo() === "carac") return acertou(`${ESC[id].nome}! ${ESC[id].explica}`)
+      etapa = 1
+      $("texto").textContent = "Isso! E qual pista do texto mostra essa escola?"
+      $("area").innerHTML = `<div class="opcoes uma" id="opcoes" role="group" aria-label="Escolha a pista">${r.pistas.map((p, i) => botaoOpcao(i, p)).join("")}</div>`
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherPista(b))
+      dicas = 0
+      return fala("feliz", `É ${ESC[id].nome} mesmo. Agora diga por quê: qual pista do trecho aponta para isso?`)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    const e = ESC[id]
+    fala("ops", `${tipo() === "carac" ? "Essa característica não é do" : "Esse trecho não é do"} ${e.nome}. O ${e.nome} tem ${e.marca}. Procure outra pista.`)
+  }
+  function escolherPista(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual()
+    if (r.pistas[botao.dataset.id] === r.pista) {
+      botao.classList.add("certa")
+      $("creditos").textContent = `${r.autor}, ${r.obra}.`
+      $("creditos").hidden = false
+      return acertou(`${ESC[r.esc].nome}! ${r.pista}. ${ESC[r.esc].explica}`)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    fala("ops", `Essa pista não aparece no trecho. Releia os versos e pense em ${ESC[r.esc].chave}.`)
+  }
+
+  // Fase 2: tocar num autor e numa escola
+  function tocarItem(botao) {
+    if (ocupado || botao.classList.contains("feito")) return
+    const lado = botao.dataset.lado
+    somClique()
+    $("area").querySelectorAll(`.item[data-lado="${lado}"]`).forEach(b => b.setAttribute("aria-pressed", "false"))
+    if (sel[lado] === botao.dataset.id) sel[lado] = null
+    else { sel[lado] = botao.dataset.id; botao.setAttribute("aria-pressed", "true") }
+    if (sel.autor && sel.escola) conferirPar()
+  }
+  function conferirPar() {
+    const r = atual(), a = AUTORES[sel.autor], e = ESC[sel.escola]
+    const certo = r.pares.some(([autor, escola]) => autor === sel.autor && escola === sel.escola)
+    const itens = [...$("area").querySelectorAll(".item")].filter(b => b.dataset.id === sel.autor && b.dataset.lado === "autor" || b.dataset.id === sel.escola && b.dataset.lado === "escola")
+    sel = { autor: null, escola: null }
+    if (certo) {
+      itens.forEach(b => { b.classList.add("feito"); b.setAttribute("aria-pressed", "false"); b.disabled = true })
+      feitos.add(itens[0].dataset.id)
+      somPar()
+      if ($("area").querySelectorAll(".item.feito").length === r.pares.length * 2) return acertou(`Linha do tempo completa! ${a.nome} (${a.obra}) é do ${e.nome}: ${e.marca}.`)
+      return fala("feliz", `${a.nome} (${a.obra}) é do ${e.nome}: ${e.marca}.`)
+    }
+    erros++
+    somErro()
+    itens.forEach(b => { b.setAttribute("aria-pressed", "false"); b.classList.remove("erro"); void b.offsetWidth; b.classList.add("erro") })
+    fala("ops", `${a.nome} não é do ${e.nome}. O ${e.nome} é marcado por ${e.marca}. Tente outra ligação.`)
+  }
+
+  // A dica cresce: primeiro a ideia central, depois tira uma resposta errada (sem contar como erro)
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual()
+    dicas++
+    if (tipo() === "pares") {
+      const faltam = r.pares.filter(([autor]) => ![...$("area").querySelectorAll(".item.feito")].some(b => b.dataset.id === autor))
+      const [autor, escola] = faltam[0]
+      if (dicas % 2 === 1) return fala("pensando", `Pense em ${AUTORES[autor].nome}. A obra ${AUTORES[autor].obra} ajuda? A escola dele tem ${ESC[escola].marca}.`)
+      return fala("pensando", `Olhe a linha do tempo: o ${ESC[escola].nome} começa por volta de ${ESC[escola].marco}.`)
+    }
+    const escolhendoPista = tipo() === "trecho" && etapa === 1
+    if (dicas === 1) return fala("pensando", escolhendoPista
+      ? `Procure no trecho: ${ESC[r.esc].chave}. Qual pista combina?`
+      : `Palavras-chave: ${ESC[r.esc].chave}. Qual escola tem isso?`)
+    const lista = [...$("opcoes").querySelectorAll(".opcao:not([disabled])")].filter(b => escolhendoPista ? r.pistas[b.dataset.id] !== r.pista : b.dataset.id !== r.esc)
+    if (!lista.length) return fala("pensando", "Já sobrou só a certa. Toque nela.")
+    const b = lista[0]
+    b.disabled = true
+    b.classList.add("errada")
+    fala("pensando", "Tirei uma opção errada. Agora ficou mais fácil.")
+  }
+
+  // Depois de um acerto, o desafio fica na tela com a explicação do Bit até o estudante tocar em Próximo
+  function acertou(frase) {
+    ocupado = true
+    somAcerto()
+    fala("comemorando", frase)
+    $("dica").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Estrelas pelos erros da fase, e confete
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 3 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Você leu o Brasil!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou as três fases${comoFoi}. Para reconhecer uma escola, procure a ideia central do texto: contraste, campo, emoção, crítica, forma, sugestão ou liberdade.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").hidden = ultima
+    $("seguir").querySelector("span").textContent = "Próxima fase"
+    $("fim-acoes").replaceChildren()
+    if (ultima) $("fim-acoes").append(Jogo.acoesDoFim(() => comecar(0)))
+    $("placar").innerHTML = rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;($("seguir").hidden ? $("fim-acoes").querySelector("button") : $("seguir"))?.focus()
+    somFesta()
+    fala(ultima ? "formatura" : "comemorando", ultima ? "Você reconhece as escolas literárias! Agora leia um poema do livro e descubra a escola sozinho." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    rodadas = FASES[fase].monta()
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    fala(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  $("seguir").onclick = () => comecar(fase + 1)
+
+  // Copiar as mensagens para o Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

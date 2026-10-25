@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quem Pensou Isso? · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Filosofia para o ensino médio: descubra quem defendeu cada ideia, ponha os filósofos em ordem no tempo e use as ideias para pensar em situações de hoje.">
+  <meta property="og:title" content="Quem Pensou Isso? · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Filosofia: ligue ideias aos filósofos que as defenderam.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Página numa coluna central que cabe no celular e no projetor */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Fases: o professor pode pular para qualquer uma */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* O Bit mora dentro do jogo, grande, e deixa a última fala na tela */
+    .fala-bit { display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; gap: 16px; }
+    .missao { width: 100%; max-width: 760px; margin: 0 auto; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: clamp(19px, 2.8vw, 25px); font-weight: 600; line-height: 1.3; }
+    .missao__tema { display: inline-block; margin: 6px 0 0 !important; padding: 2px 12px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 700; }
+    .missao__tema[hidden] { display: none; }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* Cartas dos filósofos: nome, época e uma marca desenhada, nunca o rosto */
+    .cartas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .carta { position: relative; display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 168px; padding: 12px 8px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; box-shadow: 0 6px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .carta:hover:not([disabled]) { background: #fff6cf; }
+    .carta:focus-visible, .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .carta__marca { display: grid; place-items: center; width: 64px; height: 64px; background: var(--c, var(--yellow)); border: 3px solid var(--ink); border-radius: 50%; }
+    .carta__marca svg { width: 40px; height: 40px; }
+    .carta__nome { font-size: 22px; font-weight: 700; line-height: 1.1; }
+    .carta__epoca { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .carta__anos { min-height: 1.2em; font-size: 14px; font-weight: 600; color: var(--soft); }
+    .carta.errada { background: #ffe1e7; opacity: .55; cursor: default; }
+    .carta.errada .carta__nome { text-decoration: line-through; }
+    .carta.certa { background: var(--mint); }
+    .carta__ordem { position: absolute; top: -12px; left: -8px; display: grid; place-items: center; width: 36px; height: 36px; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 20px; font-weight: 700; }
+    .carta__ordem[hidden] { display: none; }
+
+    /* Opções em texto, na fase do dia a dia */
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 760px; margin: 0 auto; }
+    .opcao { min-height: 56px; padding: 10px 18px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 600 19px/1.3 var(--font); color: var(--ink); text-align: left; cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .cartas[hidden], .opcoes[hidden], .btn[hidden] { display: none; }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* Fim de uma fase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* Para o professor: o que a turma aprende e o pedido para um jogo parecido */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0 auto; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .cartas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .carta { min-height: 140px; }
+      .carta__nome { font-size: 20px; }
+      .opcao { font-size: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fala-bit__bit img, .fala-bit__balao, .confete, .carta, .opcao { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">?</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">ideia</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">por quê?</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Quem</span> pensou <span class="pink">isso?</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Filosofia</li>
+        <li class="pill" style="--c: var(--yellow)">Ensino médio, 1ª a 3ª série</li>
+        <li class="pill">Ideias e filósofos</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Quem pensou isso? · ideia 1 de 6</p>
+          <p class="missao__tema" id="tema" hidden></p>
+          <p class="missao__texto" id="texto"></p>
+        </div>
+        <div class="cartas" id="cartas" role="group" aria-label="Escolha o filósofo"></div>
+        <div class="opcoes" id="opcoes" role="group" aria-label="Escolha a ideia"></div>
+        <p class="nota" id="nota"></p>
+        <div class="acoes">
+          <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima</span></button>
+        </div>
+        <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <div id="fim-acoes"></div>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A ligar ideias centrais da Filosofia a quem as defendeu, a situar 14 filósofos na Antiguidade, na Modernidade e no mundo contemporâneo e a usar essas ideias para pensar em situações de hoje, como uma notícia falsa, uma eleição, o trabalho e a pressão do grupo. O jogo trabalha ideias, não frases decoradas: a graça é explicar por que a ideia combina com aquele pensador.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> a turma vota na carta antes do toque e quem votou diferente explica a sua escolha. O Bit confirma e conta o porquê.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma ideia de que gostou e uma situação da vida dele em que ela ajudaria.</li>
+        <li><b>Depois:</b> cada dupla escolhe um filósofo, pesquisa em um livro ou site confiável e escreve uma ideia nova no formato do jogo, com três situações de hoje, para a outra dupla responder.</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes. Confira as ideias que o Gemini puser no jogo, porque ele pode atribuir uma frase famosa à pessoa errada.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Filosofia] para estudantes do [ensino médio]: aparece uma ideia em linguagem simples e o estudante escolhe, entre quatro cartas, o filósofo que a defendeu. O Bit, um robô simpático, explica o conceito depois de cada resposta.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: escolher o filósofo de cada ideia, colocar quatro filósofos em ordem no tempo, escolher a ideia que ajuda a pensar numa situação de hoje como redes sociais ou eleição], cada carta com nome, época e um símbolo desenhado, sem rosto de pessoa real, um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Descreva as ideias com as minhas palavras, sem inventar citações. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // Cada filósofo: nome, época, anos, cor da carta, um resumo da ideia e a marca desenhada (sem rosto)
+  const F = {
+    heraclito:  { nome: "Heráclito",  epoca: "Antiguidade",   anos: "c. 540 a 470 a.C.", ini: -540, cor: "#4da3ff", curta: "tudo muda o tempo todo, como a água de um rio" },
+    socrates:   { nome: "Sócrates",   epoca: "Antiguidade",   anos: "c. 470 a 399 a.C.", ini: -470, cor: "#ffd23f", curta: "perguntar e examinar o que achamos que sabemos" },
+    platao:     { nome: "Platão",     epoca: "Antiguidade",   anos: "c. 428 a 348 a.C.", ini: -428, cor: "#a08bff", curta: "o que vemos são sombras, e o conhecimento verdadeiro está nas ideias" },
+    aristoteles:{ nome: "Aristóteles",epoca: "Antiguidade",   anos: "384 a 322 a.C.",    ini: -384, cor: "#4fd6a6", curta: "a vida boa está na virtude, quase sempre no meio-termo entre o excesso e a falta" },
+    descartes:  { nome: "Descartes",  epoca: "Modernidade",   anos: "1596 a 1650",       ini: 1596, cor: "#cdeeff", curta: "duvidar de tudo até achar uma certeza" },
+    hobbes:     { nome: "Hobbes",     epoca: "Modernidade",   anos: "1588 a 1679",       ini: 1588, cor: "#ff8a3d", curta: "sem um poder forte, a vida vira uma guerra de todos contra todos" },
+    locke:      { nome: "Locke",      epoca: "Modernidade",   anos: "1632 a 1704",       ini: 1632, cor: "#ffd23f", curta: "a mente começa em branco, e todo conhecimento vem da experiência" },
+    rousseau:   { nome: "Rousseau",   epoca: "Modernidade",   anos: "1712 a 1778",       ini: 1712, cor: "#4fd6a6", curta: "a sociedade desigual estraga a bondade natural, e o poder deve vir do povo" },
+    kant:       { nome: "Kant",       epoca: "Modernidade",   anos: "1724 a 1804",       ini: 1724, cor: "#a08bff", curta: "agir só de um jeito que você aceitaria que valesse para todos" },
+    marx:       { nome: "Marx",       epoca: "Contemporâneo", anos: "1818 a 1883",       ini: 1818, cor: "#ff5f8f", curta: "a economia e o trabalho moldam a sociedade, e o trabalhador pode ficar distante do que produz" },
+    nietzsche:  { nome: "Nietzsche",  epoca: "Contemporâneo", anos: "1844 a 1900",       ini: 1844, cor: "#ffd23f", curta: "questionar os valores seguidos por hábito e criar os próprios" },
+    sartre:     { nome: "Sartre",     epoca: "Contemporâneo", anos: "1905 a 1980",       ini: 1905, cor: "#4da3ff", curta: "somos livres e responsáveis, e nada decide por nós o que vamos ser" },
+    beauvoir:   { nome: "Beauvoir",   epoca: "Contemporâneo", anos: "1908 a 1986",       ini: 1908, cor: "#ff5f8f", curta: "os papéis de gênero são construídos pela sociedade, não nascem prontos" },
+    arendt:     { nome: "Arendt",     epoca: "Contemporâneo", anos: "1906 a 1975",       ini: 1906, cor: "#4fd6a6", curta: "o mal pode nascer de pessoas comuns que deixam de pensar por si mesmas" },
+  }
+  const S = '#2f2a4a'
+  const traco = (w = 2.4) => `stroke="${S}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`
+  const MARCAS = {
+    heraclito: `<path d="M3 10q3.25-4 6.5 0t6.5 0 6.5 0 6.5 0M3 17q3.25-4 6.5 0t6.5 0 6.5 0 6.5 0M3 24q3.25-4 6.5 0t6.5 0 6.5 0 6.5 0" fill="none" ${traco(3)}/>`,
+    socrates: `<circle cx="16" cy="16" r="12.5" fill="#fff" ${traco()}/><path d="M11.5 12.5q0-4.5 4.5-4.5t4.5 4q0 2.6-3.2 4.2-1.3.7-1.3 2.3" fill="none" ${traco(2.8)}/><circle cx="16" cy="23.6" r="1.8" fill="${S}"/>`,
+    platao: `<path d="M3 27V17Q3 5 16 5t13 12v10z" fill="#fff" ${traco()}/><path d="M10 27v-7q0-5 6-5t6 5v7z" fill="${S}"/><path d="M13 22q3-4 6 0" fill="none" stroke="#ffd23f" stroke-width="2.2" stroke-linecap="round"/>`,
+    aristoteles: `<path d="M16 5v21M9 26h14M5 10h22" fill="none" ${traco(2.6)}/><path d="M5 10l-3.2 8.5h6.4zM27 10l-3.2 8.5h6.4z" fill="#fff" ${traco(2)}/>`,
+    descartes: `<path d="M9 21a4.8 4.8 0 0 1 0-9.6 6 6 0 0 1 11-1.8 5.4 5.4 0 0 1 3.8 11.4z" fill="#fff" ${traco()}/><circle cx="8" cy="25.5" r="2.2" fill="#fff" ${traco(2)}/><circle cx="4" cy="29" r="1.3" fill="#fff" ${traco(1.8)}/>`,
+    hobbes: `<path d="M5 25L4 11l7 6 5-10 5 10 7-6-1 14z" fill="#ffd23f" ${traco()}/><circle cx="16" cy="19.5" r="1.8" fill="${S}"/>`,
+    locke: `<path d="M16 9q-6-3-12.5-1.5V25Q10 23.500 16 26.500q6-3 12.500-1.500V7.500Q22 6 16 9zM16 9v17.500" fill="#fff" ${traco()}/>`,
+    rousseau: `<rect x="14" y="19" width="4" height="9" fill="#ff8a3d" ${traco(2)}/><circle cx="16" cy="13" r="9" fill="#4fd6a6" ${traco()}/>`,
+    kant: `<path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.700 4.1 1.600-8.600-6.300-6 8.600-1.200z" fill="#ffd23f" ${traco()}/>`,
+    marx: `<circle cx="16" cy="16" r="11.5" fill="none" ${traco(5)} stroke-dasharray="4.2 4.1"/><circle cx="16" cy="16" r="8.5" fill="#ff8a3d" ${traco()}/><circle cx="16" cy="16" r="3" fill="#fff" ${traco(2)}/>`,
+    nietzsche: `<path d="M19 3L7 18h8l-2 11 12.500-16.500H17z" fill="#ffd23f" ${traco()}/>`,
+    sartre: `<path d="M16 28V16M16 16L7 7M16 16l9-9M7 7v7M7 7h7M25 7v7M25 7h-7" fill="none" ${traco(3)}/>`,
+    beauvoir: `<path d="M16 28V14" fill="none" ${traco(3)}/><path d="M16 18q-10 0-11-10 10 0 11 10z" fill="#4fd6a6" ${traco()}/><path d="M16 14q9 0 11-9-9 0-11 9z" fill="#4fd6a6" ${traco()}/>`,
+    arendt: `<path d="M5 5h16a2.500 2.500 0 0 1 2.500 2.500v9A2.500 2.500 0 0 1 21 19h-9l-5 5v-5H5a2.500 2.500 0 0 1-2.500-2.500v-9A2.500 2.500 0 0 1 5 5z" fill="#fff" ${traco()}/><circle cx="8.500" cy="12" r="1.500" fill="${S}"/><circle cx="13" cy="12" r="1.500" fill="${S}"/><circle cx="17.500" cy="12" r="1.500" fill="${S}"/><path d="M24 12h2a2.500 2.500 0 0 1 2.500 2.500v8a2.500 2.500 0 0 1-2.500 2.500h-1v4l-4-4h-5" fill="none" ${traco()}/>`,
+  }
+  const marca = id => `<svg viewBox="0 0 32 32" aria-hidden="true">${MARCAS[id]}</svg>`
+
+  const FASES = [
+    { nome: "Quem pensou isso?", tipo: "ideia", unidade: "ideia",
+      abertura: "Oi! Eu sou o Bit. Vou mostrar uma ideia de Filosofia e você escolhe o filósofo que a defendeu. Cada carta mostra o nome, a época e uma marca.",
+      rodadas: [
+        { ideia: "Tudo está sempre mudando. Ninguém entra duas vezes no mesmo rio, porque nem o rio nem a pessoa são os mesmos.",
+          certa: "heraclito", outras: ["platao", "descartes", "hobbes"],
+          exp: "É Heráclito, da Antiguidade. Para ele, o mundo é mudança constante, e o rio é o exemplo mais famoso." },
+        { ideia: "O conhecimento verdadeiro está nas ideias. O que vemos no mundo são como sombras na parede de uma caverna.",
+          certa: "platao", outras: ["aristoteles", "socrates", "kant"],
+          exp: "É Platão, com o mito da caverna. Quem sai dela descobre que as sombras não eram a realidade inteira." },
+        { ideia: "Ser feliz é viver bem, com virtude. E a virtude costuma ficar no meio-termo: a coragem está entre a covardia e a imprudência.",
+          certa: "aristoteles", outras: ["nietzsche", "rousseau", "locke"],
+          exp: "É Aristóteles. A virtude do meio-termo diz que quase todo exagero, para mais ou para menos, atrapalha a vida boa." },
+        { ideia: "Para chegar a uma certeza, vou duvidar de tudo. Só não consigo duvidar de que estou pensando, e por isso existo.",
+          certa: "descartes", outras: ["locke", "marx", "socrates"],
+          exp: "É Descartes, o de \"Penso, logo existo\". Ele duvidou de tudo para achar uma base firme para o conhecimento." },
+        { ideia: "O ser humano é naturalmente bom, e a desigualdade da sociedade o estraga. O poder legítimo vem do povo, num contrato entre todos.",
+          certa: "rousseau", outras: ["hobbes", "sartre", "kant"],
+          exp: "É Rousseau, do Iluminismo. Ele defendia o contrato social e a vontade do povo. Hobbes também falava em contrato, mas via o ser humano de outro jeito." },
+        { ideia: "Ninguém nasce mulher, torna-se. Os papéis de gênero não vêm da natureza, vêm da sociedade.",
+          certa: "beauvoir", outras: ["arendt", "sartre", "marx"],
+          exp: "É Simone de Beauvoir, em O Segundo Sexo. Ela mostrou que muitos papéis vistos como naturais são construídos pela sociedade." },
+      ] },
+    { nome: "Linha do tempo", tipo: "linha", unidade: "grupo",
+      abertura: "Agora a linha do tempo. Toque nos filósofos do mais antigo para o mais recente. Quem vem primeiro?",
+      rodadas: [
+        { ids: ["socrates", "aristoteles", "descartes", "marx"] },
+        { ids: ["heraclito", "platao", "locke", "sartre"] },
+        { ids: ["hobbes", "rousseau", "nietzsche", "arendt"] },
+        { ids: ["platao", "kant", "nietzsche", "beauvoir"] },
+      ] },
+    { nome: "No dia a dia", tipo: "dia", unidade: "situação",
+      abertura: "Última fase: a Filosofia no dia a dia. Leia a situação e escolha a ideia que mais ajuda a pensar nela.",
+      rodadas: [
+        { tema: "Redes sociais", texto: "Chega no grupo da turma um vídeo chocante, sem fonte nenhuma, e todo mundo começa a compartilhar. Que ideia ajuda a decidir o que fazer?",
+          foco: "como lidar com uma informação sem fonte",
+          certa: "socrates", textoCerto: "Perguntar e examinar antes de aceitar: como sei que isso é verdade? Quem disse? Qual é a prova?",
+          outras: ["aristoteles", "hobbes"],
+          dica: "Pense em quem fazia perguntas a todo mundo para testar o que as pessoas diziam saber.",
+          exp: "É Sócrates: examinar antes de aceitar. Antes de compartilhar, pergunte quem publicou, onde saiu e se outra fonte confirma." },
+        { tema: "Eleição", texto: "Você vai votar pela primeira vez. Um candidato promete muito, mas não explica como vai cumprir. Que ideia ajuda a avaliar se um governo merece continuar?",
+          foco: "como avaliar um governo",
+          certa: "locke", textoCerto: "O governo existe para proteger direitos, como vida e liberdade, e o povo pode trocar quem não cumpre isso.",
+          outras: ["heraclito", "platao"],
+          dica: "Procure a ideia que fala de governo e de direitos, não de conhecimento.",
+          exp: "É Locke: o governo serve para proteger direitos, e quem não cumpre pode ser trocado. Dá para olhar as propostas e perguntar se elas protegem direitos de verdade." },
+        { tema: "Trabalho", texto: "Numa fábrica, uma pessoa aperta o mesmo parafuso o dia todo, sem saber o que o produto vira nem ter voz no que é produzido. Que ideia ajuda a entender o que ela sente?",
+          foco: "o que o trabalhador sente",
+          certa: "marx", textoCerto: "O trabalhador pode ficar distante do que produz e do próprio trabalho, a chamada alienação.",
+          outras: ["aristoteles", "heraclito"],
+          dica: "A ideia certa fala de trabalho e de quem produz.",
+          exp: "É Marx. Ele chamou de alienação o trabalhador que fica longe do que produz e não decide sobre o próprio trabalho." },
+        { tema: "Escola", texto: "Na prova, um colega diz: pode colar, todo mundo cola. Que ideia ajuda a avaliar essa atitude?",
+          foco: "como avaliar uma atitude",
+          certa: "kant", textoCerto: "Agir só de um jeito que você aceitaria que valesse para todos.",
+          outras: ["descartes", "heraclito"],
+          dica: "Imagine que a regra do seu colega vale para a turma inteira. O que acontece com a prova?",
+          exp: "É Kant: teste a regra. Se todo mundo colasse, a prova perderia o sentido, então você não pode querer que a colagem valha para todos." },
+        { tema: "Futuro", texto: "Sua família quer que você faça um curso, mas você pensa em outro caminho. Que ideia ajuda a pensar nessa escolha?",
+          foco: "como pensar numa escolha de vida",
+          certa: "sartre", textoCerto: "Nada decide por nós o que vamos ser: somos livres para escolher e responsáveis pelo que escolhemos.",
+          outras: ["hobbes", "platao"],
+          dica: "Procure a ideia que fala de liberdade e de responsabilidade.",
+          exp: "É Sartre: ninguém nasce com o futuro decidido. Você escolhe, e responde pela escolha, mesmo depois de ouvir a família." },
+        { tema: "Grupo da escola", texto: "No grupo da escola, alguns começam a zombar de um colega, e quase todos só repetem a zombaria sem parar para pensar. Que ideia ajuda a entender como isso acontece?",
+          foco: "como um grupo chega a tratar mal alguém",
+          certa: "arendt", textoCerto: "O mal pode nascer de pessoas comuns que deixam de pensar por si mesmas e só repetem o que todos fazem.",
+          outras: ["aristoteles", "locke"],
+          dica: "Procure a ideia que liga o mal a não pensar, e não a pessoas monstruosas.",
+          exp: "É Hannah Arendt: o mal nem sempre vem de gente monstruosa. Pode vir de gente comum que não para para pensar. Você pode ser quem pergunta: isso é justo?" },
+      ] },
+  ]
+  const $ = id => document.getElementById(id)
+
+  // O Bit dentro do jogo: o mesmo Bit.diz(pose, texto) dos jogos da org, mas grande e sempre na tela
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  let cartas = [], opcoes = [], colocados = [], mostrarAnos = false
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+  const embaralhar = lista => {
+    const l = [...lista]
+    for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]] }
+    return l
+  }
+  const maiuscula = t => t.charAt(0).toUpperCase() + t.slice(1)
+  const frase = id => maiuscula(F[id].curta) + "."
+
+  // Sons curtos feitos no navegador, sem arquivo para baixar
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // Uma carta de filósofo: marca, nome, época e (quando pedido) os anos
+  function htmlCarta(id) {
+    const f = F[id]
+    return `<button class="carta" type="button" data-id="${id}" style="--c: ${f.cor}" aria-label="${f.nome}, ${f.epoca}"><span class="carta__ordem" hidden></span><span class="carta__marca">${marca(id)}</span><span class="carta__nome">${f.nome}</span><span class="carta__epoca">${f.epoca}</span><span class="carta__anos"></span></button>`
+  }
+  const botaoCarta = id => $("cartas").querySelector(`.carta[data-id="${id}"]`)
+  function pintarAnos() {
+    $("cartas").querySelectorAll(".carta").forEach(c => {
+      c.querySelector(".carta__anos").textContent = mostrarAnos || colocados.includes(c.dataset.id) ? F[c.dataset.id].anos : ""
+    })
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function mostrarRodada() {
+    const r = atual(), total = FASES[fase].rodadas.length
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    dicas = 0
+    colocados = []
+    mostrarAnos = false
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].unidade} ${rodada + 1} de ${total}`
+    $("tema").hidden = tipo() !== "dia"
+    $("tema").textContent = r.tema || ""
+    $("cartas").hidden = tipo() === "dia"
+    $("opcoes").hidden = tipo() !== "dia"
+    if (tipo() === "ideia") {
+      $("texto").textContent = r.ideia
+      $("nota").textContent = "Quem defendeu essa ideia? Toque na carta."
+      cartas = embaralhar([r.certa, ...r.outras])
+      $("cartas").innerHTML = cartas.map(htmlCarta).join("")
+      $("cartas").setAttribute("aria-label", "Escolha o filósofo")
+      pintarAnos()
+      $("cartas").querySelectorAll(".carta").forEach(c => c.onclick = () => escolherIdeia(c))
+    } else if (tipo() === "linha") {
+      $("texto").textContent = "Toque nos filósofos do mais antigo para o mais recente."
+      $("nota").textContent = "Antiguidade: Grécia antiga. Modernidade: séculos XVI a XVIII. Contemporâneo: do século XIX até hoje."
+      cartas = embaralhar(r.ids)
+      $("cartas").innerHTML = cartas.map(htmlCarta).join("")
+      $("cartas").setAttribute("aria-label", "Filósofos para pôr em ordem")
+      pintarAnos()
+      $("cartas").querySelectorAll(".carta").forEach(c => c.onclick = () => escolherOrdem(c))
+    } else {
+      $("texto").textContent = r.texto
+      $("nota").textContent = "Escolha a ideia que mais ajuda a pensar nessa situação."
+      opcoes = embaralhar([{ q: r.certa, t: r.textoCerto, certo: true }, ...r.outras.map(q => ({ q, t: frase(q), certo: false }))])
+      $("opcoes").innerHTML = opcoes.map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.t}</button>`).join("")
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherDia(b))
+    }
+  }
+
+  // Fase 1: a ideia e as cartas. O erro explica o que aquele filósofo defendeu
+  function escolherIdeia(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), id = botao.dataset.id
+    if (id === r.certa) {
+      botao.classList.add("certa")
+      cartas.forEach(c => { botaoCarta(c).disabled = true })
+      mostrarAnos = true
+      pintarAnos()
+      return acertou(`Isso! ${r.exp}`)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    window.Bit?.diz("ops", `Não é ${F[id].nome}. Para ${F[id].nome}, ${F[id].curta}. Releia a ideia e tente de novo.`)
+  }
+
+  // Fase 2: tocar do mais antigo para o mais recente
+  function escolherOrdem(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), id = botao.dataset.id
+    const ordem = [...r.ids].sort((x, y) => F[x].ini - F[y].ini)
+    if (id === ordem[colocados.length]) {
+      colocados.push(id)
+      botao.classList.add("certa")
+      botao.disabled = true
+      const marcaOrdem = botao.querySelector(".carta__ordem")
+      marcaOrdem.textContent = colocados.length
+      marcaOrdem.hidden = false
+      botao.setAttribute("aria-label", `${colocados.length}º, ${F[id].nome}, ${F[id].epoca}, ${F[id].anos}`)
+      pintarAnos()
+      somClique()
+      if (colocados.length < ordem.length) return window.Bit?.diz("feliz", `${F[id].nome} (${F[id].anos}) vem em ${colocados.length}º lugar. Quem vem agora?`)
+      const resumo = ordem.map(i => `${F[i].nome} (${F[i].epoca.toLowerCase()})`).join(", ")
+      return acertou(`Linha do tempo certa! Do mais antigo para o mais recente: ${resumo}. Lembre que o a.C. conta ao contrário: quanto maior o número, mais antigo.`)
+    }
+    erros++
+    somErro()
+    window.Bit?.diz("ops", `${F[id].nome} viveu de ${F[id].anos}, mas ainda sobrou alguém mais antigo no grupo. Procure o mais antigo entre as cartas que faltam.`)
+  }
+
+  // Fase 3: a situação e a ideia que ajuda a pensar nela
+  function escolherDia(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), o = opcoes[botao.dataset.i]
+    if (o.certo) {
+      botao.classList.add("certa")
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.disabled = true })
+      return acertou(`Isso! ${r.exp}`)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    window.Bit?.diz("ops", `Essa é uma ideia de ${F[o.q].nome}. Ela serve para outros assuntos, mas aqui a pergunta é sobre ${r.foco}. Tente outra.`)
+  }
+
+  // A dica cresce: primeiro uma pista, depois tira uma opção errada (sem contar como erro)
+  function tirarUma(seletor, errada) {
+    const sobra = [...$(seletor).querySelectorAll(":scope > button:not([disabled])")].filter(errada)
+    if (!sobra.length) return false
+    const b = sobra[Math.floor(Math.random() * sobra.length)]
+    b.disabled = true
+    b.classList.add("errada")
+    return true
+  }
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual()
+    dicas++
+    if (tipo() === "ideia") {
+      if (dicas === 1) return window.Bit?.diz("pensando", `Pista: é um filósofo da ${F[r.certa].epoca}.`)
+      return window.Bit?.diz("pensando", tirarUma("cartas", b => b.dataset.id !== r.certa) ? "Tirei uma carta errada para você." : "Só sobraram cartas que podem ser. Releia a ideia com calma.")
+    }
+    if (tipo() === "linha") {
+      mostrarAnos = true
+      pintarAnos()
+      return window.Bit?.diz("pensando", "Agora os anos aparecem nas cartas. Comece pelo mais antigo e lembre: 470 a.C. vem antes de 384 a.C., porque o a.C. conta ao contrário.")
+    }
+    if (dicas === 1) return window.Bit?.diz("pensando", r.dica)
+    window.Bit?.diz("pensando", tirarUma("opcoes", b => !opcoes[b.dataset.i].certo) ? "Tirei uma ideia que não combina com a situação." : "Só sobraram ideias que podem servir. Releia a situação.")
+  }
+
+  // Depois do acerto, a rodada fica na tela com a explicação do Bit, até tocar em Próxima
+  function acertou(texto) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", texto)
+    $("dica").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próxima"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Estrelas pelos erros da fase, e confete
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Você pensa como filósofo!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou${comoFoi}. Filosofar é perguntar por quê, e as ideias dos filósofos são ferramentas para pensar em situações de hoje.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    if (ultima) {
+      $("fim-acoes").replaceChildren(Jogo.acoesDoFim(() => comecar(0)))
+    } else {
+      $("fim-acoes").innerHTML = '<button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>'
+      $("seguir").onclick = () => comecar(fase + 1)
+    }
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;($("seguir") || $("fim-acoes").querySelector("button"))?.focus()
+    somFesta()
+    window.Bit?.diz(ultima ? "formatura" : "comemorando", ultima ? "Formatura! Você ligou ideias a filósofos, pôs todos na ordem do tempo e usou a Filosofia em situações de hoje." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+
+  // Copiar as mensagens para o Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

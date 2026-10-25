@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<path d="M100 26C84 16 56 16 36 24v76c20-8 48-8 64 2z" fill="#fff6cf" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M100 26c16-10 44-10 64-2v76c-20-8-48-8-64 2z" fill="#ffe0ea" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M100 26v76" stroke="#2f2a4a" stroke-width="4"/>
+<path d="M48 40q22-4 40 4M48 54q22-4 40 4M48 68q22-4 40 4" fill="none" stroke="#a08bff" stroke-width="4" stroke-linecap="round"/>
+<path d="M112 44q18-8 40-4M112 58q18-8 40-4M112 72q12-5 26-3" fill="none" stroke="#4fd6a6" stroke-width="4" stroke-linecap="round"/>
+<g class="g a-tw"><path transform="translate(136 76) scale(.95)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></g>
+</svg>

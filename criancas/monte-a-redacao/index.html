@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monte a Redação · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Redação para o ensino médio: ponha os parágrafos na ordem, ache a tese e o conectivo certo e monte a proposta de intervenção de um texto dissertativo-argumentativo.">
+  <meta property="og:title" content="Monte a Redação · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Redação: a estrutura do texto dissertativo-argumentativo, da tese à proposta de intervenção.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(880px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game and keeps the last thing he said on screen */
+    .fala-bit { display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; gap: 16px; max-width: 760px; margin: 0 auto; }
+    .missao { padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: clamp(18px, 2.6vw, 22px); font-weight: 700; line-height: 1.3; }
+    .missao__contexto { margin-top: 10px !important; padding: 10px 12px; background: #fff; border: 3px solid var(--ink); border-radius: 14px; font-size: 17px; font-weight: 500; line-height: 1.45; }
+    .lacuna { display: inline-block; min-width: 4.5em; border-bottom: 4px solid var(--ink); text-align: center; font-weight: 700; }
+    .lacuna.cheia { background: var(--mint); border-bottom-color: transparent; border-radius: 8px; padding: 0 8px; }
+
+    /* Phase 1: the paragraphs, each with up and down buttons */
+    .ordem { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 10px; padding: 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink); }
+    .item p { grid-column: 1 / -1; margin: 0; font-size: 15.5px; line-height: 1.45; font-weight: 500; text-align: left; }
+    .item .num { display: grid; place-items: center; width: 34px; height: 34px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; font-size: 17px; font-weight: 700; }
+    .item .papel { display: none; font-size: 14px; font-weight: 700; color: var(--ink); }
+    .item.mostra .papel { display: block; }
+    .item .mover { display: flex; gap: 8px; grid-column: 3; }
+    .mexe { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 52px; min-height: 48px; padding: 0 12px; background: var(--yellow); border: 4px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); font: 700 15px var(--font); color: var(--ink); cursor: pointer; }
+    .mexe svg { width: 20px; height: 20px; }
+    .mexe:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+    .mexe[disabled] { opacity: .35; box-shadow: none; cursor: default; }
+    .mexe:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .item.certo { background: #dcf8ec; border-color: #137a57; }
+    .item.errado { background: #ffe9ee; border-style: dashed; }
+    .item.certo .num { background: var(--mint); }
+    .item.errado .num { background: #ffb3c4; }
+    .item.acabou .mover { display: none; }
+    .item.acabou { grid-template-columns: auto minmax(0, 1fr); }
+
+    /* Phases 2 and 3: options */
+    .opcoes { display: grid; gap: 12px; }
+    .opcao { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 16px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 600 17px/1.35 var(--font); color: var(--ink); text-align: left; cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .6; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcoes--papeis { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    .opcoes--papeis .opcao { justify-content: center; text-align: center; font-weight: 700; }
+
+    /* Proposal split in pieces: the one being asked is highlighted, the done ones get a color and a name */
+    .proposta { margin: 0; font-size: 17px; line-height: 1.9; font-weight: 500; }
+    .trecho { padding: 1px 4px; border-radius: 8px; }
+    .trecho.agora { background: var(--yellow); outline: 3px dashed var(--ink); outline-offset: 1px; font-weight: 700; }
+    .trecho.feito { background: var(--c); border: 2px solid var(--ink); }
+    .trecho.feito i { display: inline-block; margin-left: 6px; padding: 0 8px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; font-size: 13px; font-style: normal; font-weight: 700; line-height: 1.5; vertical-align: 1px; }
+    .legenda { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); }
+    .legenda b { color: var(--ink); }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .btn[disabled] { opacity: .45; cursor: default; }
+    .acoes [hidden], .opcoes[hidden], .ordem[hidden], .proposta[hidden], .legenda[hidden] { display: none; }
+    .placar { display: flex; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+    .fim-acoes { display: grid; justify-items: center; }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula h3:first-of-type { margin-top: 0; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 560px) {
+      .jogo { padding: 14px; }
+      .missao { padding: 10px 12px 12px; }
+      .missao__contexto { font-size: 16px; }
+      .fala-bit { gap: 10px; margin: 0 0 12px; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .item p { font-size: 15px; }
+      .proposta { font-size: 16px; }
+      .opcao { font-size: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .fala-bit__bit img, .fala-bit__balao { animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">tese</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">¶</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">Enem</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Monte</span> a <span class="pink">Redação</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Língua Portuguesa</li>
+        <li class="pill" style="--c: var(--yellow)">3º ano do ensino médio</li>
+        <li class="pill">Texto dissertativo-argumentativo</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Ponha em ordem · redação 1 de 3</p>
+          <p class="missao__texto" id="texto"></p>
+          <p class="missao__contexto" id="contexto" hidden></p>
+        </div>
+        <ol class="ordem" id="ordem" aria-label="Parágrafos da redação" hidden></ol>
+        <p class="proposta missao__contexto" id="proposta" hidden></p>
+        <p class="legenda" id="legenda" hidden><b>Agente</b>: quem age · <b>Ação</b>: o que fazer · <b>Meio</b>: como · <b>Finalidade</b>: para quê · <b>Detalhamento</b>: informação extra</p>
+        <div class="opcoes" id="opcoes" role="group" aria-label="Opções" hidden></div>
+        <div class="acoes">
+          <button class="btn btn--jogar" type="button" id="conferir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Conferir a ordem</span></button>
+          <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima</span></button>
+        </div>
+        <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <div class="fim-acoes" id="fim-acoes">
+          <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A estrutura do texto dissertativo-argumentativo cobrada no Enem: a introdução traz o tema e a tese, cada um dos dois desenvolvimentos defende um argumento, e a conclusão fecha com uma proposta de intervenção. Os conectivos mostram a relação entre as ideias (oposição, adição, exemplo, conclusão). A proposta tem cinco partes: agente, ação, meio, finalidade e detalhamento, e precisa respeitar os direitos humanos. Os textos do jogo são exemplos feitos para ele, e os trechos da Constituição de 1988 citados são o artigo 196 (saúde) e o artigo 205 (educação).</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> antes de cada conferência, a turma vota na ordem dos parágrafos ou no elemento da proposta e diz qual pista do texto levou a essa escolha.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e depois escreve, no caderno, uma proposta de intervenção com os cinco elementos sobre um tema da turma.</li>
+        <li><b>Depois:</b> cada dupla troca a proposta com outra, que marca agente, ação, meio, finalidade e detalhamento com cinco cores.</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Redação] para estudantes do [3º ano do ensino médio]: aparecem quatro parágrafos de uma redação embaralhados, e o estudante usa botões de subir e descer para colocar [introdução, desenvolvimento 1, desenvolvimento 2 e conclusão] na ordem certa.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: pôr os parágrafos em ordem, achar a tese e escolher o conectivo certo, marcar agente, ação, meio, finalidade e detalhamento numa proposta de intervenção], um personagem que explica o erro e o acerto em frases curtas, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Use só textos de exemplo escritos por você, sem copiar redações reais e sem inventar dados de pesquisa. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  // Os textos abaixo são exemplos escritos para o jogo. Nenhum número de pesquisa aparece neles.
+  const PAPEIS = {
+    agente: { nome: "Agente", cor: "#a8d4ff", pista: "diz quem vai agir" },
+    acao: { nome: "Ação", cor: "#ffb3c8", pista: "diz o que será feito" },
+    meio: { nome: "Meio", cor: "#ffc999", pista: "diz como será feito, em geral depois de “por meio de”" },
+    finalidade: { nome: "Finalidade", cor: "#a6ecd0", pista: "diz para quê, em geral depois de “a fim de”" },
+    detalhamento: { nome: "Detalhamento", cor: "#d3c8ff", pista: "traz uma informação extra que explica ou reforça um dos itens" },
+  }
+  const ARTIGO = { agente: "o", acao: "a", meio: "o", finalidade: "a", detalhamento: "o" }
+  const CHAVES = Object.keys(PAPEIS)
+  const FUNCOES = ["Introdução: tema e tese", "Desenvolvimento 1: argumento", "Desenvolvimento 2: argumento", "Conclusão: proposta"]
+  const PISTAS_ORDEM = [
+    "A introdução apresenta o tema e a tese.",
+    "O primeiro desenvolvimento vem logo depois da tese e costuma abrir com “Em primeiro lugar”.",
+    "O segundo desenvolvimento traz outro argumento e costuma abrir com um conectivo de adição, como “Além disso”, “Ademais” ou “Por outro lado”.",
+    "A conclusão retoma a tese e traz a proposta de intervenção, com “Portanto” ou “Dessa forma”.",
+  ]
+
+  const FASES = [
+    { nome: "Ponha em ordem", tipo: "ordem",
+      abertura: "Oi! Eu sou o Bit. Estes quatro parágrafos formam uma redação, mas estão embaralhados. Use Subir e Descer para pôr cada um no lugar e toque em Conferir.",
+      rodadas: [
+        { tema: "Preconceito contra a saúde mental",
+          paragrafos: [
+            "A Constituição Federal de 1988 diz, no artigo 196, que a saúde é direito de todos. No entanto, o preconceito contra quem sofre de transtornos mentais ainda afasta muitas pessoas do cuidado, por causa do silêncio nas famílias e da falta de informação.",
+            "Em primeiro lugar, o silêncio nas famílias faz o sofrimento parecer fraqueza. Quando o jovem ouve que tudo é “frescura”, ele aprende a esconder o que sente e demora a procurar ajuda.",
+            "Além disso, a falta de informação alimenta o preconceito. Sem aprender na escola e na mídia que a mente também adoece e tem tratamento, a sociedade repete mitos e isola quem precisa de apoio.",
+            "Portanto, é preciso combater o estigma. O Ministério da Educação deve promover rodas de conversa com psicólogos nas escolas, por meio de parcerias com a rede pública de saúde, a fim de acolher os estudantes. Os encontros seriam mensais e abertos às famílias.",
+          ],
+          inicial: [2, 0, 3, 1],
+          acerto: "Isso! A tese está na introdução: o preconceito persiste por causa do silêncio e da falta de informação. Cada desenvolvimento explica uma dessas causas, e a conclusão fecha com a proposta." },
+        { tema: "Telas e atenção dos jovens",
+          paragrafos: [
+            "A rotina de muitos jovens passa por uma tela. Contudo, o uso excessivo das redes sociais prejudica a concentração e o sono dos estudantes, por causa da lógica que prende a atenção e da falta de limites em casa.",
+            "Em primeiro lugar, as plataformas são feitas para prender a atenção. Notificações e vídeos em sequência estimulam o jovem a continuar, e o estudo fica em segundo plano.",
+            "Ademais, a falta de limites em casa agrava o quadro. Sem horários combinados, o celular entra no quarto e a noite de sono diminui, o que reduz o rendimento no dia seguinte.",
+            "Dessa forma, é necessário equilibrar o uso das telas. A escola, em parceria com as famílias, deve promover oficinas de uso consciente da internet, por meio de encontros com orientadores, para que os jovens aprendam a criar horários de pausa. Cada família combinaria suas regras por escrito.",
+          ],
+          inicial: [3, 1, 0, 2],
+          acerto: "Muito bem! A tese promete duas causas: a lógica que prende a atenção e a falta de limites em casa. Os desenvolvimentos seguem essa mesma ordem, e a conclusão responde às duas." },
+        { tema: "Valorização da leitura",
+          paragrafos: [
+            "A leitura é um caminho para a cidadania, mas muitos adolescentes a veem como tarefa obrigatória. Esse afastamento acontece pelo acesso desigual aos livros e pelo incentivo que não parte do gosto de cada um.",
+            "Em primeiro lugar, nem toda escola ou bairro tem biblioteca aberta e com acervo atual. Sem livros por perto, a leitura vira privilégio de quem pode comprar.",
+            "Por outro lado, o incentivo costuma se limitar à cobrança em provas. Quando o jovem não escolhe o que lê, ele associa o livro à nota e perde o prazer de ler.",
+            "Portanto, cabe às prefeituras ampliar as bibliotecas públicas, por meio de acervos renovados e de horários à noite, a fim de garantir o acesso ao livro. Além disso, as escolas podem criar clubes de leitura nos quais o estudante escolhe o título.",
+          ],
+          inicial: [1, 3, 2, 0],
+          acerto: "Certo! Repare que o conectivo do segundo desenvolvimento (“Por outro lado”) mostra que ele traz outro lado do problema, sem repetir o primeiro." },
+      ] },
+    { nome: "Tese e conectivo", tipo: "escolha",
+      abertura: "Agora vamos aos detalhes. A tese é a posição do texto, com a causa ou a razão dela. E os conectivos ligam as ideias. Escolha com calma.",
+      rodadas: [
+        { tipo: "tese", tema: "Destino do lixo nas cidades",
+          texto: "Qual frase é a tese da introdução?",
+          dica: ["A tese defende uma posição e dá a razão dela. Ela não é pergunta, nem proposta, nem só o assunto."],
+          acerto: "Isso! A tese toma posição (o problema persiste) e dá as causas (falta de educação ambiental e coleta seletiva limitada).",
+          opcoes: [
+            { t: "O lixo é um assunto presente nas cidades brasileiras.", porque: "Essa frase só apresenta o assunto. Falta posição: o que o texto defende e por quê." },
+            { t: "A má destinação do lixo nas cidades persiste por causa da falta de educação ambiental e da coleta seletiva limitada.", certa: true },
+            { t: "Será que as pessoas sabem separar o lixo?", porque: "Pergunta pode abrir a introdução, mas não é tese. A tese afirma uma posição." },
+            { t: "O governo deve criar campanhas de reciclagem.", porque: "Isso é proposta de intervenção, que fica na conclusão, não na tese." },
+          ] },
+        { tipo: "conectivo", texto: "Qual conectivo liga as duas frases?",
+          antes: "Muitos jovens têm acesso à internet.", depois: "nem todos sabem checar se uma informação é verdadeira.",
+          dica: ["A segunda frase traz uma ideia que vai contra a primeira."],
+          acerto: "“No entanto” marca oposição: o acesso existe, mas falta algo. Por isso a segunda frase contraria a primeira.",
+          opcoes: [
+            { t: "Portanto", porque: "“Portanto” conclui. Aqui a segunda frase não é consequência da primeira, ela a contraria." },
+            { t: "No entanto", certa: true },
+            { t: "Por exemplo", porque: "“Por exemplo” introduz um caso que ilustra a ideia. A segunda frase não ilustra, ela contraria." },
+            { t: "Além disso", porque: "“Além disso” soma outra ideia na mesma direção. Aqui as ideias vão em direções opostas." },
+          ] },
+        { tipo: "conectivo", texto: "Qual conectivo liga as duas frases?",
+          antes: "Hábitos simples melhoram o sono.", depois: "deixar o celular fora do quarto ajuda a dormir mais cedo.",
+          dica: ["A segunda frase dá um caso concreto da primeira."],
+          acerto: "“Por exemplo” introduz um caso que ilustra a ideia anterior. Deixar o celular fora do quarto é um dos hábitos simples.",
+          opcoes: [
+            { t: "No entanto", porque: "“No entanto” marca oposição. A segunda frase não contraria a primeira." },
+            { t: "Portanto", porque: "“Portanto” conclui. A segunda frase não é conclusão, é um caso que ilustra." },
+            { t: "Além disso", porque: "“Além disso” soma outro argumento. Aqui a segunda frase detalha o mesmo argumento." },
+            { t: "Por exemplo", certa: true },
+          ] },
+        { tipo: "conectivo", texto: "Qual conectivo liga as duas frases?",
+          antes: "Sem limites em casa, o celular invade a hora de dormir.", depois: "é preciso que famílias e escola criem regras de uso.",
+          dica: ["A segunda frase é a consequência do que foi dito antes."],
+          acerto: "“Portanto” conclui: dado o problema, a consequência é a necessidade de regras. É o conectivo típico do início da conclusão.",
+          opcoes: [
+            { t: "Por exemplo", porque: "“Por exemplo” introduz um caso. A segunda frase não dá exemplo, ela tira uma conclusão." },
+            { t: "Portanto", certa: true },
+            { t: "No entanto", porque: "“No entanto” marca oposição. A segunda frase segue a primeira, não a contraria." },
+            { t: "Além disso", porque: "“Além disso” soma mais um argumento. Aqui a segunda frase conclui o raciocínio." },
+          ] },
+        { tipo: "tese", tema: "Notícias falsas",
+          texto: "Qual frase é a tese da introdução?",
+          dica: ["Procure a frase que dá posição e razão. Relato pessoal e proposta não servem."],
+          acerto: "Isso! A tese afirma que as notícias falsas ameaçam a democracia e aponta as razões: falta de checagem e o alcance das redes.",
+          opcoes: [
+            { t: "Ontem vi uma notícia falsa no meu celular.", porque: "Relato em primeira pessoa não serve: o texto dissertativo é impessoal e defende uma tese." },
+            { t: "A internet mudou a forma de receber notícias.", porque: "Isso contextualiza o tema, mas não defende um ponto de vista nem dá razões." },
+            { t: "A circulação de notícias falsas ameaça a democracia, pois a falta de checagem e o alcance das redes enfraquecem o debate público.", certa: true },
+            { t: "Cabe às plataformas verificar as postagens.", porque: "Isso é proposta de intervenção, que fica na conclusão." },
+          ] },
+      ] },
+    { nome: "Proposta completa", tipo: "proposta",
+      abertura: "A proposta de intervenção tem cinco partes: agente, ação, meio, finalidade e detalhamento. Vamos achar cada uma e ver o que falta.",
+      rodadas: [
+        { tipo: "marcar", tema: "Saúde mental nas escolas",
+          texto: "Toque no nome da parte de cada trecho destacado.",
+          trechos: [
+            ["O Ministério da Educação", "agente"],
+            ["deve criar rodas de conversa sobre saúde mental nas escolas,", "acao"],
+            ["por meio de parcerias com psicólogos da rede pública,", "meio"],
+            ["a fim de acolher os estudantes e reduzir o preconceito.", "finalidade"],
+            ["Os encontros devem ser mensais e ter materiais para as famílias, de modo que o assunto chegue também às casas.", "detalhamento"],
+          ],
+          acerto: "Proposta completa! Quem faz, o que faz, como faz, para quê e um detalhe que reforça. Com os cinco elementos, a proposta fica completa." },
+        { tipo: "falta", tema: "Telas e atenção",
+          texto: "Esta proposta está incompleta. O que falta?",
+          proposta: "A escola deve promover oficinas de uso consciente da internet, por meio de encontros com orientadores educacionais, a fim de ensinar os jovens a equilibrar o tempo de tela.",
+          presentes: { agente: "A escola", acao: "promover oficinas de uso consciente da internet", meio: "encontros com orientadores educacionais", finalidade: "ensinar os jovens a equilibrar o tempo de tela" },
+          falta: "detalhamento",
+          dica: ["Confira um a um: quem age, o que faz, como faz e para quê. Falta uma informação extra, que explica ou reforça um item."],
+          acerto: "Falta o detalhamento. Ele traz uma informação a mais, como a frequência dos encontros ou quem participa. Por exemplo: os encontros seriam bimestrais, com a presença das famílias." },
+        { tipo: "marcar", tema: "Acesso aos livros",
+          texto: "Toque no nome da parte de cada trecho destacado. Desta vez a ordem mudou.",
+          trechos: [
+            ["A fim de ampliar o acesso aos livros,", "finalidade"],
+            ["as prefeituras devem", "agente"],
+            ["reabrir e atualizar as bibliotecas públicas,", "acao"],
+            ["por meio de verbas para novos acervos.", "meio"],
+            ["Os horários devem incluir a noite, para que também quem trabalha possa frequentar.", "detalhamento"],
+          ],
+          acerto: "Muito bem! Os elementos podem vir em qualquer ordem. O que importa é que os cinco estejam lá e ligados entre si." },
+        { tipo: "falta", tema: "Atendimento psicológico",
+          texto: "Esta proposta está incompleta. O que falta?",
+          proposta: "O Ministério da Saúde deve ampliar o atendimento psicológico gratuito nas escolas, por meio da contratação de psicólogos. Os atendimentos devem ocorrer toda semana, com horário reservado para quem preferir conversar em sigilo.",
+          presentes: { agente: "O Ministério da Saúde", acao: "ampliar o atendimento psicológico gratuito nas escolas", meio: "contratação de psicólogos", detalhamento: "Os atendimentos devem ocorrer toda semana" },
+          falta: "finalidade",
+          dica: ["Falta responder para quê a proposta existe. Em geral, essa parte começa com “a fim de” ou “para que”."],
+          acerto: "Falta a finalidade, o para quê. Por exemplo: a fim de que os estudantes recebam apoio antes de o problema se agravar." },
+        { tipo: "escolha", tema: "Evasão escolar",
+          texto: "Qual proposta respeita os direitos humanos?",
+          dica: ["No Enem, proposta que fere direitos humanos zera a nota de proposta. A educação é direito de todos, e ninguém deve ser humilhado."],
+          acerto: "Certo! A busca ativa acolhe o estudante e garante o direito à educação, previsto no artigo 205 da Constituição, com agente, ação, meio, finalidade e detalhamento.",
+          opcoes: [
+            { t: "O governo deve expulsar das escolas quem falta muito, a fim de dar exemplo aos colegas.", porque: "Expulsar quem falta nega o direito à educação (artigo 205 da Constituição). Proposta assim fere os direitos humanos." },
+            { t: "O Ministério da Educação deve criar uma busca ativa de estudantes que faltam, por meio de visitas de assistentes sociais às famílias, a fim de garantir a volta às aulas. As visitas viriam com apoio de transporte e de material escolar.", certa: true },
+            { t: "As famílias devem ter o nome divulgado em lista pública, a fim de envergonhar quem deixa o filho faltar.", porque: "Expor e envergonhar as pessoas fere a dignidade humana. Uma proposta boa acolhe, não humilha." },
+          ] },
+      ] },
+  ]
+
+  const $ = id => document.getElementById(id)
+  const BOTAO_SEGUIR = document.getElementById("seguir")
+  const embaralhar = lista => { const l = [...lista]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]] } return l }
+  const reduzido = () => matchMedia("(prefers-reduced-motion: reduce)").matches
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  let ordem = [], passo = 0, bloqueadas = new Set()
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipoRodada = () => atual().tipo || FASES[fase].tipo
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somCerto = () => tocar([[880, 0, .08], [1175, .06, .12]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  const SETA = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  const SOBE = SETA("M5 15l7-7 7 7"), DESCE = SETA("M5 9l7 7 7-7")
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function esconderTudo() {
+    for (const id of ["ordem", "proposta", "legenda", "opcoes", "contexto"]) $(id).hidden = true
+    $("opcoes").classList.remove("opcoes--papeis")
+  }
+
+  function mostrarRodada() {
+    const r = atual(), t = tipoRodada()
+    ocupado = false
+    dicas = 0
+    passo = 0
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("conferir").hidden = t !== "ordem"
+    desenharPlacar()
+    esconderTudo()
+    const f = FASES[fase]
+    $("topo").textContent = `${f.nome} · tema: ${r.tema || "redação"} · ${rodada + 1} de ${f.rodadas.length}`
+    $("texto").textContent = t === "ordem" ? "Ponha os parágrafos na ordem certa." : r.texto
+    if (t === "ordem") {
+      ordem = r.inicial.slice()
+      $("conferir").querySelector("span").textContent = "Conferir a ordem"
+      desenharOrdem()
+    } else if (t === "tese" || t === "escolha") {
+      montarOpcoes(embaralhar(r.opcoes))
+    } else if (t === "conectivo") {
+      $("contexto").hidden = false
+      $("contexto").innerHTML = `${esc(r.antes)} <span class="lacuna" id="lacuna">&nbsp;</span>, ${esc(r.depois)}`
+      montarOpcoes(embaralhar(r.opcoes))
+    } else if (t === "falta") {
+      $("contexto").hidden = false
+      $("contexto").textContent = r.proposta
+      $("opcoes").classList.add("opcoes--papeis")
+      montarOpcoes(CHAVES.map(c => ({ t: PAPEIS[c].nome, chave: c, certa: c === r.falta })))
+    } else if (t === "marcar") {
+      $("proposta").hidden = false
+      $("legenda").hidden = false
+      $("opcoes").classList.add("opcoes--papeis")
+      desenharProposta()
+      montarOpcoes(CHAVES.map(c => ({ t: PAPEIS[c].nome, chave: c })))
+    }
+  }
+
+  function montarOpcoes(lista) {
+    const caixa = $("opcoes")
+    caixa.hidden = false
+    caixa.innerHTML = lista.map((o, i) => `<button class="opcao" type="button" data-i="${i}">${esc(o.t)}</button>`).join("")
+    caixa.querySelectorAll(".opcao").forEach((botao, i) => botao.onclick = () => escolher(botao, lista[i]))
+  }
+
+  // Phase 1: paragraphs with Subir and Descer buttons, easy with touch and with keyboard
+  function desenharOrdem(marcas = [], final = false) {
+    const r = atual(), lista = $("ordem")
+    lista.hidden = false
+    lista.innerHTML = ordem.map((id, pos) => {
+      const classe = ["item", marcas[pos] === true ? "certo" : marcas[pos] === false ? "errado" : "", final ? "acabou mostra" : ""].join(" ")
+      const resumo = esc(r.paragrafos[id].split(" ").slice(0, 4).join(" "))
+      const mover = `<span class="mover">
+          <button class="mexe" type="button" data-id="${id}" data-dir="-1" aria-label="Subir o parágrafo que começa com: ${resumo}" ${pos === 0 ? "disabled" : ""}>${SOBE}Subir</button>
+          <button class="mexe" type="button" data-id="${id}" data-dir="1" aria-label="Descer o parágrafo que começa com: ${resumo}" ${pos === ordem.length - 1 ? "disabled" : ""}>${DESCE}Descer</button>
+        </span>`
+      return `<li class="${classe}"><p>${esc(r.paragrafos[id])}</p><span class="num">${pos + 1}</span><span class="papel">${final ? FUNCOES[id] : ""}</span>${final ? "" : mover}</li>`
+    }).join("")
+    lista.querySelectorAll(".mexe").forEach(botao => botao.onclick = () => mover(Number(botao.dataset.id), Number(botao.dataset.dir)))
+  }
+  function mover(id, dir) {
+    if (ocupado) return
+    const pos = ordem.indexOf(id), novo = pos + dir
+    if (novo < 0 || novo >= ordem.length) return
+    ;[ordem[pos], ordem[novo]] = [ordem[novo], ordem[pos]]
+    somClique()
+    desenharOrdem()
+    // O foco acompanha o parágrafo que mexeu; na ponta da lista, vai para o outro botão dele
+    const botoes = [...$("ordem").querySelectorAll(`.mexe[data-id="${id}"]`)]
+    const alvo = botoes.find(b => b.dataset.dir === String(dir) && !b.disabled) || botoes.find(b => !b.disabled)
+    alvo?.focus({ preventScroll: false })
+  }
+  function conferirOrdem() {
+    const r = atual()
+    const marcas = ordem.map((id, pos) => id === pos)
+    const certos = marcas.filter(Boolean).length
+    if (certos === ordem.length) {
+      desenharOrdem([], true)
+      return acertou(r.acerto)
+    }
+    erros++
+    somErro()
+    desenharOrdem(marcas)
+    const primeira = marcas.indexOf(false)
+    const inicio = certos === 0 ? "Nenhum parágrafo está no lugar ainda." : certos === 1 ? "Só 1 parágrafo está no lugar." : `${certos} parágrafos estão no lugar.`
+    window.Bit?.diz("ops", `${inicio} Olhe a posição ${primeira + 1}: ${PISTAS_ORDEM[primeira]}`)
+  }
+
+  // Phases 2 and 3: choosing the right option; each wrong one explains why
+  function escolher(botao, opcao) {
+    if (ocupado || botao.disabled) return
+    const t = tipoRodada(), r = atual()
+    if (t === "marcar") return marcar(botao, opcao)
+    if (opcao.certa) {
+      botao.classList.add("certa")
+      if (t === "conectivo") { $("lacuna").textContent = opcao.t.toLowerCase(); $("lacuna").classList.add("cheia") }
+      return acertou(r.acerto)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    if (t === "falta") {
+      const trecho = r.presentes[opcao.chave]
+      return window.Bit?.diz("ops", `${PAPEIS[opcao.chave].nome} já aparece: “${trecho}”. Procure a parte que não está no texto.`)
+    }
+    window.Bit?.diz("ops", opcao.porque)
+  }
+
+  // Phase 3, marking: each piece of the proposal, one at a time
+  function desenharProposta() {
+    const r = atual()
+    $("proposta").innerHTML = r.trechos.map(([texto, papel], i) => {
+      if (i < passo) return `<span class="trecho feito" style="--c: ${PAPEIS[papel].cor}">${esc(texto)}<i>${PAPEIS[papel].nome}</i></span>`
+      if (i === passo) return `<span class="trecho agora">${esc(texto)}</span>`
+      return `<span class="trecho">${esc(texto)}</span>`
+    }).join(" ")
+    $("proposta").setAttribute("aria-label", `Trecho ${Math.min(passo + 1, r.trechos.length)} de ${r.trechos.length}: ${r.trechos[Math.min(passo, r.trechos.length - 1)][0]}`)
+  }
+  function marcar(botao, opcao) {
+    const r = atual(), [texto, papel] = r.trechos[passo]
+    if (opcao.chave === papel) {
+      passo++
+      somCerto()
+      desenharProposta()
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.disabled = false; b.classList.remove("errada") })
+      if (passo === r.trechos.length) {
+        $("opcoes").hidden = true
+        $("proposta").removeAttribute("aria-label")
+        return acertou(r.acerto)
+      }
+      return window.Bit?.diz("feliz", `Isso! “${texto}” é ${ARTIGO[papel]} ${PAPEIS[papel].nome.toLowerCase()}. Agora o próximo trecho.`)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    window.Bit?.diz("ops", `Esse trecho ${PAPEIS[papel].pista}. Então não é ${PAPEIS[opcao.chave].nome.toLowerCase()}. Tente outra.`)
+  }
+
+  $("conferir").onclick = () => { if (!ocupado && tipoRodada() === "ordem") conferirOrdem() }
+
+  // The hint grows with each tap
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual(), t = tipoRodada()
+    dicas++
+    if (t === "ordem") {
+      const dica = dicas === 1 ? "Os quatro parágrafos seguem uma ordem fixa: " + FUNCOES.map(f => f.split(":")[0].toLowerCase()).join(", ") + "." : PISTAS_ORDEM[Math.min(dicas - 2, 3)]
+      return window.Bit?.diz("pensando", dica)
+    }
+    if (t === "marcar") {
+      return window.Bit?.diz("pensando", dicas % 2 ? "O agente é quem age. A ação é o que fazer. O meio diz como e a finalidade diz para quê." : `Este trecho ${PAPEIS[r.trechos[passo][1]].pista}.`)
+    }
+    window.Bit?.diz("pensando", r.dica[Math.min(dicas - 1, r.dica.length - 1)])
+  }
+
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próxima
+  function acertou(frase) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    for (const id of ["conferir", "dica"]) $(id).hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Redação montada!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou${comoFoi}. Tese na introdução, dois argumentos, conclusão com agente, ação, meio, finalidade e detalhamento, sempre com respeito aos direitos humanos.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    const acoes = $("fim-acoes")
+    if (ultima) {
+      acoes.replaceChildren(Jogo.acoesDoFim(() => comecar(0)))
+    } else {
+      acoes.replaceChildren(BOTAO_SEGUIR)
+    }
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;(ultima ? acoes.querySelector("button") : BOTAO_SEGUIR).focus()
+    somFesta()
+    window.Bit?.diz(ultima ? "formatura" : "comemorando", ultima ? "Nota mil na estrutura! Tese clara, argumentos desenvolvidos e uma proposta completa que respeita os direitos humanos." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (reduzido()) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  BOTAO_SEGUIR.onclick = () => comecar(fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
