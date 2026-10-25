@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Biblioteca de prompts</title>
-<meta name="description" content="Prompts de partida para o Gemini criar atividades, jogos, histórias, planos de aula e avaliações, da Educação Infantil ao 9º ano.">
+<meta name="description" content="Prompts de partida para o Gemini criar atividades, jogos, histórias, planos de aula, avaliações e preparação para o Enem, da Educação Infantil ao Ensino Médio.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -200,7 +200,7 @@
 <section class="card">
   <ul class="care">
     <li><span class="badge" style="--c: var(--yellow)"><svg viewBox="0 0 24 24"><path d="M4 20 L5 15.5 L15.5 5 A2.1 2.1 0 0 1 18.5 5 L19 5.5 A2.1 2.1 0 0 1 19 8.5 L8.5 19 Z M13.5 7 L17 10.5" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Prompts de partida:</b> troque o que está entre colchetes, ajuste para a sua turma e sempre revise a resposta do Gemini. As partes para trocar aparecem assim: <mark>[tema]</mark>.</span></li>
-    <li><span class="badge" style="--c: var(--pink)"><svg viewBox="0 0 36 36"><rect x="7" y="16" width="22" height="17" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg></span><span>Nunca escreva o nome ou dados das crianças no Gemini. Fale da turma de um jeito geral.</span></li>
+    <li><span class="badge" style="--c: var(--pink)"><svg viewBox="0 0 36 36"><rect x="7" y="16" width="22" height="17" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg></span><span>Nunca escreva o nome ou dados dos alunos no Gemini. Fale da turma de um jeito geral.</span></li>
     <li><span class="badge" style="--c: var(--blue)"><svg viewBox="0 0 24 24"><path d="M19.5 12 A7.5 7.5 0 1 1 16.8 6.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M17.5 2.5 V6.8 H13.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Se o Gemini disser que não consegue ajudar, toque em <b>Refazer</b>, embaixo da resposta, ou abra uma conversa nova. Às vezes ele recusa um pedido normal.</span></li>
   </ul>
   <p class="own">Quer montar o seu?<a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use o Construtor de prompts</a></p>
@@ -209,7 +209,7 @@
 <section class="card filters" aria-label="Filtros">
   <label class="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff1a8" stroke="#2f2a4a" stroke-width="2.6"/><path d="M15 15 L21 21" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/></svg>
-    <input type="search" id="search" placeholder="Buscar: frações, Pampa, folclore..." aria-label="Buscar nos prompts" autocomplete="off">
+    <input type="search" id="search" placeholder="Buscar: frações, Pampa, redação, Enem..." aria-label="Buscar nos prompts" autocomplete="off">
   </label>
   <span class="filter-title" id="stage-title">Turma <small class="swipe">(deslize para o lado)</small></span>
   <div class="chips" id="stage-chips" role="group" aria-labelledby="stage-title"></div>
@@ -244,7 +244,7 @@
 <script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Listing every prompt of the library. To add one, copy a block and change the texts.
-// stage: "infantil", "iniciais" or "finais". kind: one of the keys of KINDS, further down.
+// stage: "infantil", "iniciais", "finais" or "medio". kind: one of the keys of KINDS, further down.
 // The parts the teacher should change go between [colchetes]. "tip" is optional.
 // A format line that starts with "MATERIAL" becomes the space where the teacher pastes the material.
 const PROMPTS = [
@@ -778,13 +778,259 @@ const PROMPTS = [
     ],
     tip: "Mostre a rubrica para a turma antes do trabalho: assim todos sabem o que vai ser avaliado.",
   },
+  // Ensino Médio
+  {
+    title: "Simulado no estilo do Enem: 5 questões de Matemática",
+    stage: "medio", kind: "enem",
+    area: "Matemática",
+    role: "Você é um(a) professor(a) experiente de Matemática do Ensino Médio, que conhece bem o formato das questões do Enem.",
+    task: "Crie 5 questões no estilo do Enem sobre [porcentagem e juros no dia a dia].",
+    context: [
+      "A turma é da [3ª série] do Ensino Médio, com estudantes de [17 anos] que se preparam para o Enem.",
+      "Cada questão parte de uma situação real, como uma conta de luz, uma compra parcelada ou uma notícia, e não de uma conta solta.",
+      "Não diga que as questões são de provas reais do Enem e não invente o ano ou o número de uma prova.",
+      "Se usar dados, como preços ou porcentagens, deixe claro que são números de exemplo.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Cada questão com um texto-base curto, um comando claro e 5 alternativas, de A a E.",
+      "As questões vão da mais fácil para a mais difícil.",
+      "Escreva tudo em texto normal, fora de bloco de código e sem usar o teste interativo.",
+      "Se a questão tiver gráfico ou tabela, monte a tabela no texto ou descreva o gráfico entre parênteses.",
+      "No fim, separado, o gabarito com a resolução passo a passo e por que cada alternativa errada está errada.",
+    ],
+    tip: "Confira as contas de cada resolução antes de aplicar: o modelo rápido do Gemini às vezes erra uma conta no meio do caminho.",
+  },
+  {
+    title: "Correção de redação pelas 5 competências do Enem",
+    stage: "medio", kind: "enem",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa do Ensino Médio, que corrige redações pelas 5 competências do Enem.",
+    task: "Corrija a redação que está no fim desta mensagem, escrita sobre o tema [o desafio de reduzir o desperdício de alimentos no Brasil].",
+    context: [
+      "A redação é de um estudante da [3ª série] do Ensino Médio que está treinando para o Enem.",
+      "Quero um retorno que ajude a melhorar, com elogio ao que está bom e um caminho claro para o que falta.",
+      "Não reescreva a redação inteira: aponte os trechos e mostre como melhorar cada um.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Para cada uma das 5 competências: uma nota provável (0, 40, 80, 120, 160 ou 200), o motivo em 2 ou 3 frases e uma dica prática.",
+      "Os 3 trechos que mais precisam de ajuste, copiados da redação, com uma sugestão de como ficaria melhor.",
+      "Uma avaliação da proposta de intervenção: se tem agente, ação, meio, finalidade e detalhamento.",
+      "No fim, a nota total provável e as 2 coisas mais importantes para treinar na próxima redação.",
+      "MATERIAL PARA CORRIGIR:\n[cole aqui a redação, sem o nome do estudante]",
+    ],
+    tip: "Apague o nome e a turma do estudante antes de colar. A nota é uma estimativa: use o retorno como apoio, não como a correção final.",
+  },
+  {
+    title: "Proposta de redação com textos motivadores",
+    stage: "medio", kind: "enem",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa do Ensino Médio, que prepara estudantes para a redação do Enem.",
+    task: "Crie uma proposta de redação no estilo do Enem sobre o tema [os desafios da saúde mental dos jovens na era das redes sociais].",
+    context: [
+      "A turma é da [3ª série] do Ensino Médio e vai escrever em [uma aula de 50 minutos].",
+      "Os textos motivadores devem ser escritos por você, curtos e de tipos diferentes: um trecho de notícia, um depoimento e um dado.",
+      "Não invente pesquisas, instituições ou números como se fossem reais. Se usar um dado, marque [conferir a fonte] logo depois dele.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "A frase do tema, no formato do Enem: \"A partir da leitura dos textos motivadores e com base nos conhecimentos construídos ao longo de sua formação...\".",
+      "3 textos motivadores curtos, numerados, com o tipo de cada um.",
+      "As instruções da prova: texto dissertativo-argumentativo, de 7 a 30 linhas, com proposta de intervenção que respeite os direitos humanos.",
+      "Para o professor, separado: 3 caminhos de argumento possíveis e 2 repertórios culturais que os estudantes poderiam usar.",
+      "Escreva tudo em texto normal, fora de bloco de código.",
+    ],
+    tip: "Procure a fonte de cada dado antes de levar para a turma, ou troque por um dado que você já conhece de uma fonte confiável.",
+  },
+  {
+    title: "Revisão para o Enem: resumo e questões rápidas de Biologia",
+    stage: "medio", kind: "enem",
+    area: "Biologia",
+    role: "Você é um(a) professor(a) experiente de Biologia do Ensino Médio, que prepara revisões para o Enem.",
+    task: "Crie uma revisão de [ecologia: cadeias alimentares, ciclos e impactos ambientais] para estudantes que vão fazer o Enem.",
+    context: [
+      "A turma é da [3ª série] do Ensino Médio, com estudantes de [17 anos].",
+      "Os estudantes já viram o conteúdo e precisam de uma revisão rápida, de [uma aula de 50 minutos].",
+      "Use exemplos do Brasil, como [o bioma Pampa e o Cerrado].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Um resumo em tópicos curtos, com os conceitos que mais caem e um exemplo de cada um.",
+      "Um mapa mental em forma de lista com recuos, para os estudantes copiarem no caderno.",
+      "10 perguntas rápidas de verdadeiro ou falso, com a correção explicada em uma frase.",
+      "3 questões no estilo do Enem, com texto-base e 5 alternativas, e o gabarito explicado no fim.",
+      "Escreva tudo em texto normal, sem usar o teste interativo e fora de bloco de código.",
+    ],
+  },
+  {
+    title: "Aula de Física com experimento de baixo custo",
+    stage: "medio", kind: "plano",
+    area: "Física",
+    role: "Você é um(a) professor(a) experiente de Física do Ensino Médio, que gosta de ensinar com experimentos simples e seguros.",
+    task: "Crie um plano de aula sobre [as leis de Newton], com um experimento feito com materiais baratos.",
+    context: [
+      "A turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o componente é Física.",
+      "A escola não tem laboratório: o experimento usa só o que se acha em casa ou no mercado, como [garrafa PET, balão, barbante e fita].",
+      "A aula tem [50 minutos] e a turma tem [30] estudantes, que vão trabalhar em grupos.",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Objetivo, materiais com a quantidade por grupo e o tempo de cada parte: abertura, experimento e fechamento.",
+      "O passo a passo do experimento, com os cuidados de segurança.",
+      "Perguntas para os grupos responderem enquanto observam, ligando o que viram à lei de Newton.",
+      "Uma forma rápida de avaliar no fim e uma adaptação para quem tiver dificuldade.",
+      "Se houver desenho da montagem, descreva entre parênteses.",
+    ],
+    tip: "Teste o experimento antes da aula: o que funciona no papel nem sempre funciona com os materiais que você tem.",
+  },
+  {
+    title: "Lista de exercícios de Química do fácil ao difícil",
+    stage: "medio", kind: "atividade",
+    area: "Química",
+    role: "Você é um(a) professor(a) experiente de Química do Ensino Médio, que sabe criar listas de exercícios claras e graduadas.",
+    task: "Crie uma lista de exercícios para imprimir sobre [balanceamento de equações químicas].",
+    context: [
+      "A turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o componente é Química.",
+      "Os estudantes devem aprender: [entender por que uma equação precisa estar balanceada e balancear pelo método das tentativas].",
+      "Use reações do dia a dia, como [a queima do gás de cozinha e a ferrugem].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e uma explicação curta com um exemplo resolvido.",
+      "10 exercícios em 3 níveis: [4 fáceis, 4 médios e 2 desafios], com o nível marcado em cada um.",
+      "Escreva as fórmulas com números normais, como H2O, e a folha em texto normal, fora de bloco de código.",
+      "No fim, separado, o gabarito com os coeficientes de cada equação.",
+    ],
+    tip: "Confira o gabarito: num balanceamento, um coeficiente errado passa despercebido com facilidade.",
+  },
+  {
+    title: "Debate de Filosofia: um dilema ético em sala",
+    stage: "medio", kind: "plano",
+    area: "Filosofia",
+    role: "Você é um(a) professor(a) experiente de Filosofia do Ensino Médio, que usa o debate para fazer os estudantes pensarem.",
+    task: "Crie um plano de aula com um debate sobre o dilema [é certo mentir para proteger um amigo?].",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos], e o componente é Filosofia.",
+      "A aula tem [50 minutos] e quero que todos falem, não só os mais desinibidos.",
+      "Ligue o dilema a [Kant e ao utilitarismo], com explicações simples e sem citações inventadas.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "A apresentação do dilema em uma história curta, para ler para a turma.",
+      "Um resumo de cada visão filosófica em 3 frases, com um exemplo do dia a dia.",
+      "As regras do debate, os papéis dos grupos e o tempo de cada fala.",
+      "3 perguntas para fechar a aula e uma tarefa curta de escrita para casa.",
+    ],
+    tip: "Se o Gemini puser uma frase entre aspas como se fosse de um filósofo, confira se ela existe antes de usar.",
+  },
+  {
+    title: "Sociologia: ler um gráfico e discutir desigualdade",
+    stage: "medio", kind: "atividade",
+    area: "Sociologia",
+    role: "Você é um(a) professor(a) experiente de Sociologia do Ensino Médio, que ensina a ler dados com olhar crítico.",
+    task: "Crie uma atividade para imprimir sobre [desigualdade de renda no Brasil], a partir da leitura de uma tabela.",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos], e o componente é Sociologia.",
+      "Não invente números como se fossem do IBGE ou de outra pesquisa. Use números de exemplo, marcados como exemplo, ou deixe a tabela com espaços para eu preencher com dados reais.",
+      "Os estudantes devem aprender: [ler uma tabela, comparar grupos e explicar uma desigualdade com conceitos da Sociologia].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e uma tabela simples, montada no texto.",
+      "5 perguntas: 2 de leitura da tabela, 2 de interpretação e 1 de opinião com argumento.",
+      "Um quadro curto com 2 conceitos da Sociologia que ajudam a responder.",
+      "Escreva a folha em texto normal, fora de bloco de código. No fim, separado, as respostas esperadas.",
+    ],
+    tip: "Para dados reais, procure na página do IBGE e preencha a tabela antes de imprimir.",
+  },
+  {
+    title: "Quiz de Literatura: as escolas literárias",
+    stage: "medio", kind: "quiz",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Literatura do Ensino Médio, que sabe criar avaliações claras.",
+    task: "Crie um quiz de 10 perguntas sobre [Romantismo, Realismo e Modernismo no Brasil].",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos].",
+      "Use trechos curtos de obras em domínio público, como [Machado de Assis e José de Alencar]. Não invente trechos nem atribua frases a autores sem certeza.",
+      "O quiz é para [revisar antes da prova].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "10 perguntas de múltipla escolha, com 4 alternativas do mesmo tamanho.",
+      "Pelo menos 4 perguntas partem de um trecho para o estudante reconhecer a escola literária.",
+      "Escreva o quiz em texto, sem usar o teste interativo, pronto para passar para o Google Forms.",
+      "No fim, o gabarito com uma explicação curta de cada resposta.",
+    ],
+    tip: "Confira cada trecho num livro ou num site confiável: o Gemini às vezes mistura autores ou inventa um trecho parecido.",
+  },
+  {
+    title: "História: análise de fontes sobre a Revolução Farroupilha",
+    stage: "medio", kind: "atividade",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História do Ensino Médio, que ensina a ler fontes históricas.",
+    task: "Crie uma atividade de análise de fontes sobre [a Revolução Farroupilha].",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos], e o componente é História.",
+      "Não invente documentos nem citações como se fossem reais. Descreva tipos de fonte, como uma carta, um jornal da época ou uma pintura, e deixe espaço para eu colar uma fonte verdadeira.",
+      "Os estudantes devem aprender: [diferenciar fonte primária de secundária e perceber quem fala, para quem e com que interesse].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Um roteiro de análise de fonte com 5 perguntas que servem para qualquer documento.",
+      "2 propostas de fonte, descritas entre parênteses, com o que procurar em cada uma.",
+      "Uma pergunta final que compara as duas fontes e um parágrafo para o estudante escrever.",
+      "Escreva tudo em texto normal, fora de bloco de código.",
+    ],
+    tip: "Busque as fontes no acervo de um museu ou arquivo público e cole na atividade antes de imprimir.",
+  },
+  {
+    title: "Jogo de revisão no Canvas: tabela periódica",
+    stage: "medio", kind: "jogo",
+    area: "Química",
+    role: "Você é um(a) professor(a) experiente de Química do Ensino Médio, que sabe criar jogos de revisão.",
+    task: "Crie uma página HTML interativa sobre [a tabela periódica]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores fortes, em português do Brasil.",
+    context: [
+      "Depois que a página aparecer, mande na mesma conversa: a turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o jogo é para revisar [famílias, períodos e propriedades dos elementos].",
+      "Vai ser usado [no celular dos estudantes e também no projetor].",
+    ],
+    format: [
+      "3 fases: [símbolos dos elementos, famílias e propriedades].",
+      "Verde e um som no acerto, vermelho e a explicação no erro, um placar e um cronômetro opcional.",
+      "No fim, a pontuação e um botão para jogar de novo.",
+      "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
+    ],
+    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa.",
+  },
+  {
+    title: "Texto de Ciências adaptado para quem tem dificuldade de leitura",
+    stage: "medio", kind: "adaptar",
+    area: "Biologia",
+    role: "Você é um(a) professor(a) experiente do Ensino Médio, que adapta materiais para a inclusão sem tirar o conteúdo.",
+    task: "Adapte o texto que está no fim desta mensagem para um estudante com [dificuldade de leitura e TDAH].",
+    context: [
+      "O estudante é da [1ª série] do Ensino Médio e acompanha a turma no conteúdo, mas se perde em textos longos.",
+      "Mantenha os termos científicos importantes, como [fotossíntese e respiração celular], explicando cada um na primeira vez que aparecer.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Frases curtas, parágrafos de no máximo 3 linhas e subtítulos que digam do que trata cada parte.",
+      "Um quadro com as 5 palavras mais importantes e o significado de cada uma.",
+      "3 perguntas para conferir a leitura, com a resposta no fim.",
+      "No fim, a lista do que você mudou e por quê.",
+      "MATERIAL ORIGINAL:\n[cole aqui o texto, sem nome de estudante]",
+    ],
+    tip: "Descreva a necessidade, nunca o estudante: nada de nome, turma ou laudo no Gemini.",
+  },
 ]
 
-// Describing the three stages: the name on the tags, the ages and the colour
+// Describing the four stages: the name on the tags, the ages and the colour
 const STAGES = {
   infantil: { label: "Educação Infantil", ages: "3 a 5 anos", color: "#ff5f8f", light: "#ffd6e3", area: "Campo de experiência" },
   iniciais: { label: "Anos iniciais", ages: "1º ao 5º ano", color: "#4fd6a6", light: "#c9f5e3", area: "Componente" },
   finais: { label: "Anos finais", ages: "6º ao 9º ano", color: "#8c73ff", light: "#e2dbff", area: "Componente" },
+  medio: { label: "Ensino Médio", ages: "1ª à 3ª série", color: "#ff8a3d", light: "#ffdcc4", area: "Componente" },
 }
 
 // Naming each kind of material, with the colour on top of its cards
@@ -798,6 +1044,7 @@ const KINDS = {
   brincadeira: { label: "Brincadeira no pátio", tint: "#dcf5c8" },
   revisar: { label: "Revisar um material", tint: "#d4f1ff" },
   familias: { label: "Bilhete para as famílias", tint: "#ffe3c9" },
+  enem: { label: "Preparação para o Enem", tint: "#ffe1b0" },
 }
 
 
