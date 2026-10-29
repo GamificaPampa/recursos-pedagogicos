@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cozinha das Misturas · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Ciências para o 6º e o 7º ano: dê nome às mudanças de estado, escolha o jeito certo de separar cada mistura e descubra se a transformação é física ou química.">
+  <meta property="og:title" content="Cozinha das Misturas · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Ciências: estados da matéria, misturas e transformações, com exemplos da cozinha.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Página numa coluna central que cabe no celular e no projetor */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Fases: o professor pode pular para qualquer uma */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase-estrelas { display: inline-flex; gap: 1px; font-style: normal; }
+    .fase-estrelas svg { width: 16px; height: 16px; }
+    .fase-estrelas .apagada path { fill: #e6e3f2; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* O Bit mora dentro do jogo, grande, e deixa a última fala na tela */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* A situação e as escolhas à esquerda, o desenho à direita */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao cena" "controles cena"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 8px !important; font-size: clamp(17px, 2.2vw, 20px); font-weight: 600; line-height: 1.3; }
+    .missao__pergunta { margin-top: 10px !important; font-size: clamp(19px, 2.4vw, 22px); font-weight: 700; line-height: 1.2; color: #c2185b; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 10px; width: 100%; max-width: 440px; }
+    .opcoes--grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opcoes--ferr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opcao { min-height: 56px; padding: 6px 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 21px/1.1 var(--font); color: var(--ink); cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:active:not([disabled]) { transform: translateY(3px); box-shadow: 0 3px 0 var(--ink); }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcao--ferr { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 92px; padding: 6px 8px; font-size: 18px; }
+    .opcao--ferr svg { width: 46px; height: 46px; }
+    .opcao--sinal { display: flex; align-items: center; gap: 10px; text-align: left; font-size: 18px; }
+    .opcao--sinal .caixa { position: relative; flex: none; width: 26px; height: 26px; background: var(--white); border: 3px solid var(--ink); border-radius: 7px; }
+    .opcao--sinal[aria-pressed="true"] { background: var(--yellow); }
+    .opcao--sinal[aria-pressed="true"] .caixa::after { content: ""; position: absolute; left: 50%; top: 42%; width: 30%; height: 56%; border: solid var(--ink); border-width: 0 3.5px 3.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+    .opcoes[hidden], .btn[hidden] { display: none; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* O desafio feito tem um visto, além da cor, e o atual é maior: a cor não é a única pista */
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* O desenho da cena */
+    .cena-area { grid-area: cena; display: grid; gap: 8px; align-content: start; }
+    #cena { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff6dc; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    #cena text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* Fim de uma fase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* Para o professor: o que a turma aprende e as mensagens para um jogo parecido */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .seguranca { margin: 18px 0 0; padding: 12px 16px; background: var(--orange-claro); border: 3px solid var(--ink); border-radius: 16px; font-weight: 600; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "cena" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcoes--grade { grid-template-columns: minmax(0, 1fr); }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete { animation: none !important; }
+      .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
+      .opcao { transition: none; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">H<sub>2</sub>O</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">°C</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">NaCl</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Cozinha</span> das <span class="pink">Misturas</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Ciências</li>
+        <li class="pill" style="--c: var(--yellow)">6º e 7º ano</li>
+        <li class="pill">Matéria e transformações</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Estados da matéria · desafio 1 de 6</p>
+          <p class="missao__texto" id="texto"></p>
+          <p class="missao__pergunta" id="pergunta" aria-live="polite"></p>
+        </div>
+        <div class="cena-area">
+          <svg id="cena" viewBox="0 0 360 262" role="img" aria-label="Desenho da situação"></svg>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha uma resposta"></div>
+          <div class="acoes">
+            <button class="btn btn--jogar" type="button" id="conferir" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Conferir os sinais</span></button>
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>Os nomes das cinco mudanças de estado (fusão, solidificação, vaporização, condensação e sublimação) e o que acontece com as partículas em cada estado. A diferença entre mistura homogênea (uma fase só) e heterogênea (duas ou mais fases) e o método certo para separar cada uma: catação, peneiração, filtração, decantação, evaporação e imantação. E como saber se uma transformação é física (a substância continua a mesma) ou química (aparece uma substância nova), olhando os sinais: mudança de cor, gás ou fumaça, liberação de calor ou luz, cheiro novo e sólido se formando.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> antes de cada toque, a turma vota e quem votou diferente explica por quê. Na fase 2, pergunte onde cada método aparece na cozinha de casa.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno um exemplo do dia a dia para cada mudança de estado.</li>
+        <li><b>Depois:</b> em duplas, com a professora e só com materiais de cozinha, sem fogo: dissolver sal na água e deixar o prato ao sol até a água evaporar, e observar uma maçã cortada ao ar durante uma hora, anotando o que muda na cor.</li>
+        <li><b>Cuidado com o tema:</b> água fervendo tem bolhas e vapor, mas é transformação física. Os sinais ajudam, mas o que decide é aparecer ou não uma substância nova.</li>
+      </ul>
+      <p class="seguranca">Segurança: o jogo só observa. Fogo, forno e panela quente são coisa de adulto. Nunca misture produtos de limpeza, porque algumas misturas soltam gases perigosos, e não prove leite ou comida estragada.</p>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes e confira os fatos de Ciências que ele escrever, porque ele pode errar.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Ciências] para estudantes do [6º e 7º ano]: uma cena de cozinha com o desenho do antes e do depois, e o estudante escolhe o nome da [mudança de estado] que aconteceu.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: dar nome às mudanças de estado, escolher o jeito certo de separar misturas, dizer se a transformação é física ou química], um botão de dica, uma explicação curta do conceito a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Desenhe os objetos com formas simples (SVG), sem usar letras e símbolos como desenho, e use só situações seguras, sem fogo nem produtos químicos. Não invente fatos científicos: se não tiver certeza, deixe de fora. Não use o teste interativo. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const $ = id => document.getElementById(id)
+  const I = "#2f2a4a", SOFT = "#5b5675"
+
+  /* ---------- Desenhos ----------
+     Tudo é SVG feito aqui. Cada objeto desenha em torno do (0, 0) e a cena põe no lugar. */
+  const traco = (w = 3) => `stroke="${I}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`
+  const g = (x, y, s, conteudo) => `<g transform="translate(${x} ${y})${s && s !== 1 ? ` scale(${s})` : ""}">${conteudo}</g>`
+  let uid = 0
+
+  // Números sorteados sempre iguais para o mesmo desenho (a mistura não muda a cada vez que o jogo redesenha)
+  function sorteio(semente) {
+    let s = semente >>> 0
+    return () => {
+      s = (s + 0x6D2B79F5) >>> 0
+      let t = s
+      t = Math.imul(t ^ t >>> 15, t | 1)
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61)
+      return ((t ^ t >>> 14) >>> 0) / 4294967296
+    }
+  }
+  function espalhar(semente, n, x0, y0, x1, y1, desenho) {
+    const r = sorteio(semente)
+    let s = ""
+    for (let i = 0; i < n; i++) s += desenho(+(x0 + (x1 - x0) * r()).toFixed(1), +(y0 + (y1 - y0) * r()).toFixed(1), r(), i)
+    return s
+  }
+  const onda = (x, y, altura, cor = "#8d89a6", largura = 3.5) => `<path d="M${x} ${y}q6 ${-altura / 4} 0 ${-altura / 2}t0 ${-altura / 2}" fill="none" stroke="${cor}" stroke-width="${largura}" stroke-linecap="round"/>`
+  const gota = (x, y, escala = 1, cor = "#4da3ff") => g(x, y, escala, `<path d="M0 -7C3 -2 6 1 6 4A6 6 0 0 1 -6 4C-6 1 -3 -2 0 -7Z" fill="${cor}" ${traco(2)}/>`)
+  const faixa = (cor, y0, y1) => `<rect x="-200" y="${y0}" width="400" height="${y1 - y0}" fill="${cor}"/>`
+
+  // Estados da matéria: objetos da fase 1
+  const frigideira = `<path d="M40 26h24" stroke="${I}" stroke-width="9" stroke-linecap="round"/><path d="M40 26h24" stroke="#8a86a6" stroke-width="4" stroke-linecap="round"/><ellipse cx="0" cy="28" rx="46" ry="13" fill="#5b5675" ${traco()}/><ellipse cx="0" cy="25" rx="38" ry="9" fill="#8a86a6"/>`
+  const manteiga = derretida => frigideira + (derretida
+    ? `<ellipse cx="0" cy="26" rx="34" ry="8" fill="#ffd23f" ${traco(2.8)}/><path d="M-18 24q8-3 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="14" cy="22" r="2.2" fill="#fff"/>`
+    : `<path d="M-22 6h44v16h-44z" fill="#ffe27a" ${traco(2.8)}/><path d="M-22 6l10-10h44l-10 10z" fill="#fff3b8" ${traco(2.8)}/><path d="M-14 14h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`)
+
+  const forma = gelo => {
+    let s = `<path d="M-48 2h96v28h-96z" fill="#d6dbe6" ${traco()}/>`
+    for (const x of [-42, -14, 14]) s += gelo
+      ? `<rect x="${x}" y="-8" width="28" height="30" rx="5" fill="#e3f5ff" ${traco(2.5)}/><path d="M${x + 6} 0v8" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>`
+      : `<rect x="${x}" y="6" width="28" height="16" rx="4" fill="#4da3ff" ${traco(2.5)}/><path d="M${x + 5} 12q4-3 8 0t8 0" fill="none" stroke="#cfe6ff" stroke-width="2.4" stroke-linecap="round"/>`
+    return s
+  }
+
+  const panela = ferve => {
+    let s = `<rect x="-34" y="62" width="68" height="7" rx="3" fill="#5b5675" ${traco(2.5)}/>`
+    if (ferve) for (const x of [-16, 0, 16]) s += `<path d="M${x - 8} 62C${x - 8} 56 ${x - 2} 54 ${x} 46C${x + 2} 54 ${x + 8} 56 ${x + 8} 62Z" fill="#ff8a3d" ${traco(2.4)}/><path d="M${x - 3} 62C${x - 3} 58 ${x} 56 ${x} 52C${x} 56 ${x + 3} 58 ${x + 3} 62Z" fill="#ffd23f"/>`
+    s += `<rect x="-46" y="4" width="12" height="9" rx="3" fill="#5b5675" ${traco(2.5)}/><rect x="34" y="4" width="12" height="9" rx="3" fill="#5b5675" ${traco(2.5)}/>`
+    s += `<path d="M-36 -2h72v46q0 4-4 4h-64q-4 0-4-4z" fill="#aeb4c4" ${traco()}/><path d="M-30 6h60v34q0 4-4 4h-52q-4 0-4-4z" fill="#8cc4ff"/><path d="M-30 6q6-4 12 0t12 0 12 0 12 0 12 0" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`
+    if (ferve) {
+      for (const [x, y, r] of [[-14, 22, 4], [8, 26, 3.4], [16, 14, 3], [-4, 12, 2.6], [-20, 32, 2.6]]) s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#e3f5ff" ${traco(1.8)}/>`
+      s += onda(-16, -8, 28) + onda(0, -8, 32) + onda(16, -8, 28)
+    }
+    return s
+  }
+
+  const copoDeAgua = gotas => {
+    let s = ""
+    if (!gotas) s += onda(-42, 14, 22, "#c5d4e6", 3) + onda(42, 20, 22, "#c5d4e6", 3) + onda(-44, -14, 18, "#c5d4e6", 3) + onda(44, -8, 18, "#c5d4e6", 3)
+    s += `<path d="M-26 -36h52l-6 66h-40z" fill="#eef9ff" ${traco()}/><path d="M-24 -14h48l-4 44h-40z" fill="#8cc4ff"/>`
+    s += `<rect x="-15" y="-21" width="15" height="15" rx="3" fill="#e3f5ff" transform="rotate(-8 -8 -14)" ${traco(2.2)}/><rect x="3" y="-15" width="15" height="15" rx="3" fill="#e3f5ff" transform="rotate(10 10 -8)" ${traco(2.2)}/>`
+    if (gotas) s += gota(-34, -8, .9) + gota(-31, 16, .8) + gota(34, 2, .9) + gota(31, 24, .8) + gota(-34, -28, .7) + gota(-14, 4, .55, "#e3f5ff") + gota(12, 14, .55, "#e3f5ff") + gota(14, -26, .5, "#cfe6ff")
+    return s
+  }
+
+  const geloNoCongelador = menor => `<path d="M-48 30h96" stroke="${I}" stroke-width="3.5" stroke-linecap="round"/>` + (menor
+    ? `<rect x="-26" y="-22" width="52" height="52" rx="9" fill="none" stroke="#8d89a6" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 7"/><rect x="-15" y="-1" width="30" height="31" rx="6" fill="#e3f5ff" ${traco()}/><path d="M-8 6v8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>` + onda(-9, -8, 18, "#8d89a6", 3) + onda(9, -8, 18, "#8d89a6", 3)
+    : `<rect x="-26" y="-22" width="52" height="52" rx="9" fill="#e3f5ff" ${traco()}/><path d="M-16 -12v16" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`)
+
+  const pano = seco => `<path d="M-60 -40h120" stroke="${I}" stroke-width="3.5" stroke-linecap="round"/>`
+    + `<path d="M-30 -38h60v54h-60z" fill="${seco ? "#fff6d6" : "#9fcdf5"}" ${traco()}/><path d="M-30 -2h60M-30 8h60" stroke="#ff5f8f" stroke-width="3"/>`
+    + `<rect x="-24" y="-46" width="9" height="14" rx="2" fill="#ff8a3d" ${traco(2.2)}/><rect x="15" y="-46" width="9" height="14" rx="2" fill="#ff8a3d" ${traco(2.2)}/>`
+    + (seco ? onda(-12, -52, 20) + onda(12, -52, 20) : gota(-18, 30) + gota(2, 36) + gota(20, 30))
+
+  // Transformações: objetos da fase 3
+  const bolo = pronto => `<path d="M-38 0h76l-6 32h-64z" fill="#aeb4c4" ${traco()}/>` + (pronto
+    ? `<path d="M-34 0C-34 -34 34 -34 34 0z" fill="#e3a14f" ${traco()}/><path d="M-20 -14Q0 -26 20 -14" fill="none" stroke="#a8641e" stroke-width="5" stroke-linecap="round"/>` + onda(-14, -36, 22, "#ff8a3d", 3) + onda(0, -40, 26, "#ff8a3d", 3) + onda(14, -36, 22, "#ff8a3d", 3)
+    : `<path d="M-34 0C-34 -11 34 -11 34 0z" fill="#fff0b0" ${traco(2.6)}/>`)
+
+  const geloOuPoca = poca => `<path d="M-48 30h96" stroke="${I}" stroke-width="3.5" stroke-linecap="round"/>` + (poca
+    ? `<ellipse cx="0" cy="28" rx="42" ry="8" fill="#8cc4ff" ${traco(2.8)}/><path d="M-22 26q8-3 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`
+    : `<rect x="-26" y="-22" width="52" height="52" rx="9" fill="#e3f5ff" ${traco()}/><path d="M-16 -12v16" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`)
+
+  const prego = ferrugem => {
+    const cor = ferrugem ? "#c0622f" : "#aeb4c4"
+    let s = `<path d="M-4 -26h8v52l-4 9-4-9z" fill="${cor}" ${traco()}/><rect x="-13" y="-36" width="26" height="9" rx="3" fill="${cor}" ${traco()}/>`
+    if (ferrugem) s += espalhar(5, 10, -3, -22, 3, 24, (x, y, a, i) => `<circle cx="${x}" cy="${y}" r="${(1.2 + a * 1.4).toFixed(1)}" fill="${i % 2 ? "#7a3314" : "#e8944a"}"/>`) + `<circle cx="-7" cy="-32" r="1.8" fill="#7a3314"/><circle cx="8" cy="-31" r="2.2" fill="#e8944a"/>`
+    else s += `<path d="M-1 -20v34" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M-8 -33h6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>`
+    return g(0, 0, 1.35, s)
+  }
+
+  const papel = rasgado => {
+    if (!rasgado) return `<path d="M-28 -40h40l16 16v62h-56z" fill="#fff" ${traco()}/><path d="M12 -40v16h16" fill="#e8e6f2" ${traco(2.5)}/><path d="M-20 -12h36M-20 -2h36M-20 8h36M-20 18h22" stroke="#b7b2cf" stroke-width="3" stroke-linecap="round"/>`
+    let s = ""
+    for (const [x, y, giro, esc] of [[-34, -26, -18, 1], [12, -34, 14, .9], [-6, -2, -8, 1.05], [34, 8, 22, .85], [-32, 28, 12, .9], [12, 32, -14, .95]]) {
+      s += g(x, y, esc, `<g transform="rotate(${giro})"><path d="M-15 -10L9 -15L16 5L-4 14L-17 4Z" fill="#fff" ${traco(2.6)}/><path d="M-8 -2h15M-8 5h9" stroke="#b7b2cf" stroke-width="2.4" stroke-linecap="round"/></g>`)
+    }
+    return s
+  }
+
+  const fosforo = aceso => {
+    if (!aceso) return `<rect x="-4" y="-14" width="8" height="58" rx="2" fill="#e9c48a" ${traco(2.6)}/><circle cx="0" cy="-19" r="9" fill="#e5483a" ${traco()}/><path d="M-4 -23l3-2" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>`
+    return `<rect x="-4" y="-14" width="8" height="58" rx="2" fill="#e9c48a" ${traco(2.6)}/><rect x="-4" y="-14" width="8" height="26" rx="2" fill="#3b3550" ${traco(2.6)}/><circle cx="0" cy="-19" r="9" fill="#3b3550" ${traco()}/>`
+      + `<path d="M0 -66C14 -48 17 -38 11 -29C7 -23 -7 -23 -11 -29C-17 -38 -14 -48 0 -66Z" fill="#ff8a3d" ${traco()}/><path d="M0 -50C7 -42 8 -37 5 -32C2 -29 -2 -29 -5 -32C-8 -37 -6 -42 0 -50Z" fill="#ffd23f"/>`
+      + onda(-20, -52, 22, "#8d89a6", 3) + onda(20, -56, 22, "#8d89a6", 3)
+  }
+
+  const leite = azedo => {
+    let s = ""
+    if (azedo) s += onda(-12, -42, 26, "#4fd6a6", 3.6) + onda(12, -42, 26, "#4fd6a6", 3.6)
+    s += `<path d="M-26 -36h52l-6 66h-40z" fill="#eef9ff" ${traco()}/><path d="M-24 -14h48l-4 44h-40z" fill="#fffdf4"/><path d="M-24 -14h48" stroke="${I}" stroke-width="2.4"/>`
+    if (azedo) s += espalhar(9, 9, -16, -6, 16, 24, (x, y, a) => `<ellipse cx="${x}" cy="${y}" rx="${(3 + a * 2.6).toFixed(1)}" ry="${(2.4 + a * 1.6).toFixed(1)}" fill="#f1e4b0" ${traco(1.8)}/>`)
+    else s += `<path d="M-16 -6v18" stroke="#e8e6f2" stroke-width="3.5" stroke-linecap="round"/>`
+    return s
+  }
+
+  // Misturas: objetos da fase 2. A origem é o meio da borda de cima do recipiente
+  function tigela(w, h, conteudo) {
+    const id = `t${++uid}`, f = `M${-w / 2} 0H${w / 2}C${w / 2} ${h * .9} ${w * .28} ${h} 0 ${h}S${-w / 2} ${h * .9} ${-w / 2} 0Z`
+    return `<defs><clipPath id="${id}"><path d="${f}"/></clipPath></defs><path d="${f}" fill="#fff"/><g clip-path="url(#${id})">${conteudo}</g><path d="${f}" fill="none" ${traco()}/><rect x="${-w / 2 - 5}" y="-5" width="${w + 10}" height="10" rx="5" fill="#d6dbe6" ${traco(2.6)}/>`
+  }
+  function copoCheio(w, h, conteudo) {
+    const id = `c${++uid}`, f = `M${-w / 2} 0H${w / 2}L${w / 2 - 7} ${h}H${-w / 2 + 7}Z`
+    return `<defs><clipPath id="${id}"><path d="${f}"/></clipPath></defs><path d="${f}" fill="#eef9ff"/><g clip-path="url(#${id})">${conteudo}</g><path d="${f}" fill="none" ${traco()}/>`
+  }
+  const graos = (semente, n, x0, y0, x1, y1) => espalhar(semente, n, x0, y0, x1, y1, (x, y, a) => `<ellipse cx="${x}" cy="${y}" rx="4.4" ry="2.2" transform="rotate(${(a * 180).toFixed(0)} ${x} ${y})" fill="#fffbe8" stroke="${I}" stroke-width="1"/>`)
+  const pedrinhas = (semente, n, x0, y0, x1, y1) => espalhar(semente, n, x0, y0, x1, y1, (x, y, a) => `<ellipse cx="${x}" cy="${y}" rx="${(5 + a * 1.2).toFixed(1)}" ry="4" transform="rotate(${(a * 90).toFixed(0)} ${x} ${y})" fill="#8a8fa3" ${traco(1.6)}/>`)
+  const pontinhos = (semente, n, x0, y0, x1, y1, cor, r = 1.3) => espalhar(semente, n, x0, y0, x1, y1, (x, y) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${cor}"/>`)
+  const cascas = (semente, n, x0, y0, x1, y1, esc = 1) => espalhar(semente, n, x0, y0, x1, y1, (x, y, a) => `<path transform="translate(${x} ${y}) rotate(${(a * 360).toFixed(0)}) scale(${esc})" d="M-5 -2L1 -5L6 0L3 5L-4 4Z" fill="#a8641e" ${traco(1.4)}/>`)
+  const limalha = (semente, n, x0, y0, x1, y1) => pontinhos(semente, n, x0, y0, x1, y1, "#4a4563", 1.5)
+
+  const ima = (limalhaNasPontas = true) => {
+    let s = `<path d="M-17 34V-4A17 17 0 0 1 17 -4V34" fill="none" stroke="${I}" stroke-width="19" stroke-linecap="butt"/><path d="M-17 34V-4A17 17 0 0 1 17 -4V34" fill="none" stroke="#e5483a" stroke-width="13" stroke-linecap="butt"/>`
+    s += `<rect x="-24" y="26" width="14" height="12" fill="#dfe3ee" ${traco(2.4)}/><rect x="10" y="26" width="14" height="12" fill="#dfe3ee" ${traco(2.4)}/>`
+    if (limalhaNasPontas) s += pontinhos(4, 14, -26, 40, -8, 52, "#4a4563", 1.8) + pontinhos(5, 14, 8, 40, 26, 52, "#4a4563", 1.8)
+    return s
+  }
+  const sol = `<circle cx="0" cy="0" r="9" fill="#ffd23f" ${traco(2.6)}/><path d="M0 -15v-5M0 15v5M-15 0h-5M15 0h5M-11 -11l-4 -4M11 -11l4 -4M-11 11l-4 4M11 11l4 4" stroke="${I}" stroke-width="2.6" stroke-linecap="round"/>`
+
+  // Estados e partículas: a Dica mostra o estado e como as partículas ficam
+  function particulas(estado, cx, cy) {
+    let pts = []
+    if (estado === "sólido") for (let l = 0; l < 3; l++) for (let c = 0; c < 6; c++) pts.push([(c - 2.5) * 11, (l - 1) * 11])
+    else if (estado === "líquido") { const r = sorteio(7); for (let l = 0; l < 3; l++) for (let c = 0; c < 6; c++) pts.push([(c - 2.5) * 12 + (r() - .5) * 7, (l - 1) * 11 + (r() - .5) * 5]) }
+    else pts = [[-52, -12], [-22, -14], [6, -4], [38, -13], [-38, 11], [-6, 14], [26, 9], [52, 13]]
+    return pts.map(([x, y]) => `<circle cx="${(cx + x).toFixed(1)}" cy="${(cy + y).toFixed(1)}" r="4.2" fill="#a08bff" stroke="${I}" stroke-width="1.8"/>`).join("")
+  }
+  const COR_ESTADO = { "sólido": "#ffd23f", "líquido": "#8cc4ff", "gasoso": "#d9ccff" }
+  const pilula = (estado, cx, y) => `<rect x="${cx - 36}" y="${y}" width="72" height="24" rx="12" fill="${COR_ESTADO[estado]}" ${traco(2.5)}/><text x="${cx}" y="${y + 17}" text-anchor="middle" font-size="15" font-weight="700" fill="${I}">${estado}</text>`
+
+  /* ---------- Cenas ---------- */
+  const PX = [8, 202], PW = 150, PY = 20, PH = 224
+  const moldura = (i, rotulo, fundo = "#fff") => `<rect x="${PX[i]}" y="${PY}" width="${PW}" height="${PH}" rx="18" fill="${fundo}" ${traco(3.5)}/><text x="${PX[i] + 14}" y="${PY + 27}" font-size="16" font-weight="700" fill="${SOFT}">${rotulo}</text>`
+  const SETA = `<path d="M166 132H190M182 121L193 132L182 143" fill="none" ${traco(5)}/>`
+
+  // Fases 1 e 3: o antes e o depois
+  function cenaPar(r, comEstados) {
+    let s = ""
+    ;[["Antes", r.antes, r.de], ["Depois", r.depois, r.para]].forEach(([rotulo, desenho, estado], i) => {
+      const cx = PX[i] + PW / 2
+      s += moldura(i, rotulo, r.fundo?.[i])
+      s += g(cx, r.cy, r.escala ?? 1, desenho())
+      if (comEstados && estado) s += particulas(estado, cx, PY + PH - 62) + pilula(estado, cx, PY + PH - 34)
+    })
+    return s + SETA
+  }
+
+  // Fase 2: a mistura à esquerda e, depois do método certo, as partes separadas à direita
+  function cenaMisturas(r) {
+    let s = moldura(0, "A mistura") + moldura(1, "Depois") + SETA
+    s += g(PX[0] + PW / 2, 118, 1, r.mistura())
+    if (r.separado) {
+      s += g(PX[1] + PW / 2, 118, 1, r.separado())
+      s += `<text x="${PX[1] + PW / 2}" y="${PY + PH - 18}" text-anchor="middle" font-size="19" font-weight="700" fill="${I}">${METODOS.find(m => m.id === r.metodo).nome}</text>`
+    } else {
+      s += `<rect x="${PX[1] + 22}" y="70" width="${PW - 44}" height="120" rx="16" fill="none" stroke="#b7b2cf" stroke-width="4" stroke-dasharray="9 9"/><text x="${PX[1] + PW / 2}" y="144" text-anchor="middle" font-size="56" font-weight="700" fill="#b7b2cf">?</text>`
+    }
+    return s
+  }
+  // Duas partes lado a lado na parte "Depois" da fase 2
+  const duas = (esq, dir) => g(-36, 0, 1, esq) + g(38, 0, 1, dir)
+
+  /* ---------- Ferramentas da fase 2 (ícones de 48 x 48) ---------- */
+  const ICONE = {
+    catacao: `<path d="M13 5L24 37M35 5L24 37" fill="none" stroke="${I}" stroke-width="6" stroke-linecap="round"/><path d="M13 5L24 37M35 5L24 37" fill="none" stroke="#d6dbe6" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="24" cy="42" rx="6" ry="4" fill="#8a8fa3" ${traco(2.2)}/>`,
+    peneiracao: `<defs><clipPath id="ic-pen"><circle cx="21" cy="21" r="14"/></clipPath></defs><path d="M31 31L43 43" stroke="${I}" stroke-width="8" stroke-linecap="round"/><path d="M31 31L43 43" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round"/><circle cx="21" cy="21" r="15" fill="#f6fbff" ${traco(3)}/><g clip-path="url(#ic-pen)" stroke="${SOFT}" stroke-width="1.8"><path d="M9 14h24M9 21h24M9 28h24M14 6v30M21 6v30M28 6v30"/></g><circle cx="21" cy="21" r="15" fill="none" ${traco(3)}/>`,
+    filtracao: `<path d="M6 6h36L29 25v9h-10v-9z" fill="#fff" ${traco(3)}/><path d="M12 12h24L27 24h-6z" fill="#e8d9b5" stroke="${I}" stroke-width="2" stroke-linejoin="round"/><path d="M24 38v3" stroke="${I}" stroke-width="3" stroke-linecap="round"/>${gota(24, 44, .55, "#8b5a2b")}`,
+    decantacao: `<defs><clipPath id="ic-dec"><path d="M14 17C14 7 34 7 34 17C34 27 29 31 26 35h-4C19 31 14 27 14 17Z"/></clipPath></defs><rect x="20" y="3" width="8" height="6" rx="1.5" fill="#d6dbe6" ${traco(2.2)}/><g clip-path="url(#ic-dec)"><rect x="6" y="6" width="36" height="14" fill="#ffd23f"/><rect x="6" y="20" width="36" height="20" fill="#4da3ff"/></g><path d="M14 17C14 7 34 7 34 17C34 27 29 31 26 35h-4C19 31 14 27 14 17Z" fill="none" ${traco(3)}/><rect x="22" y="35" width="4" height="8" fill="#d6dbe6" ${traco(2.2)}/><path d="M17 40h9" stroke="${I}" stroke-width="3.4" stroke-linecap="round"/>`,
+    evaporacao: `<g transform="translate(37 10)">${g(0, 0, .62, sol)}</g><path d="M4 32Q24 50 44 32Z" fill="#d6dbe6" ${traco(2.8)}/><path d="M11 32l3-5 4 5M20 32l4-6 4 6M28 32l3-5 4 5" fill="#fff" stroke="${I}" stroke-width="2" stroke-linejoin="round"/>${onda(15, 22, 14, "#8d89a6", 2.6)}${onda(25, 20, 14, "#8d89a6", 2.6)}`,
+    imantacao: `<path d="M12 40V19A12 12 0 0 1 36 19V40" fill="none" stroke="${I}" stroke-width="13" stroke-linecap="butt"/><path d="M12 40V19A12 12 0 0 1 36 19V40" fill="none" stroke="#e5483a" stroke-width="8" stroke-linecap="butt"/><rect x="6" y="34" width="12" height="9" fill="#dfe3ee" ${traco(2)}/><rect x="30" y="34" width="12" height="9" fill="#dfe3ee" ${traco(2)}/>`,
+  }
+  const METODOS = [
+    { id: "filtracao", nome: "Filtração", def: "separa um sólido de um líquido com um filtro, que deixa o líquido passar e prende o sólido" },
+    { id: "decantacao", nome: "Decantação", def: "deixa a mistura parada para a parte mais pesada ir ao fundo, ou usa um funil para separar dois líquidos que não se misturam" },
+    { id: "peneiracao", nome: "Peneiração", def: "separa sólidos de tamanhos diferentes: os pequenos passam pelos furos da peneira e os grandes ficam" },
+    { id: "evaporacao", nome: "Evaporação", def: "separa um sólido dissolvido num líquido: o líquido vira vapor e vai embora, e o sólido fica" },
+    { id: "catacao", nome: "Catação", def: "separa à mão, ou com uma pinça, pedaços sólidos que dá para ver e pegar" },
+    { id: "imantacao", nome: "Imantação", def: "usa um ímã para tirar da mistura o que ele atrai, como o ferro" },
+  ]
+  const MUDANCAS = [
+    { id: "fusao", nome: "Fusão", def: "de sólido para líquido" },
+    { id: "solidificacao", nome: "Solidificação", def: "de líquido para sólido" },
+    { id: "vaporizacao", nome: "Vaporização", def: "de líquido para gasoso" },
+    { id: "condensacao", nome: "Condensação", def: "de gasoso para líquido" },
+    { id: "sublimacao", nome: "Sublimação", def: "de sólido direto para gasoso, sem passar pelo líquido" },
+  ]
+  const SINAIS = {
+    cor: "Mudança de cor",
+    gas: "Gás ou fumaça",
+    calor: "Liberação de calor ou luz",
+    cheiro: "Cheiro novo",
+    solido: "Sólido se formando",
+  }
+
+  /* ---------- Conteúdo ---------- */
+  const FASES = [
+    { nome: "Estados da matéria", tipo: "estados", tolera: 2,
+      abertura: "Oi! Eu sou o Bit, e hoje a cozinha é o nosso laboratório. Quando a matéria muda de estado, a mudança ganha um nome. Qual é o nome desta?",
+      rodadas: [
+        { texto: "Uma barra de manteiga vai para a frigideira quente e vira um líquido amarelo.", coisa: "a manteiga", de: "sólido", para: "líquido", certa: "fusao",
+          antes: () => manteiga(false), depois: () => manteiga(true), cy: 108,
+          alt: "Antes: uma barra de manteiga sólida numa frigideira. Depois: a manteiga derretida, uma poça amarela.",
+          dica: "A manteiga começa firme e termina escorrendo. O que o calor da frigideira fez com ela?",
+          expl: "Fusão: o sólido vira líquido quando recebe calor. A manteiga derrete." },
+        { texto: "A água da forminha vai para o congelador e vira cubos de gelo.", coisa: "a água", de: "líquido", para: "sólido", certa: "solidificacao",
+          antes: () => forma(false), depois: () => forma(true), cy: 108,
+          alt: "Antes: uma forma de gelo com água. Depois: a mesma forma com cubos de gelo.",
+          dica: "A água vai para um lugar muito frio, perde calor e fica dura. O que acontece com ela?",
+          expl: "Solidificação: o líquido vira sólido quando perde calor. É o contrário da fusão." },
+        { texto: "A água de uma panela no fogo começa a ferver, com bolhas, e sobe vapor.", coisa: "a água da panela", de: "líquido", para: "gasoso", certa: "vaporizacao",
+          antes: () => panela(false), depois: () => panela(true), cy: 108,
+          alt: "Antes: uma panela com água, sem fogo. Depois: a água fervendo, com bolhas e vapor subindo, e fogo embaixo.",
+          dica: "A água vai embora da panela aos poucos, subindo como vapor. Ela sai de que estado e vai para qual?",
+          expl: "Vaporização: o líquido vira gasoso. Quando é rápida, com bolhas, como na panela, chamamos de ebulição, que é um tipo de vaporização. Só adulto mexe na panela quente." },
+        { texto: "Um copo de água gelada fica cheio de gotinhas do lado de fora.", coisa: "o vapor de água do ar", de: "gasoso", para: "líquido", certa: "condensacao",
+          antes: () => copoDeAgua(false), depois: () => copoDeAgua(true), cy: 108,
+          alt: "Antes: um copo de água com gelo, seco por fora, com vapor no ar em volta. Depois: o mesmo copo com gotinhas por fora.",
+          dica: "As gotinhas aparecem do lado de fora, e a água do copo não atravessa o vidro. De onde ela vem?",
+          expl: "Condensação: o vapor de água que já estava no ar encosta no vidro gelado e vira líquido. A água não vem de dentro do copo. É o contrário da vaporização." },
+        { texto: "Um cubo de gelo esquecido no congelador vai ficando menor, e não aparece nenhuma gotinha de água.", coisa: "o gelo", de: "sólido", para: "gasoso", certa: "sublimacao",
+          antes: () => geloNoCongelador(false), depois: () => geloNoCongelador(true), cy: 108, fundo: ["#e8f6ff", "#e8f6ff"],
+          alt: "Antes: um cubo de gelo grande numa prateleira do congelador. Depois: o cubo menor, com o contorno tracejado de como era e vapor subindo.",
+          dica: "O gelo diminui, mas não sobra água. Ele foi para algum lugar sem virar líquido.",
+          expl: "Sublimação: o sólido vira gasoso direto, sem passar pelo líquido. O congelador é frio demais para o gelo derreter, mas ele vai sumindo aos poucos." },
+        { texto: "Um pano de prato molhado seca no varal, sem ferver.", coisa: "a água do pano", de: "líquido", para: "gasoso", certa: "vaporizacao",
+          antes: () => pano(false), depois: () => pano(true), cy: 118,
+          alt: "Antes: um pano de prato molhado, pingando, preso no varal. Depois: o pano seco, com vapor subindo.",
+          dica: "O pano seca sem ferver: a água vai para o ar, devagar.",
+          expl: "Vaporização de novo: a água do pano vira vapor e vai para o ar. Quando é devagar e só na superfície, chamamos de evaporação." },
+      ],
+      fim: "Você deu nome às mudanças de estado. Fusão e solidificação são opostas, vaporização e condensação também, e a sublimação pula o líquido." },
+
+    { nome: "Misturas e separação", tipo: "misturas", tolera: 3,
+      abertura: "Na cozinha tem muita mistura. Primeiro diga se ela é homogênea ou heterogênea. Depois escolha como separar. Na vida real, nunca misture produtos de limpeza, combinado?",
+      rodadas: [
+        { texto: "Um prato de arroz veio com pedrinhas misturadas, de tamanho parecido com o dos grãos.", tipo: "hetero", metodo: "catacao",
+          mist: "dois sólidos de tamanho parecido, que dá para ver e pegar um por um",
+          partes: "o arroz e as pedrinhas",
+          mistura: () => tigela(118, 46, faixa("#f3ecd0", 4, 60) + graos(21, 64, -52, 6, 52, 40) + pedrinhas(22, 6, -46, 8, 46, 36)),
+          separado: () => duas(tigela(62, 30, faixa("#f3ecd0", 4, 40) + graos(23, 34, -28, 6, 28, 26)), tigela(46, 24, faixa("#f3ecd0", 4, 40) + pedrinhas(24, 5, -18, 6, 18, 20))),
+          alt: "Uma tigela com grãos de arroz brancos e pedrinhas cinzentas misturados.",
+          nao: { peneiracao: "As pedrinhas e os grãos de arroz têm tamanho parecido: ou os dois passariam pelos furos, ou os dois ficariam presos." },
+          dica2: "As pedrinhas dá para ver e pegar com a mão, uma por uma.",
+          expl2: "Catação: pegamos cada pedrinha com a mão ou com uma pinça. Serve para pedaços sólidos que dá para ver e pegar, como o feijão com pedrinhas." },
+        { texto: "Uma farinha ficou com dezenas de cascas miudinhas misturadas.", tipo: "hetero", metodo: "peneiracao",
+          mist: "um pó fino (a farinha) misturado com dezenas de cascas miudinhas",
+          partes: "a farinha e as cascas",
+          mistura: () => tigela(118, 46, faixa("#f7e9c6", 4, 60) + pontinhos(31, 40, -52, 6, 52, 40, "#e6cf9c") + cascas(32, 16, -46, 6, 46, 36, .8)),
+          separado: () => duas(tigela(62, 30, faixa("#f7e9c6", 4, 40) + pontinhos(33, 20, -28, 6, 28, 26, "#e6cf9c")), tigela(46, 24, faixa("#fff", 4, 40) + cascas(34, 6, -16, 8, 16, 20, .8))),
+          alt: "Uma tigela de farinha clara com vários pedacinhos marrons de casca misturados.",
+          nao: { catacao: "Seriam dezenas de cascas miudinhas: pegar uma por uma demora demais. Existe um jeito que separa tudo de uma vez." },
+          dica2: "A farinha é um pó fino e as cascas são maiores. Algo cheio de furinhos deixa passar só o fino.",
+          expl2: "Peneiração: os furos da peneira deixam passar o pó fino da farinha, e as cascas, que são maiores, ficam para trás. Funciona com sólidos de tamanhos bem diferentes." },
+        { texto: "Água quente e pó de café estão misturados. O pó precisa ficar para trás, e só o líquido passa.", tipo: "hetero", metodo: "filtracao",
+          mist: "um sólido (o pó) espalhado num líquido (a água), e o líquido precisa sair limpo, sem esperar",
+          partes: "a água e o pó de café",
+          mistura: () => copoCheio(70, 84, faixa("#b07a43", 8, 90) + espalhar(41, 30, -32, 12, 32, 82, (x, y) => `<circle cx="${x}" cy="${y}" r="2.3" fill="#4a2f1a"/>`)),
+          separado: () => duas(copoCheio(48, 62, faixa("#b07a43", 8, 70)), g(0, 14, 1, `<path d="M-26 0H26L0 34Z" fill="#fff" ${traco()}/><path d="M-20 4H20L0 26Z" fill="#fff"/><ellipse cx="0" cy="6" rx="18" ry="6" fill="#4a2f1a" ${traco(2.4)}/>`)),
+          alt: "Um copo com água marrom e pontinhos escuros de pó de café espalhados por todo o líquido.",
+          nao: { decantacao: "Até daria para esperar o pó descer, mas levaria muito tempo e o líquido ainda ficaria turvo. Existe um jeito que segura o pó e deixa o líquido passar." },
+          dica2: "Um papel com furinhos bem pequenos deixa a água passar e segura o pó.",
+          expl2: "Filtração: o papel do coador tem furinhos tão pequenos que deixam o líquido passar e seguram o pó. Sai só o café líquido." },
+        { texto: "Óleo e água estão no mesmo copo, em duas camadas: o óleo fica por cima.", tipo: "hetero", metodo: "decantacao",
+          mist: "dois líquidos que não se misturam, um em cima do outro",
+          partes: "a água e o óleo, em duas camadas",
+          mistura: () => copoCheio(70, 84, faixa("#4da3ff", 44, 90) + faixa("#ffd23f", 8, 44) + `<path d="M-40 44h80" stroke="${I}" stroke-width="2.4"/>`),
+          separado: () => duas(copoCheio(48, 62, faixa("#4da3ff", 8, 70)), copoCheio(48, 62, faixa("#ffd23f", 8, 70))),
+          alt: "Um copo com duas camadas: azul, a água, embaixo, e amarela, o óleo, em cima.",
+          dica2: "Os dois líquidos não se misturam e ficam em camadas. Pense num funil com uma torneirinha embaixo.",
+          expl2: "Decantação: óleo e água não se misturam e ficam em camadas. No funil de decantação, abre-se a torneirinha para sair primeiro o líquido de baixo, a água, e fecha-se quando chega o óleo." },
+        { texto: "Quem colhe sal quer separar o sal da água do mar, que parece uma água só.", tipo: "homo", metodo: "evaporacao",
+          mist: "um sólido (o sal) dissolvido num líquido (a água)",
+          partes: "a água e o sal, que está dissolvido",
+          mistura: () => copoCheio(70, 84, faixa("#d8f1ff", 8, 90) + `<path d="M-22 18v26M-14 18v10" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>`),
+          separado: () => g(0, 14, 1, tigela(84, 26, faixa("#fff", 4, 40) + espalhar(51, 16, -34, 6, 34, 18, (x, y, a) => `<rect x="${x}" y="${y}" width="5.5" height="5.5" transform="rotate(${(a * 90).toFixed(0)} ${x} ${y})" fill="#fff" stroke="${I}" stroke-width="1.3"/>`))) + g(-40, -44, 1, sol) + onda(-10, 6, 28, "#8d89a6", 3) + onda(8, 4, 32, "#8d89a6", 3) + onda(26, 6, 28, "#8d89a6", 3),
+          alt: "Um copo de água clara com sal dissolvido: o líquido tem um aspecto só, sem nada à vista.",
+          nao: { filtracao: "O sal está dissolvido: ele passa pelo filtro junto com a água.", decantacao: "O sal dissolvido não desce para o fundo, porque ele não é um sólido solto na água." },
+          dica2: "O sal sumiu na água, mas continua lá. O que acontece com a água quando fica muito tempo ao sol?",
+          expl2: "Evaporação: a água vira vapor e vai embora, e o sal fica. É assim que se tira sal da água do mar nas salinas, com sol e vento." },
+        { texto: "Um pozinho de ferro caiu na areia. Os dois estão em pedacinhos do mesmo tamanho.", tipo: "hetero", metodo: "imantacao",
+          mist: "dois sólidos em pedacinhos do mesmo tamanho, e um deles é de ferro",
+          partes: "a areia e o pozinho de ferro",
+          mistura: () => tigela(118, 46, faixa("#e8c98a", 4, 60) + pontinhos(61, 46, -52, 6, 52, 40, "#caa25f") + limalha(62, 30, -50, 6, 50, 40)),
+          separado: () => duas(tigela(62, 30, faixa("#e8c98a", 4, 40) + pontinhos(63, 24, -28, 6, 28, 26, "#caa25f")), g(0, 4, .8, ima(true))),
+          alt: "Uma tigela de areia clara com pontinhos escuros de ferro espalhados.",
+          nao: { peneiracao: "A areia e o ferro têm o mesmo tamanho: os dois passariam pelos furos juntos." },
+          dica2: "O que prende o ferro sem prender a areia? Pense em algo que gruda na porta da geladeira.",
+          expl2: "Imantação: o ímã atrai o ferro, e a areia fica. Só funciona com o que o ímã atrai, como o ferro." },
+      ],
+      fim: "Você separou as misturas pelo jeito certo. O método depende do que está misturado: tamanho, líquido ou sólido, dissolvido ou não." },
+
+    { nome: "Física ou química", tipo: "transformacao", tolera: 3,
+      abertura: "Aqui a gente só observa. Na física, a substância continua a mesma. Na química, aparece uma substância nova. Fogo e forno, só com adulto!",
+      rodadas: [
+        { texto: "A massa do bolo é clara e mole. Depois de um tempo no forno, o bolo fica firme e dourado, e a casa toda fica com cheiro de bolo.", tipo: "quimica", sinais: ["cor", "cheiro"],
+          novo: "o bolo, que não dá para voltar a ser massa",
+          antes: () => bolo(false), depois: () => bolo(true), cy: 128,
+          alt: "Antes: uma forma com massa clara de bolo. Depois: um bolo dourado e alto, com cheirinho subindo.",
+          dica2: "Dá para desassar o bolo e ter a massa de volta?",
+          expl1: "Química: o calor e a mistura dos ingredientes formam substâncias novas. O bolo não volta a ser massa. Agora marque os sinais que o texto conta.",
+          final: "Sinais: a cor mudou, de clara para dourada, e o cheiro de bolo é novo. O calor do forno só faz a reação acontecer: ele não é um sinal dela." },
+        { texto: "Um cubo de gelo fica em cima da mesa, num dia quente, e aos poucos vira uma poça de água.", tipo: "fisica",
+          continua: "o gelo e a poça são a mesma substância, a água, só em outro estado",
+          antes: () => geloOuPoca(false), depois: () => geloOuPoca(true), cy: 128,
+          alt: "Antes: um cubo de gelo sobre a mesa. Depois: uma poça de água no lugar.",
+          dica2: "Depois de derreter, ainda é água? Ela pode voltar a ser gelo?",
+          expl1: "Física: continua sendo água, só mudou de estado. Se a poça voltar ao congelador, vira gelo de novo." },
+        { texto: "Um prego cinza fica esquecido na chuva. Com o tempo, aparecem manchas marrom-alaranjadas nele.", tipo: "quimica", sinais: ["cor"],
+          novo: "a ferrugem, que não é mais ferro",
+          antes: () => prego(false), depois: () => prego(true), cy: 124, fundo: ["#fff", "#fff"],
+          alt: "Antes: um prego cinza e brilhante. Depois: o mesmo prego com manchas marrom-alaranjadas de ferrugem.",
+          dica2: "A mancha marrom é ferro? Dá para voltar a ter o prego como era?",
+          expl1: "Química: o ferro reage com o oxigênio do ar e com a água e vira ferrugem, uma substância nova, que não é mais ferro. Agora marque os sinais que o texto conta.",
+          final: "Sinal: mudança de cor, de cinza para marrom-alaranjado." },
+        { texto: "Uma folha de papel é rasgada em vários pedacinhos.", tipo: "fisica",
+          continua: "cada pedacinho continua sendo papel",
+          antes: () => papel(false), depois: () => papel(true), cy: 128,
+          alt: "Antes: uma folha de papel inteira. Depois: vários pedacinhos de papel espalhados.",
+          dica2: "Cada pedacinho ainda é papel? O que mudou: a substância ou só o tamanho?",
+          expl1: "Física: cada pedacinho continua sendo papel. Mudaram só o tamanho e a forma." },
+        { texto: "Um adulto risca um palito de fósforo. Aparece uma chama, que dá luz e calor, e sobe um pouquinho de fumaça.", tipo: "quimica", sinais: ["calor", "gas"],
+          novo: "o carvão preto e a fumaça, que não eram o palito",
+          antes: () => fosforo(false), depois: () => fosforo(true), cy: 132,
+          alt: "Antes: um palito de fósforo novo, de cabeça vermelha. Depois: o palito com uma chama e fumaça, a cabeça preta.",
+          dica2: "O palito queimado volta a ser como era? O que sobrou dele?",
+          expl1: "Química: a madeira e a cabeça do palito reagem com o oxigênio do ar, e é isso que chamamos de queima. O que sobra, como o carvão preto, é uma substância nova. Agora marque os sinais que o texto conta.",
+          final: "Sinais: liberação de luz e calor, e fumaça. Fósforo é coisa de adulto: a gente só observa." },
+        { texto: "O leite esquecido fora da geladeira por muito tempo fica com cheiro azedo e, depois, aparecem grumos nele.", tipo: "quimica", sinais: ["cheiro", "solido"],
+          novo: "o ácido e os grumos, que não existiam no leite fresco",
+          antes: () => leite(false), depois: () => leite(true), cy: 128,
+          alt: "Antes: um copo de leite branco e liso. Depois: o copo com grumos no leite e linhas verdes de mau cheiro subindo.",
+          dica2: "O leite estragado volta a ser leite fresco? O que apareceu nele?",
+          expl1: "Química: microrganismos transformam o açúcar do leite em ácido, uma substância nova, que muda o cheiro e o gosto. Agora marque os sinais que o texto conta.",
+          final: "Sinais: cheiro novo e grumos, que são um sólido se formando. Leite estragado não se prova nem se bebe." },
+      ],
+      fim: "Na transformação química aparece uma substância nova, e os sinais ajudam a descobrir. Na física, a substância é a mesma, só muda a forma, o tamanho ou o estado." },
+  ]
+
+  /* ---------- O Bit, o som e o topo ---------- */
+  // O Bit dentro do cartão do jogo: o mesmo Bit.diz(pose, texto) dos jogos da org, mas grande e sempre na tela
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  // Sons curtos feitos no navegador, sem arquivos para baixar
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somEstrela = () => tocar([[880, 0, .08], [1175, .06, .12]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  /* ---------- O jogo ---------- */
+  let fase = 0, rodada = 0, etapa = 0, erros = 0, travado = false, dicas = 0, depois = false
+  let marcados = new Set()
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+  const lista = (itens, ultimo = "e") => itens.length < 2 ? itens.join("") : `${itens.slice(0, -1).join(", ")} ${ultimo} ${itens[itens.length - 1]}`
+  const minuscula = texto => texto.charAt(0).toLowerCase() + texto.slice(1)
+
+  function desenharCena() {
+    uid = 0
+    const r = atual()
+    let s = ""
+    if (tipo() === "misturas") s = cenaMisturas({ ...r, separado: depois ? r.separado : null })
+    else s = cenaPar(r, tipo() === "estados" && dicas >= 2)
+    $("cena").innerHTML = s
+    $("cena").setAttribute("aria-label", r.alt)
+    $("nota").textContent = tipo() === "estados"
+      ? (dicas >= 2 ? "Partículas: no sólido ficam juntinhas e arrumadas, no líquido juntas e escorregando, no gasoso soltas e longe." : "Toque em Dica para ver o estado e as partículas.")
+      : tipo() === "misturas" ? "À esquerda, a mistura. À direita, o que sai da separação." : "À esquerda, antes. À direita, depois."
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  function opcoes(itens, { classe = "", lado = "" } = {}) {
+    const caixa = $("opcoes")
+    caixa.className = `opcoes ${lado}`.trim()
+    caixa.hidden = false
+    caixa.innerHTML = itens.map(({ id, rotulo, icone }) => `<button class="opcao ${classe}" type="button" data-id="${id}">${icone ?? ""}<span>${rotulo}</span></button>`).join("")
+    return [...caixa.querySelectorAll(".opcao")]
+  }
+
+  function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    $("conferir").hidden = true
+    etapa = 0
+    dicas = 0
+    depois = false
+    marcados = new Set()
+    const r = atual()
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    $("texto").textContent = r.texto
+    montarEtapa()
+    desenharCena()
+  }
+
+  function montarEtapa() {
+    const r = atual(), t = tipo()
+    $("conferir").hidden = true
+    if (t === "estados") {
+      $("pergunta").textContent = "Qual é o nome desta mudança?"
+      opcoes(MUDANCAS.map(m => ({ id: m.id, rotulo: m.nome })), { lado: "opcoes--grade" }).forEach(b => b.onclick = () => escolherMudanca(b))
+    } else if (t === "misturas" && etapa === 0) {
+      $("pergunta").textContent = "Esta mistura é homogênea ou heterogênea?"
+      opcoes([{ id: "homo", rotulo: "Homogênea" }, { id: "hetero", rotulo: "Heterogênea" }], { lado: "opcoes--grade" }).forEach(b => b.onclick = () => escolherTipoMistura(b))
+    } else if (t === "misturas") {
+      $("pergunta").textContent = "Como separar essa mistura?"
+      opcoes(METODOS.map(m => ({ id: m.id, rotulo: m.nome, icone: `<svg viewBox="0 0 48 48" aria-hidden="true">${ICONE[m.id]}</svg>` })), { classe: "opcao--ferr", lado: "opcoes--ferr" }).forEach(b => b.onclick = () => escolherMetodo(b))
+    } else if (etapa === 0) {
+      $("pergunta").textContent = "A transformação é física ou química?"
+      opcoes([{ id: "fisica", rotulo: "Transformação física" }, { id: "quimica", rotulo: "Transformação química" }], { lado: "opcoes--grade" }).forEach(b => b.onclick = () => escolherTransformacao(b))
+    } else {
+      $("pergunta").textContent = "Quais sinais de reação o texto conta? Marque todos."
+      opcoes(Object.entries(SINAIS).map(([id, rotulo]) => ({ id, rotulo: `${rotulo}`, icone: '<i class="caixa" aria-hidden="true"></i>' })), { classe: "opcao--sinal", lado: "opcoes--grade" }).forEach(b => {
+        b.setAttribute("aria-pressed", "false")
+        b.onclick = () => {
+          const id = b.dataset.id
+          if (marcados.has(id)) marcados.delete(id)
+          else marcados.add(id)
+          b.setAttribute("aria-pressed", String(marcados.has(id)))
+          somClique()
+        }
+      })
+      $("conferir").hidden = false
+    }
+  }
+
+  // Fase 1: o nome da mudança. O erro diz o que aquele nome quer dizer
+  function escolherMudanca(botao) {
+    if (travado || botao.disabled) return
+    const r = atual(), escolhida = MUDANCAS.find(m => m.id === botao.dataset.id)
+    if (escolhida.id === r.certa) {
+      botao.classList.add("certa")
+      return acertou(r.expl)
+    }
+    errou(botao, `${escolhida.nome} é a passagem ${escolhida.def}. Aqui, ${r.coisa} passa de ${r.de} para ${r.para}.`)
+  }
+
+  // Fase 2, parte 1: homogênea ou heterogênea
+  function escolherTipoMistura(botao) {
+    if (travado || botao.disabled) return
+    const r = atual(), id = botao.dataset.id
+    if (id === r.tipo) {
+      somEstrela()
+      etapa = 1
+      dicas = 0
+      window.Bit?.diz("feliz", r.tipo === "hetero"
+        ? `Isso! Heterogênea: dá para ver mais de uma parte, que chamamos de fase. Aqui, ${r.partes}. Agora escolha como separar.`
+        : `Isso! Homogênea: tem um aspecto só, e o sal se dissolveu e não dá para ver, mas continua lá. Agora escolha como separar.`)
+      $("pergunta").textContent = "Como separar essa mistura?"
+      return montarEtapa()
+    }
+    errou(botao, r.tipo === "hetero"
+      ? `Olhe de novo: dá para ver mais de uma parte, ${r.partes}. Cada parte diferente é uma fase, então a mistura é heterogênea.`
+      : `Nada aparece separado: o sal se dissolveu e a mistura tem um aspecto só, uma fase só. Então ela é homogênea.`)
+  }
+
+  // Fase 2, parte 2: o método de separação
+  function escolherMetodo(botao) {
+    if (travado || botao.disabled) return
+    const r = atual(), m = METODOS.find(x => x.id === botao.dataset.id)
+    if (m.id === r.metodo) {
+      botao.classList.add("certa")
+      depois = true
+      desenharCena()
+      return acertou(r.expl2)
+    }
+    errou(botao, r.nao?.[m.id] ?? `${m.nome} ${m.def}. Aqui temos ${r.mist}.`)
+  }
+
+  // Fase 3, parte 1: física ou química
+  function escolherTransformacao(botao) {
+    if (travado || botao.disabled) return
+    const r = atual(), id = botao.dataset.id
+    if (id === r.tipo) {
+      botao.classList.add("certa")
+      if (r.tipo === "fisica") return acertou(r.expl1)
+      somEstrela()
+      etapa = 1
+      dicas = 0
+      window.Bit?.diz("feliz", r.expl1)
+      return montarEtapa()
+    }
+    errou(botao, r.tipo === "quimica"
+      ? `Na transformação física, a substância continua a mesma. Aqui apareceu algo novo: ${r.novo}. Então é química.`
+      : `Na transformação química aparece uma substância nova. Aqui ${r.continua}. Então é física.`)
+  }
+
+  // Fase 3, parte 2: os sinais de reação do texto
+  $("conferir").onclick = () => {
+    if (travado) return
+    const r = atual(), certos = new Set(r.sinais)
+    const demais = [...marcados].filter(s => !certos.has(s)), faltam = [...certos].filter(s => !marcados.has(s))
+    if (!demais.length && !faltam.length) {
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.disabled = true })
+      return acertou(r.final)
+    }
+    erros++
+    somErro()
+    const partes = []
+    if (demais.length) partes.push(`O texto não conta ${demais.length === 1 ? "este sinal" : "estes sinais"}: ${lista(demais.map(s => minuscula(SINAIS[s])))}.`)
+    if (faltam.length) partes.push(`Falta${faltam.length === 1 ? "" : "m"} marcar ${faltam.length === 1 ? "um sinal" : `${faltam.length} sinais`}.`)
+    window.Bit?.diz("ops", `${partes.join(" ")} Releia o texto e procure cor, gás, calor ou luz, cheiro e sólido novo.`)
+  }
+
+  function errou(botao, frase) {
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    window.Bit?.diz("ops", frase)
+  }
+
+  // A dica cresce: primeiro o que olhar, depois a resposta mais perto
+  $("dica").onclick = () => {
+    if (travado) return
+    const r = atual()
+    dicas++
+    if (tipo() === "estados") {
+      if (dicas === 1) return window.Bit?.diz("pensando", r.dica)
+      desenharCena()
+      return window.Bit?.diz("pensando", `No começo, ${r.coisa} está no estado ${r.de}. No fim, está no estado ${r.para}. Que nome tem essa passagem?`)
+    }
+    if (tipo() === "misturas") {
+      if (etapa === 0) return window.Bit?.diz("pensando", "Dá para ver mais de uma parte na mistura? Cada parte diferente é uma fase. Uma fase só é homogênea. Duas ou mais, heterogênea.")
+      return window.Bit?.diz("pensando", dicas % 2 === 1 ? "Pense em como são as partes: sólidas ou líquidas, grandes ou pequenas, soltas ou dissolvidas?" : r.dica2)
+    }
+    if (etapa === 1) return window.Bit?.diz("pensando", "Releia o texto e procure cada sinal: cor, gás ou fumaça, calor ou luz, cheiro, sólido novo. Só vale o que o texto conta.")
+    window.Bit?.diz("pensando", dicas % 2 === 1 ? "Depois da mudança, é a mesma coisa em outra forma, tamanho ou estado? Ou virou algo novo?" : r.dica2)
+  }
+
+  // Depois de um acerto, o desafio fica na tela com a explicação do Bit, até a pessoa tocar em Próximo desafio
+  function acertou(frase) {
+    travado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("dica").hidden = true
+    $("conferir").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    travado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Estrelas por quantos erros houve na fase, e confete
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= FASES[fase].tolera ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    Jogo.progresso?.guardar(fase + 1, estrelas)
+    mostrarEstrelas()
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Cientista da cozinha!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = `Você terminou a fase${comoFoi}. ${FASES[fase].fim}${ultima ? "" : ` Próxima fase: ${FASES[fase + 1].nome}.`}`
+    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    $("seguir").focus()
+    somFesta()
+    window.Bit?.diz("comemorando", ultima ? "Você domina a matéria e suas transformações! Agora é olhar para a cozinha de casa com olhos de cientista." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    travado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span><i class="fase-estrelas" role="img"></i></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  // As estrelas guardadas no aparelho aparecem em cada fase
+  function mostrarEstrelas() {
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => {
+      const guardadas = Jogo.progresso?.estrelas(i + 1) ?? 0
+      const caixa = botao.querySelector(".fase-estrelas")
+      caixa.setAttribute("aria-label", `${guardadas} de 3 estrelas`)
+      caixa.innerHTML = [0, 1, 2].map(n => `<svg viewBox="0 0 32 32" class="${n < guardadas ? "" : "apagada"}"><use href="#estrela"/></svg>`).join("")
+    })
+  }
+  mostrarEstrelas()
+  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+
+  // Copiar as mensagens para o Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

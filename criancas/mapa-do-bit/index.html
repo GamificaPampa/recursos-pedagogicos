@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa do Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Geografia para o ensino médio: calcule distâncias pela escala do mapa, ache pontos por latitude e longitude e ligue as pistas aos seis biomas do Brasil.">
+  <meta property="og:title" content="Mapa do Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Geografia: escala, coordenadas e biomas do Brasil.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase-estrelas { display: inline-flex; gap: 1px; font-style: normal; }
+    .fase-estrelas svg { width: 16px; height: 16px; }
+    .fase-estrelas .apagada path { fill: #e6e3f2; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the map on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao mapa" "controles mapa"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .grande { margin: 8px 0 6px !important; font-size: clamp(34px, 5.6vw, 50px); font-weight: 700; line-height: 1.1; white-space: nowrap; color: #e5398a; }
+    .grande[hidden] { display: none; }
+    .legenda { margin: 0 0 8px !important; font-size: 15px; font-weight: 600; color: var(--soft); }
+    .legenda:empty { display: none; }
+    .missao__texto { font-size: 18px; font-weight: 600; color: var(--ink); }
+    .pistas { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; text-align: left; font-size: 17px; font-weight: 600; line-height: 1.3; }
+    .pistas li { padding: 8px 12px; background: var(--white); border: 3px solid var(--ink); border-radius: 14px; }
+    .pistas li[hidden] { display: none; }
+    .pistas b { display: block; font-size: 14px; color: #e5398a; text-transform: uppercase; letter-spacing: .04em; }
+    .pistas li.nova { animation: balao-surge .35s var(--bounce); }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 380px; }
+    .opcoes--biomas { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 440px; }
+    .opcao { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 6px 12px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 24px var(--font); color: var(--ink); cursor: pointer; }
+    .opcoes--biomas .opcao { font-size: 19px; line-height: 1.1; }
+    .opcao i { flex: none; width: 16px; height: 16px; border: 3px solid var(--ink); border-radius: 50%; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcoes[hidden], .btn[hidden] { display: none; }
+    .toque { margin: 0; max-width: 380px; padding: 10px 14px; background: #fffdf4; border: 3px dashed var(--ink); border-radius: 16px; font-size: 16px; font-weight: 600; text-align: center; }
+    .toque[hidden] { display: none; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A desafio feito tem um visto, além da cor, e o atual é maior: a cor não é a única pista */
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* The map: always a schematic drawing, and the note under it says so */
+    .mapa-area { grid-area: mapa; display: grid; gap: 8px; align-content: start; margin: 0; }
+    #mapa { width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    #mapa text { font-family: var(--font); }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+    .ponto { cursor: pointer; outline: none; }
+    .ponto .anel { fill: rgb(255 210 63 / .45); stroke: var(--ink); stroke-width: 3; opacity: 0; }
+    .ponto:hover .anel, .ponto:focus .anel { opacity: 1; }
+    .ponto:focus .anel { stroke: #e5398a; stroke-width: 4; }
+    .regiao { transition: fill .3s ease; }
+    .pega use { animation: estrela-pega .5s var(--bounce); }
+    @keyframes estrela-pega { 50% { transform: scale(1.4); } }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(32px, 6vw, 50px); }
+    .fim p { margin: 0; max-width: 460px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "mapa" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .pistas { font-size: 16px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .opcoes--biomas .opcao { font-size: 17px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pega use, .confete, .fala-bit__bit img, .fala-bit__balao, .pistas li, .regiao { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">1:50.000</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">30°S</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">N</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Mapa</span> do <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">Geografia</li>
+        <li class="pill" style="--c: var(--yellow)">1º ano do ensino médio</li>
+        <li class="pill">Escala, coordenadas e biomas</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Escala · desafio 1 de 6</p>
+          <p class="grande" id="grande" aria-live="polite"></p>
+          <p class="legenda" id="legenda"></p>
+          <div class="missao__texto" id="texto"></div>
+        </div>
+        <figure class="mapa-area">
+          <svg id="mapa" viewBox="0 0 424 300" role="img" aria-label="Mapa esquemático"></svg>
+          <figcaption class="nota" id="nota"></figcaption>
+        </figure>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha a resposta"></div>
+          <p class="toque" id="toque" hidden>Toque no cruzamento das linhas, ou use as setas do teclado e a tecla Enter.</p>
+          <div class="acoes">
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>Três ideias de leitura de mapas. Escala: quanto a realidade foi diminuída para caber no papel, e como ir do mapa ao chão (multiplicar) e do chão ao mapa (dividir). Coordenadas: a latitude conta a partir do Equador, para o norte ou para o sul, e a longitude conta a partir do meridiano de Greenwich, para o leste ou para o oeste. Biomas: cada um dos seis biomas brasileiros (Amazônia, Cerrado, Caatinga, Mata Atlântica, Pantanal e Pampa) tem clima, plantas e lugar próprios.</p>
+      <p><b>Atenção:</b> os mapas do jogo são esquemáticos, feitos para treinar a leitura. Formas, tamanhos e limites dos biomas são aproximados, e os números das contas de escala são exemplos. Para trabalhar com mapas de verdade, use um atlas ou os mapas do IBGE.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> antes de cada resposta, a turma faz a conta no caderno e vota. Uma pessoa explica o caminho: o que multiplicou, de onde saiu o zero a mais.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota, no caderno, as coordenadas aproximadas da própria escola, procurando num atlas ou num mapa digital.</li>
+        <li><b>Depois:</b> em duplas, a turma mede com a régua a distância entre dois pontos num mapa de papel com escala e calcula a distância real, depois confere com a legenda do mapa.</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Geografia, escala de mapas] para estudantes do [1º ano do ensino médio]: aparece um mapa esquemático com dois pontos, A e B, a distância entre eles em centímetros e a escala, e o estudante escolhe a distância real entre três respostas.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: calcular a distância real a partir da escala, achar um ponto pela latitude e pela longitude numa grade, ligar pistas de clima e vegetação aos biomas brasileiros], um botão de dica, o jogo explica a conta ou o motivo em cada acerto e em cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Avise na tela que os mapas são esquemáticos e que os números são de exemplo. Confira cada conta e cada fato. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const $ = id => document.getElementById(id)
+  const INK = "#2f2a4a"
+
+  // ---------------------------------------------------------------------------------------------
+  // Fase 1: escala. Cada resposta vem com a explicação do erro. A primeira de cada lista é a certa;
+  // as opções são embaralhadas na tela. Os números são exemplos.
+  // ---------------------------------------------------------------------------------------------
+  const FASE_ESCALA = {
+    nome: "Escala", tipo: "escala",
+    abertura: "Oi! Eu sou o Bit. A escala diz quantas vezes a realidade foi diminuída para caber no mapa. Em 1:100.000, 1 cm no mapa vale 100.000 cm no chão. Vamos calcular distâncias?",
+    rodadas: [
+      { escala: "1 : 100.000", legenda: "1 cm no mapa vale 100.000 cm no chão",
+        texto: "No mapa, de A até B há 3 cm. Qual é a distância real entre os dois lugares?",
+        fig: { regua: 3, topo: "3 cm no mapa", baixo: "? de verdade", baixoRev: "3 km de verdade" },
+        opcoes: [["3 km"],
+          ["30 km", "Zero a mais. 3 × 100.000 = 300.000 cm, e 100.000 cm são 1 km. Então 300.000 cm são 3 km."],
+          ["300 km", "Faltou passar de centímetros para quilômetros. 300.000 cm ainda estão em centímetros, e 100.000 cm são 1 km."],
+          ["300 m", "300 m seriam só 30.000 cm. Aqui são 300.000 cm, e cada 100.000 cm é 1 km: ficam 3 km."]],
+        dicas: ["A escala 1:100.000 diz que 1 cm no mapa vale 100.000 cm no chão. Multiplique os 3 cm por esse número.",
+                "3 × 100.000 = 300.000 cm. Para passar para km, lembre que 100.000 cm são 1 km (100 cm = 1 m e 1.000 m = 1 km)."],
+        acerto: "3 cm × 100.000 = 300.000 cm. Como 100.000 cm são 1 km, a distância real é 3 km. Na escala 1:100.000, cada centímetro do mapa vale 1 km." },
+      { escala: "1 : 50.000", legenda: "1 cm no mapa vale 50.000 cm no chão",
+        texto: "No mapa, de A até B há 4 cm. Qual é a distância real?",
+        fig: { regua: 4, topo: "4 cm no mapa", baixo: "? de verdade", baixoRev: "2 km de verdade" },
+        opcoes: [["2 km"],
+          ["20 km", "Zero a mais. 4 × 50.000 = 200.000 cm, e 100.000 cm são 1 km. Então 200.000 cm são 2 km."],
+          ["200 m", "200 m seriam só 20.000 cm. Aqui são 200.000 cm, que dão 2 km."],
+          ["4 km", "Cada centímetro do mapa vale só meio quilômetro (50.000 cm), não 1 km. Então 4 cm valem 2 km."]],
+        dicas: ["Em 1:50.000, 1 cm no mapa vale 50.000 cm no chão. Isso é meio quilômetro, ou 500 m.",
+                "4 cm valem 4 × 500 m = 2.000 m. E 2.000 m são quantos km?"],
+        acerto: "4 × 50.000 = 200.000 cm. Dividindo por 100.000, dá 2 km. Cada centímetro do mapa vale 500 m." },
+      { escala: "1 : 250.000", legenda: "1 cm no mapa vale 250.000 cm no chão",
+        texto: "No mapa, de A até B há 6 cm. Qual é a distância real?",
+        fig: { regua: 6, topo: "6 cm no mapa", baixo: "? de verdade", baixoRev: "15 km de verdade" },
+        opcoes: [["15 km"],
+          ["150 km", "Zero a mais. 6 × 250.000 = 1.500.000 cm, e 1.500.000 ÷ 100.000 = 15 km."],
+          ["1,5 km", "Zero a menos. 1,5 km seriam 150.000 cm. Aqui são 1.500.000 cm, que dão 15 km."],
+          ["25 km", "25 km é o valor de 10 cm (10 × 2,5 km). Aqui são 6 cm: 6 × 2,5 km = 15 km."]],
+        dicas: ["1 cm no mapa vale 250.000 cm no chão. Em km, isso é 250.000 ÷ 100.000 = 2,5 km.",
+                "Agora multiplique: 6 × 2,5 km."],
+        acerto: "6 × 250.000 = 1.500.000 cm, que são 15 km. Cada centímetro do mapa vale 2,5 km." },
+      { escala: "1 : 200.000", legenda: "1 cm no mapa vale 200.000 cm no chão",
+        texto: "A distância real de A até B é de 30 km. Quantos centímetros ela tem no mapa?",
+        fig: { regua: 15, reguaSoNoFim: true, topo: "30 km de verdade", baixo: "? cm no mapa", baixoRev: "15 cm no mapa" },
+        opcoes: [["15 cm"],
+          ["60 cm", "Do chão para o mapa, a conta é de dividir, não de multiplicar. Cada centímetro vale 2 km, então 30 km cabem em 30 ÷ 2 = 15 cm."],
+          ["1,5 cm", "Zero a menos. 30 km ÷ 2 km por centímetro = 15 cm."],
+          ["150 cm", "Zero a mais. 30 km ÷ 2 km por centímetro = 15 cm."]],
+        dicas: ["1 cm no mapa vale 200.000 cm no chão, que são 2 km (200.000 ÷ 100.000).",
+                "Quantos pedaços de 2 km cabem em 30 km? Divida 30 por 2."],
+        acerto: "30 km são 3.000.000 cm. Dividindo por 200.000, dá 15 cm no mapa. Do mapa para o chão, multiplica; do chão para o mapa, divide." },
+      { escala: "1 : ?", legenda: "Descubra a escala deste mapa",
+        texto: "No mapa, A e B estão a 5 cm. No chão, a distância é de 25 km. Qual é a escala?",
+        fig: { regua: 5, topo: "5 cm no mapa", baixo: "25 km de verdade", baixoRev: "25 km de verdade" },
+        opcoes: [["1 : 500.000"],
+          ["1 : 50.000", "Zero a menos. 25 km ÷ 5 cm = 5 km por centímetro, e 5 km são 500.000 cm, não 50.000."],
+          ["1 : 5.000.000", "Zero a mais. 5 km são 500.000 cm, não 5.000.000."],
+          ["1 : 5", "Faltou passar os km para cm. 25 km ÷ 5 cm = 5 km por centímetro, e 5 km são 500.000 cm."]],
+        dicas: ["Quantos km cada centímetro do mapa vale? Divida 25 km por 5 cm.",
+                "5 km em centímetros: 5 × 100.000 = 500.000 cm. A escala é 1 : esse número."],
+        acerto: "25 km ÷ 5 cm = 5 km por centímetro. Como 5 km são 500.000 cm, a escala é 1 : 500.000." },
+      { escala: "1 : ?", legenda: "Em qual escala cabem as ruas e as casas?",
+        texto: "Você quer ver as ruas e as casas de um bairro. Qual destas escalas mostra mais detalhes?",
+        fig: { tres: [["1 : 10.000", "100 m"], ["1 : 100.000", "1 km"], ["1 : 1.000.000", "10 km"]] },
+        opcoes: [["1 : 10.000"],
+          ["1 : 100.000", "Nela, 1 cm vale 1 km: bom para ver uma cidade, mas ainda não dá para ver as casas. Quanto menos chão em cada centímetro, mais detalhes."],
+          ["1 : 1.000.000", "Nela, 1 cm vale 10 km: bom para ver um estado inteiro, mas as ruas somem. Quanto menos chão em cada centímetro, mais detalhes."]],
+        dicas: ["Em qual escala 1 cm do mapa guarda menos chão? Quanto menos chão em cada centímetro, mais detalhes cabem.",
+                "1 : 10.000 → 1 cm vale 100 m. 1 : 100.000 → 1 cm vale 1 km. 1 : 1.000.000 → 1 cm vale 10 km."],
+        acerto: "Em 1 : 10.000, 1 cm vale só 100 m, então cabem ruas e casas. É a escala maior: o número depois dos dois pontos é menor, a área é menor e os detalhes são maiores." },
+    ],
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // Fase 2: coordenadas. A grade vai de 60°S a 60°N e de 60°O a 60°L, com linhas a cada 30°.
+  // ---------------------------------------------------------------------------------------------
+  const FASE_GRADE = {
+    nome: "Coordenadas", tipo: "grade",
+    abertura: "Para achar um lugar na Terra, usamos duas medidas. A latitude conta a partir do Equador, para o norte ou para o sul. A longitude conta a partir do meridiano de Greenwich, para o leste ou para o oeste. Latitude primeiro, longitude depois.",
+    rodadas: [
+      { modo: "ler", lat: -30, lon: -60, grande: "( ? , ? )", legenda: "Latitude primeiro, longitude depois",
+        texto: "Quais são as coordenadas da estrela?",
+        opcoes: [["30°S, 60°O"],
+          ["30°N, 60°O", "A estrela está abaixo da linha do Equador, então a latitude é Sul (S), não Norte."],
+          ["30°S, 60°L", "A estrela está à esquerda do meridiano de Greenwich, então a longitude é Oeste (O), não Leste."],
+          ["60°S, 30°O", "Os números trocaram de lugar. A latitude vem primeiro e é a distância até o Equador: aqui, 30°. A longitude é 60°."]],
+        acerto: "A estrela está 30° abaixo do Equador (30°S) e 60° à esquerda de Greenwich (60°O): 30°S, 60°O." },
+      { modo: "ler", lat: 60, lon: 30, grande: "( ? , ? )", legenda: "Latitude primeiro, longitude depois",
+        texto: "Quais são as coordenadas da estrela?",
+        opcoes: [["60°N, 30°L"],
+          ["60°S, 30°L", "A estrela está acima da linha do Equador, então a latitude é Norte (N), não Sul."],
+          ["60°N, 30°O", "A estrela está à direita do meridiano de Greenwich, então a longitude é Leste (L), não Oeste."],
+          ["30°N, 60°L", "Os números trocaram de lugar. A estrela está a 60° do Equador (latitude) e a 30° de Greenwich (longitude)."]],
+        acerto: "A estrela está 60° acima do Equador (60°N) e 30° à direita de Greenwich (30°L): 60°N, 30°L." },
+      { modo: "ler", lat: -30, lon: 0, grande: "( ? , ? )", legenda: "Latitude primeiro, longitude depois",
+        texto: "Quais são as coordenadas da estrela? Repare onde ela está em relação à linha grossa vertical.",
+        opcoes: [["30°S, 0°"],
+          ["30°S, 30°L", "A estrela está em cima do meridiano de Greenwich, não 30° ao lado dele. Em cima da linha, a longitude é 0°."],
+          ["0°, 30°S", "Os valores trocaram de lugar. A latitude vem primeiro: a estrela está 30° ao sul do Equador. A longitude é 0°, porque ela está em cima de Greenwich."],
+          ["30°N, 0°", "A estrela está abaixo da linha do Equador, então a latitude é Sul (S), não Norte."]],
+        acerto: "A estrela está 30° abaixo do Equador (30°S) e em cima do meridiano de Greenwich. Em cima dele, a longitude é 0°, sem L nem O: 30°S, 0°." },
+      { modo: "marcar", lat: -30, lon: 30, grande: "30°S, 30°L", legenda: "Latitude primeiro, longitude depois",
+        texto: "Toque no ponto da grade que tem essas coordenadas.",
+        acerto: "30°S é 30° abaixo do Equador, e 30°L é 30° à direita de Greenwich. O ponto fica no cruzamento das duas linhas." },
+      { modo: "marcar", lat: 0, lon: -30, grande: "0°, 30°O", legenda: "Latitude primeiro, longitude depois",
+        texto: "Toque no ponto da grade que tem essas coordenadas.",
+        acerto: "Latitude 0° é a própria linha do Equador, sem N nem S. Depois, 30° à esquerda de Greenwich, que é 30°O. O ponto fica em cima do Equador." },
+      { modo: "hemisferios", lat: -30, lon: -56, grande: "Alegrete", legenda: "A cerca de 30°S e 56°O",
+        texto: "Alegrete, no Rio Grande do Sul, fica a cerca de 30°S e 56°O. Em quais hemisférios ela está?",
+        opcoes: [["Sul e Oeste"],
+          ["Norte e Oeste", "Alegrete está a 30°S, ao sul do Equador. Está no hemisfério Sul, não no Norte."],
+          ["Sul e Leste", "Alegrete está a 56°O, à esquerda de Greenwich. Está no hemisfério Oeste, não no Leste."],
+          ["Norte e Leste", "Os dois estão trocados: o S de 30°S é hemisfério Sul, e o O de 56°O é hemisfério Oeste."]],
+        acerto: "30°S fica ao sul do Equador, no hemisfério Sul. 56°O fica a oeste de Greenwich, no hemisfério Oeste. Todo o Brasil está a oeste de Greenwich, e a maior parte dele fica ao sul do Equador." },
+    ],
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // Fase 3: biomas do Brasil. Cada rodada é um bioma, com três pistas (a terceira vem na dica).
+  // O desenho do Brasil e os limites dos biomas são aproximados.
+  // ---------------------------------------------------------------------------------------------
+  const BIOMAS = {
+    amazonia: { nome: "Amazônia", art: "A", cor: "#4fd6a6",
+      marca: "tem floresta densa, calor e chuva o ano todo",
+      pistas: ["Clima equatorial: quente o ano todo e com chuva em quase todos os meses.",
+               "Floresta fechada, com árvores altas e muita sombra no chão.",
+               "Ocupa quase metade do território brasileiro, no Norte, e é cortada pelo rio Amazonas."],
+      acerto: "Amazônia! Clima equatorial, quente e úmido, e floresta densa. É o maior bioma do Brasil e tem uma enorme diversidade de seres vivos." },
+    cerrado: { nome: "Cerrado", art: "O", cor: "#ffd23f",
+      marca: "tem árvores retorcidas e dois tempos bem diferentes: verão chuvoso e inverno seco",
+      pistas: ["Clima tropical com duas estações bem marcadas: verão chuvoso e inverno seco.",
+               "Árvores baixas e retorcidas, de casca grossa, com raízes muito fundas que buscam água.",
+               "Fica no centro do país e guarda nascentes de rios de grandes bacias, como a do São Francisco e a do Tocantins-Araguaia."],
+      acerto: "Cerrado! É a savana brasileira. Com a seca do inverno, as plantas têm casca grossa e raízes fundas. É chamado de berço das águas, porque ali nascem rios de grandes bacias." },
+    caatinga: { nome: "Caatinga", art: "A", cor: "#ff8a3d",
+      marca: "é semiárida, com cactos e pouca chuva",
+      pistas: ["Clima semiárido: chove pouco, de forma irregular, e há secas longas.",
+               "Plantas que perdem as folhas na seca para poupar água, e cactos como o mandacaru e o xique-xique.",
+               "Fica no interior do Nordeste e não existe em nenhum outro país: é um bioma só brasileiro."],
+      acerto: "Caatinga! Semiárido, chuva escassa e plantas adaptadas à seca. Fica no interior do Nordeste e é o único bioma que existe só no Brasil." },
+    mata: { nome: "Mata Atlântica", art: "A", cor: "#ff5f8f",
+      marca: "é uma floresta úmida do litoral, com araucárias no Sul",
+      pistas: ["Clima úmido, com muita chuva perto do mar, e mais frio no Sul do país.",
+               "Floresta de árvores altas, com muitas plantas vivendo sobre os troncos. No Sul aparece a araucária, o pinheiro-do-paraná.",
+               "Estende-se pelo litoral, do Nordeste ao Sul. Já foi bem maior, mas cidades, lavouras e a retirada de madeira reduziram muito essa floresta."],
+      acerto: "Mata Atlântica! Floresta úmida ao longo do litoral. Como grande parte dos brasileiros vive nessa faixa, restou só uma parte pequena da floresta original." },
+    pampa: { nome: "Pampa", art: "O", cor: "#a08bff",
+      marca: "tem campos de capim, poucas árvores e invernos frios",
+      pistas: ["Clima subtropical, com chuva o ano todo e as quatro estações bem marcadas. No inverno faz frio e há geada.",
+               "Campos de capim, com poucas árvores e muitos tipos de gramíneas.",
+               "No Brasil, só existe no Rio Grande do Sul, e continua no Uruguai e na Argentina. A criação de gado e de ovelhas é tradicional."],
+      acerto: "Pampa! Campos abertos, chuva bem distribuída e invernos frios. É o bioma de Alegrete, aqui no Rio Grande do Sul." },
+    pantanal: { nome: "Pantanal", art: "O", cor: "#4da3ff",
+      marca: "é uma planície que alaga na época das chuvas",
+      pistas: ["Clima tropical, com estação chuvosa e estação seca. Na época das chuvas, os rios enchem e transbordam.",
+               "Mistura de campos, matas e áreas alagadas: parte do ano, boa parte do terreno fica debaixo d'água.",
+               "É a maior planície alagável do mundo e fica no Centro-Oeste, em Mato Grosso e Mato Grosso do Sul. Vivem lá o jacaré, a onça-pintada e o tuiuiú."],
+      acerto: "Pantanal! Nas chuvas, os rios transbordam e cobrem a planície; na seca, as águas baixam. Esse sobe e desce da água marca a vida de lá." },
+  }
+  const ORDEM_BIOMAS = ["amazonia", "caatinga", "cerrado", "mata", "pampa", "pantanal"]
+  const FASE_BIOMAS = {
+    nome: "Biomas", tipo: "biomas",
+    abertura: "Bioma é um grande conjunto de ambientes parecidos, com clima, plantas e bichos que combinam. O Brasil tem seis. Leia as pistas e descubra qual é.",
+    rodadas: ORDEM_BIOMAS.map(id => ({ id, texto: "Que bioma tem essas pistas?" })),
+  }
+  const FASES = [FASE_ESCALA, FASE_GRADE, FASE_BIOMAS]
+
+  // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0, revelar = false
+  let opcoesDaRodada = [], tentativas = [], feitos = new Set(), destaque = null, realce = null
+  const atual = () => FASES[fase].rodadas[rodada]
+  const tipo = () => FASES[fase].tipo
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const reduzido = () => matchMedia("(prefers-reduced-motion: reduce)").matches
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  // ---------------------------------------------------------------------------------------------
+  // Desenhos: todos esquemáticos
+  // ---------------------------------------------------------------------------------------------
+  const halo = (x, y, texto, { cor = INK, tam = 15, ancora = "middle", peso = 700 } = {}) =>
+    `<text x="${x}" y="${y}" text-anchor="${ancora}" font-size="${tam}" font-weight="${peso}" fill="${cor}" stroke="#fff" stroke-width="5" stroke-linejoin="round" paint-order="stroke">${texto}</text>`
+  const estrela = (x, y, tam = 38) => `<g class="astro" transform="translate(${x} ${y})" pointer-events="none"><use href="#estrela" x="${-tam / 2}" y="${-tam / 2}" width="${tam}" height="${tam}" style="transform-box: fill-box; transform-origin: center"/></g>`
+
+  // Fase 1: dois pontos, A e B, e a régua do mapa de papel
+  function figEscala(r) {
+    const f = r.fig
+    $("mapa").setAttribute("viewBox", "0 0 424 300")
+    if (f.tres) {
+      let s = `<rect width="424" height="300" fill="#f6f0dc"/>`
+      f.tres.forEach(([escala, chao], i) => {
+        const y = 14 + i * 94
+        s += `<rect x="14" y="${y}" width="396" height="84" rx="14" fill="#fff" stroke="${INK}" stroke-width="3"/>`
+        s += `<text x="30" y="${y + 38}" font-size="28" font-weight="700" fill="#e5398a">${escala}</text>`
+        s += `<rect x="30" y="${y + 52}" width="40" height="14" fill="#fff3b0" stroke="${INK}" stroke-width="2.5"/><text x="80" y="${y + 65}" font-size="16" font-weight="700" fill="${INK}">1 cm no mapa vale</text>`
+        s += revelar
+          ? `<text x="396" y="${y + 38}" text-anchor="end" font-size="30" font-weight="700" fill="${INK}">${chao}</text>`
+          : `<text x="396" y="${y + 38}" text-anchor="end" font-size="30" font-weight="700" fill="#9a95b5">?</text>`
+      })
+      $("mapa").innerHTML = s
+      $("mapa").setAttribute("aria-label", "Desenho esquemático com as escalas 1 : 10.000, 1 : 100.000 e 1 : 1.000.000 e o quanto 1 cm do mapa vale em cada uma")
+      return
+    }
+    const N = f.regua, u = N > 8 ? 20 : 40, ax = 50, bx = ax + N * u, y = 130
+    let s = `<rect width="424" height="300" fill="#f6f0dc"/>`
+    s += `<path d="M-10 52C80 22 140 88 220 56S360 20 440 48" fill="none" stroke="#8fd0ff" stroke-width="14" stroke-linecap="round"/>`
+    s += `<ellipse cx="350" cy="262" rx="46" ry="22" fill="#bfe5ff" stroke="${INK}" stroke-width="2.5"/>`
+    s += `<path d="M24 272q20-34 40 0M54 274q24-42 48 0M300 190q18-30 36 0" fill="#b9dca0" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`
+    s += `<path d="M${ax} ${y}H${bx}" stroke="${INK}" stroke-width="3" stroke-dasharray="7 6"/>`
+    s += `<circle cx="${ax}" cy="${y}" r="11" fill="#ff5f8f" stroke="${INK}" stroke-width="3"/><circle cx="${bx}" cy="${y}" r="11" fill="#4da3ff" stroke="${INK}" stroke-width="3"/>`
+    s += `<text x="${ax}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">A</text><text x="${bx}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">B</text>`
+    const meio = (ax + bx) / 2
+    s += halo(meio, y - 20, f.topo, { tam: 18 })
+    s += halo(meio, y + 38, revelar ? f.baixoRev : f.baixo, { tam: 18, cor: revelar ? "#1b8a62" : "#e5398a" })
+    if (!f.reguaSoNoFim || revelar) {
+      const ry = 188
+      for (let i = 0; i < N; i++) s += `<rect x="${ax + i * u}" y="${ry}" width="${u}" height="16" fill="${i % 2 ? "#fff" : "#fff3b0"}" stroke="${INK}" stroke-width="2"/>`
+      const passo = N > 8 ? 5 : 1
+      for (let i = 0; i <= N; i += passo) s += `<text x="${ax + i * u}" y="${ry + 36}" text-anchor="middle" font-size="14" font-weight="700" fill="${INK}">${i}</text>`
+      s += `<text x="${bx + 14}" y="${ry + 13}" font-size="14" font-weight="700" fill="${INK}">cm</text>`
+    }
+    $("mapa").innerHTML = s
+    $("mapa").setAttribute("aria-label", `Desenho esquemático de um mapa com os pontos A e B ligados por uma linha${f.reguaSoNoFim && !revelar ? "" : ` de ${N} cm`} e uma régua em centímetros`)
+  }
+
+  // Fase 2: grade de latitude e longitude, de 60°S a 60°N e de 60°O a 60°L
+  const GL = 62, GT = 44, GW = 320, GH = 320, MARCAS = [-60, -30, 0, 30, 60]
+  const gx = lon => GL + (lon + 60) / 120 * GW
+  const gy = lat => GT + (60 - lat) / 120 * GH
+  const latTxt = v => v === 0 ? "0°" : `${Math.abs(v)}°${v > 0 ? "N" : "S"}`
+  const lonTxt = v => v === 0 ? "0°" : `${Math.abs(v)}°${v > 0 ? "L" : "O"}`
+  const latExtenso = v => v === 0 ? "0°, sobre o Equador" : `${Math.abs(v)}° ao ${v > 0 ? "norte" : "sul"}`
+  const lonExtenso = v => v === 0 ? "0°, sobre Greenwich" : `${Math.abs(v)}° ao ${v > 0 ? "leste" : "oeste"}`
+  const ILHAS = ["M96 92c18-20 54-12 60 12s-18 38-42 32-34-26-18-44z", "M262 78c20-12 48-4 50 18s-22 30-42 22-24-28-8-40z", "M286 262c18-14 52-6 56 14s-20 34-42 26-30-26-14-40z", "M80 262c16-10 38-4 40 14s-16 26-30 20-20-22-10-34z"]
+  function figGrade(r) {
+    $("mapa").setAttribute("viewBox", "0 0 424 420")
+    const marcar = r.modo === "marcar"
+    let s = `<rect x="${GL}" y="${GT}" width="${GW}" height="${GH}" fill="#e9f6ff"/>`
+    s += ILHAS.map(d => `<path d="${d}" fill="#bfe8b0" stroke="#7aa96c" stroke-width="2.5" stroke-linejoin="round"/>`).join("")
+    for (const v of MARCAS) {
+      s += `<path d="M${gx(v)} ${GT}V${GT + GH}" stroke="${v === 0 ? INK : "#aac6dc"}" stroke-width="${v === 0 ? 3.5 : 1.5}"/>`
+      s += `<path d="M${GL} ${gy(v)}H${GL + GW}" stroke="${v === 0 ? INK : "#aac6dc"}" stroke-width="${v === 0 ? 3.5 : 1.5}"/>`
+      s += `<text x="${gx(v)}" y="${GT + GH + 20}" text-anchor="middle" font-size="14" font-weight="600" fill="#5b5675">${lonTxt(v)}</text>`
+      s += `<text x="${GL - 8}" y="${gy(v) + 5}" text-anchor="end" font-size="14" font-weight="600" fill="#5b5675">${latTxt(v)}</text>`
+    }
+    if (realce?.lat !== undefined) s += `<path d="M${GL} ${gy(realce.lat)}H${GL + GW}" stroke="#ff8a3d" stroke-width="6" stroke-linecap="round"/>`
+    if (realce?.lon !== undefined) s += `<path d="M${gx(realce.lon)} ${GT}V${GT + GH}" stroke="#ff8a3d" stroke-width="6" stroke-linecap="round"/>`
+    s += `<text x="${GL + GW - 6}" y="${gy(0) - 7}" text-anchor="end" font-size="13" font-weight="700" fill="${INK}">Equador</text>`
+    s += `<text x="${gx(0) + 7}" y="${GT + 17}" font-size="13" font-weight="700" fill="${INK}">Greenwich</text>`
+    s += `<text x="${GL + GW - 6}" y="${gy(0) + 19}" text-anchor="end" font-size="13" font-weight="700" fill="#5b5675">Leste</text>`
+    s += `<text x="${GL + 6}" y="${gy(0) + 19}" font-size="13" font-weight="700" fill="#5b5675">Oeste</text>`
+    s += `<text x="${GL + GW / 2}" y="${GT - 14}" text-anchor="middle" font-size="15" font-weight="700" fill="#5b5675">Norte</text>`
+    s += `<text x="${GL + GW / 2}" y="${GT + GH + 42}" text-anchor="middle" font-size="15" font-weight="700" fill="#5b5675">Sul</text>`
+    s += `<rect x="${GL}" y="${GT}" width="${GW}" height="${GH}" fill="none" stroke="${INK}" stroke-width="2.5"/>`
+    // guides from the star to the two axes, shown after the answer
+    const mostrarAstro = !marcar || revelar
+    if (mostrarAstro && revelar) {
+      s += `<path d="M${gx(r.lon)} ${gy(r.lat)}H${GL}M${gx(r.lon)} ${gy(r.lat)}V${GT + GH}" fill="none" stroke="#ff8a3d" stroke-width="3.5" stroke-dasharray="7 6"/>`
+      s += halo(GL + 8, gy(r.lat) - 8, latTxt(r.lat), { cor: "#c25a14", ancora: "start", tam: 14 })
+      s += halo(gx(r.lon) + 8, GT + GH - 8, lonTxt(r.lon), { cor: "#c25a14", ancora: "start", tam: 14 })
+    }
+    tentativas.forEach(([la, lo]) => { s += `<path transform="translate(${gx(lo)} ${gy(la)})" d="M-9 -9L9 9M9 -9L-9 9" stroke="#e5398a" stroke-width="5" stroke-linecap="round"/>` })
+    if (mostrarAstro) s += estrela(gx(r.lon), gy(r.lat))
+    if (marcar && !revelar) {
+      for (const la of [...MARCAS].reverse()) for (const lo of MARCAS) {
+        const feito = tentativas.some(([a, b]) => a === la && b === lo)
+        s += `<g class="ponto" role="button" tabindex="-1" data-lat="${la}" data-lon="${lo}" aria-label="Latitude ${latExtenso(la)}, longitude ${lonExtenso(lo)}"${feito ? ' aria-disabled="true"' : ""} transform="translate(${gx(lo)} ${gy(la)})"><rect x="-40" y="-40" width="80" height="80" fill="transparent"/><circle class="anel" r="19"/>${feito ? "" : `<circle r="5" fill="#fff" stroke="${INK}" stroke-width="2.5"/>`}</g>`
+      }
+    }
+    $("mapa").innerHTML = s
+    const linhasLat = Math.abs(r.lat) / 30, linhasLon = Math.abs(r.lon) / 30
+    const posicao = marcar ? "Escolha um cruzamento da grade." : `A estrela está ${r.lat === 0 ? "em cima do Equador" : `${linhasLat} ${linhasLat === 1 ? "linha" : "linhas"} ${r.lat > 0 ? "acima" : "abaixo"} do Equador`} e ${r.lon === 0 ? "em cima de Greenwich" : r.lon === -56 ? "um pouco à direita da linha mais à esquerda" : `${linhasLon} ${linhasLon === 1 ? "linha" : "linhas"} à ${r.lon > 0 ? "direita" : "esquerda"} de Greenwich`}.`
+    $("mapa").setAttribute("role", marcar && !revelar ? "group" : "img")
+    $("mapa").setAttribute("aria-label", `Mapa esquemático com uma grade de linhas a cada 30 graus, de 60°S a 60°N e de 60°O a 60°L. ${posicao}`)
+    if (marcar && !revelar) prepararPontos()
+  }
+
+  // Keyboard on the grid: arrows move between the crossings, Enter or space picks one
+  function prepararPontos() {
+    const pontos = [...$("mapa").querySelectorAll(".ponto")]
+    const ativo = pontos.find(p => p.dataset.lat === "0" && p.dataset.lon === "0") || pontos[0]
+    ativo.tabIndex = 0
+    const achar = (la, lo) => pontos.find(p => Number(p.dataset.lat) === la && Number(p.dataset.lon) === lo)
+    pontos.forEach(p => {
+      p.onclick = () => marcarPonto(Number(p.dataset.lat), Number(p.dataset.lon))
+      p.onfocus = () => { pontos.forEach(q => q.tabIndex = -1); p.tabIndex = 0 }
+      p.onkeydown = e => {
+        const la = Number(p.dataset.lat), lo = Number(p.dataset.lon)
+        const passo = { ArrowUp: [30, 0], ArrowDown: [-30, 0], ArrowLeft: [0, -30], ArrowRight: [0, 30] }[e.key]
+        if (passo) { e.preventDefault(); achar(la + passo[0], lo + passo[1])?.focus() }
+        else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); marcarPonto(la, lo) }
+      }
+    })
+  }
+
+  // Fase 3: o Brasil esquemático, com o contorno e os biomas em coordenadas aproximadas (lon, lat)
+  const CONTORNO = [[-51.6,4.3],[-51,3],[-50.3,1.8],[-50,.9],[-50.4,0],[-49,-.4],[-48,-.8],[-46.5,-.9],[-45,-1.5],[-44.3,-2.5],[-42.5,-2.8],[-40.5,-2.9],[-39,-3.6],[-37.5,-4.5],[-35.8,-5.1],[-34.9,-6.5],[-34.8,-8],[-35.4,-9.6],[-36.8,-10.8],[-37.7,-12],[-38.6,-13.2],[-39,-15],[-39.2,-17.5],[-39.9,-19.6],[-40.6,-21],[-41.2,-22.1],[-42.1,-22.9],[-43.5,-23],[-44.9,-23.4],[-46.4,-24],[-47.9,-25],[-48.6,-26.2],[-48.6,-27.9],[-49.6,-29.5],[-50.6,-31],[-52,-32.5],[-53.4,-33.7],[-53.2,-32.7],[-53.6,-32],[-55,-31.2],[-56,-30.5],[-57.6,-30.2],[-57,-29.6],[-56,-28.6],[-55,-27.8],[-54,-27.2],[-53.7,-26.3],[-54.5,-25.6],[-54.5,-24.3],[-55.4,-23.3],[-55.7,-22.5],[-56.5,-22.1],[-57.9,-22],[-57.9,-20.5],[-57.6,-19],[-58.2,-17.8],[-58.4,-16.3],[-60.2,-16.3],[-60.3,-14.5],[-61.5,-13.5],[-63,-12.5],[-64.8,-12],[-65.4,-10.3],[-66.8,-9.8],[-68.7,-11],[-70.5,-11],[-72.2,-10],[-73.3,-9.2],[-74,-7.5],[-72.9,-6.9],[-72,-5.5],[-70.8,-4.4],[-69.9,-4.2],[-69.9,-2.5],[-69.4,-1.1],[-69.8,.5],[-69.5,1.1],[-68,1.8],[-67.2,1.8],[-66.9,1.2],[-66,.8],[-65,1.3],[-64,1.8],[-63.4,2.4],[-64,3.6],[-64,4.2],[-62.8,4],[-61,4.5],[-60.5,5.2],[-60,4.6],[-59.9,3],[-59.9,1.8],[-58.5,1.3],[-57,1.9],[-56,2],[-54.5,2.3],[-53.5,2.3],[-52,2.2]]
+  const REGIOES = {
+    mata: [[-33,-5.2],[-33,-29.5],[-49.5,-29.5],[-57,-28.4],[-56.5,-28],[-54.8,-26.8],[-54.7,-24.5],[-53.8,-22.8],[-51.8,-21.8],[-49.5,-21],[-47,-20.8],[-45.5,-19.5],[-43.8,-17.8],[-42,-16],[-40,-13.5],[-38.6,-11.5],[-37,-9.6],[-36,-8],[-35.3,-6]],
+    caatinga: [[-45.5,-4.4],[-44,-3.6],[-41.8,-2.6],[-39,-3.2],[-37,-4.2],[-35.4,-5],[-35.9,-7],[-36.6,-9],[-37.8,-10.8],[-38.8,-11.8],[-39.6,-13],[-40.8,-15],[-42.5,-16.5],[-44.2,-16.2],[-44.8,-14.2],[-45.6,-12],[-45,-9.2],[-45.2,-6.5]],
+    pampa: [[-58,-29.8],[-56.3,-28],[-54.2,-28.7],[-52.6,-29.4],[-52,-29.6],[-50.9,-30.2],[-50,-30.8],[-49.5,-34.5],[-58,-34.5]],
+    pantanal: [[-58.3,-16.5],[-56.6,-16.2],[-55.3,-17.6],[-55.1,-19.6],[-55.7,-21.4],[-57.4,-21.7],[-58.1,-20.3],[-57.9,-18.4]],
+    amazonia: [[-76,8],[-44.4,8],[-44.4,-3.4],[-46,-5.4],[-48.2,-7.2],[-49.8,-9.8],[-50.2,-11.8],[-52,-13],[-54.5,-13.8],[-56.5,-14.2],[-58.4,-16],[-60.5,-15.8],[-62,-14],[-64.5,-12.8],[-67,-11.8],[-70,-12],[-73,-11],[-76,-9.5]],
+  }
+  const ROTULOS = { amazonia: [-61, -4.5, "middle"], cerrado: [-49, -14.5, "middle"], caatinga: [-41.6, -8.8, "middle"], mata: [-51.4, -25.6, "middle"], pampa: [-53.2, -30.9, "middle"], pantanal: [-58.7, -18.6, "end"] }
+  const bx = lon => 14 + (lon + 74.5) * 9.3
+  const by = lat => 14 + (5.5 - lat) * 9.9
+  const pontosPath = pts => "M" + pts.map(([lo, la]) => `${bx(lo).toFixed(1)} ${by(la).toFixed(1)}`).join("L") + "Z"
+  function figBrasil(r) {
+    $("mapa").setAttribute("viewBox", "0 0 424 420")
+    const cor = id => feitos.has(id) ? BIOMAS[id].cor : id === destaque ? "#ffe08a" : "#f0ead8"
+    const traco = id => id === destaque && !feitos.has(id) ? `stroke="#ff8a3d" stroke-width="4"` : `stroke="${INK}" stroke-width="2"`
+    let s = `<defs><clipPath id="contorno"><path d="${pontosPath(CONTORNO)}"/></clipPath></defs><rect width="424" height="420" fill="#eaf5ff"/>`
+    s += `<g clip-path="url(#contorno)"><path class="regiao" d="${pontosPath(CONTORNO)}" fill="${cor("cerrado")}"/>`
+    for (const id of ["mata", "caatinga", "pampa", "pantanal", "amazonia"]) s += `<path class="regiao" d="${pontosPath(REGIOES[id])}" fill="${cor(id)}" ${traco(id)} stroke-linejoin="round"/>`
+    s += `</g><path d="${pontosPath(CONTORNO)}" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`
+    for (const id of feitos) { const [lo, la, a] = ROTULOS[id]; s += halo(bx(lo), by(la), BIOMAS[id].nome, { tam: id === "pantanal" ? 13 : 15, ancora: a }) }
+    $("mapa").innerHTML = s
+    const nomes = [...feitos].map(id => BIOMAS[id].nome)
+    $("mapa").setAttribute("aria-label", `Mapa esquemático do Brasil dividido em seis biomas. ${nomes.length ? `Já descobertos: ${nomes.join(", ")}.` : "Nenhum bioma descoberto ainda."}`)
+  }
+
+  function desenharMapa() {
+    const r = atual()
+    $("mapa").setAttribute("role", "img")
+    if (tipo() === "escala") figEscala(r)
+    else if (tipo() === "grade") figGrade(r)
+    else figBrasil(r)
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // A rodada
+  // ---------------------------------------------------------------------------------------------
+  const NOTAS = {
+    escala: "Desenho esquemático: as formas são só enfeite. As medidas em cm são as de um mapa de papel.",
+    grade: "Mapa esquemático: a grade mostra só de 60°S a 60°N e de 60°O a 60°L. As ilhas são desenho, não são lugares reais.",
+    biomas: "Mapa esquemático do Brasil: o contorno e os limites dos biomas são aproximados.",
+  }
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function montarOpcoes() {
+    const r = atual()
+    if (tipo() === "biomas") {
+      opcoesDaRodada = ORDEM_BIOMAS.map(id => ({ id, ok: id === r.id, html: `<i style="background: ${BIOMAS[id].cor}"></i>${BIOMAS[id].nome}`,
+        why: `${BIOMAS[id].art} ${BIOMAS[id].nome} ${BIOMAS[id].marca}. As pistas falam de outro bioma: releia.` }))
+    } else if (r.opcoes) {
+      const lista = r.opcoes.map(([t, why], i) => ({ html: t, ok: i === 0, why }))
+      opcoesDaRodada = tipo() === "grade" || tipo() === "escala" ? embaralhar(lista) : lista
+    } else opcoesDaRodada = []
+    $("opcoes").className = "opcoes" + (tipo() === "biomas" ? " opcoes--biomas" : "")
+    $("opcoes").hidden = !opcoesDaRodada.length
+    $("opcoes").innerHTML = opcoesDaRodada.map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.html}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
+  }
+  function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    const r = atual()
+    dicas = 0
+    revelar = false
+    tentativas = []
+    destaque = null
+    realce = null
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    $("nota").textContent = NOTAS[tipo()] + (r.lon === -56 ? " A estrela de Alegrete está em 56°O, perto da linha de 60°O." : "")
+    $("toque").hidden = r.modo !== "marcar"
+    if (tipo() === "biomas") {
+      const b = BIOMAS[r.id]
+      $("grande").hidden = true
+      $("legenda").textContent = ""
+      $("texto").innerHTML = `${r.texto}<ul class="pistas"><li><b>Clima</b>${b.pistas[0]}</li><li><b>Plantas</b>${b.pistas[1]}</li><li id="pista-lugar" hidden><b>Lugar</b>${b.pistas[2]}</li></ul>`
+    } else {
+      $("grande").hidden = false
+      $("grande").textContent = r.escala ?? r.grande
+      $("legenda").textContent = r.legenda
+      $("texto").textContent = r.texto
+    }
+    montarOpcoes()
+    desenharMapa()
+  }
+
+  // Escolher entre as respostas. O erro explica o que olhar
+  function escolher(botao) {
+    if (ocupado || botao.disabled) return
+    const o = opcoesDaRodada[botao.dataset.i]
+    if (o.ok) {
+      botao.classList.add("certa")
+      revelar = true
+      destaque = null
+      if (tipo() === "biomas") feitos.add(atual().id)
+      desenharMapa()
+      return acertou(tipo() === "biomas" ? BIOMAS[atual().id].acerto : atual().acerto)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    window.Bit.diz("ops", o.why)
+  }
+
+  // Fase 2: marcar um ponto na grade
+  function marcarPonto(lat, lon) {
+    if (ocupado || tentativas.some(([a, b]) => a === lat && b === lon)) return
+    const r = atual(), focoVolta = document.activeElement?.closest?.(".ponto")
+    if (lat === r.lat && lon === r.lon) {
+      revelar = true
+      desenharMapa()
+      $("mapa").querySelector(".astro")?.classList.add("pega")
+      return acertou(r.acerto)
+    }
+    erros++
+    somErro()
+    tentativas.push([lat, lon])
+    const latOk = lat === r.lat, lonOk = lon === r.lon
+    const dicaLat = r.lat === 0 ? "a latitude 0° é a própria linha do Equador" : `a latitude ${latTxt(r.lat)} fica ${Math.abs(r.lat)}° ${r.lat > 0 ? "acima" : "abaixo"} do Equador`
+    const dicaLon = r.lon === 0 ? "a longitude 0° é o meridiano de Greenwich" : `a longitude ${lonTxt(r.lon)} fica ${Math.abs(r.lon)}° à ${r.lon > 0 ? "direita" : "esquerda"} de Greenwich`
+    const msg = latOk ? `A latitude está certa, mas a longitude não: ${dicaLon}.`
+      : lonOk ? `A longitude está certa, mas a latitude não: ${dicaLat}.`
+      : `Você marcou ${latTxt(lat)}, ${lonTxt(lon)}. Comece pela latitude: ${dicaLat}. Depois a longitude: ${dicaLon}.`
+    window.Bit.diz("ops", msg)
+    desenharMapa()
+    if (focoVolta) {
+      const novo = [...$("mapa").querySelectorAll(".ponto")].find(p => Number(p.dataset.lat) === lat && Number(p.dataset.lon) === lon)
+      ;(novo ?? $("mapa").querySelector(".ponto"))?.focus()
+    }
+  }
+
+  // The hint grows, one step at a time
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual()
+    dicas++
+    if (tipo() === "escala") return window.Bit.diz("pensando", r.dicas[Math.min(dicas, r.dicas.length) - 1])
+    if (tipo() === "biomas") {
+      if (dicas === 1) {
+        const lugar = $("pista-lugar")
+        lugar.hidden = false
+        lugar.classList.add("nova")
+        return window.Bit.diz("pensando", "Chegou uma pista nova, sobre o lugar. Leia a terceira caixa.")
+      }
+      destaque = r.id
+      desenharMapa()
+      return window.Bit.diz("pensando", "A região destacada no mapa é onde fica esse bioma. Que clima e que plantas combinam com esse lugar?")
+    }
+    // grade
+    if (r.modo === "marcar") {
+      if (dicas % 2 === 1) {
+        realce = { lat: r.lat }
+        desenharMapa()
+        return window.Bit.diz("pensando", `Comece pela latitude: ${r.lat === 0 ? "0° é a própria linha do Equador, a linha laranja" : `${Math.abs(r.lat)}° ${r.lat > 0 ? "acima" : "abaixo"} do Equador`}. O ponto está na linha laranja.`)
+      }
+      realce = { lon: r.lon }
+      desenharMapa()
+      return window.Bit.diz("pensando", `Agora a longitude: ${r.lon === 0 ? "0° é o meridiano de Greenwich" : `${Math.abs(r.lon)}° à ${r.lon > 0 ? "direita" : "esquerda"} de Greenwich, para o ${r.lon > 0 ? "leste" : "oeste"}`}. O ponto está na linha laranja vertical.`)
+    }
+    if (r.modo === "hemisferios") {
+      realce = dicas % 2 === 1 ? { lat: 0 } : { lon: 0 }
+      desenharMapa()
+      return window.Bit.diz("pensando", dicas % 2 === 1 ? "A linha laranja é o Equador. A estrela está acima ou abaixo dela? Acima é Norte, abaixo é Sul." : "A linha laranja é o meridiano de Greenwich. A estrela está à esquerda ou à direita dela? Esquerda é Oeste, direita é Leste.")
+    }
+    if (dicas % 2 === 1) {
+      realce = { lat: 0 }
+      desenharMapa()
+      return window.Bit.diz("pensando", "Primeiro a latitude: a estrela está acima ou abaixo do Equador (a linha laranja)? Acima é Norte, abaixo é Sul. Depois conte quantas linhas ela está do Equador, cada uma vale 30°.")
+    }
+    realce = { lon: 0 }
+    desenharMapa()
+    window.Bit.diz("pensando", r.lon === 0 ? "Agora a longitude: a estrela está em cima do meridiano de Greenwich (a linha laranja). Em cima dele, a longitude é 0°, sem L nem O." : "Agora a longitude: a estrela está à esquerda ou à direita de Greenwich (a linha laranja)? Esquerda é Oeste (O), direita é Leste (L). Conte as linhas, cada uma vale 30°.")
+  }
+
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próximo desafio
+  function acertou(frase) {
+    ocupado = true
+    somAcerto()
+    window.Bit.diz("comemorando", frase)
+    $("dica").hidden = true
+    $("toque").hidden = true
+    $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  const fimExtra = Jogo.acoesDoFim(() => comecar(0))
+  const FINS = [
+    "Você calculou as distâncias. Do mapa para o chão, multiplica pela escala; do chão para o mapa, divide. E quanto menor o número depois dos dois pontos, mais detalhes.",
+    "Você achou os pontos. A latitude conta a partir do Equador, para o norte ou para o sul; a longitude conta a partir de Greenwich, para o leste ou para o oeste.",
+    "Você ligou clima, plantas e lugar aos seis biomas do Brasil. Cada bioma tem um conjunto de características que combinam entre si.",
+  ]
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    Jogo.progresso?.guardar?.(fase + 1, estrelas)
+    mostrarEstrelas()
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Mapa completo!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = `Você terminou a fase${comoFoi}. ${FINS[fase]}`
+    $("seguir").hidden = ultima
+    if (ultima) $("fim-texto").after(fimExtra)
+    else fimExtra.remove()
+    $("seguir").querySelector("span").textContent = "Próxima fase"
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;(ultima ? fimExtra.querySelector("button") : $("seguir")).focus()
+    somFesta()
+    window.Bit.diz(ultima ? "formatura" : "comemorando", ultima ? "Escala, coordenadas e biomas: você já sabe ler um mapa! Que tal medir um mapa de papel na sua escola?" : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (reduzido()) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    feitos = new Set()
+    // the biomes come in a different order each time, so the class cannot just memorise the sequence
+    if (tipo() === "biomas") FASES[fase].rodadas = embaralhar(FASES[fase].rodadas)
+    $("fim").hidden = true
+    fimExtra.remove()
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span><i class="fase-estrelas" role="img"></i></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  // As estrelas guardadas no aparelho aparecem em cada fase
+  function mostrarEstrelas() {
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => {
+      const guardadas = Jogo.progresso?.estrelas?.(i + 1) ?? 0
+      const caixa = botao.querySelector(".fase-estrelas")
+      caixa.setAttribute("aria-label", `${guardadas} de 3 estrelas`)
+      caixa.innerHTML = [0, 1, 2].map(n => `<svg viewBox="0 0 32 32" class="${n < guardadas ? "" : "apagada"}"><use href="#estrela"/></svg>`).join("")
+    })
+  }
+  mostrarEstrelas()
+  $("seguir").onclick = () => comecar(fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>
