@@ -207,6 +207,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma diz qual fato veio primeiro ou qual é o século, e explica como pensou.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e copia no caderno a linha do tempo da fase 3.</li>
             <li><b>Depois:</b> a turma monta uma linha do tempo no varal da sala, com fatos da história da escola, da cidade e da família.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -611,6 +612,36 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual(), opcoes = [...$("opcoes").querySelectorAll(".opcao")]
+      if (tipo() === "primeiro") {
+        const [velho, novo] = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1])
+        Jogo.modoProfessor.destacar(opcoes[r.indexOf(velho)])
+        const [av, an] = [FATOS[velho][1], FATOS[novo][1]]
+        const porque = av < 0 && an < 0
+          ? `Antes de Cristo, os anos contam para trás: ${-av} a.C. está mais longe do ano 1 do que ${-an} a.C.`
+          : av < 0 ? `Tudo o que é antes de Cristo vem antes do ano 1, e ${an} d.C. vem depois dele.`
+          : `Depois de Cristo, quanto menor o número, mais antigo: ${av} veio antes de ${an}.`
+        return window.Bit?.diz("pensando", `O mais antigo é: ${FATOS[velho][0]} (${FATOS[velho][2]}). ${porque}`, 14000)
+      }
+      if (tipo() === "seculo") {
+        const [id, lista] = r, ano = FATOS[id][1], n = seculo(ano)
+        Jogo.modoProfessor.destacar(opcoes[lista.indexOf(romano(n))])
+        return window.Bit?.diz("pensando", ano % 100 === 0
+          ? `${ano} termina em 00, então é o último ano do século ${romano(n)}, que vai de ${ano - 99} a ${ano}.`
+          : `Tire os dois últimos números de ${ano} e some 1: ${Math.floor(ano / 100)} + 1 = ${n}, que em romanos é ${romano(n)}.`, 14000)
+      }
+      const ordem = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1]), proximo = ordem[colocados.length]
+      Jogo.modoProfessor.destacar(opcoes[r.indexOf(proximo)])
+      window.Bit?.diz("pensando", `${colocados.length ? "Agora vem" : "O mais antigo é"}: ${FATOS[proximo][0]} (${FATOS[proximo][2]}). A ordem é: ${ordem.map(o => FATOS[o][2].replace("cerca de ", "").replace("por volta de ", "")).join(", ")}.`, 14000)
+    },
   })
 
   desenharSom()

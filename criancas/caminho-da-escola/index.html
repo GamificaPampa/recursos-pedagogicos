@@ -233,6 +233,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de apertar Andar, uma criança fica de pé e faz o caminho com o corpo, virando como o Bit vira.</li>
             <li><b>No celular:</b> em dupla, uma criança lê os comandos em voz alta e a outra toca nos botões.</li>
             <li><b>Depois:</b> cada criança desenha o caminho de casa até a escola, com legenda, e escreve os comandos para um colega seguir.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -550,7 +551,9 @@ p, li, blockquote {
     ocupado = false
   }
 
-  const espera = ms => new Promise(pronto => setTimeout(pronto, ms))
+  // Com o modo professor, a pausa segura o Bit no fim do passo e libera quando o professor continua
+  let pausadoAula = false, aoContinuar = []
+  const espera = ms => new Promise(pronto => setTimeout(() => pausadoAula ? aoContinuar.push(pronto) : pronto(), ms))
   async function animar(passos, comPrograma = false) {
     for (let i = 1; i < passos.length; i++) {
       porRobo(passos[i].pos, passos[i].dir)
@@ -675,6 +678,52 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  const celula = (l, c) => $("mapa").querySelector(`.lugar[data-l="${l}"][data-c="${c}"]`)
+  // O caminho mais curto para a fase 2: busca em largura sobre posição e direção, com os mesmos comandos do jogo
+  function caminhoCerto(r) {
+    const fila = [{ pos: r.de, dir: r.dir, cmds: "" }], vistos = new Set([`${r.de}|${r.dir}`])
+    while (fila.length) {
+      const no = fila.shift()
+      if (no.cmds && [0, 1, 2, 3].some(d => lugar(no.pos[0] + PASSO[d][0], no.pos[1] + PASSO[d][1]) === r.para)) return no.cmds
+      for (const cmd of "FDE") {
+        const { passos, bateu } = andar(no.pos, no.dir, cmd)
+        if (bateu) continue
+        const fim = passos[passos.length - 1], chave = `${fim.pos}|${fim.dir}`
+        if (vistos.has(chave)) continue
+        vistos.add(chave)
+        fila.push({ pos: fim.pos, dir: fim.dir, cmds: no.cmds + cmd })
+      }
+    }
+    return ""
+  }
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (!$("proxima").hidden) return window.Bit?.diz("pensando", "Esta pergunta já foi respondida. Toque em Próxima questão.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Espere o Bit terminar de andar.", 9000)
+      const f = FASES[fase], r = f.rodadas[rodada]
+      if (f.tipo === "tocar") {
+        const letra = MAPA[r.alvo[0]][r.alvo[1]]
+        Jogo.modoProfessor.destacar(celula(...r.alvo))
+        return window.Bit?.diz("pensando", `É ${nomeCom(letra, "")}. ${r.dica ? r.dica + " " : ""}Procure o desenho ${nomeCom(letra, "de")} na legenda e depois o mesmo desenho no mapa.`, 12000)
+      }
+      if (f.tipo === "guiar") {
+        const alvo = [...$("mapa").querySelectorAll(".lugar")].find(g => MAPA[g.dataset.l][g.dataset.c] === r.para)
+        Jogo.modoProfessor.destacar(alvo)
+        return window.Bit?.diz("pensando", `Um caminho que dá certo: ${roteiroEmPalavras(caminhoCerto(r)).join(" ")} Assim eu paro ao lado ${nomeCom(r.para, "de")}.`, 14000)
+      }
+      const { passos } = andar(r.de, r.dir, r.cmds), fim = passos[passos.length - 1]
+      const d = (fim.dir + (r.lado === "D" ? 1 : 3)) % 4, l = fim.pos[0] + PASSO[d][0], c = fim.pos[1] + PASSO[d][1]
+      Jogo.modoProfessor.destacar(celula(l, c))
+      window.Bit?.diz("pensando", `Siga o caminho passo a passo e vire como o Bit vira. Ele para e ${nomeCom(MAPA[l][c], "")} fica à ${r.lado === "D" ? "direita" : "esquerda"} dele.`, 12000)
+    },
+    // A caminhada do Bit para no fim do passo e volta a andar quando o professor continua
+    pausar() { pausadoAula = true },
+    continuar() { pausadoAula = false; aoContinuar.splice(0).forEach(pronto => pronto()) },
   })
 
   desenharSom()

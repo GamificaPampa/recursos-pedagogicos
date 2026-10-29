@@ -224,6 +224,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> antes de cada conferência, a turma vota na ordem dos parágrafos ou no elemento da proposta e diz qual pista do texto levou a essa escolha.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e depois escreve, no caderno, uma proposta de intervenção com os cinco elementos sobre um tema da turma.</li>
         <li><b>Depois:</b> cada dupla troca a proposta com outra, que marca agente, ação, meio, finalidade e detalhamento com cinco cores.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
       </ul>
 
       <h3>Faça um jogo parecido com o Gemini</h3>
@@ -729,6 +730,32 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.", 9000)
+      const r = atual(), t = tipoRodada()
+      const botaoCom = texto => [...$("opcoes").querySelectorAll(".opcao")].find(b => b.textContent.trim() === texto)
+      if (t === "ordem") {
+        const pos = ordem.findIndex((id, i) => id !== i)
+        if (pos < 0) return window.Bit?.diz("pensando", "Os parágrafos já estão na ordem certa. Toque em Conferir a ordem.", 12000)
+        const item = $("ordem").querySelector(`.mexe[data-id="${pos}"]`)?.closest("li")
+        Jogo.modoProfessor.destacar(item)
+        return window.Bit?.diz("pensando", `Posição ${pos + 1}: ${FUNCOES[pos].replace(": ", " (")}). ${PISTAS_ORDEM[pos]} Este parágrafo está marcado.`, 12000)
+      }
+      if (t === "marcar") {
+        const [texto, papel] = r.trechos[passo]
+        Jogo.modoProfessor.destacar([$("proposta").querySelector(".trecho.agora"), botaoCom(PAPEIS[papel].nome)])
+        return window.Bit?.diz("pensando", `Este trecho ${PAPEIS[papel].pista}. Então é ${ARTIGO[papel]} ${PAPEIS[papel].nome.toLowerCase()}.`, 12000)
+      }
+      const certo = t === "falta" ? PAPEIS[r.falta].nome : r.opcoes.find(o => o.certa).t
+      Jogo.modoProfessor.destacar(botaoCom(certo))
+      window.Bit?.diz("pensando", r.acerto.replace(/^(Isso|Certo|Muito bem)! /, ""), 12000)
+    },
   })
 
   desenharSom()

@@ -213,6 +213,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> a turma repete em voz alta cada palavra e cada frase que o Bit fala, antes de alguém tocar na resposta.</li>
             <li><b>No celular:</b> em dupla, um lê a frase da fase 2 em voz alta e o outro escolhe o desenho, e depois trocam.</li>
             <li><b>Depois:</b> as duplas fazem a conversa da fase 3 de verdade, com os próprios nomes e idades, e apresentam para a turma.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -579,6 +580,29 @@ p, li, blockquote {
     }
   })
 
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual(), botoes = [...$("opcoes").querySelectorAll(".opcao")]
+      if (tipo() === "ouvir") {
+        const [palavra, opcoes] = r
+        Jogo.modoProfessor.destacar(botoes[opcoes.indexOf(palavra)])
+        return window.Bit?.diz("pensando", `A palavra é ${palavra}, que quer dizer ${PALAVRAS[palavra]}.`, 12000)
+      }
+      if (tipo() === "frase") {
+        const i = r.opcoes.findIndex(([n, cor]) => n === r.certo[0] && cor === r.certo[1])
+        Jogo.modoProfessor.destacar(botoes[i])
+        return window.Bit?.diz("pensando", `"${r.frase}" quer dizer ${r.pt}. ${NUMEROS[r.certo[0]]} é ${r.certo[0]} e ${r.certo[1]} é ${CORES[r.certo[1]][0]}.`, 12000)
+      }
+      Jogo.modoProfessor.destacar(botoes[r.certa])
+      window.Bit?.diz("pensando", r.explica, 12000)
+    },
+    // A voz em inglês para quando o professor pausa
+    pausar() { if (temVoz) try { speechSynthesis.cancel() } catch {} },
+  })
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>

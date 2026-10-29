@@ -209,6 +209,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada mistura, a turma diz que cor vai sair; depois, alguém confere com guache de verdade.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e pinta no caderno um círculo cromático com as seis cores.</li>
             <li><b>Depois:</b> cada criança faz um desenho só com cores quentes e outro só com cores frias, e a turma conversa sobre o que cada um faz sentir.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -610,6 +611,36 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", $("proxima").hidden ? "A mistura está acontecendo. Espere um instante." : "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual()
+      if (tipo() === "misturar") {
+        const nomes = Object.keys(TINTAS), pares = []
+        nomes.forEach((p, i) => nomes.slice(i).forEach(q => { if (misturar(p, q)[0] === r.alvo) pares.push([p, q]) }))
+        const par = pares.find(([p, q]) => escolhidas.length && (p === escolhidas[0] || q === escolhidas[0])) || pares[0]
+        const [p, q] = par
+        const falta = escolhidas.length ? (p === escolhidas[0] ? q : p) : null
+        const botoes = [...$("opcoes").querySelectorAll(".opcao")]
+        Jogo.modoProfessor.destacar(falta ? botoes[nomes.indexOf(falta)] : [botoes[nomes.indexOf(p)], botoes[nomes.indexOf(q)]])
+        return window.Bit?.diz("pensando", `${maiuscula(p)} com ${q} dá ${r.alvo}. ${r.explica}`, 12000)
+      }
+      if (tipo() === "temperatura") {
+        const opcoes = [...$("opcoes").querySelectorAll(".opcao")]
+        Jogo.modoProfessor.destacar(opcoes[r.quente ? 0 : 1])
+        return window.Bit?.diz("pensando", r.quente
+          ? `${r.cor ? `O ${r.nome} é quente` : "É quente"}: lembra o sol, o fogo e o calor. Vermelho, laranja e amarelo são cores quentes.`
+          : `${r.cor ? `O ${r.nome} é frio` : "É frio"}: lembra a água, a sombra e o frio. Azul, verde e roxo são cores frias.`, 12000)
+      }
+      const certa = (r + 3) % 6
+      Jogo.modoProfessor.destacar($("cena").querySelector(`.fatia[data-i="${certa}"]`))
+      window.Bit?.diz("pensando", `A complementar do ${RODA[r][0]} é o ${RODA[certa][0]}: fica bem na frente, do outro lado do círculo.`, 12000)
+    },
   })
 
   desenharSom()

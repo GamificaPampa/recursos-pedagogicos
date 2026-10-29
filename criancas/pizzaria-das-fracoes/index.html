@@ -213,6 +213,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> uma criança lê o pedido em voz alta, a turma diz quantos pedaços são e outra criança toca na pizza.</li>
             <li><b>No celular:</b> cada criança joga as três fases e conta quantas estrelas fez.</li>
             <li><b>Depois:</b> desenhe pizzas e barras de chocolate no quadro e peça frações para a turma pintar no caderno.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -509,6 +510,20 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Este pedido já foi entregue. Toque em Próxima questão.", 9000)
+      const [a, b, n] = FASES[fase].pedidos[pedido], k = a * n / b
+      Jogo.modoProfessor.destacar([...pizza.querySelectorAll(".pedaco")].slice(0, k))
+      window.Bit?.diz("pensando", n === b
+        ? `O pedido é ${a}/${b}: a pizza tem ${n} pedaços iguais e o cliente quer ${k}. Estes são os pedaços.`
+        : `A pizza tem ${n} pedaços. Dividindo em ${b} partes iguais, cada parte tem ${n / b} pedaços, e o cliente quer ${a}: ${k} pedaços, como ${a}/${b}.`, 12000)
+    },
   })
 
   desenharSom()

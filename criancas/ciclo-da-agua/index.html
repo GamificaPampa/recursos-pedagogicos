@@ -259,6 +259,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de tocar, a turma explica em voz alta o que vai acontecer com a Gotinha. Quem acertar a etapa explica o porquê.</li>
             <li><b>No celular:</b> cada criança joga as três fases e anota as situações do dia a dia que reconheceu.</li>
             <li><b>Depois:</b> com um copo de água gelada e um espelho, a turma vê a condensação acontecer e desenha o ciclo no caderno, com setas.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -560,6 +561,22 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta questão já foi respondida. Toque em Próxima questão.", 9000)
+      const f = FASES[fase], r = f.rodadas[rodada]
+      const certa = f.tipo === "ordem" ? ORDEM[(r.inicio + passo) % 4] : r.etapa
+      Jogo.modoProfessor.destacar($("opcoes").querySelector(`[data-etapa="${certa}"]`))
+      const qual = `${ETAPAS[certa].art} ${ETAPAS[certa].nome.toLowerCase()}`
+      window.Bit?.diz("pensando", f.tipo === "ordem"
+        ? `A próxima etapa é ${qual}. ${ETAPAS[certa].texto}`
+        : `É ${qual}. ${ETAPAS[certa].texto.split(": ")[1].replace(/^./, c => c.toUpperCase())}`, 12000)
+    },
   })
 
   desenharSom()

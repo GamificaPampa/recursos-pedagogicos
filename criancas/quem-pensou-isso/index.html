@@ -200,6 +200,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> a turma vota na carta antes do toque e quem votou diferente explica a sua escolha. O Bit confirma e conta o porquê.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma ideia de que gostou e uma situação da vida dele em que ela ajudaria.</li>
         <li><b>Depois:</b> cada dupla escolhe um filósofo, pesquisa em um livro ou site confiável e escreve uma ideia nova no formato do jogo, com três situações de hoje, para a outra dupla responder.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
       </ul>
 
       <h3>Faça um jogo parecido com o Gemini</h3>
@@ -632,6 +633,27 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima.", 9000)
+      const r = atual()
+      if (tipo() === "ideia") {
+        Jogo.modoProfessor.destacar(botaoCarta(r.certa))
+        return window.Bit?.diz("pensando", r.exp, 12000)
+      }
+      if (tipo() === "linha") {
+        const ordem = [...r.ids].sort((x, y) => F[x].ini - F[y].ini), id = ordem[colocados.length]
+        Jogo.modoProfessor.destacar(botaoCarta(id))
+        return window.Bit?.diz("pensando", `Agora vem ${F[id].nome} (${F[id].anos}). A ordem certa é: ${ordem.map(i => F[i].nome).join(", ")}. No a.C., quanto maior o número, mais antigo.`, 12000)
+      }
+      Jogo.modoProfessor.destacar([...$("opcoes").querySelectorAll(".opcao")].find(b => opcoes[b.dataset.i].certo))
+      window.Bit?.diz("pensando", r.exp, 12000)
+    },
   })
 
   desenharSom()

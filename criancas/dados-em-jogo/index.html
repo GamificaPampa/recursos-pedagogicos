@@ -202,6 +202,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> antes de cada resposta, a turma vota e uma pessoa explica o que no gráfico a levou a essa escolha.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e anota, no caderno, um conceito que ainda não conhecia com um exemplo da sua cidade.</li>
         <li><b>Depois:</b> em duplas, a turma procura um gráfico em jornal ou site, diz se ele engana e a qual conceito ele se liga.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
       </ul>
       <h3>Troque pelos dados reais do IBGE</h3>
       <ol>
@@ -653,6 +654,17 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (travado) return window.Bit.diz("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.", 9000)
+      Jogo.modoProfessor.destacar([...$("opcoes").querySelectorAll(".opcao")].find(b => atual().opcoes[b.dataset.i].certa))
+      window.Bit.diz("pensando", atual().ok.replace(/^Isso! /, ""), 12000)
+    },
   })
 
   desenharSom()

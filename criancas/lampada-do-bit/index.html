@@ -230,6 +230,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma diz que valor vai pôr e qual corrente espera ver no amperímetro, e depois confere.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno a conta de cada desafio da fase 2.</li>
             <li><b>Depois:</b> cada dupla inventa um circuito com uma pilha e dois resistores, calcula a corrente e troca com outra dupla para conferir.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -703,6 +704,26 @@ p, li, blockquote {
     }
   })
 
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Este desafio já foi resolvido. Toque em Próximo desafio.", 9000)
+      const r = atual()
+      if (tipo() === "lampada") {
+        const ehU = r.ajusta === "U", alvo = ehU ? r.R * r.pede : r.U / r.pede
+        const certo = Math.abs(valor - alvo) < 1e-9
+        Jogo.modoProfessor.destacar(certo ? $("acender") : valor < alvo ? $("mais") : $("menos"))
+        return window.Bit?.diz("pensando", ehU
+          ? `Da lei U = R · I: U = ${num(r.R)} · ${num(r.pede)} = ${num(alvo)} V. ${certo ? "É o valor que está na pilha. Aperte Acender." : "Leve a tensão até esse valor."}`
+          : `Da lei U = R · I sai R = U ÷ I = ${num(r.U)} ÷ ${num(r.pede)} = ${num(alvo)} Ω. ${certo ? "É o valor que está no resistor. Aperte Acender." : "Leve a resistência até esse valor."}`, 14000)
+      }
+      const i = r.opcoes.findIndex(([, res]) => res === true)
+      Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${i}"]`))
+      window.Bit?.diz("pensando", r.conta, 14000)
+    },
+  })
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>

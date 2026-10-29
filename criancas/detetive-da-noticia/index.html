@@ -255,6 +255,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> a turma lê a notícia junto e vota em cada parte suspeita antes de alguém tocar.</li>
             <li><b>No celular:</b> em dupla, os estudantes jogam e anotam as pistas que mais apareceram.</li>
             <li><b>Depois:</b> cada dupla escreve uma notícia inventada com três pistas escondidas e troca com outra dupla para investigar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -632,6 +633,35 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => {
+      // A tela de abertura esconde o jogo: abrir a fase também a fecha
+      if (!$("intro").hidden) { $("bit-balao").dataset.comecou = "1"; mostrarIntro(false) }
+      comecar(n - 1)
+    },
+    resposta() {
+      if (!$("intro").hidden) return
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima.", 9000)
+      const f = FASES[fase]
+      if (f.tipo === "pistas") {
+        const botoes = [...$("noticia").querySelectorAll(".parte")]
+        const faltam = CASOS[rodada].partes.map((parte, i) => [parte, botoes[i]]).filter(([parte, botao]) => parte[2] === "s" && !botao.classList.contains("suspeita"))
+        Jogo.modoProfessor.destacar(faltam.map(([, botao]) => botao))
+        return window.Bit?.diz("pensando", `Faltam ${faltam.length} ${faltam.length === 1 ? "pista" : "pistas"}. ${faltam.map(([parte]) => `${parte[3]}: ${parte[4]}`).join(" ")}`, 14000)
+      }
+      if (f.tipo === "julgar") {
+        const n = NOTICIAS[rodada]
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`[data-v="${n.confiavel ? 1 : 0}"]`))
+        return window.Bit?.diz("pensando", `${n.confiavel ? "Parece confiável" : "É suspeita"}: ${n.explica}`, 12000)
+      }
+      const s = SITUACOES[rodada]
+      Jogo.modoProfessor.destacar($("opcoes").querySelector(`[data-v="${s.certa}"]`))
+      window.Bit?.diz("pensando", `A melhor atitude é: ${s.opcoes[s.certa]}. ${s.explica}`, 12000)
+    },
   })
 
   desenharSom()

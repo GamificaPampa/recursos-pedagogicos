@@ -203,6 +203,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma diz qual operação vai fazer e o que vai acontecer com a balança.</li>
             <li><b>No celular:</b> cada estudante resolve as três fases e escreve no caderno cada passo da equação, como na balança.</li>
             <li><b>Depois:</b> a turma inventa equações com uma balança desenhada no quadro e troca com os colegas para resolver.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -505,6 +506,28 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", `Esta equação já foi resolvida: x = ${xv}. Toque em Próxima questão.`, 9000)
+      const d = diferenca(), pesos = lado => [...$("balanca").querySelectorAll(`.peso[data-lado="${lado}"]`)]
+      const final = `No fim, x = ${xv}.`
+      if (d !== 0) {
+        const lado = d > 0 ? "E" : "D"
+        Jogo.modoProfessor.destacar(pesos(lado).slice(-1))
+        return window.Bit?.diz("pensando", `O prato da ${d > 0 ? "esquerda" : "direita"} está mais pesado. Tire um peso de 1 dele para equilibrar. ${final}`, 12000)
+      }
+      if (b > 0) {
+        Jogo.modoProfessor.destacar(pesos("E").slice(-1), pesos("D").slice(-1))
+        return window.Bit?.diz("pensando", `Tire um peso de 1 de cada prato: a balança continua equilibrada. Faça isso até a caixa ficar sem pesos junto. ${final}`, 12000)
+      }
+      Jogo.modoProfessor.destacar($("dividir"))
+      window.Bit?.diz("pensando", `Só tem caixas na esquerda. Divida os dois lados por ${a}: ${c} ÷ ${a} = ${c / a}. ${final}`, 12000)
+    },
   })
 
   desenharSom()
