@@ -11,6 +11,8 @@ Em 30 segundos, a criança toca nos insetos que aparecem na tela do celular para
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/                                                 |
 | Autoria      | Arthur Medeiros                                                                                                          |
 
-O placar passa pelo [ntfy.sh](https://ntfy.sh) e guarda só o apelido e os pontos, por 12 horas. O recorde de cada aparelho fica só no próprio celular.
+O placar passa pelo [ntfy.sh](https://ntfy.sh) e guarda só o apelido e os pontos, por 12 horas. A criança não digita nome: o jogo sorteia um apelido (um bicho, um adjetivo e um número, como "Capivara Veloz 42"), o botão Trocar sorteia outro e ele fica guardado no aparelho. O recorde de cada aparelho também fica só no próprio celular.
 
-Para testar mudanças, use uma cópia com outro canal de placar: o canal deste jogo é o que aparece no telão das turmas.
+Cada turma tem a sua sala. O [estande.html](estande.html) sorteia um código de 4 letras e mostra junto do QR code, que já leva o código no endereço (`?sala=ABCD`); só quem usa o mesmo código aparece naquele telão. A criança confere ou digita o código na hora de enviar e, sem ele, joga normal, mas a jogada não vai para o placar. "Nova sala", na engrenagem do telão, troca o código e começa um placar vazio.
+
+Para testar mudanças, use uma cópia com outro canal de placar: o canal deste jogo, com o código da sala no fim, é o que aparece no telão das turmas.

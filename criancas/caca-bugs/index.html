@@ -151,11 +151,24 @@
   .record{margin-top:8px; font-weight:600; color:var(--soft); font-size:.95rem;}
   .send{background:var(--purple); color:#fff; padding:14px;}
   .send-title{font-weight:700; font-size:1.15rem; margin-bottom:10px;}
-  #send-form{display:flex; gap:8px;}
-  #nick{flex:1; min-width:0; font:inherit; font-size:1.1rem; font-weight:600; color:var(--ink); background:#fff; border:0; border-radius:14px; padding:10px 14px; -webkit-user-select:text; user-select:text;}
-  #nick:focus{outline:3px solid var(--yellow);}
-  .btn-sm{background:var(--yellow); color:var(--ink); font-weight:700; font-size:1.1rem; padding:0 18px; border-radius:14px; box-shadow:0 4px 0 #d9a800;}
+  #send-form{display:flex; flex-direction:column; gap:10px;}
+  .apelido{display:flex; align-items:center; gap:10px; min-height:52px; background:#fff; color:var(--ink); border-radius:14px; padding:6px 14px; font-weight:700; font-size:1.2rem; line-height:1.15;}
+  #apelido-icone{flex:none; display:flex;}
+  #apelido-icone[hidden]{display:none;}
+  #apelido-icone .icone{width:36px; height:36px;}
+  #apelido-texto{min-width:0; overflow-wrap:anywhere; font-weight:700;}
+  .sala-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .sala-row label{font-weight:600; font-size:1rem;}
+  #sala{flex:1; min-width:7.5em; max-width:11em; min-height:52px; font:inherit; font-size:1.5rem; font-weight:700; letter-spacing:.3em; text-indent:.3em; text-align:center; text-transform:uppercase; color:var(--ink); background:#fff; border:0; border-radius:14px; padding:6px 10px; -webkit-user-select:text; user-select:text;}
+  #sala::placeholder{color:#b9b5d1;}
+  #sala:focus{outline:3px solid var(--yellow);}
+  .send-acoes{display:flex; gap:8px;}
+  .send-acoes .btn-sm{flex:1;}
+  .btn-sm{display:inline-flex; align-items:center; justify-content:center; gap:.4em; min-height:52px; background:var(--yellow); color:var(--ink); font-weight:700; font-size:1.1rem; padding:0 18px; border-radius:14px; box-shadow:0 4px 0 #d9a800;}
+  .btn-sm.sec{background:#fff; box-shadow:0 4px 0 #bfc3d9;}
+  .btn-sm .icone{width:1.3em; height:1.3em;}
   .btn-sm:active{transform:translateY(3px); box-shadow:0 1px 0 #d9a800;}
+  .btn-sm.sec:active{box-shadow:0 1px 0 #bfc3d9;}
   .btn-sm:disabled{opacity:.6;}
   .send-note{margin-top:8px; font-size:.92rem; font-weight:500; opacity:.95;}
   .send.done{background:var(--mint);}
@@ -232,12 +245,22 @@
       <div class="record" id="record"></div>
     </div>
     <div class="card send">
-      <div class="send-title">Coloque seu nome no placar!</div>
+      <div class="send-title">Entre no placar da sala!</div>
       <form id="send-form" autocomplete="off">
-        <input id="nick" name="nick" maxlength="12" placeholder="Seu apelido" enterkeyhint="send" aria-label="Seu apelido">
-        <button type="submit" class="btn-sm" id="send-btn">Enviar</button>
+        <div class="apelido">
+          <span id="apelido-icone" aria-hidden="true"></span>
+          <b id="apelido-texto">Seu apelido</b>
+        </div>
+        <div class="sala-row">
+          <label for="sala">Código da sala</label>
+          <input id="sala" name="sala" maxlength="4" placeholder="ABCD" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-describedby="send-note">
+        </div>
+        <div class="send-acoes">
+          <button type="button" class="btn-sm sec" id="apelido-trocar" data-icone="repetir">Trocar</button>
+          <button type="submit" class="btn-sm" id="send-btn">Enviar</button>
+        </div>
       </form>
-      <div class="send-note" id="send-note">Use um apelido, não o nome completo.</div>
+      <div class="send-note" id="send-note">Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.</div>
     </div>
     <div class="card fact"><b>Você sabia?</b><span id="fact"></span></div>
     <button class="btn" id="btn-again" type="button" data-icone="repetir">Jogar de novo</button>
@@ -535,40 +558,89 @@
   }
 
   // ---- placar (ntfy.sh) ----
-  var PLACAR = 'https://ntfy.sh/cacabugs-es-9d27f41ac6';
-  var BLOCK_PARTS = ['porra','caralh','merda','bosta','viad','bucet','foda','fuder','cacet','piroc','xoxot','vagabund','arromb','otari','corno','penis','vadia','cuzao','boquet','putinh','putaria'];
-  var BLOCK_WORDS = ['cu','pau','fdp','pqp','vsf','tnc','krl','crl','pnc','vtnc','kct','buct','puta','puto','rola','pinto','bicha','xana','xota','pica'];
+  // O apelido é sorteado (bicho + adjetivo + número) e a sala é um código de 4 letras que o telão mostra:
+  // assim não entra nome de criança e cada turma só vê as próprias jogadas.
+  var PLACAR = 'https://ntfy.sh/cacabugs-es-9d27f41ac6'; // a sala (4 letras) entra no fim do canal
+  var BICHOS = [['Gato','m','gato'], ['Sapo','m','sapo'], ['Panda','m','panda'], ['Raposa','f','raposa'], ['Polvo','m','polvo'],
+    ['Tatu','m',''], ['Quero-quero','m',''], ['Capivara','f',''], ['Ema','f',''], ['Graxaim','m','']];
+  var ADJETIVOS = [['Veloz','Veloz'], ['Esperto','Esperta'], ['Corajoso','Corajosa'], ['Atento','Atenta'], ['Curioso','Curiosa'],
+    ['Ligeiro','Ligeira'], ['Valente','Valente'], ['Sagaz','Sagaz'], ['Animado','Animada'], ['Brilhante','Brilhante']];
+  var K_APELIDO = 'gp-apelido', K_SALA = 'cacabugs-sala';
   var lastRound = null, sentKey = null;
 
-  function cleanNick(v){
-    return v.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 12);
+  function sorteio(n){ return Math.floor(Math.random() * n); }
+  function novoApelido(){
+    var b = BICHOS[sorteio(BICHOS.length)], a = ADJETIVOS[sorteio(ADJETIVOS.length)];
+    return b[0] + ' ' + a[b[1] === 'f' ? 1 : 0] + ' ' + (1 + sorteio(99));
   }
-  function isRude(v){
-    var n = v.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/@/g,'a');
-    var flat = n.replace(/[^a-z]/g, '');
-    if(BLOCK_PARTS.some(function(w){ return flat.indexOf(w) >= 0; })) return true;
-    return n.split(/[^a-z]+/).some(function(t){ return BLOCK_WORDS.indexOf(t) >= 0; });
+  function bichoDe(apelido){
+    var nome = String(apelido).split(' ')[0];
+    for(var i = 0; i < BICHOS.length; i++) if(BICHOS[i][0] === nome) return BICHOS[i];
+    return null;
+  }
+  function apelidoValido(v){
+    var p = String(v).split(' '), b = p.length === 3 ? bichoDe(v) : null;
+    if(!b || !/^[1-9][0-9]?$/.test(p[2])) return false;
+    return ADJETIVOS.some(function(a){ return a[b[1] === 'f' ? 1 : 0] === p[1]; });
+  }
+  function apelido(){
+    var v = null;
+    try{ v = localStorage.getItem(K_APELIDO); }catch(e){}
+    if(!v || !apelidoValido(v)){ v = novoApelido(); try{ localStorage.setItem(K_APELIDO, v); }catch(e){} }
+    return v;
+  }
+  function mostrarApelido(){
+    var v = apelido(), b = bichoDe(v);
+    $('apelido-icone').innerHTML = b && b[2] ? icon(b[2]) : '';
+    $('apelido-icone').hidden = !(b && b[2]);
+    $('apelido-texto').textContent = v;
+  }
+  function trocarApelido(){
+    var antigo = apelido(), v = novoApelido();
+    while(v === antigo) v = novoApelido();
+    try{ localStorage.setItem(K_APELIDO, v); }catch(e){}
+    mostrarApelido();
+    sfx.beep();
+  }
+
+  function limparSala(v){ return String(v || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); }
+  function lerSala(){ try{ return limparSala(localStorage.getItem(K_SALA)); }catch(e){ return ''; } }
+  function guardarSala(v){ try{ if(v.length === 4) localStorage.setItem(K_SALA, v); else localStorage.removeItem(K_SALA); }catch(e){} }
+  function canal(sala){ return PLACAR + '-' + sala; }
+  // O QR do telão leva o código no endereço (?sala=ABCD) para já vir preenchido
+  try{
+    var daUrl = limparSala(new URLSearchParams(location.search).get('sala'));
+    if(daUrl.length === 4) guardarSala(daUrl);
+  }catch(e){}
+
+  // Pedido ao placar com limite de 8 s, para a criança não ficar esperando à toa
+  async function buscar(url, opcoes){
+    var ctl = new AbortController(), t = setTimeout(function(){ ctl.abort(); }, 8000);
+    try{
+      opcoes = opcoes || {}; opcoes.signal = ctl.signal;
+      var res = await fetch(url, opcoes), texto = await res.text();
+      return { ok:res.ok, status:res.status, texto:texto };
+    }finally{ clearTimeout(t); }
   }
   function ordinal(n){ return n + 'º'; }
 
   function resetSendCard(){
     var card = document.querySelector('.send');
     card.classList.remove('done');
-    withIcon(card.querySelector('.send-title'), 'trofeu', 'Coloque seu nome no placar!');
+    withIcon(card.querySelector('.send-title'), 'trofeu', 'Entre no placar da sala!');
     $('send-form').hidden = false;
     $('send-btn').disabled = false;
     $('send-btn').textContent = 'Enviar';
-    $('send-note').textContent = 'Use um apelido, não o nome completo.';
-    try{ $('nick').value = localStorage.getItem('cacabugs-nick') || ''; }catch(e){ $('nick').value = ''; }
+    mostrarApelido();
+    $('sala').value = lerSala();
+    $('send-note').textContent = 'Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.';
     sentKey = null;
   }
 
-  async function myPosition(key){
-    var res = await fetch(PLACAR + '/json?poll=1&since=all', { cache:'no-store' });
-    var text = await res.text();
+  async function myPosition(key, sala){
+    var res = await buscar(canal(sala) + '/json?poll=1&since=all', { cache:'no-store' });
     var best = {};
-    text.split('\n').forEach(function(line){
+    res.texto.split('\n').forEach(function(line){
       if(!line) return;
       try{
         var m = JSON.parse(line);
@@ -587,18 +659,21 @@
   $('send-form').addEventListener('submit', async function(e){
     e.preventDefault();
     if(!lastRound || sentKey) return;
-    var nick = cleanNick($('nick').value);
-    var note = $('send-note');
-    if(nick.length < 2){ note.textContent = 'Escreva um apelido com pelo menos 2 letras.'; $('nick').focus(); return; }
-    if(isRude(nick)){ note.textContent = 'Opa! Escolha outro apelido, por favor.'; $('nick').value = ''; $('nick').focus(); return; }
+    var nick = apelido(), note = $('send-note'), sala = limparSala($('sala').value);
+    $('sala').value = sala;
+    if(sala.length < 4){
+      guardarSala('');
+      note.textContent = 'Falta o código da sala: são 4 letras, e elas aparecem no telão. Sem ele, a jogada não vai para o placar.';
+      $('sala').focus(); return;
+    }
+    guardarSala(sala);
     var btn = $('send-btn');
     btn.disabled = true; btn.textContent = '...';
     var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     try{
-      var res = await fetch(PLACAR, { method:'POST', body: JSON.stringify({ n:nick, s:lastRound.score, h:lastRound.hit, k:key }) });
+      var res = await buscar(canal(sala), { method:'POST', body: JSON.stringify({ n:nick, s:lastRound.score, h:lastRound.hit, k:key }) });
       if(!res.ok) throw new Error('status ' + res.status);
       sentKey = key;
-      try{ localStorage.setItem('cacabugs-nick', nick); }catch(e2){}
       var card = document.querySelector('.send');
       card.classList.add('done');
       $('send-form').hidden = true;
@@ -609,18 +684,20 @@
         var p = null;
         for(var tries = 0; tries < 5 && !p; tries++){
           await wait(900);
-          try{ p = await myPosition(key); }catch(e4){}
+          try{ p = await myPosition(key, sala); }catch(e4){}
         }
         if(p){
           withIcon(card.querySelector('.send-title'), p.pos <= 3 ? ['ouro', 'prata', 'bronze'][p.pos - 1] : 'certo', nick + ', você ficou em ' + ordinal(p.pos) + ' lugar!');
-          note.textContent = p.total + (p.total === 1 ? ' jogador' : ' jogadores') + ' no placar de hoje. Olhe o telão da sala.';
+          note.textContent = p.total + (p.total === 1 ? ' jogador' : ' jogadores') + ' no placar da sala. Olhe o telão.';
         }
       }catch(e3){}
     }catch(err){
       btn.disabled = false; btn.textContent = 'Enviar';
-      note.textContent = 'Não deu para enviar. Confira a internet e toque em Enviar de novo.';
+      note.textContent = 'Não deu para enviar. Confira a internet e o código da sala, e toque em Enviar de novo.';
     }
   });
+  $('apelido-trocar').addEventListener('click', trocarApelido);
+  $('sala').addEventListener('input', function(){ var v = limparSala(this.value); if(this.value !== v) this.value = v; guardarSala(v); });
 
   $('btn-start').addEventListener('click', startRound);
   $('btn-again').replaceWith(Jogo.acoesDoFim(startRound));
