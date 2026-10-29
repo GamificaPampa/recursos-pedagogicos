@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frases que salvam · Oficina de Prompts</title>
+<meta name="description" content="As frases que evitam os erros mais comuns do Gemini: bloco de código, teste interativo, desenho com símbolos, códigos da BNCC, dados inventados e resposta em inglês. Copie e cole no fim do seu pedido.">
+<meta name="theme-color" content="#5fbcff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { background: var(--sky2) }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.45 }
+  a { color: var(--ink); font-weight: 600 }
+  button { font: inherit; color: inherit; cursor: pointer }
+  .page { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 14px 0 26px }
+  header .boia { width: clamp(80px, 20vw, 110px); flex: none; animation: boia 3s ease-in-out infinite }
+  @keyframes boia { 50% { transform: translateY(-8px) rotate(-4deg) } }
+  h1 { margin: 0; font-size: clamp(42px, 10vw, 70px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  h1 .y { color: var(--yellow) } h1 .p { color: var(--pink) }
+  header p { max-width: 660px; margin: 10px 0 0; font-size: 19px; font-weight: 600 }
+
+  .card { padding: 20px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .how { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-bottom: 24px }
+  .how p { flex: 1 1 320px; margin: 0; font-weight: 500 }
+  .todas { display: flex; flex-wrap: wrap; align-items: center; gap: 10px }
+
+  .frases { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 22px }
+  .frase { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; background: #fff; border: 4px solid var(--ink); border-top: 14px solid var(--c); border-radius: 24px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .frase h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 21px; line-height: 1.15 }
+  .frase h2 svg { width: 40px; height: 40px; flex: none }
+  .erro { margin: 0; color: var(--soft); font-weight: 500 }
+  .diga { margin: 0; padding: 10px 14px; background: var(--light); border: 3px dashed var(--ink); border-radius: 16px; font-weight: 700 }
+  .quando { margin: 0; font-size: 15px; font-weight: 500 }
+  .quando b { font-weight: 700 }
+  .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: auto }
+  .btn svg { width: 22px; height: 22px }
+  .copiado { font-weight: 700; color: #17694a }
+  .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
+  footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 8%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -30s"></span>
+  <span class="simbolo" style="left: 4%; top: 40%">?</span>
+  <span class="simbolo" style="right: 5%; top: 18%; --d: -3s">Aa</span>
+  <span class="morros" style="--altura: 13vh"></span>
+</div>
+
+<div class="page">
+  <header data-bit-pose="acenando" data-bit-dica="Cada erro do Gemini tem uma frase que evita. Copie a que você precisa e cole no fim do seu pedido.">
+    <svg class="boia" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="32" r="11" fill="#cdeeff" stroke="#2f2a4a" stroke-width="4"/><path d="M15 15 L24 24 M49 15 L40 24 M15 49 L24 40 M49 49 L40 40" stroke="#fff" stroke-width="7"/><path d="M15 15 L24 24 M49 15 L40 24 M15 49 L24 40 M49 49 L40 40" stroke="#2f2a4a" stroke-width="2" opacity=".25"/></svg>
+    <div>
+      <h1><span class="y">Frases</span> que <span class="p">salvam</span></h1>
+      <p>O modelo rápido do Gemini erra sempre nos mesmos pontos. Para cada erro, uma frase que evita. Copie e cole no fim do seu pedido.</p>
+    </div>
+  </header>
+
+  <section class="card how" data-bit-pose="pensando" data-bit-dica="A Máquina e o Construtor já põem estas frases no prompt. Use esta página quando escrever o pedido do seu jeito.">
+    <p>A Máquina de prompts e o Construtor já colocam estas frases sozinhos. Use esta página quando escrever o pedido do seu jeito ou quando o Gemini errar mesmo assim: copie a frase e mande na mesma conversa.</p>
+    <div class="todas"><button class="btn btn--conhecer" type="button" id="todas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar todas</button><span class="copiado" id="todas-ok" role="status"></span></div>
+  </section>
+
+  <div class="frases" id="frases"></div>
+
+  <div class="mais">
+    <a class="btn btn--conhecer" href="https://gamificapampa.github.io/maquina/">Máquina de prompts</a>
+    <a class="btn" href="construtor.html">Construtor de prompts</a>
+    <a class="btn" href="biblioteca.html">Biblioteca de prompts</a>
+  </div>
+</div>
+
+<footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
+
+<script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/icones.js"></script>
+<script>
+// Cada erro típico do modelo rápido do Gemini (testes de 13/10/2026) e a frase que evita. "icone" é um nome do icones.js
+const FRASES = [
+  { titulo: "Folha num bloco de código", icone: "atividade", cor: "#ffd23f", luz: "#fff1a8",
+    erro: "Ele põe a atividade inteira numa caixa cinza de código, que não dá para imprimir do jeito certo.",
+    diga: "Escreva a folha em texto normal, fora de bloco de código.", quando: "atividades, provas e listas para imprimir" },
+  { titulo: "Teste interativo no quiz", icone: "quiz", cor: "#ff8a3d", luz: "#ffdcc4",
+    erro: "Ele abre um teste para clicar dentro do Gemini, que não dá para imprimir nem passar para o Google Forms.",
+    diga: "Escreva as perguntas e o gabarito em texto, sem usar o teste interativo.", quando: "quizzes, simulados e avaliações" },
+  { titulo: "Desenho com letras e símbolos", icone: "historia", cor: "#ff5f8f", luz: "#ffd6e3",
+    erro: "Quando o material pede imagem, ele tenta desenhar com caracteres, e o desenho sai torto.",
+    diga: "Descreva cada imagem entre parênteses, sem desenhar com letras ou símbolos.", quando: "histórias, atividades com desenho e materiais da Educação Infantil" },
+  { titulo: "Códigos da BNCC inventados", icone: "plano", cor: "#4da3ff", luz: "#cfe6ff",
+    erro: "Ele escreve códigos de habilidades que parecem certos mas não existem.",
+    diga: "Não cite códigos de habilidades da BNCC.", quando: "planos de aula e atividades. Se precisar do código, procure em basenacionalcomum.mec.gov.br" },
+  { titulo: "Dados e pesquisas inventados", icone: "lupa", cor: "#4fd6a6", luz: "#c9f5e3",
+    erro: "Ele cria números, pesquisas e instituições com cara de verdade.",
+    diga: "Não invente dados nem pesquisas. Se usar um número de exemplo, avise que é exemplo, e marque com [conferir a fonte] o que eu devo checar.", quando: "textos motivadores, notícias, questões com gráfico e trabalhos de pesquisa" },
+  { titulo: "Citações e trechos inventados", icone: "livros", cor: "#a08bff", luz: "#e2dbff",
+    erro: "Ele põe entre aspas frases de autores e filósofos que eles nunca disseram, ou mistura trechos de livros.",
+    diga: "Não ponha entre aspas frases de autores sem ter certeza. Prefira explicar a ideia com as suas palavras.", quando: "Literatura, Filosofia, História e textos com repertório" },
+  { titulo: "Músicas e livros que não existem", icone: "nota", cor: "#ff8a3d", luz: "#ffdcc4",
+    erro: "Ele sugere músicas, livros e vídeos com nomes inventados.",
+    diga: "Não sugira músicas, livros ou vídeos que você não tenha certeza de que existem.", quando: "planos de aula e sequências didáticas" },
+  { titulo: "Resposta em inglês", icone: "balao", cor: "#4da3ff", luz: "#cfe6ff",
+    erro: "Às vezes ele começa a resposta em inglês, sobretudo quando usa o Canvas.",
+    diga: "Responda sempre em português do Brasil.", quando: "qualquer pedido, principalmente jogos e páginas no Canvas" },
+  { titulo: "Questão como se fosse do Enem", icone: "enem", cor: "#ffd23f", luz: "#fff1a8",
+    erro: "Ele diz que a questão é de uma prova real do Enem e inventa o ano.",
+    diga: "Crie questões no estilo do Enem, sem dizer que são de provas reais e sem inventar o ano de uma prova.", quando: "simulados e listas do Ensino Médio" },
+  { titulo: "Contas erradas na resolução", icone: "revisar", cor: "#4fd6a6", luz: "#c9f5e3",
+    erro: "Num gabarito comentado, ele erra uma conta no meio do caminho.",
+    diga: "Confira cada conta antes de responder e mostre a resolução passo a passo.", quando: "Matemática, Física, Química e qualquer gabarito com cálculo" },
+  { titulo: "Canvas que recusa o jogo", icone: "jogo", cor: "#a08bff", luz: "#e2dbff",
+    erro: "Com o pedido inteiro numa mensagem só, o Canvas diz que não consegue criar o jogo.",
+    diga: "Crie uma página HTML interativa sobre [tema]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, em português do Brasil.", quando: "jogos: mande esta frase primeiro e, depois que a página aparecer, peça as fases, o som e as estrelas" },
+  { titulo: "Dado de aluno no pedido", icone: "cadeado", cor: "#ff5f8f", luz: "#ffd6e3",
+    erro: "Um nome ou a turma escritos no pedido ficam guardados na conta.",
+    diga: "Descreva só a necessidade, sem nome nem turma: por exemplo, um estudante de 15 anos com TDAH que se perde em textos longos.", quando: "adaptações e qualquer pedido que fale de um aluno" },
+]
+
+const COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>'
+const escape = texto => texto.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])
+const icone = nome => window.Icones ? Icones.svg(nome) : ""
+
+document.getElementById("frases").innerHTML = FRASES.map((f, i) => `
+  <article class="frase" style="--c: ${f.cor}; --light: ${f.luz}">
+    <h2>${icone(f.icone)}${escape(f.titulo)}</h2>
+    <p class="erro">${escape(f.erro)}</p>
+    <p class="diga">${escape(f.diga)}</p>
+    <p class="quando"><b>Quando usar:</b> ${escape(f.quando)}</p>
+    <div class="linha"><button class="btn btn--jogar" type="button" data-i="${i}">${COPIAR}Copiar a frase</button><span class="copiado" role="status"></span></div>
+  </article>`).join("")
+
+const avisar = (lugar, ok) => {
+  lugar.textContent = ok ? "Copiado! Cole no fim do seu pedido." : ""
+  setTimeout(() => { lugar.textContent = "" }, 4000)
+}
+document.getElementById("frases").addEventListener("click", async evento => {
+  const botao = evento.target.closest("button[data-i]")
+  if (!botao) return
+  avisar(botao.parentElement.querySelector(".copiado"), await Copiar.texto(FRASES[botao.dataset.i].diga, { avisar: false }))
+})
+// As frases gerais, que servem para quase todo pedido (sem a do Canvas, que é uma mensagem à parte)
+document.getElementById("todas").addEventListener("click", async () => {
+  const gerais = FRASES.filter(f => f.icone !== "jogo").map(f => `- ${f.diga}`).join("\n")
+  avisar(document.getElementById("todas-ok"), await Copiar.texto(gerais, { avisar: false }))
+})
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+</body>
+</html>
