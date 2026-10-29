@@ -76,7 +76,7 @@
   .filter-title { display: block; margin: 16px 0 8px; font-weight: 700 }
   .filter-title .swipe { display: none; font-weight: 500; color: var(--soft) }
   .chips { display: flex; flex-wrap: wrap; gap: 8px }
-  .chip { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 3px 8px 3px 12px; background: #fff; border: 3px solid var(--risco); border-radius: 999px; font: 600 15px var(--font); color: var(--ink); line-height: 1.15; text-align: left; cursor: pointer; transition: transform .2s cubic-bezier(.3, 1.5, .6, 1) }
+  .chip { display: inline-flex; align-items: center; gap: 7px; min-height: 48px; padding: 3px 8px 3px 12px; background: #fff; border: 3px solid var(--risco); border-radius: 999px; font: 600 15px var(--font); color: var(--ink); line-height: 1.15; text-align: left; cursor: pointer; transition: transform .2s cubic-bezier(.3, 1.5, .6, 1) }
   .chip.has-icon { padding-left: 5px }
   .chip:hover { border-color: var(--ink); transform: translateY(-2px) }
   .chip[aria-pressed="true"] { background: var(--yellow); border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); transform: translateY(-2px) }
@@ -213,6 +213,8 @@
   </label>
   <span class="filter-title" id="stage-title">Turma <small class="swipe">(deslize para o lado)</small></span>
   <div class="chips" id="stage-chips" role="group" aria-labelledby="stage-title"></div>
+  <span class="filter-title" id="materia-title">Matéria <small class="swipe">(deslize para o lado)</small></span>
+  <div class="chips" id="materia-chips" role="group" aria-labelledby="materia-title"></div>
   <span class="filter-title" id="kind-title">O que você quer criar <small class="swipe">(deslize para o lado)</small></span>
   <div class="chips" id="kind-chips" role="group" aria-labelledby="kind-title"></div>
   <div class="status">
@@ -778,6 +780,141 @@ const PROMPTS = [
     ],
     tip: "Mostre a rubrica para a turma antes do trabalho: assim todos sabem o que vai ser avaliado.",
   },
+  {
+    title: "Escala e distância: quanto falta para chegar?",
+    stage: "finais", kind: "atividade",
+    area: "Geografia",
+    role: "Você é um(a) professor(a) experiente de Geografia dos anos finais do Ensino Fundamental, que sabe criar atividades impressas de cartografia.",
+    task: "Crie uma atividade para imprimir sobre [escala de mapas e cálculo de distâncias].",
+    context: [
+      "A turma é do [6º ano] do Ensino Fundamental, com estudantes de [11 e 12 anos], e o componente é Geografia.",
+      "Os estudantes devem aprender: [ler a escala de um mapa e usar a régua para descobrir a distância real entre dois lugares].",
+      "O tempo disponível é [uma aula de 50 minutos], e cada estudante tem régua e lápis.",
+      "Use lugares inventados ou do Rio Grande do Sul como exemplo, mas não apresente distâncias como se fossem oficiais: são números de exemplo, e a folha deve avisar isso.",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e uma explicação curta de escala, com um exemplo resolvido.",
+      "Um mapa simples descrito entre parênteses (onde ficam [a escola, a praça, o rio e o mercado] e qual é a escala), para eu desenhar ou buscar. Não desenhe o mapa com letras e símbolos.",
+      "5 questões, da mais fácil para a mais difícil, terminando com um problema do dia a dia: quanto tempo leva para ir a pé da escola até a praça?",
+      "No fim, separado, o gabarito com as contas feitas e uma dica para o professor.",
+    ],
+    tip: "Meça o mapa que você desenhar com a régua antes de imprimir: se a escala não bater com o desenho, as respostas ficam erradas.",
+  },
+  {
+    title: "Aula de Arte: cores quentes e frias na paisagem do Pampa",
+    stage: "finais", kind: "plano",
+    area: "Arte",
+    role: "Você é um(a) professor(a) experiente de Arte dos anos finais do Ensino Fundamental, que sabe planejar aulas de artes visuais com materiais simples.",
+    task: "Crie um plano de aula sobre [cores quentes e frias, com uma pintura da paisagem do Pampa em dois momentos do dia].",
+    context: [
+      "A turma é do [7º ano] do Ensino Fundamental, com [28] estudantes de [12 e 13 anos], e o componente é Arte.",
+      "Os estudantes devem aprender: [reconhecer cores quentes e frias e usá-las para mostrar o clima de uma paisagem, como o amanhecer e o fim de tarde].",
+      "O tempo disponível é [duas aulas de 50 minutos].",
+      "Materiais que temos: [folhas A4, tinta guache, pincéis e copos com água].",
+      "Não invente obras, artistas ou datas. Se citar um artista, escolha só um que você tenha certeza de que existe e marque [conferir] logo depois.",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Objetivo, materiais com a quantidade por grupo e o tempo de cada parte: abertura, pintura e roda de conversa.",
+      "O passo a passo da aula, com uma pergunta para os estudantes observarem as cores antes de pintar.",
+      "Se houver imagem de exemplo, descreva entre parênteses, sem desenhar com letras e símbolos.",
+      "Critérios simples para avaliar o trabalho, que valorizem a ideia e o uso das cores, não o talento para desenhar.",
+      "Uma adaptação para quem tiver dificuldade para pintar ou para quem enxerga pouco as cores.",
+    ],
+    tip: "Escolha você mesmo as obras de exemplo: o Gemini às vezes mistura o nome de uma obra com o de outra.",
+  },
+  {
+    title: "Jogo de quadra em que ninguém é eliminado",
+    stage: "finais", kind: "brincadeira",
+    area: "Educação Física",
+    role: "Você é um(a) professor(a) experiente de Educação Física dos anos finais do Ensino Fundamental, que sabe criar jogos em que todos participam.",
+    task: "Crie um jogo cooperativo para a quadra sobre [passar a bola em equipe, sem deixar ninguém de fora].",
+    context: [
+      "A turma é do [8º ano] do Ensino Fundamental, com [30] estudantes de [13 e 14 anos], e o componente é Educação Física.",
+      "Os estudantes devem aprender: [trabalhar em equipe, respeitar regras combinadas e perceber que o jogo pode ser bom para todos, não só para os mais habilidosos].",
+      "O espaço é [uma quadra descoberta], o tempo é [uma aula de 50 minutos] e os materiais são [bolas, cones e coletes].",
+      "Ninguém é eliminado e todos precisam tocar na bola. Inclua um jeito de participar para estudantes com pouca mobilidade ou que não querem competir.",
+      "Pense no sol e no calor: inclua pausas para beber água.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "O nome do jogo e o objetivo, em uma frase.",
+      "Como organizar as equipes e o espaço, passo a passo.",
+      "As regras em frases curtas, do jeito que o professor vai falar para a turma.",
+      "3 rodadas, da mais calma para a mais agitada, com o tempo de cada uma, e um momento final de alongamento e conversa.",
+      "Cuidados de segurança e uma versão para dia de chuva, em um espaço coberto.",
+      "Se houver desenho do espaço, descreva entre parênteses.",
+    ],
+    tip: "Leia as regras em voz alta como se fosse explicar para a turma. Se ficou comprido, peça para encurtar.",
+  },
+  {
+    title: "Quiz de Inglês: a rotina com o Present Simple",
+    stage: "finais", kind: "quiz",
+    area: "Língua Inglesa",
+    role: "Você é um(a) professor(a) experiente de Língua Inglesa dos anos finais do Ensino Fundamental, que sabe criar quizzes claros para quem está começando.",
+    task: "Crie um quiz de [10] perguntas em inglês sobre [a rotina diária, com o Present Simple].",
+    context: [
+      "A turma é do [7º ano] do Ensino Fundamental, com estudantes de [12 e 13 anos], e o componente é Língua Inglesa, em nível iniciante.",
+      "Os estudantes devem aprender: [usar o Present Simple para falar da rotina, com o cuidado do -s na terceira pessoa].",
+      "Use vocabulário simples e situações da vida de jovens brasileiros, como ir à escola e ajudar em casa.",
+      "As perguntas e as alternativas ficam em inglês, mas as instruções e as explicações do gabarito ficam em português.",
+      "Vai ser usado [no Google Formulários, como revisão antes da prova].",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "[10] perguntas de múltipla escolha, com 4 alternativas cada, da mais fácil para a mais difícil.",
+      "Pelo menos 3 perguntas com uma frase para completar e 2 com um pequeno texto de 3 linhas.",
+      "Alternativas do mesmo tamanho, para a resposta certa não ficar óbvia.",
+      "Escreva tudo aqui na conversa, como texto normal, fora de bloco de código e sem usar o teste interativo.",
+      "No fim, o gabarito com uma explicação curta de cada resposta, em português.",
+    ],
+    tip: "Se o Gemini abrir o teste interativo, toque em Tentar novamente sem a ferramenta, embaixo da resposta. Leia o inglês das alternativas: às vezes uma das erradas também está certa.",
+  },
+  {
+    title: "Jogo da linha do tempo: do Brasil Colônia à República",
+    stage: "finais", kind: "jogo",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História dos anos finais do Ensino Fundamental, que sabe criar jogos de revisão.",
+    task: "Crie uma página HTML interativa sobre [a linha do tempo do Brasil, da chegada dos portugueses à Proclamação da República]: aparecem cartões com fatos e a pessoa toca em cada um e depois no lugar certo da linha. Botões grandes, cores fortes, em português do Brasil.",
+    context: [
+      "Depois que a página aparecer, mande na mesma conversa: a turma é do [8º ano] do Ensino Fundamental, com estudantes de [13 e 14 anos], e o jogo é para revisar [a ordem dos grandes acontecimentos].",
+      "Use só datas muito conhecidas e que você tenha certeza: [1500, 1822 e 1889]. Para os outros fatos, mostre só o período e não invente datas.",
+      "Vai ser usado [no celular dos estudantes e também no projetor].",
+    ],
+    format: [
+      "3 fases: [ordenar 4 fatos, ordenar 6 fatos e ligar cada fato ao seu período].",
+      "Verde e um som no acerto, vermelho e uma explicação curta no erro, e um placar.",
+      "No fim, a pontuação e um botão para jogar de novo.",
+      "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
+    ],
+    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Confira os fatos e as datas antes de usar com a turma.",
+  },
+  {
+    title: "Conferir uma lista de Matemática e o gabarito",
+    stage: "finais", kind: "revisar",
+    area: "Matemática",
+    role: "Você é um(a) revisor(a) cuidadoso(a) de materiais de Matemática dos anos finais do Ensino Fundamental, que confere cada conta passo a passo.",
+    task: "Confira a lista de exercícios com o gabarito que está no fim desta mensagem e aponte os erros, sem reescrever tudo.",
+    context: [
+      "O material é de [Matemática], para uma turma do [8º ano] do Ensino Fundamental, com estudantes de [13 e 14 anos], sobre [equações e porcentagem].",
+      "Fui eu que preparei a lista [com a ajuda do Gemini] e quero conferir antes de usar com a turma.",
+      "Refaça cada conta do zero, sem olhar o gabarito primeiro, e só depois compare com ele.",
+      "Procure erros de conta, enunciados que permitem mais de uma resposta, dados que faltam e números que não combinam com a vida real.",
+      "Se não tiver certeza de que algo está errado, diga que não tem certeza, em vez de afirmar.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma tabela com 4 colunas: o número da questão, a sua resposta, a resposta do gabarito e se batem ou não.",
+      "Para cada erro, a conta feita passo a passo e uma sugestão de como corrigir o enunciado ou o gabarito.",
+      "Os problemas mais importantes primeiro.",
+      "No fim, um resumo de até 3 linhas: a lista está pronta para usar ou ainda precisa de ajustes?",
+      "MATERIAL PARA REVISAR:\n[cole aqui a lista e o gabarito, sem nomes de estudantes]",
+    ],
+    tip: "Refaça você mesmo as contas em que o Gemini apontou erro: ele também pode errar a conta de conferência.",
+  },
   // Ensino Médio
   {
     title: "Simulado no estilo do Enem: 5 questões de Matemática",
@@ -1023,6 +1160,158 @@ const PROMPTS = [
     ],
     tip: "Descreva a necessidade, nunca o estudante: nada de nome, turma ou laudo no Gemini.",
   },
+  {
+    title: "Questões de Geografia no estilo do Enem: cidades e meio ambiente",
+    stage: "medio", kind: "enem",
+    area: "Geografia",
+    role: "Você é um(a) professor(a) experiente de Geografia do Ensino Médio, que conhece bem o formato das questões do Enem.",
+    task: "Crie 5 questões no estilo do Enem sobre [urbanização e problemas ambientais nas cidades brasileiras].",
+    context: [
+      "A turma é da [3ª série] do Ensino Médio, com estudantes de [17 anos] que se preparam para o Enem.",
+      "Cada questão parte de um texto-base curto escrito por você, de uma situação do dia a dia ou de um mapa ou gráfico descrito em texto.",
+      "Não diga que as questões são de provas reais do Enem e não invente ano, número de prova, instituição ou pesquisa. Se usar números, deixe claro que são de exemplo.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Cada questão com um texto-base curto, um comando claro e 5 alternativas, de A a E.",
+      "As questões vão da mais fácil para a mais difícil.",
+      "Escreva tudo em texto normal, fora de bloco de código e sem usar o teste interativo.",
+      "Se a questão tiver mapa, gráfico ou imagem, descreva entre parênteses ou monte a tabela no texto, sem desenhar com letras e símbolos.",
+      "No fim, separado, o gabarito com a explicação e por que cada alternativa errada está errada.",
+    ],
+    tip: "Se o texto-base trouxer um número, confira se ele combina com o que você conhece do assunto antes de aplicar.",
+  },
+  {
+    title: "Leitura de imagem: grafite e arte de rua",
+    stage: "medio", kind: "atividade",
+    area: "Arte",
+    role: "Você é um(a) professor(a) experiente de Arte do Ensino Médio, que ensina os estudantes a olhar com atenção para uma imagem.",
+    task: "Crie uma atividade para imprimir de leitura de imagem sobre [grafite e arte de rua].",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos], e o componente é Arte.",
+      "Os estudantes devem aprender: [descrever o que veem em uma imagem, interpretar a mensagem e discutir o papel da arte no espaço público].",
+      "Não invente artistas, obras, cidades ou datas. Descreva as imagens entre parênteses: eu busco ou fotografo um mural da nossa cidade.",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e uma moldura para colar a imagem.",
+      "A descrição, entre parênteses, de [2] imagens de exemplo, dizendo o que procurar em cada uma, sem desenhar com letras e símbolos.",
+      "Um roteiro de leitura com 5 perguntas, do que se vê ao que se pensa: o que há na imagem, quais cores e formas aparecem, onde ela está, o que ela quer dizer e o que eu mudaria.",
+      "Uma proposta final: fazer o esboço de um mural para a escola e escrever um parágrafo explicando a ideia.",
+      "Escreva a folha em texto normal, fora de bloco de código.",
+    ],
+    tip: "Fotografe um mural ou uma parede da sua cidade e cole na folha: uma imagem do lugar costuma prender mais a atenção.",
+  },
+  {
+    title: "Adaptar uma aula de quadra para todos participarem",
+    stage: "medio", kind: "adaptar",
+    area: "Educação Física",
+    role: "Você é um(a) professor(a) experiente de Educação Física do Ensino Médio, que adapta aulas para a inclusão sem tirar o conteúdo.",
+    task: "Adapte o plano de aula que está no fim desta mensagem, sobre [esportes de rede, como o vôlei], para que todos os estudantes participem.",
+    context: [
+      "A turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o componente é Educação Física.",
+      "Na turma há estudantes com [mobilidade reduzida e deficiência visual]: inclua adaptações para eles, de modo que participem da mesma atividade dos colegas, e não de outra à parte.",
+      "O espaço é [uma quadra] e os materiais são [bolas, rede e cones].",
+      "Pense também em quem não se sente à vontade para se expor: proponha papéis além de jogar, como árbitro, estatístico ou técnico.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Mantenha o objetivo e o conteúdo da aula original.",
+      "Para cada adaptação, diga o que muda na regra, no espaço ou no material, em frases curtas.",
+      "Os cuidados de segurança de cada adaptação.",
+      "Uma versão das regras para o professor explicar em voz alta, em 5 linhas.",
+      "No fim, liste o que você mudou e por quê.",
+      "MATERIAL ORIGINAL:\n[cole aqui o plano da aula, sem nomes de estudantes]",
+    ],
+    ask: true,
+    tip: "Descreva a necessidade, nunca o estudante: nada de nome, turma ou laudo no Gemini.",
+  },
+  {
+    title: "Quiz de Educação Física: saúde e atividade física",
+    stage: "medio", kind: "quiz",
+    area: "Educação Física",
+    role: "Você é um(a) professor(a) experiente de Educação Física do Ensino Médio, que sabe criar quizzes claros.",
+    task: "Crie um quiz de [10] perguntas sobre [atividade física, saúde e hábitos do dia a dia].",
+    context: [
+      "A turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o componente é Educação Física.",
+      "O quiz é para [abrir uma conversa em sala, antes de um projeto sobre hábitos saudáveis].",
+      "Não invente quantidades de minutos, calorias ou porcentagens como se fossem recomendações oficiais: foque nos conceitos.",
+      "Não faça perguntas sobre o corpo ou o peso dos estudantes nem use frases que incentivem comparar corpos.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "[10] perguntas de múltipla escolha, com 4 alternativas do mesmo tamanho.",
+      "Pelo menos 3 perguntas partem de uma situação do dia a dia, como [ir de bicicleta para a escola ou passar a tarde no celular].",
+      "Escreva o quiz em texto normal, sem usar o teste interativo, pronto para passar para o Google Forms.",
+      "No fim, o gabarito com uma explicação curta de cada resposta.",
+    ],
+    tip: "Confira as informações de saúde em uma fonte confiável, como o Ministério da Saúde, antes de usar com a turma.",
+  },
+  {
+    title: "Jogo de revisão no Canvas: phrasal verbs",
+    stage: "medio", kind: "jogo",
+    area: "Língua Inglesa",
+    role: "Você é um(a) professor(a) experiente de Língua Inglesa do Ensino Médio, que sabe criar jogos de revisão.",
+    task: "Crie uma página HTML interativa sobre [phrasal verbs do dia a dia, como give up, look for e turn on]: aparece uma frase com uma lacuna e a pessoa toca na opção certa. Botões grandes, cores fortes, instruções em português do Brasil.",
+    context: [
+      "Depois que a página aparecer, mande na mesma conversa: a turma é da [2ª série] do Ensino Médio, com estudantes de [16 e 17 anos], e o jogo é para revisar [10 phrasal verbs e seus significados].",
+      "As frases ficam em inglês simples, e as dicas e as explicações ficam em português.",
+      "Vai ser usado [no celular dos estudantes e também no projetor].",
+    ],
+    format: [
+      "3 fases: [escolher o phrasal verb certo, escolher o significado e completar a frase].",
+      "Verde e um som no acerto, vermelho e a explicação em português no erro, e um placar.",
+      "No fim, a pontuação e um botão para jogar de novo.",
+      "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
+    ],
+    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Leia as frases em inglês antes de usar com a turma: às vezes o modelo cria uma que soa estranha.",
+  },
+  {
+    title: "Revisar um texto em inglês escrito por estudantes",
+    stage: "medio", kind: "revisar",
+    area: "Língua Inglesa",
+    role: "Você é um(a) professor(a) experiente de Língua Inglesa do Ensino Médio, que dá retorno claro e gentil sobre textos de quem está aprendendo.",
+    task: "Revise o texto em inglês que está no fim desta mensagem e mostre os erros mais importantes, sem reescrever tudo.",
+    context: [
+      "O texto é de um estudante da [2ª série] do Ensino Médio, escrito sobre [a rotina de fim de semana], em nível [básico].",
+      "Quero um retorno que ajude a aprender: elogie o que está certo e explique cada erro de um jeito simples, em português.",
+      "Foque nos erros que atrapalham o entendimento e não corrija o estilo de quem está começando.",
+      "Se não tiver certeza de que algo está errado, diga que não tem certeza, em vez de afirmar.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma tabela com 3 colunas: a frase do estudante, a correção e a explicação curta, em português.",
+      "No máximo 5 erros, os mais importantes primeiro.",
+      "2 elogios específicos ao que o estudante fez bem.",
+      "Um exercício curto de 3 frases para treinar o erro que mais apareceu, com as respostas no fim.",
+      "MATERIAL PARA REVISAR:\n[cole aqui o texto, sem o nome do estudante]",
+    ],
+    tip: "Apague o nome e a turma do estudante antes de colar. O retorno é um apoio: quem decide o que corrigir é você.",
+  },
+  {
+    title: "Aula de Estatística com os dados da própria turma",
+    stage: "medio", kind: "plano",
+    area: "Matemática",
+    role: "Você é um(a) professor(a) experiente de Matemática do Ensino Médio, que gosta de ensinar com dados da vida real.",
+    task: "Crie um plano de aula sobre [média, mediana e moda], usando dados que a própria turma coleta.",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com [30] estudantes de [16 e 17 anos], e o componente é Matemática.",
+      "A aula tem [50 minutos] e os estudantes vão trabalhar em grupos de [4].",
+      "Os dados são anônimos e de assuntos que não expõem ninguém, como [o tempo que cada estudante leva para chegar à escola]. Não use peso, altura, renda nem notas.",
+      "Os estudantes devem aprender: [calcular média, mediana e moda e discutir qual delas representa melhor o grupo].",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Objetivo, materiais e o tempo de cada parte: abertura, coleta, cálculo e fechamento.",
+      "O passo a passo, com um jeito de coletar sem identificar ninguém, como papéis sem nome colocados em uma caixa.",
+      "Um exemplo resolvido com [7] números de exemplo, para o professor mostrar no quadro.",
+      "3 perguntas para a turma discutir, como: o que muda se aparecer um valor muito grande?",
+      "Uma forma rápida de avaliar no fim e uma adaptação para quem tiver dificuldade.",
+    ],
+    tip: "Refaça a conta do exemplo resolvido: o Gemini erra contas, principalmente a mediana quando a lista tem uma quantidade par de valores.",
+  },
 ]
 
 // Describing the four stages: the name on the tags, the ages and the colour
@@ -1061,7 +1350,17 @@ const $ = id => document.getElementById(id)
 const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character])
 const fold = text => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 const iconOf = kind => Icones.svg(kind)
-const filters = { stage: "", kind: "", words: [] }
+const filters = { stage: "", materia: "", kind: "", words: [] }
+
+// A matéria vem do campo area. Os campos de experiência da Educação Infantil entram juntos,
+// e nomes iguais viram uma matéria só (o endereço usa o nome sem acento, em minúsculas, com hífen)
+const slug = text => fold(text).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+const materiaOf = prompt => prompt.stage === "infantil" ? "Educação Infantil" : /^qualquer/i.test(prompt.area) ? "Qualquer matéria" : prompt.area.trim()
+const materias = new Map()
+PROMPTS.forEach(prompt => { const nome = materiaOf(prompt); if (!materias.has(slug(nome))) materias.set(slug(nome), nome) })
+const materiasEmOrdem = [...materias].sort((a, b) => a[1].localeCompare(b[1], "pt-BR"))
+// O valor que cada filtro olha em um prompt
+const valorDe = { stage: prompt => prompt.stage, materia: prompt => slug(materiaOf(prompt)), kind: prompt => prompt.kind }
 
 // Writing the prompt as plain text with labelled parts, the same format the builder copies
 function toText(prompt) {
@@ -1134,6 +1433,8 @@ function chipHTML(filter, value, content, extraClass = "") {
 }
 $("stage-chips").innerHTML = chipHTML("stage", "", "Todas as turmas") + Object.entries(STAGES).map(([id, stage]) =>
   chipHTML("stage", id, `<span class="dot" style="--c: ${stage.color}"></span><span>${stage.label}<small>${stage.ages}</small></span>`)).join("")
+$("materia-chips").innerHTML = chipHTML("materia", "", "Todas as matérias") + materiasEmOrdem.map(([id, nome]) =>
+  chipHTML("materia", id, `<span>${escape(nome)}</span>`)).join("")
 $("kind-chips").innerHTML = chipHTML("kind", "", "Todos os tipos") + Object.entries(KINDS).map(([id, kind]) =>
   chipHTML("kind", id, `${iconOf(id)}<span>${kind.label}</span>`, "has-icon")).join("")
 
@@ -1142,11 +1443,12 @@ const cards = [...document.querySelectorAll(".pcard")]
 const chips = [...document.querySelectorAll(".chip")]
 
 // Searching in everything a teacher could type: title, stage, kind, area and the prompt itself
-const haystacks = PROMPTS.map(prompt => fold([prompt.title, STAGES[prompt.stage].label, STAGES[prompt.stage].ages, KINDS[prompt.kind].label, prompt.area, toText(prompt)].join(" ")))
+const haystacks = PROMPTS.map(prompt => fold([prompt.title, STAGES[prompt.stage].label, STAGES[prompt.stage].ages, KINDS[prompt.kind].label, materiaOf(prompt), prompt.area, toText(prompt)].join(" ")))
 
 const matches = (index, ignore) => {
   const prompt = PROMPTS[index]
   return (ignore === "stage" || !filters.stage || prompt.stage === filters.stage)
+    && (ignore === "materia" || !filters.materia || valorDe.materia(prompt) === filters.materia)
     && (ignore === "kind" || !filters.kind || prompt.kind === filters.kind)
     && filters.words.every(word => haystacks[index].includes(word))
 }
@@ -1163,18 +1465,18 @@ function applyFilters(animate = true) {
   })
   chips.forEach(chip => {
     const { filter, value } = chip.dataset
-    const total = PROMPTS.filter((prompt, index) => matches(index, filter) && (!value || prompt[filter] === value)).length
+    const total = PROMPTS.filter((prompt, index) => matches(index, filter) && (!value || valorDe[filter](prompt) === value)).length
     chip.querySelector(".n").textContent = total
     chip.classList.toggle("zero", total === 0)
     chip.setAttribute("aria-pressed", String(filters[filter] === value))
   })
   $("count").textContent = `${shown} ${shown === 1 ? "prompt" : "prompts"}`
   $("empty").hidden = shown > 0
-  $("clear").hidden = !filters.stage && !filters.kind && !filters.words.length
+  $("clear").hidden = !filters.stage && !filters.materia && !filters.kind && !filters.words.length
 }
 
 function clearFilters() {
-  Object.assign(filters, { stage: "", kind: "", words: [] })
+  Object.assign(filters, { stage: "", materia: "", kind: "", words: [] })
   $("search").value = ""
   applyFilters()
 }
@@ -1209,20 +1511,24 @@ $("library").addEventListener("click", async event => {
 })
 // O site lembra os filtros: eles vão para o endereço, para mandar o link já filtrado, e ficam guardados no aparelho
 const pedidos = new URLSearchParams(location.search)
-const guardados = pedidos.has("etapa") || pedidos.has("tipo") || pedidos.has("busca")
-  ? { stage: pedidos.get("etapa") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "" }
+const guardados = pedidos.has("etapa") || pedidos.has("materia") || pedidos.has("tipo") || pedidos.has("busca")
+  ? { stage: pedidos.get("etapa") || "", materia: pedidos.get("materia") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "" }
   : Lembrar.ler("biblioteca", {})
+// A matéria aceita o nome do jeito que vier: "Língua Inglesa", "lingua-inglesa"...
+if (typeof guardados.materia === "string") guardados.materia = slug(guardados.materia)
 if (chips.some(chip => chip.dataset.filter === "stage" && chip.dataset.value === guardados.stage)) filters.stage = guardados.stage
+if (guardados.materia && chips.some(chip => chip.dataset.filter === "materia" && chip.dataset.value === guardados.materia)) filters.materia = guardados.materia
 if (chips.some(chip => chip.dataset.filter === "kind" && chip.dataset.value === guardados.kind)) filters.kind = guardados.kind
 if (typeof guardados.busca === "string" && guardados.busca) {
   $("search").value = guardados.busca
   filters.words = fold(guardados.busca).split(/\s+/).filter(Boolean)
 }
 const anotarFiltros = () => {
-  const dados = { stage: filters.stage, kind: filters.kind, busca: $("search").value.trim() }
+  const dados = { stage: filters.stage, materia: filters.materia, kind: filters.kind, busca: $("search").value.trim() }
   Lembrar.guardar("biblioteca", dados)
   const endereco = new URLSearchParams()
   if (dados.stage) endereco.set("etapa", dados.stage)
+  if (dados.materia) endereco.set("materia", dados.materia)
   if (dados.kind) endereco.set("tipo", dados.kind)
   if (dados.busca) endereco.set("busca", dados.busca)
   history.replaceState(null, "", endereco.size ? "?" + endereco : location.pathname)
