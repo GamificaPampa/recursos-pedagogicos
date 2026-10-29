@@ -350,12 +350,12 @@
       title: 'Ache o bug no código',
       lede: 'Este robô controla um semáforo. Toque na linha errada.',
       lines: [
-        'SE sinal = vermelho ENTÃO andar()',
+        'SE sinal = vermelho ENTÃO parar()',
         'SE sinal = verde ENTÃO parar()',
         'SE sinal = amarelo ENTÃO atenção()'
       ],
-      bugIndex: 0,
-      explain: 'No vermelho o robô deveria parar, não andar. As duas primeiras linhas estão trocadas.'
+      bugIndex: 1,
+      explain: 'No verde o robô deveria andar, não parar. Só essa linha estava errada.'
     },
     {
       title: 'Ache o bug no código',
@@ -392,14 +392,15 @@
       var code = document.createElement('span'); code.textContent = text;
       line.appendChild(ln); line.appendChild(code);
       line.addEventListener('click', function(){
-        if(line.classList.contains('right-pick')) return;
+        // Depois do acerto, as outras linhas não mudam mais a resposta
+        if(codeEl.querySelector('.right-pick')) return;
         if(i === r.bugIndex){
           line.classList.add('right-pick');
           fb.textContent = (wrongTried ? 'Encontrou! +10 pts. ' : 'Na mosca! +20 pts. ') + r.explain;
           fb.className = 'feedback show ok';
           addScore(wrongTried ? 10 : 20);
           vibrate(30);
-          setTimeout(nextStep, 1400);
+          setTimeout(nextStep, 2800);
         } else {
           wrongTried = true;
           line.classList.add('wrong-pick');
