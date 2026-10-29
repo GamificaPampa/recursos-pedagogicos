@@ -28,6 +28,10 @@
     .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
     .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
     .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase-estrelas { display: inline-flex; gap: 1px; font-style: normal; }
+    .fase-estrelas svg { width: 16px; height: 16px; }
+    .fase-estrelas .apagada path { fill: #e6e3f2; }
+    .fase[aria-pressed="true"] .fase-estrelas svg:not(.apagada) path { fill: #ff8a3d; }
     .fase[aria-pressed="true"] { background: var(--yellow); }
     .fase[aria-pressed="true"] b { background: var(--white); }
     .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
@@ -649,6 +653,8 @@ p, li, blockquote {
   function terminarFase() {
     const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
     const ultima = fase === FASES.length - 1
+    Jogo.progresso.guardar(fase + 1, estrelas)
+    mostrarEstrelas()
     $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
       `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
     $("fim-titulo").textContent = ultima ? "Redação montada!" : `Fase ${fase + 1} completa!`
@@ -695,8 +701,18 @@ p, li, blockquote {
     window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
   }
 
-  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span></button>`).join("")
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span><i class="fase-estrelas" role="img"></i></button>`).join("")
   $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  // As estrelas guardadas no aparelho aparecem em cada fase
+  function mostrarEstrelas() {
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => {
+      const guardadas = Jogo.progresso.estrelas(i + 1)
+      const caixa = botao.querySelector(".fase-estrelas")
+      caixa.setAttribute("aria-label", `${guardadas} de 3 estrelas`)
+      caixa.innerHTML = [0, 1, 2].map(n => `<svg viewBox="0 0 32 32" class="${n < guardadas ? "" : "apagada"}"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>`).join("")
+    })
+  }
+  mostrarEstrelas()
   BOTAO_SEGUIR.onclick = () => comecar(fase + 1)
 
   // Copying the prompt messages for the Gemini
