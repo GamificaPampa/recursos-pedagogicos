@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#6cc4ff">
 <title>Arcade do Código</title>
 <style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
-<link rel="stylesheet" href="estilo.css?v=6">
+<link rel="stylesheet" href="estilo.css?v=7">
 </head>
 <body>
 <div class="sky" aria-hidden="true">
@@ -61,12 +61,22 @@
       <div class="record" id="record"></div>
     </div>
     <div class="card send" id="send-card">
-      <div class="send-title" id="send-title">Coloque seu nome no placar!</div>
+      <div class="send-title" id="send-title">Entre no placar da sala!</div>
       <form id="send-form" autocomplete="off">
-        <input id="nick" name="nick" maxlength="12" placeholder="Seu apelido" enterkeyhint="send" aria-label="Seu apelido">
-        <button type="submit" class="btn-sm" id="send-btn">Enviar</button>
+        <div class="apelido" id="apelido-box">
+          <span id="apelido-icone" aria-hidden="true"></span>
+          <b id="apelido-texto">Seu apelido</b>
+        </div>
+        <div class="sala-row">
+          <label for="sala">Código da sala</label>
+          <input id="sala" name="sala" maxlength="4" placeholder="ABCD" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-describedby="send-note">
+        </div>
+        <div class="send-acoes">
+          <button type="button" class="btn-sm sec" id="apelido-trocar" data-icone="repetir">Trocar</button>
+          <button type="submit" class="btn-sm" id="send-btn">Enviar</button>
+        </div>
       </form>
-      <div class="send-note" id="send-note">Use um apelido, não o nome completo.</div>
+      <div class="send-note" id="send-note">Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.</div>
     </div>
     <div class="card fact">
       <b id="learn-title">Você praticou</b><span id="learn"></span>
@@ -104,7 +114,7 @@
 
 <script src="/identidade-visual/js/icones.js"></script>
 <script src="/identidade-visual/js/jogo.js"></script>
-<script src="nucleo.js?v=7"></script>
+<script src="nucleo.js?v=8"></script>
 <script src="ninja.js?v=4"></script>
 <script src="esteira.js?v=6"></script>
 <script src="robo.js?v=4"></script>

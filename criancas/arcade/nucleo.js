@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   var $ = function(id){ return document.getElementById(id); };
-  var PLACAR = 'https://ntfy.sh/arcade-codigo-es-7b3e19c4a2';
+  var PLACAR = 'https://ntfy.sh/arcade-codigo-es-7b3e19c4a2'; // a sala (4 letras) entra no fim do canal
   var INK = '#2f2a4a';
   var A = window.Arcade = { games:{}, order:[], INK:INK, COLORS:['#ff5f8f','#8c73ff','#4fd6a6','#ff8a3d','#3fb4ff'] };
 
@@ -609,34 +609,87 @@
   }
 
   // ---------- placar ----------
-  var BLOCK_PARTS = ['porra','caralh','merda','bosta','viad','bucet','foda','fuder','cacet','piroc','xoxot','vagabund','arromb','otari','corno','penis','vadia','cuzao','boquet','putinh','putaria'];
-  var BLOCK_WORDS = ['cu','pau','fdp','pqp','vsf','tnc','krl','crl','pnc','vtnc','kct','buct','puta','puto','rola','pinto','bicha','xana','xota','pica'];
-  function cleanNick(v){ return v.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 12); }
-  function isRude(v){
-    var n = v.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/@/g,'a');
-    var flat = n.replace(/[^a-z]/g, '');
-    if(BLOCK_PARTS.some(function(w){ return flat.indexOf(w) >= 0; })) return true;
-    return n.split(/[^a-z]+/).some(function(t){ return BLOCK_WORDS.indexOf(t) >= 0; });
+  // O apelido é sorteado (bicho + adjetivo + número) e a sala é um código de 4 letras que o telão mostra:
+  // assim não entra nome de criança e cada turma só vê as próprias jogadas.
+  var BICHOS = [['Gato','m','gato'], ['Sapo','m','sapo'], ['Panda','m','panda'], ['Raposa','f','raposa'], ['Polvo','m','polvo'],
+    ['Tatu','m',''], ['Quero-quero','m',''], ['Capivara','f',''], ['Ema','f',''], ['Graxaim','m','']];
+  var ADJETIVOS = [['Veloz','Veloz'], ['Esperto','Esperta'], ['Corajoso','Corajosa'], ['Atento','Atenta'], ['Curioso','Curiosa'],
+    ['Ligeiro','Ligeira'], ['Valente','Valente'], ['Sagaz','Sagaz'], ['Animado','Animada'], ['Brilhante','Brilhante']];
+  var K_APELIDO = 'gp-apelido', K_SALA = 'arcade-sala';
+  function sorteio(n){ return Math.floor(Math.random() * n); }
+  function novoApelido(){
+    var b = BICHOS[sorteio(BICHOS.length)], a = ADJETIVOS[sorteio(ADJETIVOS.length)];
+    return b[0] + ' ' + a[b[1] === 'f' ? 1 : 0] + ' ' + (1 + sorteio(99));
+  }
+  function bichoDe(apelido){
+    var nome = String(apelido).split(' ')[0];
+    for(var i = 0; i < BICHOS.length; i++) if(BICHOS[i][0] === nome) return BICHOS[i];
+    return null;
+  }
+  function apelidoValido(v){
+    var p = String(v).split(' '), b = p.length === 3 ? bichoDe(v) : null;
+    if(!b || !/^[1-9][0-9]?$/.test(p[2])) return false;
+    return ADJETIVOS.some(function(a){ return a[b[1] === 'f' ? 1 : 0] === p[1]; });
+  }
+  function apelido(){
+    var v = null;
+    try{ v = localStorage.getItem(K_APELIDO); }catch(e){}
+    if(!v || !apelidoValido(v)){ v = novoApelido(); try{ localStorage.setItem(K_APELIDO, v); }catch(e){} }
+    return v;
+  }
+  function trocarApelido(){
+    var antigo = apelido(), v = novoApelido();
+    while(v === antigo) v = novoApelido();
+    try{ localStorage.setItem(K_APELIDO, v); }catch(e){}
+    mostrarApelido();
+    A.sfx.click();
+  }
+  function mostrarApelido(){
+    var v = apelido(), b = bichoDe(v);
+    $('apelido-icone').innerHTML = b && b[2] ? A.iconHtml(b[2]) : '';
+    $('apelido-icone').hidden = !(b && b[2]);
+    $('apelido-texto').textContent = v;
+  }
+
+  function limparSala(v){ return String(v || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); }
+  function lerSala(){ try{ return limparSala(localStorage.getItem(K_SALA)); }catch(e){ return ''; } }
+  function guardarSala(v){ try{ if(v.length === 4) localStorage.setItem(K_SALA, v); else localStorage.removeItem(K_SALA); }catch(e){} }
+  function canal(sala){ return PLACAR + '-' + sala; }
+  // O QR do telão leva o código no endereço (?sala=ABCD) para já vir preenchido
+  function salaDoEndereco(){
+    try{
+      var v = limparSala(new URLSearchParams(location.search).get('sala'));
+      if(v.length === 4) guardarSala(v);
+    }catch(e){}
+  }
+
+  // Pedido ao placar com limite de 8 s, para a criança não ficar esperando à toa
+  async function buscar(url, opcoes){
+    var ctl = new AbortController(), t = setTimeout(function(){ ctl.abort(); }, 8000);
+    try{
+      opcoes = opcoes || {}; opcoes.signal = ctl.signal;
+      var res = await fetch(url, opcoes), texto = await res.text();
+      return { ok:res.ok, status:res.status, texto:texto };
+    }finally{ clearTimeout(t); }
   }
 
   function resetSendCard(){
     var card = $('send-card');
     card.classList.remove('done');
-    A.iconText($('send-title'), 'trofeu', 'Coloque seu nome no placar!');
+    A.iconText($('send-title'), 'trofeu', 'Entre no placar da sala!');
     $('send-form').hidden = false;
     $('send-btn').disabled = false;
     $('send-btn').textContent = 'Enviar';
-    $('send-note').textContent = 'Use um apelido, não o nome completo.';
-    try{ $('nick').value = localStorage.getItem('arcade-nick') || ''; }catch(e){ $('nick').value = ''; }
+    mostrarApelido();
+    $('sala').value = lerSala();
+    $('send-note').textContent = 'Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.';
     sentKey = null;
   }
 
-  async function myPosition(key, game){
-    var res = await fetch(PLACAR + '/json?poll=1&since=all', { cache:'no-store' });
-    var text = await res.text();
+  async function myPosition(key, game, sala){
+    var res = await buscar(canal(sala) + '/json?poll=1&since=all', { cache:'no-store' });
     var list = [];
-    text.split('\n').forEach(function(line){
+    res.texto.split('\n').forEach(function(line){
       if(!line) return;
       try{
         var m = JSON.parse(line);
@@ -653,17 +706,21 @@
   async function sendScore(e){
     e.preventDefault();
     if(!lastRound || sentKey) return;
-    var nick = cleanNick($('nick').value), note = $('send-note');
-    if(nick.length < 2){ note.textContent = 'Escreva um apelido com pelo menos 2 letras.'; $('nick').focus(); return; }
-    if(isRude(nick)){ note.textContent = 'Opa! Escolha outro apelido, por favor.'; $('nick').value = ''; $('nick').focus(); return; }
+    var nick = apelido(), note = $('send-note'), sala = limparSala($('sala').value);
+    $('sala').value = sala;
+    if(sala.length < 4){
+      guardarSala('');
+      note.textContent = 'Falta o código da sala: são 4 letras, e elas aparecem no telão. Sem ele, a jogada não vai para o placar.';
+      $('sala').focus(); return;
+    }
+    guardarSala(sala);
     var btn = $('send-btn');
     btn.disabled = true; btn.textContent = '...';
     var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     try{
-      var res = await fetch(PLACAR, { method:'POST', body:JSON.stringify({ g:lastRound.g, m:lastRound.m, n:nick, s:lastRound.score, k:key }) });
+      var res = await buscar(canal(sala), { method:'POST', body:JSON.stringify({ g:lastRound.g, m:lastRound.m, n:nick, s:lastRound.score, k:key }) });
       if(!res.ok) throw new Error('status ' + res.status);
       sentKey = key;
-      try{ localStorage.setItem('arcade-nick', nick); }catch(e2){}
       $('send-card').classList.add('done');
       $('send-form').hidden = true;
       A.iconText($('send-title'), 'certo', nick + ', você está no placar!');
@@ -672,15 +729,15 @@
       var p = null;
       for(var tries = 0; tries < 5 && !p; tries++){
         await wait(900);
-        try{ p = await myPosition(key, lastRound.g); }catch(e3){}
+        try{ p = await myPosition(key, lastRound.g, sala); }catch(e3){}
       }
       if(p){
         A.iconText($('send-title'), p.pos <= 3 ? ['ouro', 'prata', 'bronze'][p.pos - 1] : 'certo', nick + ', você ficou em ' + p.pos + 'º lugar!');
-        note.textContent = p.total + (p.total === 1 ? ' jogada' : ' jogadas') + ' neste jogo hoje. Olhe o telão da sala.';
+        note.textContent = p.total + (p.total === 1 ? ' jogada' : ' jogadas') + ' neste jogo na sala. Olhe o telão.';
       }
     }catch(err){
       btn.disabled = false; btn.textContent = 'Enviar';
-      note.textContent = 'Não deu para enviar. Confira a internet e toque em Enviar de novo.';
+      note.textContent = 'Não deu para enviar. Confira a internet e o código da sala, e toque em Enviar de novo.';
     }
   }
 
@@ -885,6 +942,9 @@
     $('mute').addEventListener('click', trocarSom);
     $('mute-menu').addEventListener('click', trocarSom);
     $('send-form').addEventListener('submit', sendScore);
+    $('apelido-trocar').addEventListener('click', trocarApelido);
+    $('sala').addEventListener('input', function(){ var v = limparSala(this.value); if(this.value !== v) this.value = v; guardarSala(v); });
+    salaDoEndereco();
     document.addEventListener('visibilitychange', function(){ if(document.hidden && api.running) finish('time'); });
     window.addEventListener('resize', function(){
       if(current && current.resize && !$('scr-game').hidden) current.resize();
