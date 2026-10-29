@@ -384,6 +384,20 @@ const KINDS = {
     next: ["Crie mais 5 questões no mesmo estilo, um pouco mais difíceis.", "Transforme essas questões num simulado de 30 minutos, com folha de respostas."],
     tip: "Confira as contas e os dados de cada questão antes de aplicar: o modelo rápido do Gemini às vezes erra uma conta no meio da resolução.",
   },
+  sequencia: {
+    label: "Sequência didática", maker: "sequências didáticas com material pronto",
+    task: topic => `Crie uma sequência didática de 3 aulas sobre "${topic}", com o material de cada aula.`,
+    format: early => [
+      "Uma visão geral: o objetivo de cada aula e como as 3 aulas se ligam.",
+      "Para cada aula: abertura, desenvolvimento e fechamento, com o tempo de cada parte.",
+      early ? "Aula 1: uma atividade para imprimir com desenhos e quase sem texto, com instruções que o professor lê em voz alta." : "Aula 1: uma atividade para imprimir com 4 exercícios, do fácil ao difícil, e o gabarito.",
+      "Aula 2: um quiz de 8 perguntas com 3 alternativas e o gabarito explicado, sem usar o teste interativo.",
+      "Aula 3: a ideia de um jogo em uma frase, para pedir depois no Canvas, e um fechamento com a turma.",
+      "Escreva tudo em texto normal, fora de bloco de código, e descreva as imagens entre parênteses.",
+    ],
+    next: ["Transforme a ideia de jogo da aula 3 em um jogo no Canvas.", "Crie uma versão mais simples da atividade da aula 1."],
+    tip: "Para o jogo da aula 3, abra uma conversa nova com o Canvas ligado e mande primeiro só a ideia curta.",
+  },
 }
 
 // Asking the same final checks of every material, the habit the workshop wants teachers to keep
@@ -428,7 +442,7 @@ function buildPrompt() {
     $("time").value && `O tempo disponível é ${$("time").value}.`,
     (kind === "jogo" || kind === "quiz") && `Vai ser usado ${$("place").value}.`,
     needs.length && `Na turma há ${students} com ${joinList(needs)}. Inclua adaptações: ${needs.map(need => `para ${need}, ${NEEDS[need]}`).join("; ")}.`,
-    (kind === "plano" || kind === "atividade") && "Não cite códigos de habilidades da BNCC.",
+    (kind === "plano" || kind === "atividade" || kind === "sequencia") && "Não cite códigos de habilidades da BNCC.",
     (kind === "plano" || kind === "historia") && "Não cite músicas nem livros que você não tenha certeza de que existem.",
     `Responda em português do Brasil, com exemplos do dia a dia ${older ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
     $("extra").value.trim(),
