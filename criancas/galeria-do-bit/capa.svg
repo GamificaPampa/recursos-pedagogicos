@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="30" y="8" width="140" height="104" rx="8" fill="#d9a441" stroke="#2f2a4a" stroke-width="4"/>
+<rect x="42" y="20" width="116" height="62" fill="#cdeeff" stroke="#2f2a4a" stroke-width="3"/>
+<circle cx="66" cy="40" r="10" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/>
+<path d="M42 82V66Q70 48 98 66T158 62V82Z" fill="#4fd6a6"/>
+<path d="M120 66L136 38L152 66Z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>
+<rect x="64" y="90" width="72" height="14" rx="3" fill="#fff" stroke="#2f2a4a" stroke-width="3"/>
+<path d="M72 97H128" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/>
+<g class="g a-tw"><path transform="translate(144 6) scale(.75)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></g>
+</svg>

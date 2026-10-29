@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detetive da História · GamificaPampa</title>
+  <meta name="description" content="Um jogo de História para o ensino médio: investigue fontes históricas, descubra quem fala e com que interesse e ponha em ordem os fatos do Brasil República.">
+  <meta property="og:title" content="Detetive da História · GamificaPampa">
+  <meta property="og:description" content="Um jogo de História: fontes primárias e secundárias, ponto de vista e os fatos do Brasil República.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Página numa coluna central que cabe no celular e no projetor */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(900px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(34px, 8vw, 66px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Fases: o professor pode pular para qualquer uma */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase-estrelas { display: inline-flex; gap: 1px; font-style: normal; }
+    .fase-estrelas svg { width: 16px; height: 16px; }
+    .fase-estrelas .apagada path { fill: #e6e3f2; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* O Bit mora dentro do jogo e deixa a última fala na tela */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; gap: 16px; max-width: 800px; margin: 0 auto; }
+    .fala-bit { display: flex; align-items: center; gap: 16px; width: 100%; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 120px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.6em; margin: 0; font-size: clamp(16px, 2.2vw, 20px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    .missao { padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .missao__texto { margin-top: 6px !important; font-size: clamp(18px, 2.6vw, 22px); font-weight: 600; line-height: 1.3; }
+    .fonte { margin: 10px 0 0; padding: 10px 14px; background: #fff6df; border: 3px dashed var(--ink); border-left: 10px solid var(--orange); border-radius: 12px; font-size: clamp(18px, 2.6vw, 22px); font-weight: 500; line-height: 1.4; }
+    .fonte.contexto { background: var(--white); border-left-color: var(--blue); }
+    .creditos { margin-top: 8px !important; font-size: 15px; font-weight: 600; color: var(--soft); }
+
+    .opcoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .opcoes.uma { grid-template-columns: minmax(0, 1fr); }
+    .opcao { min-height: 56px; padding: 8px 16px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 600 clamp(17px, 2.2vw, 20px) var(--font); color: var(--ink); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+    .opcao small { display: block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--soft); }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible, .item:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .6; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcao[disabled] { cursor: default; }
+
+    /* Ordem dos fatos: toque do mais antigo ao mais novo */
+    .ordem { display: grid; gap: 10px; }
+    .item { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px 14px; background: var(--white); border: 4px solid var(--ink); border-radius: 16px; box-shadow: 0 5px 0 var(--ink); font: 700 clamp(16px, 2.1vw, 19px)/1.2 var(--font); color: var(--ink); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+    .item:hover:not(.feito) { background: #fff6cf; }
+    .item .ordem-n { flex: none; display: grid; place-items: center; width: 36px; height: 36px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; font-size: 18px; }
+    .item .ordem-n:empty::before { content: "?"; color: var(--soft); }
+    .item small { display: block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--soft); }
+    .item.feito { background: var(--mint); cursor: default; }
+    .item.feito .ordem-n { background: var(--white); }
+    .item.erro { animation: balanca .4s; background: #ffe1e7; }
+    @keyframes balanca { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .btn[hidden] { display: none; }
+    .placar { display: flex; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A rodada feita tem um visto, além da cor: a cor não é a única pista */
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* Fim da fase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(30px, 6vw, 48px); }
+    .fim p { margin: 0; max-width: 480px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* Para o professor */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 560px) {
+      .fala-bit { gap: 10px; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .missao { padding: 10px 12px 12px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+      .opcoes { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .item { padding: 8px 10px; gap: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">1889</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">fonte</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">1988</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Detetive</span> da <span class="pink">História</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--mint)">História</li>
+        <li class="pill" style="--c: var(--yellow)">2º ano do ensino médio</li>
+        <li class="pill">Fontes e Brasil República</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo"></p>
+          <p class="missao__texto" id="texto"></p>
+          <blockquote class="fonte" id="fonte" hidden></blockquote>
+          <p class="creditos" id="nota-fonte" hidden>Fonte de exemplo, descrita para o jogo. Não é um documento real.</p>
+        </div>
+        <div id="area"></div>
+        <div class="acoes">
+          <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+          <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+        </div>
+        <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes"></div>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A ler uma fonte como um historiador. Na fase 1, a separar fonte primária (da época dos fatos, feita por quem os viveu) de fonte secundária (feita depois, por quem estudou o assunto). Na fase 2, a perguntar quem fala, de que lugar e com que interesse, e o que a fonte não mostra: um discurso do governo, um jornal sob censura, um panfleto de campanha, uma carta, memórias e uma propaganda. Na fase 3, a pôr em ordem os fatos do Brasil República (1889, 1930, 1937, 1964, 1984 e 1988) e a ligar cada fato à sua causa e à sua consequência.</p>
+      <p>As fontes do jogo são exemplos descritos, não documentos reais.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> antes do toque, a turma vota e diz a pergunta que usou: quem fez a fonte, quando e para quê?</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma pista que o ajudou a decidir em cada fase.</li>
+        <li><b>Depois:</b> cada dupla escolhe uma fonte do livro didático (um trecho, uma foto, um jornal), diz se é primária ou secundária, quem fala, com que interesse e o que ficou de fora, e compara com outra fonte sobre o mesmo fato.</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes. O Gemini pode errar fatos e datas: confira cada uma no livro didático antes de usar.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [fontes históricas] para estudantes do [2º ano do ensino médio]: aparece a descrição de uma fonte, como uma carta de 1889 ou um livro didático de hoje, e o estudante escolhe se ela é primária ou secundária.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: fonte primária ou secundária, quem fala e com que interesse, ordem e causa dos fatos do Brasil República], um botão de dica, explicação curta a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Use só fontes descritas como exemplo e avise na tela que não são documentos reais. Não invente documentos, citações nem datas, e não use códigos da BNCC nem o teste interativo. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const $ = id => document.getElementById(id)
+  const embaralha = lista => { const c = [...lista]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]] } return c }
+  const juntar = lista => lista.length < 2 ? lista.join("") : `${lista.slice(0, -1).join(", ")} e ${lista[lista.length - 1]}`
+
+  // Fase 1: fontes de exemplo, só descritas. "resp" é o tipo certo
+  const FONTES = [
+    { desc: "Uma carta escrita em 1889 por um fazendeiro a um parente, reclamando dos prejuízos que teve com o fim da escravidão.", resp: "primaria",
+      certa: "Fonte primária! A carta foi escrita na época dos fatos, por alguém que viveu aquele momento. Ela mostra o que o fazendeiro pensava, e não necessariamente o que aconteceu.",
+      errada: "Veja a data: 1889, a época dos fatos. Quem escreve vivendo aquele momento produz uma fonte primária.",
+      dica: "A carta é de 1889, o mesmo tempo dos fatos. E quem escreveu viveu aquilo." },
+    { desc: "Um capítulo de livro didático de 2024 que explica como foi a Proclamação da República.", resp: "secundaria",
+      certa: "Fonte secundária! Foi feita hoje, por autores que estudaram o assunto em várias outras fontes.",
+      errada: "Este livro é de 2024, muito depois de 1889. Quem estuda os fatos depois, a partir de outras fontes, produz uma fonte secundária.",
+      dica: "O livro é de 2024 e conta algo de mais de cem anos antes. Os autores estudaram, não viveram." },
+    { desc: "Uma fotografia tirada em 1930 de soldados nas ruas de uma cidade, durante a Revolução de 1930.", resp: "primaria",
+      certa: "Fonte primária! O registro foi feito na hora dos fatos. Lembre que o fotógrafo escolheu o que mostrar e de onde mostrar.",
+      errada: "A foto é de 1930, tirada durante os fatos. Registro feito na hora é fonte primária.",
+      dica: "A foto foi tirada em 1930, enquanto os fatos aconteciam." },
+    { desc: "Um jornal impresso em novembro de 1937, com a notícia do início do Estado Novo.", resp: "primaria",
+      certa: "Fonte primária! O jornal é da época e mostra como os fatos foram contados naquele momento, pelo olhar de quem o publicou.",
+      errada: "O jornal é de 1937, publicado no momento dos fatos. Fonte da época é primária.",
+      dica: "O jornal saiu em 1937, junto com os fatos que ele conta." },
+    { desc: "Uma entrevista de 2020 com uma historiadora que pesquisa a ditadura militar.", resp: "secundaria",
+      certa: "Fonte secundária! A historiadora analisa os fatos muito depois, a partir de documentos e de outras fontes.",
+      errada: "A entrevista é de 2020 e quem fala analisa o passado muito depois. Análise feita depois é fonte secundária.",
+      dica: "A entrevista é de 2020. A historiadora estuda o passado, e isso é uma análise feita depois." },
+    { desc: "Um documentário de 2015 sobre as Diretas Já, feito com historiadores e imagens de arquivo.", resp: "secundaria",
+      certa: "Fonte secundária! O documentário é de 2015 e interpreta os fatos. As imagens de arquivo que ele usa, da época, é que são fontes primárias.",
+      errada: "O documentário foi feito em 2015 e interpreta os fatos, então é secundário. Só as imagens de arquivo que ele usa são primárias.",
+      dica: "O documentário é de 2015, muito depois dos fatos. Mas as imagens de arquivo dentro dele são da época." },
+  ]
+
+  // Fase 2: quem fala e com que interesse. Cada opção errada tem o seu porquê
+  const INTERESSES = [
+    { fonte: "Um discurso do presidente Getúlio Vargas, em 1937, explicando por que o governo fechou o Congresso.", pergunta: "Quem fala e com que interesse?",
+      dica: "Pense em quem tomou a decisão: o que o governo ganha se o povo aceitar a explicação?",
+      explica: "Um discurso de governante mostra a versão do poder. Serve para saber como o governo quis ser visto, mas não prova que os motivos dados eram verdadeiros.",
+      opcoes: [
+        { t: "Quem governa, que quer justificar o que fez e convencer o povo", certa: true },
+        { t: "Um observador de fora, que não tem nenhum interesse no assunto", porque: "Quem fala é o próprio governo, explicando uma decisão que ele mesmo tomou. Não é um observador de fora." },
+        { t: "Um opositor, que quer mostrar os erros do governo", porque: "O opositor seria o contrário. Aqui quem fala é o governo, defendendo a própria decisão." },
+      ] },
+    { fonte: "Um jornal publicado durante a ditadura militar, quando o governo censurava as notícias, com só notícias boas sobre o governo.", pergunta: "Como um historiador deve ler essa fonte?",
+      dica: "Pergunte o que não aparece. Quem decidia o que podia ser publicado?",
+      explica: "Fonte censurada também ensina: mostra o que o governo deixava dizer. Para saber o que ficou de fora, compare com outras fontes, como depoimentos e documentos.",
+      opcoes: [
+        { t: "Como o que o governo deixava publicar, comparando com outras fontes", certa: true },
+        { t: "Como o retrato completo do que aconteceu, porque jornal sempre conta tudo", porque: "Com censura, o jornal não conta tudo. O que não aparece pode ter sido proibido." },
+        { t: "Como uma fonte sem valor, porque foi censurada", porque: "Fonte censurada ainda é fonte: mostra o que o governo permitia dizer e como queria ser visto. É só ler com cuidado e comparar." },
+      ] },
+    { fonte: "Um panfleto de 1984, feito pelos organizadores de um comício das Diretas Já, chamando o povo para ir à praça.", pergunta: "Quem fala e com que interesse?",
+      dica: "Quem distribui um panfleto quer que você faça alguma coisa. O quê?",
+      explica: "Um panfleto de campanha é feito para convencer e mobilizar. Mostra o que o movimento queria e como chamava o povo, mas não o que todos pensavam.",
+      opcoes: [
+        { t: "Quem apoia a eleição direta e quer reunir gente na campanha", certa: true },
+        { t: "O governo da época, que quer esvaziar o comício", porque: "O panfleto convida para o comício. O governo da época não chamaria o povo para uma campanha contra ele." },
+        { t: "Um jornal sem lado, que só informa o dia e a hora", porque: "Quem faz um panfleto de campanha tem lado: quer convencer e mobilizar, e não só informar." },
+      ] },
+    { fonte: "Uma carta escrita em 1889 por um fazendeiro, reclamando dos prejuízos que teve com o fim da escravidão.", pergunta: "De que lugar essa fonte fala?",
+      dica: "Veja quem escreve e qual é o seu interesse. Que vozes ficaram de fora?",
+      explica: "Toda fonte fala de um lugar. A carta mostra o ponto de vista de um fazendeiro, e não o das pessoas escravizadas ou libertas. Para ouvir essas vozes, é preciso procurar outras fontes.",
+      opcoes: [
+        { t: "De quem tinha escravizados e se sente prejudicado; a voz das pessoas libertas não aparece", certa: true },
+        { t: "De todos os brasileiros da época, que pensavam do mesmo jeito", porque: "Cada pessoa vê os fatos de um lugar. Um fazendeiro não fala por todos." },
+        { t: "Das pessoas libertas, que contam como foi a abolição para elas", porque: "Quem escreve é o fazendeiro, que se sente prejudicado. As pessoas libertas não são quem fala nessa carta." },
+      ] },
+    { fonte: "Um livro de memórias, publicado décadas depois, de um político que apoiou o Golpe de 1964.", pergunta: "Como ler essa fonte?",
+      dica: "Ele viveu os fatos, mas escreveu muito tempo depois. O que isso muda?",
+      explica: "Memórias valem muito, porque mostram o que quem viveu os fatos viu e pensou. Mas são escritas depois e com um lado, e por isso se comparam com documentos e com outros relatos.",
+      opcoes: [
+        { t: "Como o relato de quem viveu os fatos, que pode defender o próprio papel e deve ser comparado", certa: true },
+        { t: "Como um relato neutro, porque o tempo apagou os interesses dele", porque: "O tempo não apaga o interesse. Quem escreve memórias costuma contar de um jeito que o favoreça." },
+        { t: "Como um documento da época, porque ele estava lá", porque: "Ele viveu os fatos, mas escreveu décadas depois, lembrando e escolhendo o que contar. Isso é memória, e não um registro feito na hora." },
+      ] },
+    { fonte: "Uma propaganda do governo militar, nos anos 1970, que só mostra obras e o crescimento da economia.", pergunta: "Quem fala e com que interesse?",
+      dica: "Quem faz a propaganda? O que ganha se você gostar do que vê?",
+      explica: "Propaganda mostra o que interessa a quem a faz. É boa para saber como o governo queria ser visto, e o que ficou de fora precisa ser buscado em outras fontes.",
+      opcoes: [
+        { t: "O governo, que quer passar uma imagem boa de si mesmo", certa: true },
+        { t: "Um pesquisador, que quer analisar a economia com cuidado", porque: "Pesquisador mostra dados e limites. Propaganda só mostra o lado bom." },
+        { t: "Um jornal independente, que fiscaliza o governo", porque: "Quem fiscaliza aponta problemas. Esta fonte só mostra o que é bom para o governo." },
+      ] },
+  ]
+
+  // Fase 3: os fatos do Brasil República. Datas conferidas. "nome" não traz o ano, que só aparece depois do acerto
+  const EV = {
+    proclamacao: { nome: "Fim da monarquia: o Brasil vira República", ano: "1889", curta: "o Brasil ainda era uma monarquia, governada por um imperador",
+      fato: "Em 15 de novembro de 1889, o imperador foi deposto e o Brasil virou República." },
+    revolucao: { nome: "Getúlio Vargas chega ao poder", ano: "1930", curta: "Vargas chegou à presidência, depois de uma eleição contestada",
+      fato: "Em 1930, Getúlio Vargas assumiu o governo e a chamada República Velha chegou ao fim." },
+    estadonovo: { nome: "Vargas fecha o Congresso e começa o Estado Novo", ano: "1937", curta: "Vargas já estava no poder e o Congresso foi fechado",
+      fato: "Em 1937, Vargas fechou o Congresso, impôs uma nova Constituição e começou o Estado Novo, que durou até 1945." },
+    golpe: { nome: "Militares derrubam o presidente João Goulart", ano: "1964", curta: "militares tomaram o poder e o presidente João Goulart caiu",
+      fato: "Em 1964, militares derrubaram o presidente João Goulart e ficaram no poder até 1985." },
+    diretas: { nome: "Campanha Diretas Já pede voto direto para presidente", ano: "1984", curta: "a ditadura já estava enfraquecida e o povo ia às praças pedir voto",
+      fato: "Em 1984, a campanha das Diretas Já levou o povo às praças para pedir eleição direta para presidente." },
+    constituicao: { nome: "Promulgação da Constituição Cidadã", ano: "1988", curta: "a nova lei maior do país veio depois do fim do governo dos militares",
+      fato: "Em 1988, foi promulgada a Constituição Cidadã." },
+  }
+  const DESAFIOS3 = [
+    { kind: "ordem", ids: ["proclamacao", "revolucao", "estadonovo"],
+      texto: "Toque nos fatos na ordem em que aconteceram, do mais antigo ao mais novo." },
+    { kind: "escolha", contexto: "Em 1937, o presidente Getúlio Vargas fechou o Congresso e começou o Estado Novo.", pergunta: "Qual fato o governo usou como pretexto?",
+      dica: "Uma causa vem antes da consequência. Procure o que veio antes de 1937 e falava em perigo.",
+      explica: "O Plano Cohen era um documento falso, divulgado em 1937. O governo usou o medo de um golpe comunista para justificar o Estado Novo. Por isso a gente sempre pergunta quem fez uma fonte e para quê.",
+      opcoes: [
+        { t: "A divulgação do Plano Cohen, um documento falso sobre um plano comunista para tomar o poder", certa: true },
+        { t: "O Golpe de 1964, que derrubou o presidente João Goulart", porque: "O Golpe de 1964 veio 27 anos depois. Uma causa precisa vir antes da consequência." },
+        { t: "A campanha das Diretas Já, que pedia eleição direta", porque: "As Diretas Já são de 1984, 47 anos depois. Uma causa não pode vir depois." },
+      ] },
+    { kind: "escolha", contexto: "Em 1964, militares derrubaram o presidente João Goulart.", pergunta: "Qual foi uma consequência desse golpe?",
+      dica: "Consequência vem depois do fato. Descarte o que já tinha acontecido antes de 1964.",
+      explica: "Depois do golpe, os militares ficaram no governo por 21 anos, até 1985.",
+      opcoes: [
+        { t: "Os militares ficaram no governo por 21 anos, até 1985", certa: true },
+        { t: "O Estado Novo começou, com Vargas no poder", porque: "O Estado Novo é de 1937, 27 anos antes. Consequência vem depois do fato." },
+        { t: "O Brasil deixou de ser Império e virou República", porque: "Isso foi em 1889, 75 anos antes. Consequência vem depois do fato." },
+      ] },
+    { kind: "escolha", contexto: "Em 1984, a campanha das Diretas Já encheu praças de várias cidades pedindo eleição direta para presidente.", pergunta: "O que aconteceu com esse pedido?",
+      dica: "Lembre que a ditadura só acabou em 1985, e que o voto direto para presidente voltou depois disso.",
+      explica: "A emenda das Diretas foi derrotada na Câmara em abril de 1984. Mesmo assim, a campanha ajudou a enfraquecer o regime: em janeiro de 1985, o Colégio Eleitoral elegeu um civil, Tancredo Neves. O voto direto para presidente voltou em 1989.",
+      opcoes: [
+        { t: "A emenda foi derrotada no Congresso, mas a pressão ajudou a encerrar o governo dos militares em 1985", certa: true },
+        { t: "A emenda foi aprovada e o povo votou para presidente em 1985", porque: "A emenda foi derrotada. Em 1985, o presidente ainda foi escolhido por um colégio eleitoral. O voto direto só voltou em 1989." },
+        { t: "O governo fechou o Congresso e cancelou as eleições", porque: "Isso não aconteceu em 1984. O Congresso votou a emenda, e o regime foi perdendo a força." },
+      ] },
+    { kind: "escolha", contexto: "Em 1988, depois de anos de ditadura, foi promulgada a Constituição Cidadã.", pergunta: "Qual foi uma mudança trazida por ela?",
+      dica: "Ela veio depois da ditadura, para garantir direitos. Quem tem 16 ou 17 anos, como você, foi lembrado.",
+      explica: "A Constituição de 1988 garante direitos e eleições livres, proíbe a censura e permite o voto a partir dos 16 anos, de forma facultativa. Quem tem 16 ou 17 anos já pode votar, se quiser.",
+      opcoes: [
+        { t: "O voto passou a ser facultativo a partir dos 16 anos", certa: true },
+        { t: "A censura prévia a jornais e livros passou a ser permitida", porque: "Foi o contrário: a Constituição de 1988 proíbe a censura." },
+        { t: "O presidente passou a poder fechar o Congresso quando quisesse", porque: "Isso foi do Estado Novo e da ditadura. A Constituição de 1988 limita o poder do governo." },
+      ] },
+    { kind: "ordem", ids: ["proclamacao", "revolucao", "estadonovo", "golpe", "diretas", "constituicao"],
+      texto: "Linha do tempo completa. Toque nos seis fatos na ordem em que aconteceram." },
+  ]
+
+  const FASES = [
+    { nome: "Primária ou secundária", tipo: "fonte", limite: 2,
+      abertura: "Oi! Eu sou o Bit, detetive da História. Fonte primária é da época dos fatos. Fonte secundária é feita depois, por quem estudou. Qual é esta?",
+      monta: () => embaralha(FONTES).map(f => ({ kind: "binaria", ...f })) },
+    { nome: "Quem fala?", tipo: "quem", limite: 3,
+      abertura: "Toda fonte tem alguém por trás. Descubra quem fala, de que lugar e o que essa pessoa quer. Isso é o interesse da fonte.",
+      monta: () => embaralha(INTERESSES).map(f => ({ kind: "escolha", ...f, ops: embaralha(f.opcoes) })) },
+    { nome: "Ordem e causa", tipo: "tempo", limite: 3,
+      abertura: "Agora o tempo. Ponha os fatos do Brasil República em ordem e descubra o que causou cada um e o que veio depois.",
+      monta: () => DESAFIOS3.map(d => d.kind === "ordem" ? { ...d, itens: embaralha(d.ids) } : { ...d, ops: embaralha(d.opcoes) }) },
+  ]
+
+  // O Bit dentro do cartão do jogo: o mesmo Bit.diz(pose, texto) dos outros jogos, grande e sempre na tela
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0, rodadas = [], marcados = 0
+  const atual = () => rodadas[rodada]
+  const fala = (pose, texto) => window.Bit?.diz(pose, texto)
+
+  // Sons curtos feitos no navegador, sem arquivos para baixar
+  let audio = null, comSom = true
+  function tocar(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somClique = () => tocar([[520, 0, .05]])
+  const somPar = () => tocar([[880, 0, .08], [1175, .06, .12]])
+  const somAcerto = () => tocar([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => tocar([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => tocar([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  const botaoOpcao = (i, rotulo) => `<button class="opcao" type="button" data-i="${i}">${rotulo}</button>`
+
+  function desenharPlacar() {
+    $("placar").innerHTML = rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+
+  // A caixa da fonte: de exemplo (com o aviso) ou só o contexto do fato
+  function mostrarFonte(texto, exemplo) {
+    $("fonte").hidden = !texto
+    $("fonte").textContent = texto || ""
+    $("fonte").className = "fonte" + (exemplo ? "" : " contexto")
+    $("nota-fonte").hidden = !(texto && exemplo)
+  }
+
+  function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    dicas = 0
+    marcados = 0
+    const r = atual()
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${rodadas.length}`
+    if (r.kind === "binaria") {
+      mostrarFonte(r.desc, true)
+      $("texto").textContent = "Esta fonte é primária ou secundária?"
+      $("area").innerHTML = `<div class="opcoes" id="opcoes" role="group" aria-label="Escolha o tipo da fonte">
+        <button class="opcao" type="button" data-id="primaria">Fonte primária<small>da época dos fatos</small></button>
+        <button class="opcao" type="button" data-id="secundaria">Fonte secundária<small>feita depois, por quem estudou</small></button>
+      </div>`
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherTipo(b))
+    } else if (r.kind === "escolha") {
+      if (r.fonte) mostrarFonte(r.fonte, true)
+      else mostrarFonte(r.contexto, false)
+      $("texto").textContent = r.pergunta
+      $("area").innerHTML = `<div class="opcoes uma" id="opcoes" role="group" aria-label="Escolha a resposta">${r.ops.map((o, i) => botaoOpcao(i, o.t)).join("")}</div>`
+      $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherResposta(b))
+    } else {
+      mostrarFonte("", false)
+      $("texto").textContent = r.texto
+      $("area").innerHTML = `<div class="ordem" id="ordem" role="group" aria-label="Fatos para pôr em ordem">${r.itens.map(id => `<button class="item" type="button" data-id="${id}"><span class="ordem-n" aria-hidden="true"></span><span>${EV[id].nome}<small></small></span></button>`).join("")}</div>`
+      $("ordem").querySelectorAll(".item").forEach(b => b.onclick = () => tocarFato(b))
+    }
+  }
+
+  // Fase 1: primária ou secundária
+  function escolherTipo(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual()
+    if (botao.dataset.id === r.resp) {
+      botao.classList.add("certa")
+      return acertou(r.certa)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    fala("ops", r.errada)
+  }
+
+  // Fase 2 e as perguntas da fase 3: escolher a resposta, e cada erro explica
+  function escolherResposta(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), o = r.ops[botao.dataset.i]
+    if (o.certa) {
+      botao.classList.add("certa")
+      return acertou(r.explica)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    fala("ops", o.porque)
+  }
+
+  // Fase 3: tocar nos fatos, do mais antigo ao mais novo
+  function tocarFato(botao) {
+    if (ocupado || botao.classList.contains("feito")) return
+    const r = atual(), id = botao.dataset.id, e = EV[id]
+    if (id === r.ids[marcados]) {
+      marcados++
+      botao.classList.add("feito")
+      botao.disabled = true
+      botao.querySelector(".ordem-n").textContent = marcados
+      botao.querySelector("small").textContent = e.ano
+      botao.setAttribute("aria-label", `${marcados}º: ${e.nome}, ${e.ano}`)
+      somPar()
+      if (marcados === r.ids.length) return acertou(`Ordem certa: ${juntar(r.ids.map(i => EV[i].ano))}. ${e.fato}`)
+      return fala("feliz", e.fato)
+    }
+    erros++
+    somErro()
+    botao.classList.remove("erro")
+    void botao.offsetWidth
+    botao.classList.add("erro")
+    fala("ops", `Esse fato é de ${e.ano}, então vem mais para a frente. Procure um fato mais antigo.`)
+  }
+
+  // A dica cresce: primeiro a pista, depois tira uma resposta errada (sem contar como erro)
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual()
+    dicas++
+    if (r.kind === "ordem") {
+      const prox = EV[r.ids[marcados]]
+      return fala("pensando", dicas % 2 === 1 ? `O próximo: ${prox.curta}.` : `O próximo é de ${prox.ano}.`)
+    }
+    if (r.kind === "binaria") return fala("pensando", dicas === 1
+      ? "Pergunte: quando e por quem a fonte foi feita? Na época dos fatos, por quem viveu? Ou depois, por quem estudou?"
+      : r.dica)
+    if (dicas === 1) return fala("pensando", r.dica)
+    const lista = [...$("opcoes").querySelectorAll(".opcao:not([disabled])")].filter(b => !r.ops[b.dataset.i].certa)
+    if (!lista.length) return fala("pensando", "Já sobrou só a certa. Toque nela.")
+    const b = lista[0]
+    b.disabled = true
+    b.classList.add("errada")
+    fala("pensando", "Tirei uma opção errada. Agora ficou mais fácil.")
+  }
+
+  // Depois de um acerto, o desafio fica na tela com a explicação do Bit até o estudante tocar em Próximo
+  function acertou(frase) {
+    ocupado = true
+    somAcerto()
+    fala("comemorando", frase)
+    $("dica").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Estrelas pelos erros da fase, e confete
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= FASES[fase].limite ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    Jogo.progresso?.guardar(fase + 1, estrelas)
+    mostrarEstrelas()
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Caso resolvido!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou as três fases${comoFoi}. Toda fonte tem autor, data e interesse. Antes de usar uma, pergunte: quem fez, quando e para quê? Depois compare com outras fontes.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").hidden = ultima
+    $("seguir").querySelector("span").textContent = "Próxima fase"
+    $("fim-acoes").replaceChildren()
+    if (ultima) $("fim-acoes").append(Jogo.acoesDoFim(() => comecar(0)))
+    $("placar").innerHTML = rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;($("seguir").hidden ? $("fim-acoes").querySelector("button") : $("seguir"))?.focus()
+    somFesta()
+    fala(ultima ? "formatura" : "comemorando", ultima ? "Agora você lê as fontes como um historiador. Pergunte sempre: quem fez, quando e para quê?" : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    rodadas = FASES[fase].monta()
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    fala(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span><i class="fase-estrelas" role="img"></i></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  // As estrelas guardadas no aparelho aparecem em cada fase
+  function mostrarEstrelas() {
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => {
+      const guardadas = Jogo.progresso?.estrelas(i + 1) ?? 0
+      const caixa = botao.querySelector(".fase-estrelas")
+      caixa.setAttribute("aria-label", `${guardadas} de 3 estrelas`)
+      caixa.innerHTML = [0, 1, 2].map(n => `<svg viewBox="0 0 32 32" class="${n < guardadas ? "" : "apagada"}"><use href="#estrela"/></svg>`).join("")
+    })
+  }
+  mostrarEstrelas()
+  $("seguir").onclick = () => comecar(fase + 1)
+
+  // Copiar as mensagens para o Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

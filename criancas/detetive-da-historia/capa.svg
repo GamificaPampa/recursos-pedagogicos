@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<g transform="rotate(-6 80 62)">
+<path d="M38 12h84l12 12v84H38z" fill="#fff6cf" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M122 12v12h12" fill="#ffe1b0" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M50 38h60M50 52h76M50 66h44" fill="none" stroke="#a08bff" stroke-width="4" stroke-linecap="round"/>
+<circle cx="64" cy="92" r="9" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3.5"/>
+</g>
+<path d="M150 82l22 24" stroke="#2f2a4a" stroke-width="13" stroke-linecap="round"/>
+<path d="M150 82l22 24" stroke="#ff8a3d" stroke-width="6" stroke-linecap="round"/>
+<circle cx="132" cy="62" r="27" fill="#cfe6ff" fill-opacity=".9" stroke="#2f2a4a" stroke-width="4.5"/>
+<path d="M114 60h34M114 72h22" fill="none" stroke="#7b5cff" stroke-width="6" stroke-linecap="round"/>
+<path d="M118 50c3-6 8-9 14-9" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<g class="g a-tw"><path transform="translate(150 6) scale(.8)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></g>
+</svg>

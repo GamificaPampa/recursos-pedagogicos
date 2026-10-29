@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<path d="M44 40q6-8 0-16t0-14M62 40q6-8 0-16t0-14M80 40q6-8 0-16t0-14" fill="none" stroke="#8d89a6" stroke-width="4" stroke-linecap="round"/>
+<rect x="18" y="62" width="14" height="10" rx="3" fill="#5b5675" stroke="#2f2a4a" stroke-width="3.5"/>
+<rect x="92" y="62" width="14" height="10" rx="3" fill="#5b5675" stroke="#2f2a4a" stroke-width="3.5"/>
+<path d="M26 50h72v52q0 6-6 6H32q-6 0-6-6z" fill="#aeb4c4" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M32 60h60v38q0 4-4 4H36q-4 0-4-4z" fill="#8cc4ff"/>
+<circle cx="46" cy="78" r="5" fill="#e3f5ff" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="70" cy="88" r="4" fill="#e3f5ff" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="78" cy="70" r="3.4" fill="#e3f5ff" stroke="#2f2a4a" stroke-width="2.5"/>
+<path d="M126 36h52l-6 72h-40z" fill="#eef9ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M128 70h48l-3 36h-42z" fill="#4da3ff"/>
+<path d="M127 52h50l-1 18h-48z" fill="#ffd23f"/>
+<path d="M126 36h52l-6 72h-40z" fill="none" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/>
+<path d="M128 70h48" stroke="#2f2a4a" stroke-width="3"/>
+<g class="g a-tw"><path transform="translate(140 6) scale(.75)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></g>
+</svg>

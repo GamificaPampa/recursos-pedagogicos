@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galeria do Bit · GamificaPampa</title>
+  <meta name="description" content="Um jogo de Arte para os anos finais: descubra os elementos da linguagem visual, toque nos lugares certos da composição e reconheça movimentos artísticos pelas características.">
+  <meta property="og:title" content="Galeria do Bit · GamificaPampa">
+  <meta property="og:description" content="Um jogo de Arte: elementos visuais, composição e movimentos artísticos.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    /* Page in one central column that fits the phone and the projector */
+    .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
+    .topo svg { width: 22px; height: 22px; }
+    main { display: grid; gap: 26px; width: min(1040px, 100% - 32px); margin: 10px auto 56px; }
+    header { text-align: center; }
+    header h1 { font-size: clamp(38px, 8vw, 72px); }
+    .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .rodape { padding: 0 16px 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+    /* Phases: the teacher can jump to any of them */
+    .fases { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .fase { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 16px 4px 6px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font: 600 16px var(--font); color: var(--ink); cursor: pointer; }
+    .fase b { display: grid; place-items: center; width: 32px; height: 32px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .fase-estrelas { display: inline-flex; gap: 1px; font-style: normal; }
+    .fase-estrelas svg { width: 16px; height: 16px; }
+    .fase-estrelas .apagada path { fill: #e6e3f2; }
+    .fase[aria-pressed="true"] { background: var(--yellow); }
+    .fase[aria-pressed="true"] b { background: var(--white); }
+    .fase:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    /* Bit lives inside the game, big, and keeps the last thing he said on screen */
+    .fala-bit { grid-area: fala; display: flex; align-items: center; gap: 16px; width: 100%; max-width: 760px; margin: 0 auto 16px; }
+    .fala-bit__bit { flex: none; width: clamp(84px, 15vw, 128px); }
+    .fala-bit__bit img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 0 rgb(47 42 74 / .3)); }
+    .fala-bit__bit img.nova { animation: bit-pula .55s var(--bounce); }
+    @keyframes bit-pula { 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(2px) rotate(3deg); } }
+    .fala-bit__balao { flex: 1; display: flex; align-items: center; min-height: 3.4em; margin: 0; font-size: clamp(17px, 2.3vw, 21px); line-height: 1.3; text-align: left; box-shadow: 0 6px 0 rgb(47 42 74 / .25); }
+    .fala-bit__balao.nova { animation: balao-surge .35s var(--bounce); }
+    @keyframes balao-surge { from { transform: scale(.88); opacity: .3; } }
+
+    /* The question and the answers on the left, the picture on the right */
+    .jogo { position: relative; overflow: hidden; }
+    .mesa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "fala fala" "missao quadro" "controles quadro"; gap: 16px 24px; }
+    .missao { grid-area: missao; align-self: end; padding: 14px 18px 16px; background: #fffdf4; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 8px 0 rgb(47 42 74 / .25); text-align: center; }
+    .missao p { margin: 0; }
+    .missao__topo { font-size: 15px; font-weight: 600; color: var(--soft); }
+    .pergunta { margin: 8px 0 0 !important; font-size: clamp(22px, 3.2vw, 30px); font-weight: 700; line-height: 1.15; }
+    .pistas { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; text-align: left; }
+    .pistas[hidden] { display: none; }
+    .pistas li { padding: 6px 12px; background: var(--white); border: 3px solid var(--ink); border-radius: 14px; font-size: 16px; font-weight: 600; line-height: 1.25; }
+    .pistas-titulo { margin: 12px 0 0 !important; font-size: 14px; font-weight: 700; color: var(--soft); text-transform: uppercase; letter-spacing: .04em; }
+    .pistas-titulo[hidden] { display: none; }
+
+    .controles { grid-area: controles; display: grid; align-content: start; gap: 14px; justify-items: center; }
+    .opcoes { display: grid; gap: 12px; width: 100%; max-width: 420px; }
+    .opcao { min-height: 56px; padding: 6px 16px; background: var(--white); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); font: 700 22px var(--font); color: var(--ink); cursor: pointer; }
+    .opcao:hover:not([disabled]) { background: #fff6cf; }
+    .opcao:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    .opcao.errada { background: #ffe1e7; opacity: .55; text-decoration: line-through; cursor: default; }
+    .opcao.certa { background: var(--mint); }
+    .opcoes[hidden], .btn[hidden] { display: none; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .acoes svg { width: 22px; height: 22px; }
+    .placar { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .placar li { position: relative; width: 18px; height: 18px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; }
+    .placar li.feito { background: var(--mint); }
+    .placar li.agora { background: var(--yellow); transform: scale(1.3); }
+    /* A fase feita tem um visto, além da cor, e a atual é maior: a cor não é a única pista */
+    .placar li.feito::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: translate(-50%, -50%) rotate(45deg); }
+
+    /* The picture: a drawing made by the game, with spots to tap in some rounds */
+    .quadro-area { grid-area: quadro; display: grid; gap: 8px; align-content: start; }
+    #quadro { display: block; width: 100%; height: auto; border: 4px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 0 8px 0 rgb(47 42 74 / .25); }
+    #quadro text { font-family: var(--font); }
+    .alvo { cursor: pointer; outline: none; }
+    .alvo .anel { opacity: 0; transition: opacity .15s; }
+    .alvo:hover .anel, .alvo:focus-visible .anel, .alvo.certo .anel { opacity: 1; }
+    .alvo.errado { cursor: default; }
+    .alvo.errado .marca { opacity: .45; }
+    .alvo.certo .anel { stroke: #1f9d6c; }
+    .nota { margin: 0; font-size: 15px; font-weight: 600; color: var(--soft); text-align: center; }
+
+    /* End of a phase */
+    .fim { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: rgb(255 255 255 / .96); text-align: center; }
+    .fim[hidden] { display: none; }
+    .fim h2 { font-size: clamp(30px, 6vw, 48px); }
+    .fim p { margin: 0; max-width: 480px; font-weight: 600; }
+    .fim .estrelas { display: flex; gap: 10px; }
+    .fim .estrelas svg { width: clamp(58px, 12vw, 84px); height: auto; }
+    .fim .estrelas .apagada path { fill: #e6e3f2; }
+    .confete { position: absolute; top: -24px; width: 14px; height: 22px; border: 2px solid var(--ink); border-radius: 3px; animation: confete-cai linear forwards; pointer-events: none; }
+    @keyframes confete-cai { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* For the teacher: what the class learns and the prompt for a similar game */
+    .aula h2 { margin-bottom: 14px; font-size: clamp(28px, 5vw, 40px); }
+    .aula h3 { margin: 22px 0 8px; font-size: 22px; }
+    .aula p, .aula li { margin: 0 0 8px; }
+    .aula ul { margin: 0; padding-left: 22px; }
+    .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 16px; white-space: pre-wrap; font-weight: 500; }
+    .mensagem b { display: block; margin-bottom: 4px; }
+    .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+    .linha svg { width: 22px; height: 22px; }
+
+    @media (max-width: 760px) {
+      .mesa { grid-template-columns: minmax(0, 1fr); grid-template-areas: "missao" "quadro" "fala" "controles"; gap: 12px; }
+      .missao { padding: 10px 12px 12px; }
+      .pistas li { font-size: 15px; }
+      .fala-bit { gap: 10px; margin: 0; }
+      .fala-bit__bit { width: 62px; }
+      .fala-bit__balao { min-height: 0; padding: 8px 12px; font-size: 15px; }
+      .fase { padding: 4px; }
+      .fase span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .fases { margin-bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .alvo .anel, .confete, .fala-bit__bit img, .fala-bit__balao { transition: none !important; animation: none !important; }
+    }
+  </style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+</head>
+<body class="ceu">
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 24%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 50%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 4%; top: 30%">forma</span>
+    <span class="simbolo" style="right: 5%; top: 15%; --d: -2s">cor</span>
+    <span class="simbolo" style="right: 7%; top: 60%; --d: -4s">linha</span>
+    <span class="morros"></span>
+  </div>
+
+  <div class="topo">
+    <a class="btn btn--small" href="https://gamificapampa.github.io/turma/">Todos os jogos</a>
+    <button class="btn btn--small" type="button" id="som" aria-pressed="true" aria-label="Som ligado. Desligar o som"></button>
+  </div>
+
+  <main>
+    <header>
+      <h1 class="loud anima-letras"><span class="yellow">Galeria</span> do <span class="pink">Bit</span></h1>
+      <ul class="pills">
+        <li class="pill" style="--c: var(--purple)">Arte</li>
+        <li class="pill" style="--c: var(--yellow)">7º e 8º ano</li>
+        <li class="pill">Linguagem visual</li>
+      </ul>
+    </header>
+
+    <section class="card jogo" aria-label="Jogo">
+      <div class="fases" role="group" aria-label="Escolher a fase" id="fases"></div>
+      <div class="mesa">
+        <div class="fala-bit">
+          <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
+          <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
+        </div>
+        <div class="missao">
+          <p class="missao__topo" id="topo">Elementos visuais · desafio 1 de 6</p>
+          <p class="pergunta" id="texto" aria-live="polite">Qual elemento visual domina este quadro?</p>
+          <p class="pistas-titulo" id="pistas-titulo" hidden>Pistas</p>
+          <ul class="pistas" id="pistas" hidden></ul>
+        </div>
+        <div class="quadro-area">
+          <svg id="quadro" viewBox="0 0 400 300" role="img" aria-label="Quadro"></svg>
+          <p class="nota" id="nota"></p>
+        </div>
+        <div class="controles">
+          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha a resposta"></div>
+          <div class="acoes">
+            <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
+            <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próximo desafio</span></button>
+          </div>
+          <ol class="placar" id="placar" aria-label="Desafios da fase"></ol>
+        </div>
+      </div>
+
+      <div class="fim" id="fim" hidden>
+        <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
+        <h2 class="loud" id="fim-titulo">Fase completa!</h2>
+        <p id="fim-texto"></p>
+        <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes"></div>
+      </div>
+    </section>
+
+    <section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+      <h2 id="titulo-aula">Para usar na aula</h2>
+      <h3>O que a turma aprende</h3>
+      <p>A reconhecer os elementos da linguagem visual (ponto, linha, forma, textura, cor e perspectiva), a ler a composição de um quadro (equilíbrio simétrico, assimétrico e radial, primeiro plano e fundo, ponto de fuga) e a identificar cinco movimentos pelas características: Renascimento, Impressionismo, Cubismo, Modernismo brasileiro e arte urbana. Os quadros do jogo são estudos que o Bit desenhou no estilo de cada movimento, não são obras de verdade.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+        <li><b>No projetor:</b> a turma olha o quadro e vota antes do toque. Quem votou diferente explica o que viu no quadro.</li>
+        <li><b>No celular:</b> cada estudante joga as três fases e depois escolhe um movimento para pesquisar uma das obras citadas.</li>
+        <li><b>Depois:</b> cada dupla desenha no papel um estudo no estilo de um movimento (pinceladas curtas para o Impressionismo, formas quebradas para o Cubismo, letras grandes e cores fortes para o grafite) e a turma adivinha qual é.</li>
+      </ul>
+      <h3>Obras citadas no jogo</h3>
+      <p>O jogo só cita o nome e o autor. Nenhuma obra é reproduzida, então a turma pode procurar cada uma pelo nome em sites de museus.</p>
+      <ul>
+        <li>Mona Lisa, de Leonardo da Vinci (Renascimento)</li>
+        <li>Impressão, Nascer do Sol, de Claude Monet (Impressionismo)</li>
+        <li>A Noite Estrelada, de Vincent van Gogh (Pós-Impressionismo)</li>
+        <li>As Senhoritas de Avignon, de Pablo Picasso (marco do início do Cubismo)</li>
+        <li>Abaporu, de Tarsila do Amaral (Modernismo brasileiro)</li>
+        <li>Murais de Os Gêmeos, em São Paulo (arte urbana)</li>
+      </ul>
+
+      <h3>Faça um jogo parecido com o Gemini</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [elementos da linguagem visual] para estudantes do [7º ano]: o código desenha um quadro simples com [pontos, linhas ou formas] e o estudante escolhe qual elemento visual domina o quadro. Não use imagens de obras reais. É um jogo, não o teste interativo.</p>
+      <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: elementos visuais, composição e equilíbrio, movimentos artísticos], 5 desafios por fase, um botão de dica, uma explicação do conceito a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Cite só as obras e os autores que eu escrever aqui: [Abaporu, de Tarsila do Amaral; A Noite Estrelada, de Van Gogh]. Não invente datas, autores nem curiosidades. Tudo em português do Brasil.</p>
+      <div class="linha">
+        <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+        <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+        <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="estrela" viewBox="0 0 32 32"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+<script src="/identidade-visual/js/jogo.js"></script>
+<script>
+  const INK = "#2f2a4a"
+  const $ = id => document.getElementById(id)
+  const f1 = n => Math.round(n * 10) / 10
+
+  // A small seeded random generator, so each drawing is always the same
+  const rng = semente => () => {
+    semente = semente + 0x6D2B79F5 | 0
+    let t = Math.imul(semente ^ semente >>> 15, 1 | semente)
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t
+    return ((t ^ t >>> 14) >>> 0) / 4294967296
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Drawings. Each one returns the inside of the 400 x 300 picture.     */
+  /* The argument est tells what happened: ok (right answer), ajuda (hint) */
+  /* ------------------------------------------------------------------ */
+
+  const arvore = (x, y, e = 1) => `<rect x="${f1(x - 6 * e)}" y="${f1(y - 42 * e)}" width="${f1(12 * e)}" height="${f1(42 * e)}" fill="#9a5b2e" stroke="${INK}" stroke-width="3"/><circle cx="${x}" cy="${f1(y - 64 * e)}" r="${f1(34 * e)}" fill="#3fae4f" stroke="${INK}" stroke-width="3"/>`
+
+  // Fase 1
+  function dPonto() {
+    const r = rng(3)
+    let s = `<rect width="400" height="300" fill="#fff8e6"/>`
+    const aneis = [[0, 1, 11, "#e5398a"], [30, 8, 9, "#2f2a4a"], [58, 15, 7.5, "#e5398a"], [86, 22, 6, "#2f2a4a"], [114, 30, 4.5, "#e5398a"]]
+    for (const [R, n, pr, cor] of aneis) for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2 + R * .01
+      s += `<circle cx="${f1(200 + R * Math.cos(a))}" cy="${f1(150 + R * Math.sin(a))}" r="${pr}" fill="${cor}"/>`
+    }
+    for (let i = 0; i < 40; i++) {
+      const x = 10 + r() * 380, y = 10 + r() * 280
+      if (Math.hypot(x - 200, y - 150) < 132) continue
+      s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(2 + r() * 2.5)}" fill="${r() < .5 ? "#7b5cff" : "#ff8a3d"}"/>`
+    }
+    return s
+  }
+  function dLinha() {
+    let espiral = ""
+    for (let t = 0; t <= 4 * Math.PI; t += .2) espiral += `${t ? "L" : "M"}${f1(320 + (3 + t * 3.3) * Math.cos(t))} ${f1(245 + (3 + t * 3.3) * Math.sin(t))}`
+    let diag = ""
+    for (let i = 0; i < 8; i++) diag += `M${30 + i * 14} 285L${80 + i * 14} 205`
+    return `<rect width="400" height="300" fill="#f6fbff"/>`
+      + `<path d="M20 70C70 20 110 120 160 70S250 20 300 70S370 120 385 70" fill="none" stroke="#7b5cff" stroke-width="8" stroke-linecap="round"/>`
+      + `<path d="M20 135L60 185L100 135L140 185L180 135L220 185L260 135L300 185L340 135L380 185" fill="none" stroke="#ff8a3d" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>`
+      + `<path d="${diag}" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`
+      + `<path d="M150 235H255" stroke="#1f9d6c" stroke-width="14" stroke-linecap="round"/>`
+      + `<path d="${espiral}" fill="none" stroke="#e5398a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`
+  }
+  function dForma() {
+    return `<rect width="400" height="300" fill="#fff8e6"/>`
+      + `<circle cx="95" cy="105" r="55" fill="#ff5f8f"/><rect x="170" y="50" width="110" height="110" fill="#ffd23f"/><path d="M340 50L295 165H385Z" fill="#4fd6a6"/>`
+      + `<path d="M60 235C40 205 100 190 130 215C160 240 120 282 80 272C55 266 70 252 60 235Z" fill="#a08bff"/>`
+      + `<ellipse cx="240" cy="236" rx="62" ry="32" fill="#ff8a3d"/>`
+      + `<path d="M340 192L352 224L387 226L360 247L370 281L340 262L310 281L320 247L293 226L328 224Z" fill="#e5398a"/>`
+  }
+  function dTextura() {
+    const r = rng(11)
+    let rabisco = ""
+    for (let i = 0; i < 70; i++) {
+      const x = 150 + r() * 100, y = 100 + r() * 100, a = r() * Math.PI
+      rabisco += `M${f1(x)} ${f1(y)}l${f1(Math.cos(a) * 14)} ${f1(Math.sin(a) * 14)}`
+    }
+    return `<defs><pattern id="pt" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#ff8a3d"/><circle cx="3" cy="3" r="2" fill="#a8430f"/><circle cx="9" cy="9" r="2" fill="#a8430f"/></pattern><clipPath id="q2"><rect x="150" y="100" width="100" height="100"/></clipPath></defs>`
+      + `<rect width="400" height="300" fill="#f6fbff"/>`
+      + `<rect x="28" y="100" width="100" height="100" fill="#ff8a3d" stroke="${INK}" stroke-width="3"/>`
+      + `<rect x="150" y="100" width="100" height="100" fill="#ff8a3d"/><g clip-path="url(#q2)"><path d="${rabisco}" stroke="#a8430f" stroke-width="2.5" stroke-linecap="round"/></g><rect x="150" y="100" width="100" height="100" fill="none" stroke="${INK}" stroke-width="3"/>`
+      + `<rect x="272" y="100" width="100" height="100" fill="url(#pt)" stroke="${INK}" stroke-width="3"/>`
+  }
+  function dCor() {
+    return `<defs><linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d62f2f"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ffd23f"/></linearGradient></defs>`
+      + `<rect width="400" height="190" fill="url(#ceu)"/>`
+      + `<ellipse cx="90" cy="60" rx="60" ry="14" fill="#ff9a62"/><ellipse cx="320" cy="90" rx="52" ry="12" fill="#ffb347"/>`
+      + `<circle cx="200" cy="188" r="56" fill="#fff3b0"/>`
+      + `<rect y="188" width="400" height="112" fill="#c9301c"/>`
+      + `<path d="M0 188L50 160Q90 148 130 188Z" fill="#8f1d14"/><path d="M300 188Q340 150 400 168V188Z" fill="#8f1d14"/>`
+      + `<path d="M150 200H250M162 214H238M174 228H226M186 242H214" stroke="#ffd23f" stroke-width="7" stroke-linecap="round"/>`
+      + `<path d="M20 214H100M300 226H380M60 250H150M270 262H350" stroke="#ff8a3d" stroke-width="6" stroke-linecap="round"/>`
+  }
+  // The road is used in phase 1 (perspective) and in phase 2 (vanishing point)
+  function dEstrada(mostrar) {
+    let s = `<rect width="400" height="300" fill="#cdeeff"/><circle cx="320" cy="58" r="22" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`
+    s += `<path d="M0 125L45 92L92 125L150 86L205 125L262 98L320 125L360 100L400 125Z" fill="#a9c3e8"/><rect y="125" width="400" height="175" fill="#7bd88f"/><path d="M200 125L335 300H65Z" fill="#6b6585"/>`
+    for (const [t0, t1] of [[.1, .17], [.24, .36], [.46, .64], [.76, 1]]) {
+      const y0 = 125 + 175 * t0, y1 = 125 + 175 * t1
+      s += `<path d="M${f1(200 - 7 * t0)} ${f1(y0)}H${f1(200 + 7 * t0)}L${f1(200 + 7 * t1)} ${f1(y1)}H${f1(200 - 7 * t1)}Z" fill="#fff"/>`
+    }
+    for (const t of [.22, .4, .62, .9]) for (const lado of [-1, 1]) {
+      const x = 200 + lado * 155 * t, y = 125 + 175 * t, h = 120 * t
+      s += `<path d="M${f1(x)} ${f1(y)}V${f1(y - h)}M${f1(x - 18 * t)} ${f1(y - h + 12 * t)}H${f1(x + 18 * t)}" stroke="${INK}" stroke-width="${f1(2 + 5 * t)}" stroke-linecap="round"/>`
+    }
+    if (mostrar) {
+      s += `<path d="M65 300L200 125L335 300M60 175L200 125M340 175L200 125" fill="none" stroke="#e5398a" stroke-width="4" stroke-dasharray="9 7" stroke-linecap="round"/><circle cx="200" cy="125" r="6" fill="#e5398a" stroke="${INK}" stroke-width="2.5"/>`
+    }
+    return s
+  }
+
+  // Fase 2
+  function dSimetria(est) {
+    const metade = `<ellipse cx="88" cy="52" rx="38" ry="14" fill="#fff"/><ellipse cx="110" cy="44" rx="24" ry="12" fill="#fff"/>${arvore(62, 240, 1.1)}<circle cx="132" cy="264" r="7" fill="#ff5f8f" stroke="${INK}" stroke-width="2.5"/><path d="M132 271v14" stroke="#1f9d6c" stroke-width="3"/>`
+    let s = `<rect width="400" height="300" fill="#cdeeff"/><rect y="240" width="400" height="60" fill="#7bd88f"/>`
+    s += `<circle cx="200" cy="50" r="24" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`
+    s += `<rect x="165" y="150" width="70" height="90" fill="#ffb347" stroke="${INK}" stroke-width="3"/><path d="M155 152L200 108L245 152Z" fill="#e5398a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M188 240V208a12 12 0 0 1 24 0V240Z" fill="#7b5cff" stroke="${INK}" stroke-width="3"/>`
+    s += metade + `<g transform="translate(400 0) scale(-1 1)">${metade}</g>`
+    if (est.ok || est.ajuda) s += `<path d="M200 0V300" stroke="#e5398a" stroke-width="4" stroke-dasharray="9 7"/>`
+    return s
+  }
+  function dRadial(est) {
+    const cores = ["#e5398a", "#4da3ff", "#ffd23f", "#4fd6a6", "#ff8a3d", "#7b5cff"]
+    let s = `<rect width="400" height="300" fill="#fff8e6"/><path d="M200 130V292" stroke="#9a5b2e" stroke-width="8" stroke-linecap="round"/>`
+    for (let k = 0; k < 6; k++) s += `<path transform="translate(200 130) rotate(${k * 60})" d="M0 0L0 -112Q62 -104 80 -40Z" fill="${cores[k]}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+    s += `<circle cx="200" cy="130" r="12" fill="#fff" stroke="${INK}" stroke-width="3"/>`
+    if (est.ok || est.ajuda) {
+      s += `<circle cx="200" cy="130" r="118" fill="none" stroke="#e5398a" stroke-width="3" stroke-dasharray="8 6"/>`
+      for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3 - Math.PI / 2; s += `<path d="M200 130L${f1(200 + 118 * Math.cos(a))} ${f1(130 + 118 * Math.sin(a))}" stroke="#e5398a" stroke-width="3" stroke-dasharray="8 6"/>` }
+    }
+    return s
+  }
+  function dAssimetria(est) {
+    let s = `<rect width="400" height="300" fill="#f6fbff"/>`
+    s += `<circle cx="125" cy="165" r="78" fill="#7b5cff" stroke="${INK}" stroke-width="3"/>`
+    s += `<path d="M300 70L270 125H330Z" fill="#ff8a3d" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="305" y="170" width="46" height="46" rx="4" fill="#e5398a" stroke="${INK}" stroke-width="3"/><circle cx="275" cy="248" r="22" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`
+    if (est.ok || est.ajuda) s += `<path d="M200 0V300" stroke="#e5398a" stroke-width="4" stroke-dasharray="9 7"/>`
+    return s
+  }
+  function dArvoreSimetrica(est) {
+    let s = `<rect width="400" height="300" fill="#cdeeff"/><rect y="240" width="400" height="60" fill="#7bd88f"/>`
+    s += `<path d="M200 0V300" stroke="#5b5675" stroke-width="2.5" stroke-dasharray="8 7" opacity=".7"/><text x="208" y="20" font-size="14" font-weight="700" fill="#5b5675">eixo</text>`
+    s += `<circle cx="200" cy="55" r="22" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`
+    s += `<rect x="170" y="150" width="60" height="90" fill="#ffb347" stroke="${INK}" stroke-width="3"/><path d="M160 152L200 110L240 152Z" fill="#e5398a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M188 240V210a12 12 0 0 1 24 0V240Z" fill="#7b5cff" stroke="${INK}" stroke-width="3"/>`
+    s += arvore(60, 240)
+    if (est.ok) s += arvore(340, 240)
+    if (est.ajuda && !est.ok) s += `<path d="M60 256H200M200 256H340" stroke="#e5398a" stroke-width="3" stroke-dasharray="6 5"/><path d="M60 248v16M200 248v16M340 248v16" stroke="#e5398a" stroke-width="3"/>`
+    return s
+  }
+  function dPlanos(est) {
+    let s = `<rect width="400" height="300" fill="#cdeeff"/><circle cx="335" cy="48" r="20" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`
+    s += `<path d="M170 150L225 92L270 138L315 96L372 150Z" fill="#a9c3e8"/><path d="M255 150L335 88L400 140V150Z" fill="#b9cfee"/>`
+    s += `<rect y="150" width="400" height="150" fill="#8bdc9a"/>`
+    s += `<rect x="150" y="165" width="75" height="62" fill="#ffb347" stroke="${INK}" stroke-width="3"/><path d="M142 167L187 126L232 167Z" fill="#e5398a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="176" y="192" width="22" height="35" rx="3" fill="#7b5cff" stroke="${INK}" stroke-width="3"/>`
+    s += arvore(95, 290, 2.2)
+    return s
+  }
+
+  // Fase 3: studies drawn in the style of each movement (no real work is reproduced)
+  function dImpressionismo() {
+    const r = rng(21)
+    const escolher = lista => lista[Math.floor(r() * lista.length)]
+    const traco = (x, y, cor, l = 14, w = 7) => `<path d="M${f1(x)} ${f1(y)}l${l} ${f1((r() - .5) * 4)}" stroke="${cor}" stroke-width="${w}" stroke-linecap="round"/>`
+    const ceu = ["#ffd1a1", "#ffb59a", "#f7a1b8", "#ffe08a", "#fcb98d", "#d7b3ec", "#ffc7d6"]
+    const agua = ["#6fa8dc", "#4a7fc1", "#8a79c9", "#3f9a9a", "#a5c8ec", "#7ec4c0", "#5d6fc4"]
+    const sol = ["#ffe27a", "#ffd23f", "#ffb347", "#ffe9a8"]
+    const mata = ["#3f7d4e", "#2f6b5a", "#5a9a5a", "#7fb069"]
+    let s = `<rect width="400" height="300" fill="#f4dcc0"/>`
+    for (let i = 0; i < 380; i++) {
+      const x = r() * 390, y = r() * 154
+      s += traco(x, y, Math.hypot(x - 270, y - 100) < 75 ? escolher(sol) : escolher(ceu))
+    }
+    s += `<circle cx="270" cy="100" r="25" fill="#fff3b0"/>`
+    for (let i = 0; i < 40; i++) { const a = r() * 6.28, d = 28 + r() * 14; s += traco(270 + d * Math.cos(a) - 6, 100 + d * Math.sin(a), escolher(sol), 10, 5) }
+    for (let i = 0; i < 480; i++) {
+      const x = r() * 390, y = 146 + r() * 156
+      const reflexo = Math.abs(x - 270) < 28 + (y - 146) * .12
+      s += traco(x, y, reflexo && r() < .6 ? escolher(sol) : escolher(agua))
+    }
+    for (let i = 0; i < 130; i++) s += traco(6 + r() * 92, 96 + r() * 52, escolher(mata), 12, 8)
+    for (let i = 0; i < 40; i++) s += traco(6 + r() * 92, 150 + r() * 36, escolher(mata), 12, 6)
+    s += `<path d="M150 152H182" stroke="#3b3b66" stroke-width="7" stroke-linecap="round"/><path d="M166 146V120" stroke="#3b3b66" stroke-width="3" stroke-linecap="round"/><path d="M169 146L183 126" stroke="#fff" stroke-width="7" stroke-linecap="round"/>`
+    return s
+  }
+  function dCubismo() {
+    return `<rect width="400" height="300" fill="#e8dcc0"/>`
+      + `<path d="M0 0H170L120 300H0Z" fill="#d9c9a0"/><path d="M170 0H400V140L250 200Z" fill="#b9b08a"/><path d="M120 300L250 200L400 140V300Z" fill="#9a8d6b"/><path d="M0 120L90 60L110 180L0 230Z" fill="#8d8a85" opacity=".75"/>`
+      + `<path d="M270 150L375 62L390 82L285 178Z" fill="#7a5230" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M375 62L398 40L404 64L390 82Z" fill="#3b342e" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+      + `<path d="M150 140L235 110L285 175L265 255L175 265L130 200Z" fill="#c9a15a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+      + `<path d="M205 95L265 135L250 230L200 200Z" fill="#7a5230" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+      + `<path d="M150 140L235 110L205 150Z" fill="#f2e4bd" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M175 265L130 200L190 215Z" fill="#7d7a4a" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`
+      + `<circle cx="205" cy="190" r="22" fill="#3b342e" stroke="${INK}" stroke-width="3"/><path d="M258 150L266 176L258 205L250 176Z" fill="#3b342e"/>`
+      + `<path d="M232 188L372 80M236 198L376 92M240 208L380 104" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/>`
+      + `<path d="M20 250L70 220L60 285Z" fill="#7d7a4a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M70 220L110 262L60 285Z" fill="#c9a15a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+  }
+  function dRenascimento(est) {
+    const ys = [185, 198, 214, 237, 269.5, 300]
+    const xAt = (xb, y) => 200 + (xb - 200) * (y - 120) / 180
+    let s = `<defs><linearGradient id="manto" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7d9ee0"/><stop offset="1" stop-color="#2d4577"/></linearGradient><linearGradient id="rosto" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3cfa8"/><stop offset="1" stop-color="#b98558"/></linearGradient></defs>`
+    s += `<rect width="400" height="300" fill="#f0e2c0"/><rect y="30" width="400" height="14" fill="#d8c9a7" stroke="${INK}" stroke-width="2"/>`
+    s += `<path d="M150 185V105a50 50 0 0 1 100 0V185Z" fill="#cdeeff" stroke="${INK}" stroke-width="3"/><path d="M150 185V150Q175 132 200 150T250 146V185Z" fill="#9bd3a0"/>`
+    s += `<path d="M55 185V120a25 25 0 0 1 50 0V185Z" fill="#c9b98f" stroke="${INK}" stroke-width="3"/><path d="M295 185V120a25 25 0 0 1 50 0V185Z" fill="#c9b98f" stroke="${INK}" stroke-width="3"/>`
+    for (const x of [10, 112, 272, 370]) s += `<rect x="${x}" y="${x === 10 || x === 370 ? 44 : 60}" width="${x === 10 || x === 370 ? 20 : 16}" height="${x === 10 || x === 370 ? 141 : 125}" fill="#e0d2ac" stroke="${INK}" stroke-width="2.5"/>`
+    for (let j = 0; j < 5; j++) for (let i = -7; i < 11; i++) {
+      const y0 = ys[j], y1 = ys[j + 1], a = i * 100, b = a + 100
+      s += `<path d="M${f1(xAt(a, y0))} ${y0}L${f1(xAt(b, y0))} ${y0}L${f1(xAt(b, y1))} ${y1}L${f1(xAt(a, y1))} ${y1}Z" fill="${(i + j) % 2 ? "#c97b4a" : "#f2e4bd"}"/>`
+    }
+    s += `<rect y="185" width="400" height="115" fill="none"/><ellipse cx="200" cy="266" rx="32" ry="6" fill="rgb(0 0 0 / .25)"/>`
+    s += `<path d="M176 264L186 178Q200 168 214 178L224 264Z" fill="url(#manto)" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><circle cx="200" cy="158" r="15" fill="url(#rosto)" stroke="${INK}" stroke-width="3"/><path d="M185 156a15 15 0 0 1 30 0q-15-10-30 0Z" fill="#5a3a22"/>`
+    if (est.ok) {
+      for (const xb of [-300, -100, 100, 300, 500, 700]) s += `<path d="M${xb} 300L200 120" stroke="#e5398a" stroke-width="3" stroke-dasharray="9 7"/>`
+      s += `<circle cx="200" cy="120" r="6" fill="#e5398a" stroke="${INK}" stroke-width="2.5"/>`
+    }
+    return s
+  }
+  function dModernismo() {
+    return `<rect width="400" height="300" fill="#55b7f0"/>`
+      + `<circle cx="320" cy="70" r="54" fill="#ff8a3d"/><circle cx="320" cy="70" r="42" fill="#ffd23f"/>`
+      + `<path d="M0 190Q100 118 200 185T400 168V300H0Z" fill="#3fae4f"/>`
+      + `<path d="M-20 300Q60 170 190 300Z" fill="#f06fa0"/><path d="M200 300Q300 200 420 300Z" fill="#ffb347"/>`
+      + `<rect x="222" y="196" width="52" height="40" fill="#fff3c9"/><path d="M214 198L248 168L282 198Z" fill="#e5398a"/><rect x="238" y="212" width="20" height="24" fill="#4da3ff"/>`
+      + `<rect x="296" y="214" width="44" height="34" fill="#ffd23f"/><path d="M290 216L318 192L346 216Z" fill="#7b5cff"/><rect x="311" y="228" width="16" height="20" fill="#e5398a"/>`
+      + `<path d="M120 262Q110 220 130 170" fill="none" stroke="#7a4a23" stroke-width="9" stroke-linecap="round"/>`
+      + `<path d="M130 170Q96 150 86 168Q108 160 130 170ZM130 170Q160 140 182 152Q152 152 130 170ZM130 170Q120 128 140 112Q136 142 130 170ZM130 170Q100 130 80 128Q104 144 130 170Z" fill="#1f9d6c" stroke="#1f9d6c" stroke-width="6" stroke-linejoin="round"/>`
+      + `<rect x="40" y="206" width="22" height="64" rx="11" fill="#1f9d6c"/><rect x="18" y="222" width="14" height="30" rx="7" fill="#1f9d6c"/><rect x="26" y="238" width="20" height="12" rx="6" fill="#1f9d6c"/><rect x="62" y="216" width="14" height="28" rx="7" fill="#1f9d6c"/><rect x="48" y="232" width="22" height="12" rx="6" fill="#1f9d6c"/>`
+  }
+  function dGrafite() {
+    let tijolos = ""
+    for (let j = 0; j < 12; j++) {
+      tijolos += `M0 ${j * 25}H400`
+      for (let k = 0; k < 9; k++) tijolos += `M${(j % 2 ? 25 : 0) + k * 50} ${j * 25}v25`
+    }
+    const letras = `font-size="130" font-weight="700" text-anchor="middle" stroke-linejoin="round"`
+    let gotas = ""
+    for (const [x, h] of [[120, 44], [172, 30], [214, 52], [262, 36], [300, 24]]) gotas += `<path d="M${x} 190v${h}" stroke="#ffd23f" stroke-width="7" stroke-linecap="round"/><circle cx="${x}" cy="${190 + h + 3}" r="5" fill="#ffd23f"/>`
+    return `<rect width="400" height="300" fill="#b4553c"/><path d="${tijolos}" stroke="#8c3d2a" stroke-width="3"/>`
+      + `<text x="206" y="196" ${letras} fill="#4da3ff" stroke="${INK}" stroke-width="12" paint-order="stroke">BIT</text>`
+      + `<text x="200" y="188" ${letras} fill="#ffd23f" stroke="${INK}" stroke-width="12" paint-order="stroke">BIT</text>`
+      + gotas
+      + `<path d="M170 80l9 18 20 3-14 14 4 20-19-10-19 10 4-20-14-14 20-3z" fill="#4fd6a6" stroke="${INK}" stroke-width="3" stroke-linejoin="round" transform="translate(30 -66)"/>`
+      + `<circle cx="50" cy="60" r="5" fill="#ff5f8f"/><circle cx="68" cy="46" r="3" fill="#4da3ff"/><circle cx="350" cy="236" r="5" fill="#4fd6a6"/><circle cx="364" cy="252" r="3" fill="#ffd23f"/><circle cx="40" cy="250" r="4" fill="#ffd23f"/>`
+  }
+  function dPlaca(est) {
+    return `<rect width="400" height="300" fill="#e9e4f7"/>`
+      + `<rect x="90" y="14" width="220" height="170" rx="6" fill="#d9a441" stroke="${INK}" stroke-width="4"/><rect x="106" y="30" width="188" height="138" fill="#fff8e6" stroke="${INK}" stroke-width="3"/>`
+      + `<circle cx="200" cy="99" r="42" fill="#ffd23f" stroke="${INK}" stroke-width="4"/><text x="200" y="118" text-anchor="middle" font-size="56" font-weight="700" fill="${INK}">?</text>`
+      + `<rect x="70" y="200" width="260" height="88" rx="8" fill="#fff" stroke="${INK}" stroke-width="3"/>`
+      + `<text x="200" y="228" text-anchor="middle" font-size="22" font-weight="700" fill="${INK}">A Noite Estrelada</text>`
+      + `<text x="200" y="250" text-anchor="middle" font-size="17" font-weight="600" fill="#5b5675">1889</text>`
+      + `<text x="200" y="274" text-anchor="middle" font-size="19" font-weight="700" fill="${est.ok ? "#1f9d6c" : "#e5398a"}">${est.ok ? "Vincent van Gogh" : "Artista: ?"}</text>`
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Content                                                             */
+  /* ------------------------------------------------------------------ */
+  const certa = t => ({ t, ok: true })
+  const errada = (t, p) => ({ t, ok: false, p })
+
+  const MOV = {
+    renascimento: { nome: "Renascimento", art: "o", def: "O Renascimento nasceu na Itália, entre os séculos XIV e XVI, e valorizava a proporção, a simetria e a perspectiva com ponto de fuga.", obra: "Mona Lisa, de Leonardo da Vinci" },
+    impressionismo: { nome: "Impressionismo", art: "o", def: "O Impressionismo, da França do século XIX, pintava a luz de um instante com pinceladas curtas e soltas.", obra: "Impressão, Nascer do Sol, de Claude Monet" },
+    cubismo: { nome: "Cubismo", art: "o", def: "O Cubismo, criado por Pablo Picasso e Georges Braque no começo do século XX, quebra o objeto em formas geométricas vistas de vários lados.", obra: "As Senhoritas de Avignon, de Pablo Picasso, que marca o início do movimento" },
+    modernismo: { nome: "Modernismo brasileiro", art: "o", def: "O Modernismo brasileiro ganhou força com a Semana de Arte Moderna de 1922, em São Paulo, e valorizou o Brasil com cores vivas e formas livres.", obra: "Abaporu, de Tarsila do Amaral" },
+    grafite: { nome: "Arte urbana e grafite", art: "a", chama: "a arte urbana", def: "A arte urbana vai para muros e outros lugares públicos, com spray, estêncil e letras estilizadas.", obra: "os murais de Os Gêmeos, em São Paulo" },
+  }
+  const opMov = (chave, certaChave) => chave === certaChave ? certa(MOV[chave].nome)
+    : errada(MOV[chave].nome, `Não é ${MOV[chave].chama ?? `${MOV[chave].art} ${MOV[chave].nome}`}. ${MOV[chave].def} Releia as pistas.`)
+  const rodadaMov = (chave, opcoes, desenho, alt, pistas, dica) => ({
+    desenho, alt, pergunta: "Que movimento tem estas características?", pistas, dica,
+    opcoes: opcoes.map(c => opMov(c, chave)),
+    acerto: `É ${MOV[chave].chama ? "a arte urbana" : `o ${MOV[chave].nome}`}! ${MOV[chave].def} Uma obra famosa: ${MOV[chave].obra}.`,
+    nota: "Este quadro é um estudo que o Bit desenhou no estilo do movimento. Não é uma obra de verdade.",
+  })
+
+  const FASES = [
+    { nome: "Elementos visuais",
+      abertura: "Oi! Eu sou o Bit e esta é a minha galeria. Toda imagem é feita de elementos visuais: ponto, linha, forma, textura, cor e perspectiva. Vamos descobrir qual deles aparece em cada quadro?",
+      rodadas: [
+        { desenho: dPonto, alt: "Quadro com bolinhas coloridas em anéis ao redor do centro, cada anel com bolinhas menores, como uma flor.", pergunta: "Qual elemento visual domina este quadro?",
+          opcoes: [certa("Ponto"), errada("Linha", "Não é a linha. A linha é uma marca comprida, que vai de um lugar a outro. Aqui cada marca é pequena e separada."), errada("Textura", "Não é a textura. A textura é o jeito da superfície. Aqui o que domina são marcas pequenas e redondas.")],
+          acerto: "Isso! O quadro é feito de pontos. O ponto é a marca mais simples, e muitos pontos juntos formam uma figura, como esta flor de bolinhas.",
+          dica: ["Chegue perto do quadro: o que é cada pedacinho dele?", "São marcas pequenas, redondas e separadas. Juntas, elas formam uma figura grande."] },
+        { desenho: dLinha, alt: "Quadro com riscos de vários tipos: uma onda roxa grossa, um zigue-zague laranja, riscos finos na diagonal, um traço verde e uma espiral rosa.", pergunta: "Qual elemento visual domina este quadro?",
+          opcoes: [errada("Forma", "Não é a forma. A forma é uma área fechada e preenchida. Aqui as marcas são compridas e finas."), errada("Ponto", "Não é o ponto. O ponto é uma marca pequena e isolada. Aqui as marcas são compridas."), certa("Linha")],
+          acerto: "Isso! São linhas: retas, curvas, grossas e finas. A linha sugere caminho e movimento. O zigue-zague parece mais agitado que a linha reta.",
+          dica: ["Cada marca vai de um lugar a outro. Como se chama uma marca comprida?", "Há linha reta, curva, grossa e fina. Elas dão a ideia de caminho e de movimento."] },
+        { desenho: dForma, alt: "Quadro com figuras de cores chapadas: um círculo, um quadrado, um triângulo, uma mancha livre, uma elipse e uma estrela.", pergunta: "Qual elemento visual domina este quadro?",
+          opcoes: [errada("Linha", "Não é a linha. Aqui não há riscos: são áreas pintadas por inteiro."), certa("Forma"), errada("Ponto", "Não é o ponto. Os pontos são pequenos. Aqui há figuras grandes e preenchidas.")],
+          acerto: "Isso! Círculo, quadrado e triângulo são formas geométricas. A mancha livre também é uma forma, só que orgânica, sem medidas certas.",
+          dica: ["Veja as áreas pintadas por inteiro, sem riscos nem pontinhos. Elas têm um contorno fechado.", "Círculo, quadrado e triângulo são formas geométricas. As outras são formas livres."] },
+        { desenho: dTextura, alt: "Três quadrados laranja do mesmo tamanho: o primeiro liso, o segundo riscado com traços miúdos e o terceiro cheio de bolinhas escuras.", pergunta: "O que muda de um quadrado para o outro?",
+          opcoes: [errada("A cor", "Não é a cor. Os três têm exatamente o mesmo laranja."), errada("A forma", "Não é a forma. Os três são quadrados do mesmo tamanho."), certa("A textura")],
+          acerto: "Isso! A cor e a forma são iguais. O que muda é a textura: lisa, riscada e pontilhada. A textura pode ser sentida com a mão ou só vista, como aqui.",
+          dica: ["Compare a cor e o formato dos três quadrados. Eles são iguais?", "Têm a mesma cor e o mesmo formato. Só a superfície muda, e dá vontade de passar a mão."] },
+        { desenho: dCor, alt: "Quadro de um pôr do sol com céu vermelho, laranja e amarelo, sol grande no horizonte e mar em tons de vermelho e laranja.", pergunta: "Que cores dominam este pôr do sol?",
+          opcoes: [errada("Cores frias", "Não são as frias. Azul, verde e violeta são cores frias, e quase não aparecem aqui."), certa("Cores quentes"), errada("Tons de cinza", "Tem muita cor aqui: vermelho, laranja e amarelo. Não são tons de cinza.")],
+          acerto: "Isso! Vermelho, laranja e amarelo são cores quentes. Elas lembram sol e fogo e passam energia. Azul, verde e violeta são frias e passam calma.",
+          dica: ["Pense nas cores do fogo e do sol. Elas passam calor ou frio?", "Vermelho, laranja e amarelo são quentes. Azul, verde e violeta são frias."] },
+        { desenho: est => dEstrada(est.ok), alt: "Quadro de uma estrada que afunila até o horizonte, com postes que ficam menores quanto mais longe, montanhas e sol.", pergunta: "Que elemento dá a sensação de profundidade?",
+          opcoes: [errada("Textura", "Não é a textura. A textura é o jeito da superfície. O que dá profundidade aqui são os postes que diminuem e a estrada que afunila."), errada("Ponto", "Não é o ponto. O que dá profundidade são os postes que diminuem e a estrada que afunila."), certa("Perspectiva")],
+          acerto: "Isso! Quanto mais longe, menor o poste e mais juntas as beiras da estrada. Elas se encontram num ponto do horizonte. Esse jeito de desenhar profundidade é a perspectiva.",
+          dica: ["Compare o tamanho dos postes. O que está perto é igual ao que está longe?", "Quando as linhas da estrada se encontram num ponto do horizonte, esse é o ponto de fuga."] },
+      ] },
+    { nome: "Composição",
+      abertura: "Agora vamos olhar a composição, que é o jeito de arrumar as coisas no quadro. Descubra o tipo de equilíbrio e toque nos lugares certos.",
+      rodadas: [
+        { desenho: dSimetria, alt: "Quadro com uma casa no centro, sol acima dela e, de cada lado, uma nuvem, uma árvore e uma flor, tudo igual nos dois lados.", pergunta: "Que tipo de equilíbrio tem este quadro?",
+          opcoes: [certa("Simétrico"), errada("Assimétrico", "Não é o assimétrico. Nele os lados são diferentes e se equilibram pelo peso. Aqui os dois lados são iguais."), errada("Radial", "Não é o radial. No radial, tudo parte de um centro, como as pétalas de uma flor. Aqui os lados são iguais, como num espelho.")],
+          acerto: "Isso! Se dobrarmos o quadro no meio, os dois lados coincidem, como num espelho. É o equilíbrio simétrico: passa ordem e calma.", ajuda: true,
+          dica: ["Imagine uma linha no meio do quadro. O lado esquerdo é igual ao direito?", "Quando os dois lados são iguais, como num espelho, o equilíbrio é simétrico."] },
+        { desenho: dRadial, alt: "Quadro de um cata-vento com seis pás de cores diferentes que saem do centro e giram ao redor dele.", pergunta: "Que tipo de equilíbrio tem este quadro?",
+          opcoes: [errada("Simétrico", "Não é o simétrico. Os lados não são um espelho um do outro: as pás giram ao redor do centro. Quando tudo parte de um centro, o equilíbrio é radial."), certa("Radial"), errada("Assimétrico", "Não é o assimétrico. No assimétrico os elementos são diferentes e se equilibram pelo peso. Aqui as pás são iguais e giram em volta de um centro.")],
+          acerto: "Isso! As pás saem do centro e se repetem em volta dele. É o equilíbrio radial, como as pétalas de uma flor, os raios do sol e os raios de uma roda de bicicleta.", ajuda: true,
+          dica: ["Onde cada pá começa? Todas saem do mesmo lugar?", "Quando os elementos saem de um centro e se repetem ao redor dele, o equilíbrio é radial."] },
+        { desenho: dAssimetria, alt: "Quadro com um círculo roxo grande perto do centro, à esquerda, e três figuras pequenas à direita, longe do centro: um triângulo, um quadrado e um círculo.", pergunta: "Que tipo de equilíbrio tem este quadro?",
+          opcoes: [errada("Radial", "Não é o radial. Aqui nada parte de um centro, como numa flor."), certa("Assimétrico"), errada("Simétrico", "Não é o simétrico. Se dobrarmos o quadro no meio, os lados não coincidem: um tem uma figura grande e o outro tem três pequenas.")],
+          acerto: "Isso! Os lados são diferentes, mas o peso visual se equilibra: uma figura grande perto do centro compensa várias pequenas mais longe, como numa gangorra. O assimétrico dá mais movimento ao quadro.", ajuda: true,
+          dica: ["Compare os dois lados do quadro. Eles são iguais?", "Os lados são diferentes, mas parecem pesar o mesmo. Pense numa gangorra: alguém pesado perto do meio equilibra vários leves na ponta."] },
+        { desenho: dArvoreSimetrica, alt: "Quadro com um eixo vertical tracejado no meio, uma casa sobre o eixo e uma árvore à esquerda. Faltam a árvore da direita.", pergunta: "Toque no lugar da segunda árvore para o quadro ficar simétrico.",
+          alvos: [
+            { x: 272, y: 178, r: 33, marca: "fantasma", rotulo: "Lugar 1: à direita, no chão, perto da casa", p: "Este lugar fica perto demais do eixo. A outra árvore está bem mais longe do centro, e no espelho a distância precisa ser igual." },
+            { x: 340, y: 178, r: 33, marca: "fantasma", rotulo: "Lugar 2: à direita, no chão, longe da casa", ok: true },
+            { x: 122, y: 178, r: 33, marca: "fantasma", rotulo: "Lugar 3: à esquerda, no chão, entre a árvore e a casa", p: "Este lugar fica do mesmo lado da outra árvore. A simetria pede a árvore do outro lado do eixo." },
+            { x: 340, y: 98, r: 33, marca: "fantasma", rotulo: "Lugar 4: à direita, no alto, longe da casa", p: "A distância até o eixo está certa, mas esta árvore ficaria no ar, sem chão. No espelho, a altura também se repete." },
+          ],
+          acerto: "Isso! A árvore da direita ficou à mesma distância do eixo e na mesma altura que a da esquerda. Na simetria, cada elemento tem um par igual do outro lado, como num espelho.", ajuda: true,
+          dica: ["O eixo no meio é o espelho. A árvore nova tem que ficar do outro lado dele.", "Veja a árvore da esquerda: ela está a uma distância do eixo e a uma altura do chão. A da direita repete as duas."] },
+        { desenho: dPlanos, alt: "Quadro de uma paisagem com sol, montanhas pequenas e claras no fundo, uma casa no meio e uma árvore muito grande na frente.", pergunta: "Toque no que está no primeiro plano, o mais perto de quem olha.",
+          alvos: [
+            { x: 325, y: 122, r: 40, marca: "area", rotulo: "Montanhas", p: "As montanhas estão no fundo: são pequenas, claras e ficam no alto, perto do horizonte." },
+            { x: 95, y: 170, r: 60, marca: "area", rotulo: "Árvore grande", ok: true },
+            { x: 335, y: 48, r: 33, marca: "area", rotulo: "Sol", p: "O sol está lá longe, no céu, atrás de tudo." },
+            { x: 200, y: 195, r: 36, marca: "area", rotulo: "Casa", p: "A casa está no plano do meio: é menor que a árvore e a árvore cobre uma parte dela." },
+          ],
+          acerto: "Isso! A árvore é a maior, está mais baixa no quadro e cobre parte da casa. Esse é o primeiro plano. A casa fica no plano do meio, e as montanhas, pequenas e claras, ficam no fundo.",
+          dica: ["O primeiro plano é a parte mais perto de quem olha. O que está perto parece maior.", "Veja quem cobre quem: o que está na frente tapa um pedaço do que está atrás."] },
+        { desenho: est => dEstrada(est.ok || est.ajuda), alt: "Quadro de uma estrada que afunila até o horizonte, com postes de cada lado, montanhas e sol. Há quatro marcadores numerados.", pergunta: "Onde fica o ponto de fuga desta estrada?",
+          alvos: [
+            { x: 320, y: 58, r: 33, marca: "pino", rotulo: "Marcador 1: o sol", p: "O sol está no céu e não tem a ver com a estrada. O ponto de fuga é onde as linhas da estrada se juntam." },
+            { x: 104, y: 195, r: 33, marca: "pino", rotulo: "Marcador 2: um poste ao lado da estrada", p: "O poste está na beira da estrada, mas não é onde as linhas se encontram. Siga as beiras da estrada até onde elas se juntam." },
+            { x: 200, y: 125, r: 33, marca: "pino", rotulo: "Marcador 3: o horizonte, no fim da estrada", ok: true },
+            { x: 200, y: 278, r: 33, marca: "pino", rotulo: "Marcador 4: o começo da estrada, perto de quem olha", p: "Aqui a estrada é mais larga: é o ponto mais perto de quem olha. As linhas só se encontram lá longe, onde a estrada some." },
+          ],
+          acerto: "Isso! As beiras da estrada parecem se encontrar no horizonte. Esse é o ponto de fuga. Os artistas do Renascimento usavam esse truque para desenhar profundidade.", ajuda: true,
+          dica: ["O ponto de fuga é onde as linhas paralelas parecem se encontrar, bem longe.", "Siga com o olho as duas beiras da estrada. Onde elas se juntam?"] },
+      ] },
+    { nome: "Movimentos artísticos",
+      abertura: "Cada movimento artístico tem o seu jeito de criar. Os quadros desta fase são estudos que eu desenhei no estilo de cada um, não são obras de verdade. Leia as pistas e descubra qual é.",
+      rodadas: [
+        rodadaMov("impressionismo", ["cubismo", "impressionismo", "grafite"], dImpressionismo,
+          "Estudo no estilo impressionista: um nascer do sol sobre a água, feito de pinceladas curtas e soltas em laranja, rosa, azul e violeta.",
+          ["Pinceladas curtas e soltas", "A luz e a cor de um instante, em paisagens"],
+          ["Pense na França do século XIX: os artistas saíam para pintar ao ar livre e queriam pegar a luz do momento.", "O nome veio de um quadro de Claude Monet chamado Impressão, Nascer do Sol."]),
+        rodadaMov("cubismo", ["cubismo", "renascimento", "modernismo"], dCubismo,
+          "Estudo no estilo cubista: um violão quebrado em formas geométricas de marrom, ocre e cinza, vistas de vários lados ao mesmo tempo.",
+          ["Formas geométricas e quebradas", "O objeto visto de vários lados ao mesmo tempo"],
+          ["Dois artistas, Pablo Picasso e Georges Braque, criaram esse jeito no começo do século XX.", "No começo, as cores eram sóbrias: marrons, cinzas e ocres."]),
+        rodadaMov("renascimento", ["impressionismo", "cubismo", "renascimento"], dRenascimento,
+          "Estudo no estilo renascentista: uma sala simétrica com piso de ladrilhos que se afunila até um ponto, arcos e uma figura de manto azul no centro, com sombras suaves.",
+          ["Perspectiva com ponto de fuga", "Proporção, simetria e sombras suaves"],
+          ["Esse movimento nasceu na Itália e voltou a admirar a arte da Grécia e de Roma antigas.", "Foi nele que os artistas passaram a usar o ponto de fuga para desenhar profundidade."]),
+        rodadaMov("modernismo", ["grafite", "modernismo", "renascimento"], dModernismo,
+          "Estudo no estilo do modernismo brasileiro: uma paisagem com sol grande, morros arredondados, casinhas, uma palmeira e um cacto, em cores vivas.",
+          ["Cores vivas e formas arredondadas", "Temas do Brasil, como paisagens e a vida do país"],
+          ["Tudo ganhou força com a Semana de Arte Moderna, em São Paulo, em 1922.", "Os artistas queriam uma arte brasileira, sem copiar só o que vinha da Europa."]),
+        rodadaMov("grafite", ["cubismo", "modernismo", "grafite"], dGrafite,
+          "Estudo no estilo da arte urbana: um muro de tijolos com a palavra BIT em letras grandes e coloridas, com gotas de tinta escorrendo.",
+          ["Feita em muros e outros lugares públicos", "Spray, estêncil e letras estilizadas"],
+          ["É a arte que a pessoa vê passando na rua, sem precisar ir a um museu.", "No Brasil, artistas como Os Gêmeos, de São Paulo, ficaram famosos por seus murais."]),
+        { desenho: dPlaca, alt: "Moldura dourada vazia, num museu, com a etiqueta da obra A Noite Estrelada, 1889, e o nome do artista escondido.", pergunta: "Quem pintou A Noite Estrelada?",
+          opcoes: [errada("Claude Monet", "Não foi Monet. Ele foi um dos criadores do Impressionismo e pintou, por exemplo, Impressão, Nascer do Sol."), certa("Vincent van Gogh"), errada("Leonardo da Vinci", "Não foi Leonardo da Vinci. Ele viveu no Renascimento, séculos antes, e pintou a Mona Lisa.")],
+          acerto: "Isso! Vincent van Gogh pintou A Noite Estrelada em 1889. Ele é chamado de pós-impressionista: veio depois do Impressionismo e usava cor forte e pinceladas marcadas para mostrar emoção.",
+          nota: "A obra não aparece aqui de propósito: o Bit mostra só a etiqueta. Procure a obra pelo nome e pelo autor.",
+          dica: ["Ele nasceu na Holanda e é famoso pelos céus de pinceladas marcadas e cores fortes.", "Veio depois do Impressionismo e usou a cor para mostrar emoção. O sobrenome começa com Van."] },
+      ] },
+  ]
+
+  /* ------------------------------------------------------------------ */
+  /* The Bit, sound and game state (same pieces as the other games)       */
+  /* ------------------------------------------------------------------ */
+  const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops"]
+  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  window.Bit = {
+    diz(pose, texto) {
+      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-balao").textContent = texto
+      for (const parte of [$("bit-img"), $("bit-balao")]) {
+        parte.classList.remove("nova")
+        void parte.offsetWidth
+        parte.classList.add("nova")
+      }
+    },
+    cala() {},
+  }
+
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  let est = { ok: false, ajuda: false, erradas: new Set() }
+  const atual = () => FASES[fase].rodadas[rodada]
+
+  // Short sounds made in the browser, no files to download
+  let audio = null, comSom = true
+  function toque(notas, tipoOnda = "triangle") {
+    if (!comSom) return
+    try {
+      audio ??= new AudioContext()
+      notas.forEach(([freq, inicio, duracao]) => {
+        const osc = audio.createOscillator(), vol = audio.createGain(), t = audio.currentTime + inicio
+        osc.type = tipoOnda
+        osc.frequency.value = freq
+        vol.gain.setValueAtTime(.18, t)
+        vol.gain.exponentialRampToValueAtTime(.001, t + duracao)
+        osc.connect(vol).connect(audio.destination)
+        osc.start(t)
+        osc.stop(t + duracao)
+      })
+    } catch {}
+  }
+  const somAcerto = () => toque([[523, 0, .12], [659, .1, .12], [784, .2, .2]])
+  const somErro = () => toque([[220, 0, .18], [180, .12, .22]], "square")
+  const somFesta = () => toque([[523, 0, .14], [659, .12, .14], [784, .24, .14], [1047, .36, .35]])
+  function desenharSom() {
+    $("som").innerHTML = comSom
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Som'
+      : '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 12l7 8M28 12l-7 8" stroke="#ff5f8f" stroke-width="3" stroke-linecap="round"/></svg>Sem som'
+    $("som").setAttribute("aria-pressed", String(comSom))
+    $("som").setAttribute("aria-label", comSom ? "Som ligado. Desligar o som" : "Som desligado. Ligar o som")
+  }
+  // Kit de jogo do identidade-visual: o som vale para todos os jogos e fica guardado no aparelho,
+  // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
+  $("som").onclick = () => Jogo.som.mudar()
+  Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+
+  /* ------------------------------------------------------------------ */
+  /* The picture and the tap spots                                        */
+  /* ------------------------------------------------------------------ */
+  function alvosSvg(r) {
+    return r.alvos.map((a, i) => {
+      const errado = est.erradas.has(i), certo = est.ok && a.ok
+      const livre = !est.ok && !errado
+      let marca = ""
+      if (a.marca === "pino") marca = `<circle class="marca" cx="${a.x}" cy="${a.y}" r="15" fill="#fff" stroke="${INK}" stroke-width="3"/><text class="marca" x="${a.x}" y="${a.y + 6}" text-anchor="middle" font-size="18" font-weight="700" fill="${INK}">${i + 1}</text>`
+      if (a.marca === "fantasma") marca = `<circle class="marca" cx="${a.x}" cy="${a.y}" r="${a.r - 2}" fill="rgb(255 255 255 / .55)" stroke="${INK}" stroke-width="3" stroke-dasharray="7 6"/><text class="marca" x="${a.x}" y="${a.y + 7}" text-anchor="middle" font-size="22" font-weight="700" fill="${INK}">${i + 1}</text>`
+      const xis = errado ? `<path d="M${a.x - 10} ${a.y - 10}l20 20m0 -20l-20 20" stroke="#e53950" stroke-width="5" stroke-linecap="round"/>` : ""
+      return `<g class="alvo${errado ? " errado" : ""}${certo ? " certo" : ""}" data-i="${i}" role="button" tabindex="${livre ? 0 : -1}" aria-disabled="${livre ? "false" : "true"}" aria-label="${a.rotulo}${errado ? ", resposta errada" : ""}">`
+        + `<circle cx="${a.x}" cy="${a.y}" r="${a.r}" fill="transparent"/>${marca}`
+        + `<circle class="anel" cx="${a.x}" cy="${a.y}" r="${a.r}" fill="none" stroke="#ff5f8f" stroke-width="4" stroke-dasharray="7 6"/>${xis}</g>`
+    }).join("")
+  }
+  function desenharQuadro(foco = null) {
+    const r = atual()
+    $("quadro").innerHTML = r.desenho(est) + (r.alvos ? alvosSvg(r) : "")
+    $("quadro").setAttribute("role", r.alvos ? "group" : "img")
+    $("quadro").setAttribute("aria-label", r.alt)
+    if (foco !== null) $("quadro").querySelector(`.alvo[data-i="${foco}"]`)?.focus({ preventScroll: true })
+  }
+
+  function desenharPlacar() {
+    $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
+  }
+  function mostrarRodada() {
+    $("proxima").hidden = true
+    $("dica").hidden = false
+    const r = atual()
+    dicas = 0
+    est = { ok: false, ajuda: false, erradas: new Set() }
+    desenharPlacar()
+    $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].rodadas.length}`
+    $("texto").textContent = r.pergunta
+    $("pistas").hidden = $("pistas-titulo").hidden = !r.pistas
+    $("pistas").innerHTML = (r.pistas ?? []).map(p => `<li>${p}</li>`).join("")
+    $("opcoes").hidden = !r.opcoes
+    $("opcoes").innerHTML = (r.opcoes ?? []).map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.t}</button>`).join("")
+    $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
+    $("nota").textContent = r.nota ?? (r.alvos ? "Toque no quadro. No teclado, use Tab e Enter." : fase === 0 ? "Quadros desenhados pelo Bit." : "")
+    desenharQuadro()
+  }
+
+  // Choosing an answer. A wrong choice explains the concept
+  function escolher(botao) {
+    if (ocupado || botao.disabled) return
+    const r = atual(), op = r.opcoes[botao.dataset.i]
+    if (op.ok) {
+      botao.classList.add("certa")
+      est.ok = true
+      desenharQuadro()
+      return acertou(r.acerto)
+    }
+    erros++
+    somErro()
+    botao.disabled = true
+    botao.classList.add("errada")
+    $("opcoes").querySelector(".opcao:not(:disabled)")?.focus({ preventScroll: true })
+    window.Bit?.diz("ops", op.p)
+  }
+
+  // Tapping a spot on the picture
+  function tocarAlvo(i) {
+    if (ocupado || est.erradas.has(i)) return
+    const r = atual(), a = r.alvos[i]
+    if (a.ok) {
+      est.ok = true
+      desenharQuadro()
+      return acertou(r.acerto)
+    }
+    erros++
+    somErro()
+    est.erradas.add(i)
+    desenharQuadro(i)
+    window.Bit?.diz("ops", a.p)
+  }
+  $("quadro").addEventListener("click", e => {
+    const alvo = e.target.closest(".alvo")
+    if (alvo) tocarAlvo(Number(alvo.dataset.i))
+  })
+  $("quadro").addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.classList?.contains("alvo")) {
+      e.preventDefault()
+      tocarAlvo(Number(e.target.dataset.i))
+    }
+  })
+
+  // The hint grows: first what to look at, then what the concept is (and, when it helps, a guide on the picture)
+  $("dica").onclick = () => {
+    if (ocupado) return
+    const r = atual()
+    dicas++
+    if (dicas >= 2 && r.ajuda && !est.ajuda) {
+      est.ajuda = true
+      desenharQuadro()
+    }
+    window.Bit?.diz("pensando", r.dica[Math.min(dicas, r.dica.length) - 1])
+  }
+
+  // After a right answer the round stays on screen with the Bit's explanation, until the student taps Próximo desafio
+  function acertou(frase) {
+    ocupado = true
+    somAcerto()
+    window.Bit?.diz("comemorando", frase)
+    $("dica").hidden = true
+    $("proxima").querySelector("span").textContent = rodada === FASES[fase].rodadas.length - 1 ? "Ver o resultado" : "Próximo desafio"
+    $("proxima").hidden = false
+    $("proxima").focus({ preventScroll: true })
+  }
+  $("proxima").onclick = () => {
+    ocupado = false
+    rodada++
+    if (rodada < FASES[fase].rodadas.length) mostrarRodada()
+    else terminarFase()
+  }
+
+  // Stars by how many mistakes were made in the phase, and confetti
+  function terminarFase() {
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
+    const ultima = fase === FASES.length - 1
+    Jogo.progresso?.guardar(fase + 1, estrelas)
+    mostrarEstrelas()
+    $("estrelas-fim").innerHTML = [0, 1, 2].map(i =>
+      `<svg viewBox="0 0 32 32" class="${i < estrelas ? "anima-saltar" : "apagada"}" style="--d: ${i * .15}s"><use href="#estrela"/></svg>`).join("")
+    $("fim-titulo").textContent = ultima ? "Galeria completa!" : `Fase ${fase + 1} completa!`
+    const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
+    $("fim-texto").textContent = ultima
+      ? `Você terminou as três fases${comoFoi}. Para reconhecer um movimento artístico, olhe como o quadro foi feito: a pincelada, as formas, as cores e o lugar onde a obra aparece.`
+      : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
+    $("seguir").hidden = ultima
+    $("seguir").querySelector("span").textContent = "Próxima fase"
+    $("fim-acoes").replaceChildren()
+    if (ultima) $("fim-acoes").append(Jogo.acoesDoFim(() => comecar(0)))
+    $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
+    $("fim").hidden = false
+    ;($("seguir").hidden ? $("fim-acoes").querySelector("button") : $("seguir"))?.focus()
+    somFesta()
+    window.Bit?.diz(ultima ? "formatura" : "comemorando", ultima ? "Você já olha uma obra como artista! Agora procure as obras citadas pelo nome e pelo autor e veja de perto." : "Fase completa! Vamos para a próxima?")
+    if (estrelas === 3) confete()
+  }
+  function confete() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const cores = ["#ffd23f", "#ff5f8f", "#4fd6a6", "#4da3ff", "#a08bff", "#ff8a3d"]
+    for (let i = 0; i < 40; i++) {
+      const papel = document.createElement("span")
+      papel.className = "confete"
+      papel.style.left = `${Math.random() * 100}%`
+      papel.style.background = cores[i % cores.length]
+      papel.style.animationDuration = `${1.6 + Math.random() * 1.6}s`
+      papel.style.animationDelay = `${Math.random() * .5}s`
+      $("fim").append(papel)
+      setTimeout(() => papel.remove(), 3800)
+    }
+  }
+
+  function comecar(numero) {
+    fase = numero
+    rodada = 0
+    erros = 0
+    ocupado = false
+    $("fim").hidden = true
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
+    mostrarRodada()
+    window.Bit?.diz(fase === 0 ? "acenando" : "pensando", FASES[fase].abertura)
+  }
+
+  $("fases").innerHTML = FASES.map((f, i) => `<button class="fase" type="button" aria-pressed="false"><b>${i + 1}</b><span>${f.nome}</span><i class="fase-estrelas" role="img"></i></button>`).join("")
+  $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.onclick = () => comecar(i))
+  // As estrelas guardadas no aparelho aparecem em cada fase
+  function mostrarEstrelas() {
+    $("fases").querySelectorAll(".fase").forEach((botao, i) => {
+      const guardadas = Jogo.progresso?.estrelas(i + 1) ?? 0
+      const caixa = botao.querySelector(".fase-estrelas")
+      caixa.setAttribute("aria-label", `${guardadas} de 3 estrelas`)
+      caixa.innerHTML = [0, 1, 2].map(n => `<svg viewBox="0 0 32 32" class="${n < guardadas ? "" : "apagada"}"><use href="#estrela"/></svg>`).join("")
+    })
+  }
+  mostrarEstrelas()
+  $("seguir").onclick = () => comecar(fase + 1)
+
+  // Copying the prompt messages for the Gemini
+  document.querySelectorAll("[data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+
+  desenharSom()
+  addEventListener("load", () => comecar(0))
+</script>
+</body>
+</html>

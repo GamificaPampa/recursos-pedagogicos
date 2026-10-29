@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="30" y="10" width="140" height="100" rx="10" fill="#e9f6ff" stroke="#2f2a4a" stroke-width="4"/>
+<path d="M70 12v96M130 12v96M32 35h136M32 85h136" stroke="#c4d9ea" stroke-width="2"/>
+<path d="M100 12v96M32 60h136" stroke="#2f2a4a" stroke-width="3"/>
+<path d="M44 30c10-10 28-8 30 4s-12 18-24 14-12-10-6-18zM112 74c10-8 26-4 28 8s-12 18-24 12-10-12-4-20z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M70 86H130V60" stroke="#ff8a3d" stroke-width="3" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
+<path transform="translate(54 74) scale(.75)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/>
+<g class="g a-tw"><path transform="translate(118 16) scale(.8)" d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></g>
+</svg>
