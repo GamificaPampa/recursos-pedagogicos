@@ -511,12 +511,16 @@ function draw() {
   document.querySelector("#code li:last-child")?.scrollIntoView({ block: "nearest" })
 }
 
-// Showing a red line in the code panel for a few seconds
+// Showing a red line in the code panel for a few seconds. While the same warning is on screen, dragging over
+// the same machine again only keeps it there, without a new beep and a new speech at every finger move
 function warn(text) {
+  const repeated = warning === text
   warning = text
-  window.Bit?.diz("ops", text, 3500)
-  beep([300, 200], { type: "sawtooth", volume: 0.12, spacing: 0.12, length: 0.2 })
-  draw()
+  if (!repeated) {
+    window.Bit?.diz("ops", text, 3500)
+    beep([300, 200], { type: "sawtooth", volume: 0.12, spacing: 0.12, length: 0.2 })
+    draw()
+  }
   clearTimeout(warningTimer)
   warningTimer = setTimeout(() => {
     warning = ""
