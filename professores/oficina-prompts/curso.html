@@ -276,6 +276,26 @@
   .finish-msg:empty { display: none }
   .navrow { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 22px }
 
+  /* Selos: um por módulo concluído, no estilo das Medalhas do Bit */
+  .selo { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 4px 0 rgba(47, 42, 74, .25)) }
+  .selo text { fill: var(--ink); font-family: var(--font); font-size: 15px; font-weight: 700 }
+  .selo--falta { filter: grayscale(1); opacity: .5 }
+  .selos-txt { margin: 0 !important; font-weight: 600 !important }
+  .selos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 10px 14px; margin: 14px 0 0; padding: 0; list-style: none }
+  .selo-item { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 48px; padding: 6px 4px 8px; border-radius: 20px; text-align: center; text-decoration: none; transition: transform .2s }
+  .selo-item:hover { transform: translateY(-3px) }
+  .selo-item .selo { max-width: 140px }
+  .selo-item b, .selo-item small { display: block; line-height: 1.2 }
+  .selo-item small { color: var(--soft); font-size: 14px; font-weight: 600 }
+  .finish-selo { margin-top: 18px }
+  .ganhou { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 16px; text-align: left }
+  .ganhou .selo { flex: none; width: 128px }
+  .ganhou-bit { flex: none; width: 80px; height: auto; animation: bob .8s ease-in-out 3 }
+  .ganhou .bubble { flex: 1 1 170px; max-width: 420px }
+  .ganhou-txt { margin: 0; font-weight: 700 }
+  .ganhou.novo .selo { animation: selo-in .8s cubic-bezier(.3, 1.6, .6, 1) both }
+  @keyframes selo-in { 0% { transform: scale(.2) rotate(-28deg); opacity: 0 } 55% { opacity: 1 } 100% { transform: none } }
+
   /* Final test */
   .quiz { padding: 22px; background: #fff; border: 4px solid var(--ink); border-radius: 28px; box-shadow: var(--shadow) }
   .quiz p { margin: 0 0 12px; font-weight: 500 }
@@ -331,6 +351,18 @@
   .cp-circle i { position: absolute; top: -2mm; left: -2mm; display: grid; place-items: center; width: 8mm; height: 8mm; background: var(--c); border: .8mm solid #1d2a44; border-radius: 50%; color: #fff; -webkit-text-stroke: 1.2mm #1d2a44; paint-order: stroke fill; font-size: 5mm; font-style: normal }
   .cp-seal { position: absolute; left: 7mm; bottom: 5mm; width: 32mm; height: 38mm }
   .cp-bot { position: absolute; right: 9mm; bottom: 6mm; width: 30mm; height: 32mm }
+  .cp-extra { margin: 2mm 0 0; font-size: 4.8mm; font-weight: 600; line-height: 1.2 }
+  .cp-selos { display: flex; justify-content: center; gap: 4mm; margin: 2mm 0 0; padding: 0; list-style: none }
+  .cp-selos li { width: 21mm }
+  .cp-selos .selo { filter: none }
+  .cp-skills { margin-top: 4mm }
+  .cp-circle { width: 19mm; height: 19mm; margin-bottom: 1.5mm }
+  .cp-circle svg { inset: 2mm; width: 15mm; height: 15mm }
+  .tem-extra .cp-name { margin-top: 5mm }
+  .tem-extra .cp-text { margin-top: 3mm }
+  .tem-extra .cp-hours { margin-top: 3mm }
+  .tem-extra .cp-skills { margin-top: 3mm }
+  .tem-extra .cp-selos li { width: 19mm }
   .cp-note { position: absolute; left: 45mm; right: 45mm; bottom: 12mm; margin: 0; color: #5d5880; font-size: 3.6mm; font-weight: 500 }
   .cp-foot { position: absolute; left: 45mm; right: 45mm; bottom: 5mm; margin: 0; color: #4a5a78; font-size: 4.2mm; font-weight: 600 }
 
@@ -455,6 +487,14 @@
     </div>
   </section>
 
+  <section class="block" aria-labelledby="h-selos">
+    <h2 class="h2" id="h-selos" style="--c: var(--pink)">Seus selos</h2>
+    <div class="panel">
+      <p class="selos-txt" id="selos-text" role="status"></p>
+      <ul class="selos" id="selos"></ul>
+    </div>
+  </section>
+
   <section class="block" aria-labelledby="h-antes">
     <h2 class="h2" id="h-antes" style="--c: var(--pink)">Antes de começar</h2>
     <div class="cards" style="margin-top: 0">
@@ -483,7 +523,7 @@
       <a class="mod" href="#modulo-4" style="--c: var(--purple); --light: #e2dbff"><span class="n" aria-hidden="true">4</span><b>Gems e projeto final</b><span>O seu assistente com instruções fixas, um exemplo pronto e o roteiro do projeto final.</span><span class="tag" data-tag>A fazer</span></a>
     </div>
     <div class="mods" style="margin-top: 22px">
-      <a class="mod" href="#modulo-em" style="--c: var(--orange); --light: #ffdcc4"><span class="n" aria-hidden="true">+</span><b>Extra: IA na sala do Ensino Médio</b><span>Enem, redação, trabalhos que a IA não faz sozinha e como conferir as fontes.</span><span class="tag">Opcional</span></a>
+      <a class="mod" href="#modulo-em" style="--c: var(--orange); --light: #ffdcc4"><span class="n" aria-hidden="true">+</span><b>Extra: IA na sala do Ensino Médio</b><span>Enem, redação, trabalhos que a IA não faz sozinha e como conferir as fontes.</span><span class="tag" data-tag-extra>Opcional</span></a>
     </div>
   </section>
 
@@ -497,7 +537,7 @@
       </article>
       <article class="card">
         <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-medal"/></svg>Comprovante</h3>
-        <p>Com os 4 módulos e o teste, você gera um comprovante de conclusão para imprimir ou salvar em PDF.</p>
+        <p>Com os 4 módulos e o teste, você gera um comprovante de conclusão para imprimir ou salvar em PDF. Se concluir o módulo extra, ele entra no comprovante.</p>
         <p><a class="mini" href="#comprovante" style="--c: #fff1a8">Ver o comprovante</a></p>
       </article>
     </div>
@@ -627,6 +667,7 @@
   <div class="finish">
     <button class="btn" type="button" data-finish="0">Concluí este módulo</button>
     <p class="finish-msg" role="status"></p>
+    <div class="finish-selo" data-finish-selo="0" hidden></div>
   </div>
   <nav class="navrow" aria-label="Navegação do módulo 1"><a class="btn calm" href="#inicio">Início do curso</a><a class="btn calm" href="#modulo-2">Próximo módulo<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></a></nav>
 </section>
@@ -728,6 +769,7 @@
   <div class="finish">
     <button class="btn" type="button" data-finish="1">Concluí este módulo</button>
     <p class="finish-msg" role="status"></p>
+    <div class="finish-selo" data-finish-selo="1" hidden></div>
   </div>
   <nav class="navrow" aria-label="Navegação do módulo 2"><a class="btn calm" href="#modulo-1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg>Módulo anterior</a><a class="btn calm" href="#modulo-3">Próximo módulo<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></a></nav>
 </section>
@@ -844,6 +886,7 @@
   <div class="finish">
     <button class="btn" type="button" data-finish="2">Concluí este módulo</button>
     <p class="finish-msg" role="status"></p>
+    <div class="finish-selo" data-finish-selo="2" hidden></div>
   </div>
   <nav class="navrow" aria-label="Navegação do módulo 3"><a class="btn calm" href="#modulo-2"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg>Módulo anterior</a><a class="btn calm" href="#modulo-4">Próximo módulo<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></a></nav>
 </section>
@@ -946,6 +989,7 @@
   <div class="finish">
     <button class="btn" type="button" data-finish="3">Concluí este módulo</button>
     <p class="finish-msg" role="status"></p>
+    <div class="finish-selo" data-finish-selo="3" hidden></div>
   </div>
   <nav class="navrow" aria-label="Navegação do módulo 4"><a class="btn calm" href="#modulo-3"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg>Módulo anterior</a><a class="btn calm" href="#teste">Teste final<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></a></nav>
 </section>
@@ -954,7 +998,7 @@
 <section class="view" id="v-modulo-em" data-title="Módulo extra" style="--c: var(--orange); --light: #ffdcc4">
   <header class="mhead">
     <span class="n" aria-hidden="true">+</span>
-    <div><p class="kicker">Módulo extra · cerca de 30 minutos · não conta no comprovante</p><h1 tabindex="-1">IA na sala do Ensino Médio</h1></div>
+    <div><p class="kicker">Módulo extra · cerca de 30 minutos · opcional</p><h1 tabindex="-1">IA na sala do Ensino Médio</h1></div>
   </header>
   <div class="goal">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
@@ -1022,6 +1066,11 @@
   </section>
 
   <nav class="more" aria-label="Para ir além no módulo extra"><span>Para ir além:</span><a class="mini" href="biblioteca.html?etapa=medio" style="--c: #ffdcc4">Prompts do Ensino Médio</a><a class="mini" href="gems.html" style="--c: #e2dbff">Gem do Ensino Médio</a><a class="mini" href="guia.html">Guia do professor</a></nav>
+  <div class="finish">
+    <button class="btn" type="button" data-finish-extra>Concluí este módulo</button>
+    <p class="finish-msg" role="status"></p>
+    <div class="finish-selo" data-finish-selo="4" hidden></div>
+  </div>
   <nav class="navrow" aria-label="Navegação do módulo extra"><a class="btn calm" href="#inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg>Início do curso</a></nav>
 </section>
 
@@ -1070,12 +1119,14 @@
         <p class="cp-name" id="cp-name"></p>
         <p class="cp-text">concluiu o curso online <b>Oficina de Prompts para Professores</b>, com os 4 módulos e o teste final, em <b id="cp-date"></b>.</p>
         <p class="cp-hours">Carga horária estimada: <b>4 horas</b></p>
+        <p class="cp-extra" id="cp-extra" hidden>Inclui o módulo extra <b>IA na sala do Ensino Médio</b></p>
         <ul class="cp-skills">
           <li style="--c: #4da3ff; --light: #cfe6ff"><span class="cp-circle"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#c-chat" x="4" y="4" width="92" height="92"/></svg><i>1</i></span>conversar com<br>o Gemini</li>
           <li style="--c: #ff5f8f; --light: #ffd6e3"><span class="cp-circle"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#c-sheet" x="0" y="4" width="84" height="84"/><use href="#c-pencil" x="44" y="40" width="56" height="56"/></svg><i>2</i></span>criar conteúdo<br>para a turma</li>
           <li style="--c: #4fd6a6; --light: #c9f5e3"><span class="cp-circle"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#c-gamepad" x="0" y="18" width="84" height="84"/><use href="#c-star" x="60" y="4" width="38" height="38"/></svg><i>3</i></span>criar jogos<br>com o Canvas</li>
           <li style="--c: #8c73ff; --light: #e2dbff"><span class="cp-circle"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#c-bot" x="0" y="8" width="76" height="76"/><use href="#c-gem" x="58" y="54" width="42" height="42"/></svg><i>4</i></span>montar o seu<br>assistente (Gem)</li>
         </ul>
+        <ul class="cp-selos" id="cp-selos" aria-label="Selos ganhos"></ul>
         <svg class="cp-seal" viewBox="0 0 300 360" aria-hidden="true">
           <path d="M75 220 L135 245 L100 355 L78 328 L45 340 Z" fill="#ff5f8f" stroke="#1d2a44" stroke-width="9" stroke-linejoin="round"/>
           <path d="M225 220 L165 245 L200 355 L222 328 L255 340 Z" fill="#4da3ff" stroke="#1d2a44" stroke-width="9" stroke-linejoin="round"/>
@@ -1371,6 +1422,77 @@ function save() {
 
 const eligible = () => state.modules.every(Boolean) && state.quizPassed
 
+// ---------- Seals: one for each module, and one for the extra module ----------
+
+// The extra module has its own saved copy, so the structure of the progress above does not change
+const EXTRA_KEY = KEY + "-extra"
+const extra = { done: false }
+
+function readExtra() {
+  try {
+    const data = JSON.parse(window.localStorage.getItem(EXTRA_KEY) || "null")
+    if (data && data.done === true) extra.done = true
+  } catch (error) {
+    // A broken saved copy just means not done
+  }
+}
+
+function saveExtra() {
+  try {
+    window.localStorage.setItem(EXTRA_KEY, JSON.stringify(extra))
+  } catch (error) {
+    storageOk = false
+  }
+  refresh()
+}
+
+const SELOS = [
+  { nome: "Bom pedido", modulo: "Módulo 1", href: "#modulo-1", cor: "#4da3ff", icone: "i-chat", fala: "Bom pedido! Você já escreve um pedido com as 4 partes." },
+  { nome: "Conteúdo pronto", modulo: "Módulo 2", href: "#modulo-2", cor: "#ff5f8f", icone: "i-sheet", fala: "Conteúdo pronto! Agora a turma ganha materiais feitos por você." },
+  { nome: "Jogo no ar", modulo: "Módulo 3", href: "#modulo-3", cor: "#4fd6a6", icone: "i-game", fala: "Jogo no ar! É só testar no celular e compartilhar." },
+  { nome: "Gem criado", modulo: "Módulo 4", href: "#modulo-4", cor: "#8c73ff", icone: "i-gem", fala: "Gem criado! O seu assistente fica pronto para o ano todo." },
+  { nome: "Ensino Médio", modulo: "Módulo extra", href: "#modulo-em", cor: "#ff8a3d", icone: "i-school", fala: "Selo do Ensino Médio! Agora é levar o Enem para a sala." },
+]
+const earned = index => index < 4 ? state.modules[index] : extra.done
+
+// A round seal with a ribbon: the symbol of the module and a short name. Grey while it is not earned
+function seloSvg(index, got = true) {
+  const seal = SELOS[index], ink = "#2f2a4a"
+  return `<svg class="selo${got ? "" : " selo--falta"}" viewBox="0 0 140 150" aria-hidden="true" focusable="false">
+    <path d="M48 88 L82 100 L64 146 L54 132 L38 140 Z" fill="#ff5f8f" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M92 88 L58 100 L76 146 L86 132 L102 140 Z" fill="#4da3ff" stroke="${ink}" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="70" cy="60" r="50" fill="${seal.cor}" stroke="${ink}" stroke-width="5"/>
+    <circle cx="70" cy="60" r="32" fill="#fff" stroke="${ink}" stroke-width="3.5"/>
+    <use href="#${seal.icone}" x="48" y="38" width="44" height="44"/>
+    <rect x="5" y="90" width="130" height="26" rx="13" fill="#fff" stroke="${ink}" stroke-width="4"/>
+    <text x="70" y="108.5" text-anchor="middle">${seal.nome}</text>
+  </svg>`
+}
+
+let sealsShown = ""
+let celebrate = -1
+
+function paintSeals() {
+  const flags = SELOS.map((_, index) => Boolean(earned(index)))
+  const count = flags.slice(0, 4).filter(Boolean).length
+  $("selos-text").textContent = `${count} de 4 selos dos módulos${extra.done ? ", mais o selo extra" : ""}.${count || extra.done ? "" : " Conclua um módulo para ganhar o primeiro."}`
+  const signature = flags.map(Number).join("")
+  if (signature !== sealsShown) {
+    sealsShown = signature
+    $("selos").innerHTML = SELOS.map((seal, index) => `<li><a class="selo-item" href="${seal.href}">${seloSvg(index, flags[index])}<span><b>${seal.nome}</b><small>${seal.modulo} · ${flags[index] ? "ganho" : "a ganhar"}</small></span></a></li>`).join("")
+  }
+  document.querySelectorAll("[data-finish-selo]").forEach(box => {
+    const index = Number(box.dataset.finishSelo), got = flags[index], fresh = celebrate === index
+    if (!fresh && Boolean(box.dataset.shown) === got) return
+    box.dataset.shown = got ? (fresh ? "novo" : "visto") : ""
+    box.hidden = !got
+    box.innerHTML = !got ? ""
+      : fresh ? `<div class="ganhou novo"><img class="ganhou-bit" src="/identidade-visual/mascote/bit-comemorando.svg" width="80" height="80" alt=""><p class="bubble">${SELOS[index].fala}</p>${seloSvg(index)}</div>`
+      : `<div class="ganhou">${seloSvg(index)}<p class="ganhou-txt">Selo ${SELOS[index].nome} ganho</p></div>`
+    if (fresh) box.scrollIntoView({ block: "nearest", behavior: calm ? "auto" : "smooth" })
+  })
+}
+
 // Showing the progress everywhere: top bar, start page, module cards and the finish buttons
 function refresh() {
   const done = state.modules.filter(Boolean).length
@@ -1407,6 +1529,16 @@ function refresh() {
     button.innerHTML = state.modules[index] ? `${icon("i-yes")}Módulo concluído` : "Concluí este módulo"
   })
   document.querySelectorAll("[data-practice-note]").forEach(note => { note.hidden = !state.practice[Number(note.dataset.practiceNote)] })
+
+  document.querySelectorAll("[data-tag-extra]").forEach(tag => {
+    tag.classList.toggle("done", extra.done)
+    tag.innerHTML = extra.done ? `${icon("i-yes")}Concluído` : "Opcional"
+  })
+  document.querySelectorAll("[data-finish-extra]").forEach(button => {
+    button.classList.toggle("is-done", extra.done)
+    button.innerHTML = extra.done ? `${icon("i-yes")}Módulo concluído` : "Concluí este módulo"
+  })
+  paintSeals()
 }
 
 function practiceDone(index) {
@@ -1436,10 +1568,29 @@ document.addEventListener("click", event => {
     return
   }
   state.modules[index] = true
+  celebrate = index
   save()
+  celebrate = -1
   confetti()
   const left = state.modules.filter(item => !item).length
-  message.textContent = left ? `Módulo concluído! Faltam ${left}.` : "Módulo concluído! Você fez os 4 módulos. Agora é o teste final."
+  message.textContent = left ? `Módulo concluído! Selo ${SELOS[index].nome} ganho. Faltam ${left}.` : `Módulo concluído! Selo ${SELOS[index].nome} ganho. Você fez os 4 módulos. Agora é o teste final.`
+})
+
+// The extra module is optional: no practice is needed, and it only adds to the certificate
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-finish-extra]")
+  if (!button) return
+  const message = button.parentElement.querySelector(".finish-msg")
+  if (extra.done) {
+    message.textContent = "Este módulo extra já está concluído. Ele entra no seu comprovante."
+    return
+  }
+  extra.done = true
+  celebrate = 4
+  saveExtra()
+  celebrate = -1
+  confetti()
+  message.textContent = "Módulo extra concluído! Selo Ensino Médio ganho. Ele entra no comprovante, como acréscimo."
 })
 
 // Copy buttons of the "Try it in Gemini" boxes
@@ -1882,6 +2033,9 @@ function showComp() {
 function drawComp(name) {
   $("cp-name").textContent = name
   $("cp-date").textContent = longDate(state.doneDate || today())
+  $("cp-extra").hidden = !extra.done
+  $("comp").classList.toggle("tem-extra", extra.done)
+  $("cp-selos").innerHTML = SELOS.map((_, index) => index).filter(earned).map(index => `<li>${seloSvg(index)}</li>`).join("")
   $("comp-ready").hidden = false
   $("comp-wrap").hidden = false
   fitComp()
@@ -1932,7 +2086,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitComp)
 $("reset").addEventListener("click", () => {
   if (!window.confirm("Apagar todo o seu progresso no curso, neste navegador?")) return
   Object.assign(state, { modules: [false, false, false, false], practice: [false, false, false, false], quizBest: 0, quizPassed: false, name: "", doneDate: "" })
-  try { window.localStorage.removeItem(KEY) } catch (error) { storageOk = false }
+  extra.done = false
+  try { window.localStorage.removeItem(KEY); window.localStorage.removeItem(EXTRA_KEY) } catch (error) { storageOk = false }
   $("comp-name").value = ""
   document.querySelectorAll(".finish-msg").forEach(message => { message.textContent = "" })
   Object.assign(quiz, { stage: "intro", index: 0, score: 0, answered: false, marks: [] })
@@ -2204,6 +2359,7 @@ function route() {
 }
 
 readProgress()
+readExtra()
 practiceMissing()
 practiceHunt()
 practiceFix()
