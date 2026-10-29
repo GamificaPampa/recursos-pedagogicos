@@ -854,9 +854,12 @@ Jogo.som.aoMudar(ligado => {
 document.querySelector("#final p").after(Jogo.acoesDoFim(() => press("Enter")))
 
 
+// Só o primeiro dedo corta: um segundo dedo ou a palma da mão não ligam um corte de um dedo ao outro
+let activePointer = null
 canvas.addEventListener("pointerdown", event => {
   startMusic()
-  if (!running) return
+  if (!running || swiping) return
+  activePointer = event.pointerId
   swiping = true
   strokeHits = 0
   anchor = pointer(event)
@@ -866,7 +869,7 @@ canvas.addEventListener("pointerdown", event => {
   try { canvas.setPointerCapture(event.pointerId) } catch {}
 })
 canvas.addEventListener("pointermove", event => {
-  if (!swiping || !running) return
+  if (!swiping || !running || event.pointerId !== activePointer) return
   const point = pointer(event)
   trail.push(point)
   if (Math.hypot(point.x - anchor.x, point.y - anchor.y) > 3) {
@@ -876,13 +879,14 @@ canvas.addEventListener("pointermove", event => {
 })
 // Um toque sem arrastar também corta o que está embaixo do dedo, para quem não consegue deslizar
 canvas.addEventListener("pointerup", event => {
+  if (event.pointerId !== activePointer) return
   if (swiping && running && trail.length <= 1) {
     const point = pointer(event)
     cut({ ...point, x: point.x - 14 }, { ...point, x: point.x + 14 })
   }
   endSwipe()
 })
-canvas.addEventListener("pointercancel", endSwipe)
+canvas.addEventListener("pointercancel", event => { if (event.pointerId === activePointer) endSwipe() })
 
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
