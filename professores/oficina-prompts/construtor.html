@@ -487,7 +487,7 @@ function render() {
   $("copy2").hidden = !game
   $("tip").innerHTML = game
     ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Mande a 1ª mensagem, espere a página aparecer e mande a 2ª. Se ele recusar, toque em <b>Refazer</b>."
-    : `<b>Dica:</b> ${details.tip} Leia a resposta antes de usar com a turma: a IA pode errar fatos.`
+    : `<b>Dica:</b> ${details.tip} Leia a resposta antes de usar com a turma: a IA pode errar fatos. Se ela errar mesmo assim, veja as <a href="frases.html">frases que salvam</a>.`
   $("next").innerHTML = details.next.concat(COMMON_NEXT).map(text =>
     `<li><span>${escape(text)}</span><button type="button" data-copy="${escape(text)}">Copiar</button></li>`).join("")
   $("paste-box").hidden = $("paste-note").hidden = kind !== "adaptar"
