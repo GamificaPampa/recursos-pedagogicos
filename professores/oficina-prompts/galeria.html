@@ -30,8 +30,7 @@
 
   /* Buttons: thick outline and a hard shadow, like the buttons of the games */
   .btn.white { background: #fff }
-  .btn.small { --drop-y: 5px; min-height: 44px; padding: 4px 14px; font-size: 16px }
-  .btn.whatsapp { --c: var(--purple) }
+  .btn.small { --drop-y: 5px; min-height: 48px; padding: 4px 14px; font-size: 16px }
   /* Jogar é sempre verde, como em todo o site */
   a.btn.grow { --c: var(--mint) }
   .btn.off { background: rgba(255, 255, 255, .6); border-style: dashed; box-shadow: none; color: var(--soft); font-size: 16px; cursor: default; transform: none }
@@ -140,17 +139,25 @@
   .badge svg { width: 26px; height: 26px }
   label { display: block; margin-bottom: 14px; font-weight: 600 }
   label small { font-weight: 500 }
-  select, input[type=text], input[type=url], textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--risco); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
+  select, input[type=text], input[type=url], input[type=email], textarea { display: block; width: 100%; min-height: 50px; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--risco); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
+  textarea { min-height: 96px; resize: vertical }
   select:focus, input:focus, textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(77, 163, 255, .35) }
+  .confirm input:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px }
   .missing { border-color: var(--pink) !important; background: #fff4f7 }
-  .preview-title { display: block; margin: 4px 0 6px; font-weight: 600 }
-  #message { height: 210px; margin: 0 0 14px; background: #f3f8ff; border: 3px dashed rgba(47, 42, 74, .3); font-size: 15px; resize: vertical }
-  .check-first { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 10px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 600 }
-  .check-first svg { width: 34px; height: 34px; flex: none }
-  .send { display: flex; flex-wrap: wrap; gap: 12px }
-  .send .btn { flex: 1 1 200px }
+  .hint { display: block; margin-top: 5px; font-size: 15px; font-weight: 500; color: var(--soft); overflow-wrap: anywhere }
+  .hint.warn { color: var(--ink); font-weight: 600 }
+  .how { margin: 0 0 18px; padding: 10px 14px; background: var(--sky2); border-radius: 14px; font-size: 16px; font-weight: 500 }
+  .confirm { display: flex; align-items: flex-start; gap: 12px; min-height: 52px; margin-bottom: 16px; padding: 10px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 600; cursor: pointer }
+  .confirm input { width: 28px; height: 28px; flex: none; margin: 0; accent-color: var(--ink); cursor: pointer }
+  .hp { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
+  .send .btn { width: 100% }
+  .send .btn[disabled] { opacity: .7; cursor: wait }
   #form-status { margin: 14px 0 0; padding: 10px 14px; background: #ffd6e3; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600; overflow-wrap: anywhere }
+  .done { display: grid; justify-items: center; gap: 10px; padding: 10px 0; text-align: center }
+  .done svg { width: 84px; height: 84px; overflow: visible }
+  .done h3 { margin: 0; font-size: clamp(26px, 6vw, 34px) }
+  .done p { margin: 0 0 6px; font-size: 19px; font-weight: 500 }
 
   /* The example games made by the course team */
   .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 22px }
@@ -210,7 +217,7 @@
   </div>
   <nav class="nav">
     <a href="#jogos" style="--c: var(--yellow)">Jogos dos professores</a>
-    <a href="#enviar" style="--c: var(--mint)">Enviar o meu jogo</a>
+    <a href="#enviar" style="--c: var(--mint)">Mande o seu jogo</a>
     <a href="#exemplos" style="--c: var(--pink)">Exemplos</a>
   </nav>
 </header>
@@ -238,15 +245,15 @@
     </svg>
     <div>
       <h3>Ainda não tem jogos aqui.</h3>
-      <p>Os primeiros aparecem depois do Encontro 3. Fez um jogo com o Gemini? Envie o link para ele entrar na galeria.</p>
-      <a class="btn" href="#enviar" style="--c: var(--pink)"><svg class="i"><use href="#i-send"/></svg>Enviar o meu jogo</a>
+      <p>Os primeiros aparecem depois do Encontro 3. Fez um jogo com o Gemini? Mande o link para ele entrar na galeria.</p>
+      <a class="btn" href="#enviar" style="--c: var(--pink)"><svg class="i"><use href="#i-send"/></svg>Mande o seu jogo</a>
     </div>
   </div>
 </section>
 
 <section class="sec" id="enviar">
-  <h2 class="sec-title" style="--c: var(--mint)">Enviar o meu jogo</h2>
-  <p class="sec-sub">Fez um jogo no Canvas do Gemini? Mande o link para quem organiza a oficina.</p>
+  <h2 class="sec-title" style="--c: var(--mint)">Mande o seu jogo</h2>
+  <p class="sec-sub">Fez um jogo no Canvas do Gemini? Mande o link para a coordenação. A equipe testa o jogo e, se estiver tudo certo, põe na lista da galeria.</p>
   <div class="send-grid">
     <div>
       <div class="card">
@@ -255,7 +262,7 @@
           <li><span class="pic" style="--c: var(--blue)"><span>1</span><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="6" width="34" height="28" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><path d="M3 14 H37" stroke="#2f2a4a" stroke-width="3"/><circle cx="9" cy="10" r="1.6" fill="#2f2a4a"/><circle cx="14" cy="10" r="1.6" fill="#2f2a4a"/><path d="M16 19 L26 24.5 L16 30 Z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg></span><span>No Gemini, abra a conversa do jogo e deixe o jogo aberto no <b>Canvas</b>.</span></li>
           <li><span class="pic" style="--c: var(--yellow)"><span>2</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 V14 M7.5 7.5 L12 3 L16.5 7.5 M5 11 V20.5 H19 V11" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Toque em <b>Compartilhar</b> e crie o link público. Copie o link.</span></li>
           <li><span class="pic" style="--c: var(--purple)"><span>3</span><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 18 L12 6 Q20 9 28 6 L32 18 Z" fill="#2f2a4a"/><path d="M3 19 H37" stroke="#2f2a4a" stroke-width="3.5" stroke-linecap="round"/><circle cx="12.5" cy="28" r="6" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><circle cx="27.5" cy="28" r="6" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><path d="M18.5 27 Q20 25.5 21.5 27" fill="none" stroke="#2f2a4a" stroke-width="3"/></svg></span><span>Cole o link numa <b>janela anônima</b> do navegador. Se o jogo abrir sem pedir para entrar na conta, o link está pronto.</span></li>
-          <li><span class="pic" style="--c: var(--mint)"><span>4</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Preencha o formulário e envie a mensagem.</span></li>
+          <li><span class="pic" style="--c: var(--mint)"><span>4</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Preencha o formulário e envie. A equipe recebe na hora.</span></li>
         </ol>
         <p class="small-print">Janela anônima no Chrome: menu <b>⋮</b> e depois <b>Nova janela anônima</b>. Com a conta da escola, o link às vezes só abre para quem é da escola: o teste mostra isso.</p>
       </div>
@@ -268,43 +275,57 @@
       </div>
     </div>
 
-    <form class="card" id="send-form" autocomplete="off" novalidate>
+    <div class="card" id="send-card">
       <h3>Dados do jogo</h3>
-      <label>Nome do jogo
-        <input type="text" id="f-titulo" maxlength="80" placeholder="Por exemplo: Caça às frações">
-      </label>
-      <div class="pair">
-        <label>Turma
-          <select id="f-turma"></select>
+      <p class="how">Como funciona: a coordenação recebe o seu envio, abre o jogo, testa e põe na lista. Quando entrar, ele aparece aqui com o seu nome de professor e a sua escola ou cidade, nunca com nome de aluno.</p>
+      <form id="send-form" action="https://formspree.io/f/xljgodjo" method="POST" autocomplete="on" novalidate>
+        <input type="hidden" name="_subject" value="Galeria da Oficina: jogo novo">
+        <div class="hp" aria-hidden="true"><label>Não preencha este campo<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
+        <label for="f-jogo">Nome do jogo
+          <input type="text" id="f-jogo" name="nome_do_jogo" maxlength="80" placeholder="Por exemplo: Caça às frações" autocomplete="off" required aria-describedby="e-jogo">
         </label>
-        <label>Componente
-          <input type="text" id="f-componente" list="componentes" maxlength="60" placeholder="Por exemplo: Matemática">
+        <label for="f-link">Link do Canvas
+          <input type="url" id="f-link" name="link_do_canvas" inputmode="url" placeholder="https://gemini.google.com/share/..." autocomplete="off" required aria-describedby="d-link">
+          <span class="hint" id="d-link">É o link de Compartilhar do Gemini. Antes de enviar, cole numa janela anônima: se o jogo abrir sem pedir login, está certo.</span>
+          <span class="hint warn" id="a-link" hidden>Esse link não parece ser do Gemini. Confira se é o link de Compartilhar do Canvas.</span>
         </label>
+        <div class="pair">
+          <label for="f-materia">Matéria
+            <input type="text" id="f-materia" name="materia" list="materias" maxlength="60" placeholder="Matemática" autocomplete="off" required>
+          </label>
+          <label for="f-etapa">Etapa
+            <select id="f-etapa" name="etapa" required></select>
+          </label>
+        </div>
+        <datalist id="materias"></datalist>
+        <label for="f-ensina">O que o jogo ensina
+          <textarea id="f-ensina" name="o_que_ensina" maxlength="200" rows="3" placeholder="Por exemplo: a criança toca nas pizzas que mostram a metade e aprende frações" required></textarea>
+        </label>
+        <div class="pair">
+          <label for="f-professor">Seu nome
+            <input type="text" id="f-professor" name="professor" maxlength="80" autocomplete="name" required>
+          </label>
+          <label for="f-escola">Escola ou cidade <small>(opcional)</small>
+            <input type="text" id="f-escola" name="escola_ou_cidade" maxlength="80" autocomplete="organization" placeholder="Por exemplo: Alegrete">
+          </label>
+        </div>
+        <label for="f-email">Seu e-mail
+          <input type="email" id="f-email" name="email" inputmode="email" maxlength="120" autocomplete="email" placeholder="nome@escola.rs.gov.br" required aria-describedby="d-email">
+          <span class="hint" id="d-email">Só para a equipe responder. Ele não aparece na galeria.</span>
+        </label>
+        <label class="confirm" for="f-confirmo"><input type="checkbox" id="f-confirmo" name="confirmacao" value="Confirmo que o jogo não tem nome, foto nem dado de aluno" required><span>Confirmo que o jogo não tem nome, foto nem dado de aluno</span></label>
+        <div class="send">
+          <button class="btn btn--falar" type="submit" id="send-btn"><svg class="i"><use href="#i-send"/></svg><span>Enviar para a equipe</span></button>
+        </div>
+        <p id="form-status" role="alert" hidden></p>
+      </form>
+      <div class="done" id="send-done" role="status" tabindex="-1" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icone-estrela"/></svg>
+        <h3>Recebemos!</h3>
+        <p>A equipe confere e publica na galeria.</p>
+        <button class="btn btn--white" type="button" id="send-again">Mandar outro jogo</button>
       </div>
-      <datalist id="componentes"></datalist>
-      <label>Link do jogo
-        <input type="url" id="f-link" inputmode="url" placeholder="https://gemini.google.com/share/...">
-      </label>
-      <label>Em uma frase, o que a criança faz no jogo? <small>(opcional)</small>
-        <input type="text" id="f-descricao" maxlength="120" placeholder="Por exemplo: toca nas pizzas que mostram a metade">
-      </label>
-      <div class="pair">
-        <label>Seu primeiro nome <small>(opcional)</small>
-          <input type="text" id="f-autor" maxlength="30" placeholder="Por exemplo: Ana">
-        </label>
-        <label>Escola <small>(opcional)</small>
-          <input type="text" id="f-escola" maxlength="80">
-        </label>
-      </div>
-      <span class="preview-title">A mensagem fica assim:</span>
-      <textarea id="message" readonly aria-label="Mensagem para quem organiza a oficina"></textarea>
-      <div class="check-first"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3"/><path d="M11 18.5 L16 23.5 L25 13" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>Antes de enviar: o link abriu na janela anônima? O jogo não tem nomes nem fotos de crianças?</div>
-      <div class="send">
-        <a class="btn whatsapp" id="send-whatsapp" href="https://wa.me/" target="_blank" rel="noopener"><svg class="i"><use href="#i-chat"/></svg>Enviar pelo WhatsApp</a>
-        <button class="btn white" type="button" id="send-copy"><svg class="i"><use href="#i-copy"/></svg>Copiar mensagem</button>
-      </div>
-      <p id="form-status" role="status" hidden></p>
-    </form>
+    </div>
   </div>
 </section>
 
@@ -353,22 +374,23 @@
 
 <script src="/identidade-visual/js/copiar.js"></script>
 <script>
-// Listing the games of the gallery. The facilitator edits this list by hand: one object per game,
-// in the order they should appear on the page. To add a game, copy the example below into the list,
-// remove the "//" at the start of each line and change the values. Only the share link of the game
-// goes here: never the names or photos of children.
+// Os jogos publicados na galeria. Um objeto por jogo, na ordem em que aparecem na página.
+// A equipe só acrescenta aqui um jogo que já testou: abriu o link numa janela anônima, jogou e
+// conferiu que não tem nome, foto nem dado de aluno. Para acrescentar, copie o modelo abaixo para
+// dentro da lista, tire o "//" do começo de cada linha e troque os valores. Só o link de
+// compartilhar entra aqui. Nunca nome de aluno, nem o e-mail do professor.
 //
 //   {
-//     titulo: "Caça às frações",                              // the name of the game
-//     turma: "4º ano",                                        // the class, as the teacher wrote it
-//     etapa: "iniciais",                                      // "infantil", "iniciais" or "finais" (used by the filter)
-//     componente: "Matemática",                               // the subject or the BNCC field of experience
-//     autor: "Ana",                                           // optional: the teacher's first name only
-//     escola: "EMEF Exemplo",                                 // optional
-//     descricao: "Toque nas pizzas que mostram a metade.",    // one short line
-//     link: "https://gemini.google.com/share/xxxxxxxxxxxx",   // the public share link from Gemini
-//     cor: "orange",                                          // "blue", "pink", "mint", "orange", "purple" or "yellow"
+//     titulo: "Caça às frações",                              // o nome do jogo
+//     componente: "Matemática",                               // a matéria
+//     etapa: "iniciais",                                      // "infantil", "iniciais" ou "finais" (o filtro usa)
+//     link: "https://gemini.google.com/share/xxxxxxxxxxxx",   // o link de Compartilhar do Canvas
+//     ensina: "Frações: a criança toca nas pizzas que mostram a metade.",  // o que o jogo ensina, em uma frase
+//     autoria: "Professora de Matemática de Alegrete",        // "Professor(a) de [matéria] de [escola ou cidade]"
+//     cor: "orange",                                          // "blue", "pink", "mint", "orange", "purple" ou "yellow"
 //   },
+//
+// Listas antigas continuam valendo: descricao vale como ensina, e autor e escola valem como autoria.
 const GALERIA = [
 ]
 
@@ -379,12 +401,6 @@ const COLORS = {
 const STAGES = { infantil: "Educação Infantil", iniciais: "Anos iniciais", finais: "Anos finais" }
 const FILTERS = [["todas", "Todas", "var(--yellow)"], ["infantil", "Educação Infantil", "var(--pink)"], ["iniciais", "Anos iniciais", "var(--blue)"], ["finais", "Anos finais", "var(--orange)"]]
 
-// Using the same classes as the prompt builder, so the message already says the stage of the game
-const CLASSES = [
-  ["infantil", "Educação Infantil", ["3 anos", "4 anos", "5 anos"]],
-  ["iniciais", "Anos iniciais", ["1º ano", "2º ano", "3º ano", "4º ano", "5º ano"]],
-  ["finais", "Anos finais", ["6º ano", "7º ano", "8º ano", "9º ano"]],
-]
 const SUBJECTS = ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos",
   "O eu, o outro e o nós", "Corpo, gestos e movimentos", "Traços, sons, cores e formas", "Escuta, fala, pensamento e imaginação", "Espaços, tempos, quantidades, relações e transformações"]
 
@@ -473,14 +489,15 @@ const safeLink = link => /^https?:\/\/\S+$/i.test(String(link ?? "").trim()) ? S
 function gameCard(game) {
   const n = GALERIA.indexOf(game), link = safeLink(game.link)
   const color = COLORS[game.cor] ? game.cor : Object.keys(COLORS)[n % 6]
-  const by = [game.autor && `Feito por ${game.autor}`, game.escola].filter(Boolean).join(" · ")
+  const ensina = game.ensina || game.descricao
+  const by = game.autoria || [game.autor && `Feito por ${game.autor}`, game.escola].filter(Boolean).join(" · ")
   const meta = [game.turma, game.componente].filter(Boolean).join(" · ")
   return `<article class="game" style="${paint(color)};--d:${(n % 3) * .08}s">
     <div class="stage"><span aria-hidden="true">${SCENES[sceneOf(game.componente)]}</span>${STAGES[game.etapa] ? `<span class="tag">${STAGES[game.etapa]}</span>` : ""}</div>
     <div class="body">
       <h3>${escape(game.titulo)}</h3>
-      ${game.descricao ? `<p>${escape(game.descricao)}</p>` : ""}
       ${meta ? `<p class="meta"><span class="dot"></span>${escape(meta)}</p>` : ""}
+      ${ensina ? `<p><b>O que ensina:</b> ${escape(ensina)}</p>` : ""}
       ${by ? `<p class="by">${icon("person")}${escape(by)}</p>` : ""}
       <div class="row">${link
         ? `<a class="btn grow" href="${escape(link)}" target="_blank" rel="noopener">${icon("play")}Jogar</a><button class="btn white small" type="button" data-copy="${escape(link)}">${icon("copy")}Copiar link</button>`
@@ -490,13 +507,16 @@ function gameCard(game) {
 }
 
 let filter = "todas"
+const FILTER_FROM = 4 // com menos jogos que isso, o filtro só atrapalha
 
 // Showing the cards of the chosen stage, or the empty frame while nobody has sent a game yet
 function render() {
   const total = GALERIA.length, shown = GALERIA.filter(game => filter === "todas" || game.etapa === filter)
   $("empty").hidden = total > 0
-  $("filters").hidden = $("games").hidden = $("note-line").hidden = total === 0
-  $("count").textContent = total === 0 ? "Os jogos que os professores criam no Encontro 3 aparecem aqui." : `${total} ${total === 1 ? "jogo" : "jogos"} até agora. Escolha a etapa:`
+  const filterable = total >= FILTER_FROM
+  $("games").hidden = $("note-line").hidden = total === 0
+  $("filters").hidden = !filterable
+  $("count").textContent = total === 0 ? "Os jogos que os professores criam no Encontro 3 aparecem aqui." : `${total} ${total === 1 ? "jogo" : "jogos"} até agora.${filterable ? " Escolha a etapa:" : ""}`
   $("filters").innerHTML = FILTERS.map(([id, label, color]) => {
     const count = id === "todas" ? total : GALERIA.filter(game => game.etapa === id).length
     return `<button type="button" data-filter="${id}" aria-pressed="${id === filter}" style="--c: ${color}">${label}<b>${count}</b></button>`
@@ -533,86 +553,105 @@ $("games").addEventListener("click", event => {
   if (button) copy(button.dataset.copy, "Link copiado!")
 })
 
-// Building the message for the facilitator from the form, the same text for WhatsApp and for copying
-$("f-turma").innerHTML = `<option value="">Escolha</option>` + CLASSES.map(([stage, label, items]) =>
-  `<optgroup label="${label}">${items.map(item => `<option value="${item}" data-stage="${stage}">${item}</option>`).join("")}</optgroup>`).join("")
-$("componentes").innerHTML = SUBJECTS.map(subject => `<option value="${subject}">`).join("")
+// Formulário: a coordenação recebe pelo Formspree, o mesmo serviço do contato do hub
+$("f-etapa").innerHTML = `<option value="">Escolha</option>` + Object.values(STAGES).map(label => `<option value="${label}">${label}</option>`).join("")
+$("materias").innerHTML = SUBJECTS.map(subject => `<option value="${subject}">`).join("")
 
-const REQUIRED = [["f-titulo", "nome do jogo"], ["f-turma", "turma"], ["f-componente", "componente"], ["f-link", "link do jogo"]]
+const form = $("send-form"), status = $("form-status")
+const FIELDS = [["f-jogo", "nome do jogo"], ["f-link", "link do Canvas"], ["f-materia", "matéria"], ["f-etapa", "etapa"],
+  ["f-ensina", "o que o jogo ensina"], ["f-professor", "seu nome"], ["f-email", "e-mail"], ["f-confirmo", "a confirmação sobre dados de aluno"]]
 const value = id => $(id).value.trim()
 
-// Adding the https:// that people often leave out when they copy only the address
+// Colocando o https:// que as pessoas costumam esquecer quando copiam só o endereço
 function readLink() {
   const link = value("f-link")
   if (!link) return ""
   return /^https?:\/\//i.test(link) ? link : `https://${link.replace(/^\/+/, "")}`
 }
+const goodLink = () => /^https?:\/\/[^\s.\/]+\.\S+$/i.test(readLink())
+const goodEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value("f-email"))
 
-function buildMessage() {
-  const option = $("f-turma").selectedOptions[0], stage = option?.dataset.stage
-  const turma = value("f-turma") ? `${value("f-turma")} (${STAGES[stage]})` : ""
-  const blank = "[falta preencher]"
-  const fields = [
-    `Nome do jogo: ${value("f-titulo") || blank}`,
-    `Turma: ${turma || blank}`,
-    `Componente: ${value("f-componente") || blank}`,
-    value("f-descricao") && `O que a criança faz: ${value("f-descricao").replace(/\.$/, "")}.`,
-    `Link do jogo: ${readLink() || blank}`,
-    value("f-autor") && `Feito por: ${value("f-autor")}`,
-    value("f-escola") && `Escola: ${value("f-escola")}`,
-  ]
-  return `Olá! Quero colocar o meu jogo na Galeria da Oficina de Prompts.\n\n${fields.filter(Boolean).join("\n")}`
-}
-
-function missingFields() {
-  const missing = REQUIRED.filter(([id]) => !value(id))
-  if (value("f-link") && !/^https?:\/\/[^\s.]+\.\S+$/i.test(readLink())) missing.push(["f-link", "um link que funcione"])
-  return missing
-}
-
-function updateMessage() {
-  const text = buildMessage()
-  $("message").value = text
-  $("send-whatsapp").href = `https://wa.me/?text=${encodeURIComponent(text)}`
-  for (const [id] of REQUIRED) if (value(id)) $(id).classList.remove("missing")
-  $("form-status").hidden = true
-}
-
-// Stopping the send while something is missing, and saying exactly what
-function checkForm() {
-  const missing = missingFields()
-  const status = $("form-status")
-  for (const [id] of REQUIRED) $(id).classList.toggle("missing", missing.some(([other]) => other === id))
-  if (missing.length) {
-    const names = [...new Set(missing.map(([, name]) => name))]
-    status.textContent = `Falta preencher: ${names.length < 2 ? names[0] : `${names.slice(0, -1).join(", ")} e ${names.at(-1)}`}.`
-    status.hidden = false
-    $(missing[0][0]).focus()
-    return false
+function problems() {
+  const list = []
+  for (const [id, name] of FIELDS) {
+    if (id === "f-confirmo" ? !$(id).checked : !value(id)) list.push([id, name])
+    else if (id === "f-link" && !goodLink()) list.push([id, "um link que funcione"])
+    else if (id === "f-email" && !goodEmail()) list.push([id, "um e-mail que funcione"])
   }
-  if (!/gemini\.google\.com|g\.co\/gemini/i.test(readLink())) {
-    status.textContent = "Confira o link: o link de compartilhar do Gemini costuma começar com https://gemini.google.com/share/"
-    status.hidden = false
-  } else {
-    status.hidden = true
-  }
-  return true
+  return list
 }
 
-$("send-form").addEventListener("input", updateMessage)
-$("send-form").addEventListener("change", updateMessage)
-$("send-form").addEventListener("submit", event => event.preventDefault())
-$("send-whatsapp").addEventListener("click", event => {
-  updateMessage()
-  if (!checkForm()) event.preventDefault()
+function say(text) {
+  status.textContent = text
+  status.hidden = !text
+}
+
+function mark(list) {
+  for (const [id] of FIELDS) {
+    const bad = list.some(([other]) => other === id)
+    const box = id === "f-confirmo" ? $(id).closest(".confirm") : $(id)
+    box.classList.toggle("missing", bad)
+    $(id).setAttribute("aria-invalid", bad)
+  }
+}
+
+// O aviso do link aparece enquanto a pessoa digita, mas não impede o envio: a equipe testa o link de qualquer jeito
+function checkLinkHost() {
+  $("a-link").hidden = !value("f-link") || /gemini\.google\.com|g\.co\/gemini/i.test(readLink())
+}
+
+form.addEventListener("input", () => {
+  checkLinkHost()
+  if (!status.hidden) mark(problems())
 })
-$("send-copy").addEventListener("click", () => {
-  updateMessage()
-  if (checkForm()) copy(buildMessage(), "Mensagem copiada! Agora cole na conversa.")
+form.addEventListener("change", () => { if (!status.hidden) mark(problems()) })
+
+function listNames(names) {
+  return names.length < 2 ? names[0] : `${names.slice(0, -1).join(", ")} e ${names.at(-1)}`
+}
+
+async function sendForm(event) {
+  event.preventDefault()
+  const list = problems()
+  mark(list)
+  if (list.length) {
+    say(`Falta preencher: ${listNames([...new Set(list.map(([, name]) => name))])}.`)
+    $(list[0][0]).focus()
+    return
+  }
+  say("")
+  const button = $("send-btn"), label = button.querySelector("span")
+  button.disabled = true
+  label.textContent = "Enviando..."
+  try {
+    const data = new FormData(form)
+    data.set("link_do_canvas", readLink())
+    const answer = await fetch(form.action, { method: "POST", body: data, headers: { Accept: "application/json" } })
+    if (!answer.ok) {
+      say("O serviço de envio recusou a mensagem e a equipe não recebeu. Os dados continuam aqui: tente de novo em alguns minutos. Se o erro continuar, fale com a coordenação da oficina.")
+      return
+    }
+    form.hidden = true
+    $("send-done").hidden = false
+    $("send-done").focus()
+  } catch (error) {
+    say("Não deu para enviar: parece que a internet caiu. Confira a conexão e tente de novo. Os dados continuam aqui.")
+  } finally {
+    button.disabled = false
+    label.textContent = "Enviar para a equipe"
+  }
+}
+form.addEventListener("submit", sendForm)
+$("send-again").addEventListener("click", () => {
+  form.reset()
+  mark([])
+  checkLinkHost()
+  $("send-done").hidden = true
+  form.hidden = false
+  $("f-jogo").focus()
 })
 
 render()
-updateMessage()
 </script>
 </body>
 </html>
