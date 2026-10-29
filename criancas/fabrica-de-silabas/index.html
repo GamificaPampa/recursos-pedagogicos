@@ -193,6 +193,7 @@ p, li, blockquote {
             <li><b>No celular ou tablet:</b> em dupla, uma criança aperta "Ouvir a palavra" e a outra monta. Depois elas trocam.</li>
             <li><b>Dica:</b> o primeiro toque fala a palavra em sílabas; o segundo faz pular a próxima sílaba. A dica que mostra a sílaba conta nas estrelas como um erro.</li>
             <li><b>Depois:</b> recorte as sílabas em papel e peça para a turma trocar uma sílaba e formar palavras novas, como BOLA e BALA.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -582,6 +583,23 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta palavra já está pronta. Toque em Próxima questão.", 9000)
+      const p = atual(), montar = FASES[fase].tipo === "montar"
+      const certa = montar ? p.silabas[passo] : p.silabas[p.falta]
+      Jogo.modoProfessor.destacar([...$("silabas").querySelectorAll(".silaba")].find(b => !b.disabled && b.textContent === certa))
+      window.Bit?.diz("pensando", montar
+        ? `A palavra é ${p.palavra}: ${p.silabas.join(" - ")}. Agora entra a sílaba ${certa}.`
+        : `A palavra é ${p.palavra}: ${p.silabas.join(" - ")}. A sílaba que falta é ${certa}.`, 12000)
+    },
+    // A leitura em voz alta para quando o professor pausa
+    pausar() { if (podeFalar) speechSynthesis.cancel() },
   })
 
   desenharSom()

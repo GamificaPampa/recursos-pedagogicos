@@ -211,6 +211,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> a fase 1 é para fazer de verdade. A turma fica de pé, com espaço em volta, e segue o Bit durante os 20 segundos de cada exercício.</li>
             <li><b>Na quadra:</b> antes das fases 2 e 3, a turma mede os batimentos com a mão no pescoço, faz o aquecimento e mede de novo para comparar.</li>
             <li><b>Depois:</b> cada grupo inventa um exercício novo para o circuito, desenha o boneco nas duas posições e ensina para a turma.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -623,6 +624,43 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  let pausadoAula = false
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual()
+      if (tipo() === "mexer") {
+        // Aqui não há resposta certa: o Bit mostra como fazer o exercício e para que ele serve
+        Jogo.modoProfessor.destacar($("acao"))
+        return window.Bit?.diz("pensando", `${EXERCICIOS[r].como} ${EXERCICIOS[r].trabalha} Aperte Começar para valer os 20 segundos.`, 14000)
+      }
+      const opcoes = [...$("opcoes").querySelectorAll(".opcao")]
+      if (tipo() === "quadra") {
+        Jogo.modoProfessor.destacar(opcoes[r.opcoes.indexOf(r.certo)])
+        return window.Bit?.diz("pensando", r.explica, 12000)
+      }
+      Jogo.modoProfessor.destacar(opcoes[r.certa])
+      window.Bit?.diz("pensando", r.explica, 12000)
+    },
+    // O relógio do exercício para enquanto o professor explica e só volta se ele estava correndo
+    pausar() {
+      if (!relogio) return
+      pausadoAula = true
+      pararRodada()
+      $("cena").classList.add("parado")
+    },
+    continuar() {
+      if (!pausadoAula) return
+      pausadoAula = false
+      if (ocupado || relogio) return
+      $("cena").classList.remove("parado")
+      relogio = setInterval(tique, 1000)
+    },
   })
 
   desenharSom()

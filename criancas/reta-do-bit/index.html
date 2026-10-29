@@ -237,6 +237,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma vota na lei da reta ou diz qual a e qual b vai pôr, e explica por quê.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno a função de cada situação da fase 3, com mais uma previsão feita por ele.</li>
             <li><b>Depois:</b> cada dupla inventa uma situação com valor fixo e valor por unidade, monta a função e troca com outra dupla para desenhar o gráfico.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -539,6 +540,7 @@ p, li, blockquote {
   })
 
   // Phase 2: the Bit runs on the line from left to right and picks the stars that are on it
+  const voo = { desde: 0, parado: 0 }
   function lancar() {
     const r = atual(), naReta = r.pontos.map(([x, y]) => Math.abs(a * x + b - y) < 1e-9)
     const t = trecho(a, b)
@@ -559,8 +561,11 @@ p, li, blockquote {
     const bit = $("bit-reta"), inicio = performance.now(), duracao = 1500
     const pegas = new Set()
     bit.style.display = ""
+    voo.parado = 0
     const passo = agora => {
-      const p = Math.min(1, (agora - inicio) / duracao), x = t[0] + (t[1] - t[0]) * p
+      // Com o professor pausando, o voo espera e o tempo parado não conta
+      if (voo.desde) return requestAnimationFrame(passo)
+      const p = Math.min(1, (agora - inicio - voo.parado) / duracao), x = t[0] + (t[1] - t[0]) * p
       bit.setAttribute("transform", `translate(${px(x)} ${py(a * x + b)})`)
       r.pontos.forEach(([sx], i) => {
         if (naReta[i] && x >= sx && !pegas.has(i)) {
@@ -711,6 +716,31 @@ p, li, blockquote {
     }
   })
 
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual()
+      if (tipo() === "ler") {
+        const i = r.opcoes.findIndex(([oa, ob]) => oa === r.a && ob === r.b)
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${i}"]`))
+        const passo = Number.isInteger(r.a) ? 1 : 2
+        return window.Bit?.diz("pensando", `A reta corta o eixo y em (0, ${num(r.b)}), então b = ${num(r.b)}. Quando o x anda ${passo}, ela ${r.a > 0 ? "sobe" : "desce"} ${num(Math.abs(r.a * passo))}, então a = ${num(r.a)}.`, 14000)
+      }
+      if (tipo() === "ajustar") {
+        const [[x1, y1], [x2, y2]] = r.pontos, ra = (y2 - y1) / (x2 - x1), rb = y1 - ra * x1
+        Jogo.modoProfessor.destacar([...$("grafico").querySelectorAll(".alvo")])
+        return window.Bit?.diz("pensando", `De uma estrela para a outra, o x anda ${x2 - x1} e o y ${y2 > y1 ? "sobe" : "desce"} ${Math.abs(y2 - y1)}, então a = ${num(ra)}. A reta corta o eixo y em ${num(rb)}, então b = ${num(rb)}: y = ${num(ra)}x ${rb < 0 ? "−" : "+"} ${num(Math.abs(rb))}.`, 14000)
+      }
+      Jogo.modoProfessor.destacar($("texto"))
+      window.Bit?.diz("pensando", `${r.dicaB} ${r.dicaA} Então f(x) = ${num(r.a)}x ${r.b < 0 ? "−" : "+"} ${num(Math.abs(r.b))}.`, 14000)
+    },
+    // O voo do Bit pela reta para enquanto o professor explica
+    pausar() { if (!voo.desde) voo.desde = performance.now() },
+    continuar() { if (voo.desde) { voo.parado += performance.now() - voo.desde; voo.desde = 0 } },
+  })
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>

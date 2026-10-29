@@ -203,6 +203,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> a turma vota na escola antes do toque e, na fase 3, diz em voz alta a pista que viu no trecho.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma característica nova de cada escola.</li>
         <li><b>Depois:</b> cada dupla escolhe um poema ou um trecho de romance do livro didático, descobre a escola e defende a resposta com duas pistas do texto.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
       </ul>
 
       <h3>Faça um jogo parecido com o Gemini</h3>
@@ -617,6 +618,29 @@ p, li, blockquote {
       }
       setTimeout(() => botao.textContent = original, 2500)
     }
+  })
+
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return fala("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.")
+      if (ocupado) return fala("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.")
+      const r = atual(), itens = [...$("area").querySelectorAll(".item")]
+      if (tipo() === "pares") {
+        const faltam = r.pares.filter(([autor]) => !itens.some(b => b.classList.contains("feito") && b.dataset.lado === "autor" && b.dataset.id === autor))
+        const [autor, escola] = faltam.find(([a]) => a === sel.autor) || faltam[0]
+        Jogo.modoProfessor.destacar(itens.filter(b => (b.dataset.lado === "autor" && b.dataset.id === autor) || (b.dataset.lado === "escola" && b.dataset.id === escola)))
+        return fala("pensando", `${AUTORES[autor].nome} (${AUTORES[autor].obra}) é do ${ESC[escola].nome}: ${ESC[escola].marca}.`)
+      }
+      const opcoesTela = [...$("opcoes").querySelectorAll(".opcao")]
+      if (tipo() === "trecho" && etapa === 1) {
+        Jogo.modoProfessor.destacar(opcoesTela.find(b => r.pistas[b.dataset.id] === r.pista))
+        return fala("pensando", `A pista é: ${r.pista}. Ela mostra o ${ESC[r.esc].nome}, que tem ${ESC[r.esc].chave}.`)
+      }
+      Jogo.modoProfessor.destacar(opcoesTela.find(b => b.dataset.id === r.esc))
+      fala("pensando", `É o ${ESC[r.esc].nome}. ${ESC[r.esc].explica}`)
+    },
   })
 
   desenharSom()

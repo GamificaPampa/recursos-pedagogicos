@@ -222,6 +222,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> a turma monta o quadro de Punnett no caderno antes de cada toque e confere com o jogo.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e anota a proporção de cada cruzamento da fase 2.</li>
             <li><b>Depois:</b> a turma simula um cruzamento Pp × Pp com duas moedas (cara é P, coroa é p), anota 40 filhotes e compara com os 25% do quadro.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -656,6 +657,44 @@ p, li, blockquote {
     }
   })
 
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual(), t = traco()
+      const marcar = valor => Jogo.modoProfessor.destacar([...$("opcoes").querySelectorAll(".opcao")].find(b => b.dataset.v === valor))
+      if (tipo() === "conceito") {
+        if (r.pergunta === "fenotipo") {
+          const f = fenotipo(t, r.gen)
+          marcar([...$("opcoes").querySelectorAll(".opcao")].map(b => b.dataset.v).find(v => v.toLowerCase() === f))
+          return window.Bit?.diz("pensando", dominante(r.gen)
+            ? `Basta um ${t.letra} maiúsculo para a característica dominante aparecer: ${r.gen} dá ${f}.`
+            : `Sem nenhum ${t.letra} maiúsculo, aparece a característica recessiva: ${r.gen} dá ${f}.`, 12000)
+        }
+        if (r.pergunta === "tipo") {
+          const homo = r.gen[0] === r.gen[1]
+          marcar(homo ? "Homozigoto" : "Heterozigoto")
+          return window.Bit?.diz("pensando", `${r.gen} tem ${homo ? "as duas letras iguais, então é homozigoto" : "uma letra de cada, então é heterozigoto"}.`, 12000)
+        }
+        marcar(r.gen)
+        return window.Bit?.diz("pensando", `A característica recessiva só aparece com as duas letras minúsculas. Por isso o genótipo é ${r.gen}.`, 12000)
+      }
+      if (tipo() === "punnett") {
+        const q = quadro(r.pai, r.mae)
+        Jogo.modoProfessor.destacar([...$("quadro").querySelectorAll("button.celula")])
+        return window.Bit?.diz("pensando", `Cada quadrinho junta a letra da linha com a da coluna. Linha ${r.mae[0]}: ${q[0].join(" e ")}. Linha ${r.mae[1]}: ${q[1].join(" e ")}.`, 14000)
+      }
+      if (r.descobrir) {
+        marcar(r.pai)
+        return window.Bit?.diz("pensando", `O bezerro é bb: um b veio da vaca e o outro do touro. Como o touro é preto, ele tem um B: o genótipo dele é ${r.pai}.`, 14000)
+      }
+      const q = quadro(r.pai, r.mae).flat(), n = q.filter(g => dominante(g) === (r.alvo === "dom")).length
+      marcar(`${n * 25}%`)
+      window.Bit?.diz("pensando", `No quadro, ${n === 0 ? "nenhum" : n} dos 4 quadrinhos ${n > 1 ? "dão" : "dá"} ${r.alvo === "dom" ? t.domF : t.recF}. Cada um vale 25%: ${n} × 25% = ${n * 25}%.`, 14000)
+    },
+  })
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>

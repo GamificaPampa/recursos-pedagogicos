@@ -244,6 +244,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> a turma diz qual coeficiente mudar e prevê o que vai acontecer na contagem de átomos antes de cada toque.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e copia no caderno as equações balanceadas, com a contagem de cada átomo.</li>
             <li><b>Depois:</b> a turma monta as moléculas da fase 2 com massinha e palito e confere a contagem na mesa.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
           </ul>
         </div>
         <div class="qr">
@@ -654,6 +655,47 @@ p, li, blockquote {
     }
   })
 
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  // Os menores coeficientes que balanceiam a reação atual, achados por tentativa
+  function coeficientesCertos() {
+    const r = atual(), n = substancias().length, max = FASES[fase].maximo
+    const guardados = coefs
+    let achou = null
+    const teste = (i, atualLista) => {
+      if (achou) return
+      if (i === n) {
+        coefs = atualLista
+        if (!balanco().diferentes.length && atualLista.reduce(mdc) === 1) achou = atualLista.slice()
+        return
+      }
+      for (let k = 1; k <= max && !achou; k++) teste(i + 1, [...atualLista, k])
+    }
+    teste(0, [])
+    coefs = guardados
+    return achou
+  }
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
+      const r = atual()
+      if (tipo() === "contar") {
+        const porFormula = contar(r.formula)[r.el], total = r.coef * porFormula
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-n="${total}"]`))
+        return window.Bit?.diz("pensando", r.coef > 1
+          ? `Cada ${texto(r.formula)} tem ${porFormula} ${r.el}, e são ${r.coef} moléculas: ${r.coef} × ${porFormula} = ${total} átomos.`
+          : `O número pequeno depois do ${r.el} diz quantos átomos há: ${total}.`, 12000)
+      }
+      const certos = coeficientesCertos(), lista = substancias()
+      if (!certos) return
+      const faltam = lista.map((_, i) => i).filter(i => coefs[i] < certos[i])
+      Jogo.modoProfessor.destacar(faltam.map(i => $("bancada").querySelector(`.passo[data-i="${i}"][data-sinal="1"]`)))
+      const n = r.reagentes.length
+      const equacao = lista.slice(0, n).map((f, i) => comCoef(certos[i], f)).join(" + ") + " → " + lista.slice(n).map((f, i) => comCoef(certos[n + i], f)).join(" + ")
+      window.Bit?.diz("pensando", `A reação balanceada fica assim: ${equacao}. Em cada lado, todos os átomos aparecem na mesma quantidade.`, 14000)
+    },
+  })
   desenharSom()
   addEventListener("load", () => comecar(0))
 </script>
