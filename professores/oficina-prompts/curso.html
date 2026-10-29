@@ -334,6 +334,32 @@
   .cp-note { position: absolute; left: 45mm; right: 45mm; bottom: 12mm; margin: 0; color: #5d5880; font-size: 3.6mm; font-weight: 500 }
   .cp-foot { position: absolute; left: 45mm; right: 45mm; bottom: 5mm; margin: 0; color: #4a5a78; font-size: 4.2mm; font-weight: 600 }
 
+  /* Choosing the stage: the examples of each module follow it */
+  .stage-h { margin: 0 0 8px; font-size: 28px; line-height: 1.1 }
+  .stage-picks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 12px }
+  .stage-picks.compact { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); margin-top: 0 }
+  .stage-btn { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 12px; background: #fff; border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 4px 0 var(--ink); font-size: 18px; font-weight: 700; line-height: 1.15; text-align: left; transition: transform .1s, box-shadow .1s, background .2s }
+  .stage-btn:hover { transform: translateY(-2px) }
+  .stage-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink) }
+  .stage-btn > svg { width: 34px; height: 34px; flex: none }
+  .stage-btn small { display: block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--soft) }
+  .stage-ok { display: none; margin-left: auto }
+  .stage-ok svg { display: block; width: 24px; height: 24px }
+  .stage-btn[aria-pressed="true"] { background: var(--mint); box-shadow: 0 0 0 var(--ink); transform: translateY(3px) }
+  .stage-btn[aria-pressed="true"] small { color: var(--ink) }
+  .stage-btn[aria-pressed="true"] .stage-ok { display: block }
+  .stage-picks.compact .stage-btn { min-height: 48px; padding: 4px 10px; font-size: 16px }
+  .stage-picks.compact .stage-btn > svg { width: 28px; height: 28px }
+  .stage-bar { margin: 14px 0 0; padding: 10px 14px 14px; background: rgba(255, 255, 255, .85); border: 3px solid var(--ink); border-radius: 20px }
+  .stage-bar-l { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700 }
+  .stage-hint { margin: 12px 0 0 !important }
+  #stage-clear { min-height: 48px }
+  .stage-line { margin: 12px 0 0; padding: 10px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; font-weight: 500 }
+  .stage-remind { margin-top: 30px; padding: 18px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: var(--shadow) }
+  .stage-remind h2 { margin: 0 0 6px; font-size: 26px; line-height: 1.1 }
+  .stage-remind p { margin: 0 0 12px; font-weight: 500 }
+  .stage-remind:focus { outline: none }
+
   .confetti-box { position: fixed; inset: 0; z-index: 50; overflow: hidden; pointer-events: none }
   .confetti { position: absolute; top: -20px; width: 12px; height: 20px; border: 2px solid var(--ink); border-radius: 3px; animation: fall linear forwards }
   @keyframes fall { to { transform: translateY(110vh) rotate(720deg) } }
@@ -350,7 +376,7 @@
   }
   @media (max-width: 480px) {
     .scene { grid-template-columns: 1fr; justify-items: center }
-    .practice, .try, .panel, .quiz { padding-left: 16px; padding-right: 16px }
+    .practice, .try, .panel, .quiz, .stage-remind { padding-left: 16px; padding-right: 16px }
     .navrow .btn { flex: 1 1 100% }
     .meter-pill { margin-left: 0 }
   }
@@ -407,6 +433,16 @@
       <li style="--c: #fff">Gemini</li>
     </ul>
   </header>
+
+  <section class="block" aria-labelledby="h-etapa">
+    <div class="panel stage-box" id="etapa">
+      <h2 class="stage-h" id="h-etapa">Para quem você dá aula?</h2>
+      <p>Escolha a sua etapa e os exemplos de cada módulo passam a ser dela. Dá para trocar a qualquer momento.</p>
+      <div class="stage-picks" data-stage-picker role="group" aria-labelledby="h-etapa"></div>
+      <p class="stage-hint" id="stage-hint" role="status"></p>
+      <p class="row" style="margin: 0"><button class="linkish" type="button" id="stage-clear" hidden>Tirar a escolha e ver os exemplos gerais</button></p>
+    </div>
+  </section>
 
   <section class="block" aria-labelledby="h-progresso">
     <h2 class="h2" id="h-progresso" style="--c: var(--yellow)">Seu progresso</h2>
@@ -477,8 +513,10 @@
   </header>
   <div class="goal">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
-    <p class="bubble"><b>Objetivo:</b> escrever um pedido claro com as 4 partes, melhorar a resposta conversando, consertar as respostas estranhas e proteger os dados das crianças.</p>
+    <p class="bubble"><b>Objetivo:</b> escrever um pedido claro com as 4 partes, melhorar a resposta conversando, consertar as respostas estranhas e proteger os dados <span data-sw="m1-goal">das crianças</span>.</p>
   </div>
+  <div class="stage-bar"><span class="stage-bar-l" data-stage-label>Escolha a sua etapa para ver exemplos dela:</span><div class="stage-picks compact" data-stage-picker data-compact role="group" aria-label="Sua etapa"></div></div>
+  <p class="stage-line" data-line="1" hidden></p>
 
   <div class="cards">
     <article class="card">
@@ -496,18 +534,18 @@
     <article class="card wide">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-blocks"/></svg>As 4 partes de um bom pedido</h3>
       <div class="ptcf">
-        <div class="pt part-role"><strong><i class="letter">P</i>Papel</strong>Quem o Gemini deve ser.<em>Você é professor(a) de Matemática do 2º ano.</em></div>
-        <div class="pt part-task"><strong><i class="letter">T</i>Tarefa</strong>O que ele deve fazer, com um verbo.<em>Crie um jogo de somas até 20.</em></div>
-        <div class="pt part-context"><strong><i class="letter">C</i>Contexto</strong>Para quem, para quê e com quais limites.<em>Crianças de 7 anos, começando a ler.</em></div>
-        <div class="pt part-format"><strong><i class="letter">F</i>Formato</strong>Como o resultado deve sair.<em>Botões grandes, 3 fases, estrelas no final.</em></div>
+        <div class="pt part-role"><strong><i class="letter">P</i>Papel</strong>Quem o Gemini deve ser.<em data-sw="pp">Você é professor(a) de Matemática do 2º ano.</em></div>
+        <div class="pt part-task"><strong><i class="letter">T</i>Tarefa</strong>O que ele deve fazer, com um verbo.<em data-sw="pt">Crie um jogo de somas até 20.</em></div>
+        <div class="pt part-context"><strong><i class="letter">C</i>Contexto</strong>Para quem, para quê e com quais limites.<em data-sw="pc">Crianças de 7 anos, começando a ler.</em></div>
+        <div class="pt part-format"><strong><i class="letter">F</i>Formato</strong>Como o resultado deve sair.<em data-sw="pf">Botões grandes, 3 fases, estrelas no final.</em></div>
       </div>
       <p class="small">Nem todo pedido precisa das 4 partes, mas quanto mais você der, melhor o resultado.</p>
     </article>
     <article class="card wide">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-chat"/></svg>Antes e depois</h3>
       <div class="two">
-        <div class="bad"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-no"/></svg>Vago</b><p class="quote">Faça um jogo de matemática.</p><p class="small" style="color: var(--ink)">O Gemini precisa adivinhar a idade, o conteúdo e o formato.</p></div>
-        <div class="good"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-yes"/></svg>Com as 4 partes</b><p class="quote">Você é professor(a) de Matemática do 2º ano. Crie um jogo de somas até 20, para crianças de 7 anos que estão começando a ler, no celular. Use botões grandes, 3 fases e estrelas no final.</p></div>
+        <div class="bad"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-no"/></svg>Vago</b><p class="quote" data-sw="ad-vago">Faça um jogo de matemática.</p><p class="small" style="color: var(--ink)">O Gemini precisa adivinhar a idade, o conteúdo e o formato.</p></div>
+        <div class="good"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-yes"/></svg>Com as 4 partes</b><p class="quote" data-sw="ad-bom">Você é professor(a) de Matemática do 2º ano. Crie um jogo de somas até 20, para crianças de 7 anos que estão começando a ler, no celular. Use botões grandes, 3 fases e estrelas no final.</p></div>
       </div>
     </article>
     <article class="card">
@@ -516,7 +554,7 @@
       <p class="note">Peça <b>uma mudança de cada vez</b>. Fica mais fácil ver o que melhorou.</p>
     </article>
     <article class="card">
-      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-lock"/></svg>Proteja as crianças</h3>
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-lock"/></svg><span data-sw="m1-protect">Proteja as crianças</span></h3>
       <div class="two">
         <div class="bad"><b>Nunca</b><ul><li>Nomes</li><li>Fotos</li><li>Laudos, notas, endereços</li></ul></div>
         <div class="good"><b>Pode</b><ul><li>Idade e ano da turma</li><li>Tema e conteúdo</li><li>Necessidades, sem identificar</li></ul></div>
@@ -569,7 +607,7 @@
       <li>Leia a resposta e peça um ajuste de cada vez, como “Deixe mais simples”.</li>
     </ol>
     <label for="t1">Pedido para o Gemini (dá para editar aqui)</label>
-    <textarea id="t1" rows="5" spellcheck="false">Você é professor(a) de [componente] do [ano]. Crie uma atividade para imprimir sobre [conteúdo da próxima semana], para crianças de [idade] anos. Uma folha A4, com 4 exercícios do mais fácil para o mais difícil e o gabarito separado no fim.</textarea>
+    <textarea id="t1" rows="5" spellcheck="false" data-sw="t1">Você é professor(a) de [componente] do [ano]. Crie uma atividade para imprimir sobre [conteúdo da próxima semana], para crianças de [idade] anos. Uma folha A4, com 4 exercícios do mais fácil para o mais difícil e o gabarito separado no fim.</textarea>
     <div class="row"><button class="btn" type="button" data-copy="t1" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copiar pedido</button><a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o Gemini</a><span class="status" role="status"></span></div>
   </section>
 
@@ -579,6 +617,12 @@
   </section>
 
   <nav class="more" aria-label="Para ir além no módulo 1"><span>Para ir além:</span><a class="mini" href="jogo.html" style="--c: #cfe6ff">Jogo do Prompt</a><a class="mini" href="construtor.html" style="--c: #ffdcc4">Construtor de prompts</a><a class="mini" href="guia.html">Guia do professor</a></nav>
+
+  <section class="stage-remind" id="stage-remind" aria-labelledby="remind-h" tabindex="-1" hidden>
+    <h2 id="remind-h">Falta escolher a sua etapa</h2>
+    <p id="remind-text">Para ver exemplos da sua turma nos próximos módulos, escolha para quem você dá aula.</p>
+    <div class="stage-picks compact" data-stage-picker data-compact role="group" aria-labelledby="remind-h"></div>
+  </section>
 
   <div class="finish">
     <button class="btn" type="button" data-finish="0">Concluí este módulo</button>
@@ -597,6 +641,8 @@
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
     <p class="bubble"><b>Objetivo:</b> criar planos, histórias, quizzes e rubricas melhores, com a BNCC sem códigos inventados e materiais que incluem todo mundo.</p>
   </div>
+  <div class="stage-bar"><span class="stage-bar-l" data-stage-label>Escolha a sua etapa para ver exemplos dela:</span><div class="stage-picks compact" data-stage-picker data-compact role="group" aria-label="Sua etapa"></div></div>
+  <p class="stage-line" data-line="2" hidden></p>
 
   <div class="cards">
     <article class="card wide">
@@ -633,7 +679,7 @@
     <article class="card">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-book"/></svg>Histórias que ensinam</h3>
       <p>Uma boa história para a roda tem um personagem, um lugar que a turma conhece, um problema ligado ao conteúdo e um tamanho certo.</p>
-      <p class="say">Escreva uma história de 3 minutos de leitura para crianças de [idade] anos sobre [conteúdo], passada [no pampa / na escola / na cidade], com um personagem que resolve um problema. No fim, 3 perguntas de compreensão.</p>
+      <p class="say" data-sw="story">Escreva uma história de 3 minutos de leitura para crianças de [idade] anos sobre [conteúdo], passada [no pampa / na escola / na cidade], com um personagem que resolve um problema. No fim, 3 perguntas de compreensão.</p>
     </article>
     <article class="card">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-quiz"/></svg>Quizzes que revisam de verdade</h3>
@@ -668,7 +714,7 @@
       <li>Depois peça: “Crie uma versão fácil, uma média e uma desafio da atividade.”</li>
     </ol>
     <label for="t2">Pedido para o Gemini (dá para editar aqui)</label>
-    <textarea id="t2" rows="6" spellcheck="false">Você é professor(a) de [componente] do [ano]. Crie um plano de aula de 50 minutos sobre [tema], para crianças de [idade] anos. Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte e como avaliar. Antes de criar, me faça 3 perguntas sobre a minha turma.</textarea>
+    <textarea id="t2" rows="6" spellcheck="false" data-sw="t2">Você é professor(a) de [componente] do [ano]. Crie um plano de aula de 50 minutos sobre [tema], para crianças de [idade] anos. Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte e como avaliar. Antes de criar, me faça 3 perguntas sobre a minha turma.</textarea>
     <div class="row"><button class="btn" type="button" data-copy="t2" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copiar pedido</button><a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o Gemini</a><span class="status" role="status"></span></div>
   </section>
 
@@ -694,8 +740,10 @@
   </header>
   <div class="goal">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
-    <p class="bubble"><b>Objetivo:</b> criar um jogo no Canvas em duas mensagens, testar como criança, pedir consertos que funcionam e compartilhar com a turma.</p>
+    <p class="bubble"><b>Objetivo:</b> criar um jogo no Canvas em duas mensagens, testar como <span data-sw="m3-goal">criança</span>, pedir consertos que funcionam e compartilhar com a turma.</p>
   </div>
+  <div class="stage-bar"><span class="stage-bar-l" data-stage-label>Escolha a sua etapa para ver exemplos dela:</span><div class="stage-picks compact" data-stage-picker data-compact role="group" aria-label="Sua etapa"></div></div>
+  <p class="stage-line" data-line="3" hidden></p>
 
   <div class="cards">
     <article class="card">
@@ -711,8 +759,8 @@
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-chat"/></svg>Duas mensagens funcionam melhor</h3>
       <p>Nos testes, o Canvas <b>recusou jogos pedidos num texto longo</b> e aceitou quando o pedido veio em duas partes:</p>
       <div class="two">
-        <div class="good"><b>Mensagem 1: a ideia</b><p class="quote">Crie no Canvas um jogo de equações do 1º grau para estudantes de 12 e 13 anos: uma balança com caixas x e pesos de 1, e o estudante tira pesos dos dois lados até descobrir quanto vale o x.</p></div>
-        <div class="good"><b>Mensagem 2: os detalhes</b><p class="quote">Agora melhore o jogo: 3 fases, a balança inclina quando fica desequilibrada, um botão de dica, botões grandes para o celular, som no acerto e estrelas no fim de cada fase.</p></div>
+        <div class="good"><b>Mensagem 1: a ideia</b><p class="quote" data-sw="m3-q1">Crie no Canvas um jogo de equações do 1º grau para estudantes de 12 e 13 anos: uma balança com caixas x e pesos de 1, e o estudante tira pesos dos dois lados até descobrir quanto vale o x.</p></div>
+        <div class="good"><b>Mensagem 2: os detalhes</b><p class="quote" data-sw="m3-q2">Agora melhore o jogo: 3 fases, a balança inclina quando fica desequilibrada, um botão de dica, botões grandes para o celular, som no acerto e estrelas no fim de cada fase.</p></div>
       </div>
       <p class="small">Se ainda assim ele recusar, toque em Refazer.</p>
     </article>
@@ -733,7 +781,7 @@
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-play"/></svg>Pedir, testar, descrever, consertar</h3>
       <ol class="tiles steps-tiles">
         <li style="--t: #cfe6ff"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-chat"/></svg>Peça o jogo com as 4 partes</li>
-        <li style="--t: #c9f5e3"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-phone"/></svg>Teste como se fosse uma criança</li>
+        <li style="--t: #c9f5e3"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-phone"/></svg>Teste como se fosse <span data-sw="m3-tile">uma criança</span></li>
         <li style="--t: #fff1a8"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-search"/></svg>Descreva o problema</li>
         <li style="--t: #ffdcc4"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-wrench"/></svg>Peça para consertar só ele</li>
       </ol>
@@ -771,13 +819,18 @@
     <h2 id="t3-title"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-spark"/></svg>Experimente no Gemini</h2>
     <ol class="steps">
       <li>Na caixa de mensagem do Gemini, toque em <b>+</b>, depois em <b>Mais ferramentas</b> e escolha <b>Canvas</b>.</li>
-      <li>Cole o pedido, troque os [colchetes] e envie. Se o Gemini disser que não consegue, toque em <b>Refazer</b> ou mande primeiro só a ideia do jogo e o resto depois.</li>
+      <li data-sw="t3-step2">Cole o pedido, troque os [colchetes] e envie. Se o Gemini disser que não consegue, toque em <b>Refazer</b> ou mande primeiro só a ideia do jogo e o resto depois.</li>
       <li>Jogue como criança. Achou um problema? Use a frase do conserto.</li>
       <li>Compartilhe o link e teste numa janela anônima.</li>
     </ol>
-    <label for="t3">Pedido para o Gemini (dá para editar aqui)</label>
-    <textarea id="t3" rows="5" spellcheck="false">Você é professor(a) de [componente] do [ano] e cria jogos educativos. Crie um jogo sobre [conteúdo] para jogar no navegador, para crianças de [idade] anos, no celular, em 10 minutos. Um arquivo só, botões grandes, 3 fases do fácil ao difícil, som no acerto, estrelas no final e sem anúncios.</textarea>
-    <div class="row"><button class="btn" type="button" data-copy="t3" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copiar pedido</button><a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o Gemini</a><span class="status" role="status"></span></div>
+    <label for="t3" data-sw="t3-label">Pedido para o Gemini (dá para editar aqui)</label>
+    <textarea id="t3" rows="5" spellcheck="false" data-sw="t3">Você é professor(a) de [componente] do [ano] e cria jogos educativos. Crie um jogo sobre [conteúdo] para jogar no navegador, para crianças de [idade] anos, no celular, em 10 minutos. Um arquivo só, botões grandes, 3 fases do fácil ao difícil, som no acerto, estrelas no final e sem anúncios.</textarea>
+    <div class="row"><button class="btn" type="button" data-copy="t3" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg><span data-sw="t3-copy1">Copiar pedido</span></button><a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o Gemini</a><span class="status" role="status"></span></div>
+    <div id="t3b-box" hidden>
+      <label for="t3b">Mensagem 2: os detalhes (envie depois que o jogo aparecer; dá para editar aqui)</label>
+      <textarea id="t3b" rows="5" spellcheck="false" data-sw="t3b"></textarea>
+      <div class="row"><button class="btn" type="button" data-copy="t3b" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copiar mensagem 2</button><span class="status" role="status"></span></div>
+    </div>
     <p class="small" style="color: var(--ink)">Com imagens, passo a passo: <a href="passo-a-passo.html#canvas">ativar o Canvas</a> e <a href="passo-a-passo.html#compartilhar">compartilhar o jogo</a>.</p>
   </section>
 
@@ -805,6 +858,8 @@
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
     <p class="bubble"><b>Objetivo:</b> montar o seu Gem, revisar tudo com o checklist e criar um material ou jogo para usar de verdade.</p>
   </div>
+  <div class="stage-bar"><span class="stage-bar-l" data-stage-label>Escolha a sua etapa para ver exemplos dela:</span><div class="stage-picks compact" data-stage-picker data-compact role="group" aria-label="Sua etapa"></div></div>
+  <p class="stage-line" data-line="4" hidden></p>
 
   <div class="cards">
     <article class="card">
@@ -815,7 +870,7 @@
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-plan"/></svg>Como criar</h3>
       <ol class="steps">
         <li>No Gemini, toque na engrenagem <b>Configurações</b>, embaixo à esquerda, depois em <b>Gems</b> e em <b>Novo Gem</b>.</li>
-        <li>Dê um nome, como <b>Assistente do 2º ano</b>.</li>
+        <li>Dê um nome, como <b data-sw="gemnome">Assistente do 2º ano</b>.</li>
         <li>Cole as instruções, teste e salve.</li>
       </ol>
       <p class="small">O nome dos botões pode mudar com as atualizações do Gemini.</p>
@@ -838,7 +893,7 @@
     </article>
     <article class="card wide">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-gem"/></svg>Exemplo de instruções</h3>
-      <p class="say">Você é o assistente de um(a) professor(a) do 2º ano de uma escola pública do interior do Rio Grande do Sul. As crianças têm 7 e 8 anos e estão se alfabetizando. Sempre: responda em português do Brasil, com frases curtas; faça atividades com até 4 exercícios e o gabarito separado; prefira ideias que funcionem sem internet e com material barato. Se eu não disser o tema, pergunte antes de criar. Nunca invente códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.</p>
+      <p class="say" data-sw="gem-exemplo">Você é o assistente de um(a) professor(a) do 2º ano de uma escola pública do interior do Rio Grande do Sul. As crianças têm 7 e 8 anos e estão se alfabetizando. Sempre: responda em português do Brasil, com frases curtas; faça atividades com até 4 exercícios e o gabarito separado; prefira ideias que funcionem sem internet e com material barato. Se eu não disser o tema, pergunte antes de criar. Nunca invente códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.</p>
       <p class="small">Repare: tem a turma, o jeito de responder e as regras, e nenhum dado de criança.</p>
     </article>
     <article class="card">
@@ -872,11 +927,11 @@
     <ol class="steps">
       <li>Copie as instruções que você montou na prática.</li>
       <li>No Gemini, toque na engrenagem <b>Configurações</b>, embaixo à esquerda, depois em <b>Gems</b> e em <b>Novo Gem</b>.</li>
-      <li>Dê um nome, como <b>Assistente do 2º ano</b>, e cole as instruções.</li>
+      <li>Dê um nome, como <b data-sw="gemnome">Assistente do 2º ano</b>, e cole as instruções.</li>
       <li>Teste com o pedido abaixo, ajuste as instruções e salve.</li>
     </ol>
     <label for="t4">Pedido para testar o Gem (dá para editar aqui)</label>
-    <textarea id="t4" rows="3" spellcheck="false">Crie uma atividade sobre [tema] para a minha turma.</textarea>
+    <textarea id="t4" rows="3" spellcheck="false" data-sw="t4">Crie uma atividade sobre [tema] para a minha turma.</textarea>
     <div class="row"><button class="btn" type="button" data-copy="t4" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copiar pedido</button><a class="btn calm" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o Gemini</a><span class="status" role="status"></span></div>
     <p class="small" style="color: var(--ink)">Se a conta da escola não mostrar os Gems, guarde as instruções num documento e cole no começo de cada conversa. Com imagens: <a href="passo-a-passo.html#gem">passo a passo para criar um Gem</a>.</p>
   </section>
@@ -1167,6 +1222,7 @@ const STAGES = [
   ["1º ao 3º ano", "crianças de 6 a 8 anos, do 1º ao 3º ano, que estão aprendendo a ler"],
   ["4º e 5º ano", "crianças de 9 e 10 anos, do 4º e 5º ano"],
   ["6º ao 9º ano", "estudantes de 11 a 14 anos, do 6º ao 9º ano"],
+  ["Ensino Médio", "estudantes de 15 a 17 anos, do Ensino Médio"],
 ]
 const KINDS = [
   ["Atividades para imprimir", "atividades para imprimir", "uma atividade", "Entregue uma folha A4 com título, uma instrução curta e de 3 a 5 exercícios, do mais fácil para o mais difícil. No fim, separado, o gabarito."],
@@ -1884,6 +1940,246 @@ $("reset").addEventListener("click", () => {
   refresh()
 })
 
+// ---------- The stage of the teacher: the examples of each module follow it ----------
+
+const STAGE_KEY = "gamificapampa-curso-etapa"
+const ETAPAS = [
+  ["infantil", "Educação Infantil", "4 e 5 anos", "i-star"],
+  ["iniciais", "Anos iniciais", "1º ao 5º ano", "i-book"],
+  ["finais", "Anos finais", "6º ao 9º ano", "i-wrench"],
+  ["medio", "Ensino Médio", "1ª a 3ª série", "i-school"],
+]
+// Which option of the Gem practice (practice 4) matches each stage
+const GEM_STAGE = { infantil: 0, iniciais: 1, finais: 3, medio: 4 }
+
+const STAGE_HINTS = {
+  none: "Sem escolher, os exemplos são gerais, para qualquer turma.",
+  infantil: "Os exemplos agora são para crianças de 4 e 5 anos, que ainda não leem.",
+  iniciais: "Os exemplos agora são para crianças do 1º ao 5º ano.",
+  finais: "Os exemplos agora são para estudantes do 6º ao 9º ano.",
+  medio: `Os exemplos agora são para estudantes do Ensino Médio. O <a href="#modulo-em">módulo extra</a> também é para você.`,
+}
+
+// "Na sua etapa": one short tip at the top of each module (index 0 is module 1)
+const STAGE_LINES = {
+  infantil: [
+    "pense em atividades para fazer em voz alta e com o corpo, sem precisar ler. Peça sempre os materiais baratos e o tempo de cada parte.",
+    "peça propostas de roda, brincadeira e história para ouvir. Para a BNCC, peça só o nome do campo de experiências, sem códigos.",
+    "o jogo é de tocar e ouvir, sem texto para ler. Peça botões bem grandes, sons suaves e o erro como dica, nunca como castigo.",
+    "o Gem pode guardar a turma (4 e 5 anos, que não leem), os materiais baratos e o seu jeito de fechar a roda. Nunca ponha nomes.",
+  ],
+  iniciais: [
+    "diga sempre a idade e se as crianças já leem. Frases curtas e exercícios pequenos fazem toda a diferença.",
+    "peça frases curtas, exemplos do dia a dia e poucos exercícios por folha, com letra grande e espaço para responder.",
+    "prefira perguntas curtas, botões grandes e fases rápidas. Teste com o dedo, no celular, como a criança faria.",
+    "o Gem pode guardar o ano, se as crianças já leem e o jeito de dar o gabarito. Troque o nome do Gem pelo seu ano.",
+  ],
+  finais: [
+    "fale de estudantes e diga a idade e o ano. Peça situações do dia a dia deles e um desafio para quem termina antes.",
+    "peça trabalho em dupla, uma pergunta para abrir a aula e uma saída rápida no fim. Confira fatos e contas: os estudantes percebem o erro.",
+    "o jogo pode ter situação-problema, dica e pontos. Confira as contas e as respostas antes de jogar com a turma.",
+    "o Gem pode guardar o ano, o componente e o formato que você prefere, como atividade com resolução. Um Gem por componente costuma funcionar melhor.",
+  ],
+  medio: [
+    `peça questões no estilo do Enem, com texto-base, e nunca diga que são de prova real. Veja também o <a href="#modulo-em">módulo extra do Ensino Médio</a>.`,
+    `peça texto-base, 5 alternativas, gabarito com resolução e trabalhos ligados à cidade ou à comunidade. Confira as fontes: o Gemini inventa dados. Mais no <a href="#modulo-em">módulo extra</a>.`,
+    `pense em simuladores em que o estudante muda um valor e vê o que acontece, seguidos de uma questão no estilo do Enem. Confira as contas. Há jogos de exemplo no <a href="#modulo-em">módulo extra</a>.`,
+    `o Gem pode guardar a série, a matéria e o formato de questão do Enem. A página dos <a href="gems.html">Gems</a> tem o Gem do Ensino Médio pronto. Veja o <a href="#modulo-em">módulo extra</a>.`,
+  ],
+}
+
+// What changes in each stage. A stage without an entry keeps the text the page already has
+const everyStage = value => ({ infantil: value, iniciais: value, finais: value, medio: value })
+const olderStudents = value => ({ finais: value, medio: value })
+
+const STAGE_SWAPS = {
+  "m1-goal": olderStudents("dos estudantes"),
+  "m1-protect": olderStudents("Proteja os estudantes"),
+  "m3-goal": olderStudents("estudante"),
+  "m3-tile": olderStudents("um estudante"),
+
+  // Module 1: the four parts and before and after
+  pp: { infantil: "Você é professor(a) de Educação Infantil.", finais: "Você é professor(a) de Ciências do 8º ano.", medio: "Você é professor(a) de Química da 3ª série." },
+  pt: { infantil: "Crie uma brincadeira de roda sobre os bichos do pampa.", finais: "Crie um quiz sobre fontes de energia.", medio: "Crie 5 questões sobre soluções." },
+  pc: { infantil: "Crianças de 4 anos, que ainda não leem.", finais: "Estudantes de 13 anos, para revisar antes da prova.", medio: "Estudantes de 17 anos que se preparam para o Enem." },
+  pf: { infantil: "3 passos curtos e materiais baratos.", finais: "8 questões, 3 alternativas e o gabarito explicado.", medio: "Texto-base, 5 alternativas e o gabarito explicado." },
+  "ad-vago": { infantil: "Faça uma atividade sobre animais.", finais: "Faça um quiz de Ciências.", medio: "Faça questões de Química." },
+  "ad-bom": {
+    infantil: "Você é professor(a) de Educação Infantil. Crie uma brincadeira de roda sobre os bichos do pampa, para crianças de 4 anos que ainda não leem. Use 3 passos curtos e materiais baratos, e termine com uma pergunta para conversar na roda.",
+    finais: "Você é professor(a) de Ciências do 8º ano. Crie um quiz sobre fontes de energia, para estudantes de 13 anos que vão fazer prova na semana que vem. Use 8 questões de múltipla escolha, com 3 alternativas, e o gabarito explicado no fim, em texto normal.",
+    medio: "Você é professor(a) de Química da 3ª série do Ensino Médio. Crie 5 questões no estilo do Enem sobre soluções, para estudantes de 17 anos que se preparam para a prova. Use texto-base curto, 5 alternativas e o gabarito com a resolução, em texto normal, sem usar o teste interativo.",
+  },
+  t1: {
+    infantil: "Você é professor(a) de Educação Infantil. Crie uma atividade para a roda de conversa sobre [tema, por exemplo os bichos do pampa], para crianças de [4 ou 5] anos que ainda não leem. As crianças respondem mostrando, apontando ou falando, sem precisar ler. Entregue 4 propostas curtas, da mais calma à mais animada, com os materiais baratos que vou usar. Se precisar de imagem, descreva a imagem entre parênteses. Escreva em texto normal, fora de bloco de código, em português do Brasil. Não use códigos da BNCC.",
+    iniciais: "Você é professor(a) de [componente] do [2º ano]. Crie uma atividade para imprimir sobre [conteúdo da próxima semana], para crianças de [7] anos que estão aprendendo a ler. Uma folha A4, com frases curtas, 4 exercícios do mais fácil ao mais difícil e o gabarito separado no fim. Onde precisar de imagem, descreva a imagem entre parênteses. Escreva em texto normal, fora de bloco de código, sem usar o teste interativo, em português do Brasil.",
+    finais: "Você é professor(a) de [componente] do [8º ano]. Crie uma atividade para imprimir sobre [conteúdo da próxima semana], para estudantes de [13] anos. Uma folha A4, com 5 exercícios do mais fácil ao mais difícil, um deles ligado a uma situação do dia a dia dos estudantes, e o gabarito com a resolução separado no fim. Escreva em texto normal, fora de bloco de código, sem usar o teste interativo, em português do Brasil. Não invente dados nem códigos da BNCC.",
+    medio: "Você é professor(a) de [matéria] da [2ª série] do Ensino Médio. Crie uma lista de 5 exercícios sobre [conteúdo], do mais fácil ao mais difícil, para estudantes de [16] anos. O último exercício deve ser no estilo do Enem, com texto-base curto ligado a uma situação real, um comando claro e 5 alternativas, de A a E. No fim, o gabarito com a resolução. Escreva em texto normal, fora de bloco de código, sem usar o teste interativo, em português do Brasil. Não diga que a questão é de prova real, não invente dados e não use códigos da BNCC.",
+  },
+
+  // Module 2: stories and the lesson plan
+  story: {
+    infantil: "Escreva uma história de 3 minutos para ler em voz alta para crianças de [4 ou 5] anos sobre [tema], passada [no pampa / na escola / na cidade], com um personagem que resolve um problema e uma parte para a turma repetir. No fim, 3 perguntas para conversar na roda.",
+    finais: "Escreva um caso curto, de uma página, para estudantes de [12] anos sobre [conteúdo], passado [no pampa / na escola / na cidade], em que um personagem enfrenta um problema ligado ao conteúdo. No fim, 3 perguntas para debater em grupo.",
+    medio: "Escreva um texto-base de 15 linhas para estudantes de [16] anos sobre [tema], ligado a uma situação real da nossa região, sem inventar dados nem citações. No fim, 3 perguntas para debater e 1 questão no estilo do Enem.",
+  },
+  t2: {
+    infantil: "Você é professor(a) de Educação Infantil. Crie um plano de atividade de 40 minutos sobre [tema], para crianças de [4 ou 5] anos, que aprendem brincando e ainda não leem. Relacione com os campos de experiências da BNCC, só pelo nome do campo, sem códigos. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte (roda, brincadeira e fechamento) e como observar o que as crianças fizeram, sem prova. Se citar imagem, descreva a imagem entre parênteses. Escreva em texto normal, fora de bloco de código, em português do Brasil. Antes de criar, me faça 3 perguntas sobre a minha turma.",
+    iniciais: "Você é professor(a) de [componente] do [3º ano]. Crie um plano de aula de 50 minutos sobre [tema], para crianças de [8] anos. Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte (com uma brincadeira ou um jogo no meio) e como avaliar. Escreva em texto normal, fora de bloco de código, em português do Brasil. Antes de criar, me faça 3 perguntas sobre a minha turma.",
+    finais: "Você é professor(a) de [componente] do [7º ano]. Crie um plano de aula de 50 minutos sobre [tema], para estudantes de [12] anos. Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código. Inclua uma pergunta para abrir a aula, um momento em que os estudantes trabalhem em duplas e uma saída rápida para saber o que aprenderam. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte e como avaliar. Escreva em texto normal, fora de bloco de código, em português do Brasil. Antes de criar, me faça 3 perguntas sobre a minha turma.",
+    medio: "Você é professor(a) de [matéria] da [2ª série] do Ensino Médio. Crie um plano de aula de 50 minutos sobre [tema], para estudantes de [16] anos. Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código. Inclua uma questão no estilo do Enem, com texto-base curto, 5 alternativas e o gabarito explicado, e uma tarefa em que os estudantes liguem o tema à cidade ou à comunidade deles. Entregue o objetivo, os materiais, o passo a passo com o tempo de cada parte e como avaliar. Escreva em texto normal, fora de bloco de código, sem usar o teste interativo, em português do Brasil. Não invente dados nem citações. Antes de criar, me faça 3 perguntas sobre a minha turma.",
+  },
+
+  // Module 3: the game, always in two messages
+  "m3-q1": {
+    infantil: "Crie no Canvas um jogo para crianças de 4 e 5 anos que ainda não leem: aparecem 3 animais do pampa e a criança toca no que o jogo pede, com a voz dizendo o nome do animal.",
+    iniciais: "Crie no Canvas um jogo de somas até 20 para crianças de 7 anos: aparece uma conta e a criança toca na resposta certa entre 3 botões.",
+    medio: "Crie no Canvas um simulador de função afim para estudantes de 16 anos: o estudante muda o coeficiente angular e o linear numa barra e vê a reta se mexer no plano.",
+  },
+  "m3-q2": {
+    infantil: "Agora melhore o jogo: 3 fases, com 2, 3 e 4 animais, botões bem grandes, nada para ler, o erro vira uma dica e não um castigo, som suave no acerto e estrelas no fim de cada fase.",
+    iniciais: "Agora melhore o jogo: 3 fases, o erro mostra uma dica e deixa tentar de novo, botões grandes para o celular, som no acerto e estrelas no fim de cada fase.",
+    medio: "Agora melhore o jogo: 3 fases, em cada uma o estudante leva a reta até pontos marcados, com uma questão no estilo do Enem sobre o que viu no fim, botão de dica, botões grandes para o celular e estrelas no fim de cada fase.",
+  },
+  "t3-step2": everyStage("Cole a <b>mensagem 1</b>, troque os [colchetes] e envie. Quando o jogo aparecer, cole a <b>mensagem 2</b>. Se o Gemini disser que não consegue, toque em <b>Refazer</b>."),
+  "t3-label": everyStage("Mensagem 1: a ideia do jogo (dá para editar aqui)"),
+  "t3-copy1": everyStage("Copiar mensagem 1"),
+  t3: {
+    infantil: "Crie no Canvas um jogo de [tema, por exemplo animais do pampa] para crianças de [4 e 5] anos que ainda não leem, para jogar no celular. A criança toca na figura que o jogo pede, e o jogo fala o pedido em voz alta.",
+    iniciais: "Crie no Canvas um jogo de [conteúdo] para crianças de [7] anos que estão aprendendo a ler, para jogar no celular. Aparece uma pergunta curta e a criança toca na resposta certa entre 3 botões.",
+    finais: "Crie no Canvas um jogo de [conteúdo, por exemplo equações do 1º grau] para estudantes de [12 e 13] anos, para jogar no celular. Aparece uma situação-problema, o estudante escolhe a resposta e o jogo mostra na hora se está certa.",
+    medio: "Crie no Canvas um simulador de [conteúdo, por exemplo função afim] para estudantes de [16] anos, para usar no celular ou no computador. O estudante muda os valores e vê na hora o que acontece.",
+  },
+  t3b: {
+    infantil: "Agora melhore o jogo: 3 fases com 2, 3 e 4 figuras, botões bem grandes, nada para ler, o erro vira uma dica e não um castigo, som suave no acerto, um botão para desligar o som e estrelas no fim de cada fase. Desenhe as figuras com formas simples e use textos em português do Brasil. Sem anúncios e sem pedir o nome da criança.",
+    iniciais: "Agora melhore o jogo: 3 fases do fácil ao difícil, frases curtas, botões grandes, o erro mostra uma dica e deixa tentar de novo, som no acerto com botão para desligar e estrelas no fim de cada fase. Textos em português do Brasil, sem inventar dados, sem anúncios e sem pedir o nome da criança.",
+    finais: "Agora melhore o jogo: 3 fases do fácil ao difícil, um botão de dica, estrelas no fim de cada fase, botões grandes para o celular e som no acerto com botão para desligar. Confira as contas e as respostas, use textos em português do Brasil, sem anúncios e sem pedir o nome do estudante.",
+    medio: "Agora melhore: 3 fases e, no fim de cada uma, uma questão no estilo do Enem com texto-base curto, 5 alternativas e a resolução comentada. Acrescente um botão de dica e botões grandes. Confira as contas, use textos em português do Brasil, não diga que a questão é de prova real, sem anúncios e sem pedir o nome do estudante.",
+  },
+
+  // Module 4: the Gem
+  gemnome: { infantil: "Assistente da Educação Infantil", finais: "Assistente do 8º ano", medio: "Assistente do Ensino Médio" },
+  "gem-exemplo": {
+    infantil: "Você é o assistente de um(a) professor(a) da Educação Infantil de uma escola pública do interior do Rio Grande do Sul. As crianças têm 4 e 5 anos e ainda não leem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, com frases curtas; proponha atividades de roda, brincadeira e movimento com material barato; se citar imagem, descreva a imagem entre parênteses. Se eu não disser o tema, pergunte antes de criar. Nunca invente músicas, livros nem códigos da BNCC.",
+    finais: "Você é o assistente de um(a) professor(a) do 8º ano de uma escola pública do interior do Rio Grande do Sul. Os estudantes têm 13 e 14 anos. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça atividades com até 5 exercícios, um deles ligado ao dia a dia dos estudantes, e o gabarito com a resolução separado. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados nem códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.",
+    medio: "Você é o assistente de um(a) professor(a) do Ensino Médio de uma escola pública do interior do Rio Grande do Sul. Os estudantes têm de 15 a 17 anos e se preparam para o Enem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça questões no estilo do Enem, com texto-base, 5 alternativas e o gabarito com a resolução, sem dizer que são de prova real. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados, citações nem códigos da BNCC: marque com [conferir a fonte] o que eu devo checar.",
+  },
+  t4: {
+    infantil: "Crie uma atividade para a roda de conversa sobre [tema], para a minha turma, sem precisar ler.",
+    iniciais: "Crie uma atividade para imprimir sobre [tema] para a minha turma.",
+    finais: "Crie uma atividade sobre [tema] para os meus estudantes, com uma situação do dia a dia deles.",
+    medio: "Crie 3 questões no estilo do Enem sobre [tema] para os meus estudantes, com o gabarito explicado.",
+  },
+}
+
+let stage = null
+let reminderUsed = false
+let autoPicking = false
+const swapOriginals = new Map()
+
+function readStage() {
+  try {
+    const saved = window.localStorage.getItem(STAGE_KEY)
+    if (ETAPAS.some(item => item[0] === saved)) stage = saved
+  } catch (error) {
+    // Sem armazenamento, a escolha vale só até fechar a página
+  }
+}
+
+function saveStage() {
+  try {
+    if (stage) window.localStorage.setItem(STAGE_KEY, stage)
+    else window.localStorage.removeItem(STAGE_KEY)
+  } catch (error) {
+    // Idem
+  }
+}
+
+function renderPickers() {
+  document.querySelectorAll("[data-stage-picker]").forEach(box => {
+    const compact = box.hasAttribute("data-compact")
+    box.innerHTML = ETAPAS.map(([id, name, ages, symbol]) =>
+      `<button type="button" class="stage-btn" data-stage="${id}" aria-pressed="false">${icon(symbol)}<span><b>${name}</b>${compact ? "" : `<small>${ages}</small>`}</span><span class="stage-ok" aria-hidden="true">${icon("i-yes")}</span></button>`).join("")
+  })
+}
+
+// Textareas grow to show the whole request when a stage is chosen
+function autosizeAll() {
+  document.querySelectorAll(".try textarea").forEach(area => {
+    area.style.height = ""
+    if (stage && area.offsetParent !== null) area.style.height = area.scrollHeight + 6 + "px"
+  })
+}
+
+// In the Gem practice, the option of the chosen stage is picked, until the teacher picks one
+function pickGemStage() {
+  const box = $("p4")
+  const checked = box.querySelector('input[name="p4-stage"]:checked')
+  if (checked && box.dataset.auto !== "1") return
+  const radio = stage ? box.querySelector(`input[name="p4-stage"][value="${GEM_STAGE[stage]}"]`) : null
+  if (checked) checked.checked = false
+  if (radio) radio.checked = true
+  box.dataset.auto = radio ? "1" : ""
+  autoPicking = true
+  box.querySelector("input").dispatchEvent(new Event("change", { bubbles: true }))
+  autoPicking = false
+}
+
+function paintStage() {
+  const info = ETAPAS.find(item => item[0] === stage)
+  document.querySelectorAll("[data-stage]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.stage === stage)))
+  document.querySelectorAll("[data-stage-label]").forEach(label => { label.textContent = info ? "Sua etapa:" : "Escolha a sua etapa para ver exemplos dela:" })
+
+  document.querySelectorAll("[data-sw]").forEach(element => {
+    // In the Gem practice, the request to test the Gem follows the kind of material picked there
+    if (element.id === "t4" && document.querySelector('input[name="p4-kind"]:checked')) return
+    const options = STAGE_SWAPS[element.dataset.sw]
+    const text = stage && options && options[stage] !== undefined ? options[stage] : swapOriginals.get(element)
+    if (element.matches("textarea")) element.value = text
+    else element.innerHTML = text
+  })
+  document.querySelectorAll("[data-line]").forEach(line => {
+    line.hidden = !stage
+    if (stage) line.innerHTML = "<b>Na sua etapa:</b> " + STAGE_LINES[stage][Number(line.dataset.line) - 1]
+  })
+
+  $("stage-hint").innerHTML = STAGE_HINTS[stage || "none"]
+  $("stage-clear").hidden = !stage
+  $("t3b-box").hidden = !stage
+  $("stage-remind").hidden = Boolean(stage) && !reminderUsed
+  $("remind-h").textContent = stage ? "Etapa escolhida" : "Falta escolher a sua etapa"
+  $("remind-text").textContent = stage ? `Pronto: ${info[1]}. Os exemplos dos módulos já são da sua etapa. Dá para trocar quando quiser.` : "Para ver exemplos da sua turma nos próximos módulos, escolha para quem você dá aula."
+  pickGemStage()
+  autosizeAll()
+}
+
+function setStage(id, fromReminder = false) {
+  stage = id
+  if (fromReminder) reminderUsed = true
+  saveStage()
+  paintStage()
+}
+
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-stage]")
+  if (button) return setStage(button.dataset.stage, Boolean(button.closest("#stage-remind")))
+  if (event.target.closest("#stage-clear")) {
+    reminderUsed = false
+    setStage(null)
+  }
+})
+
+function initStage() {
+  document.querySelectorAll("[data-sw]").forEach(element => swapOriginals.set(element, element.matches("textarea") ? element.value : element.innerHTML))
+  renderPickers()
+  readStage()
+  $("p4").addEventListener("change", event => {
+    if (!autoPicking && event.target.name === "p4-stage") $("p4").dataset.auto = ""
+  })
+  paintStage()
+  window.addEventListener("resize", autosizeAll)
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(autosizeAll)
+}
+
 // ---------- Moving between the parts of the course ----------
 
 const VIEWS = ["inicio", "modulo-1", "modulo-2", "modulo-3", "modulo-4", "modulo-em", "teste", "comprovante"]
@@ -1899,6 +2195,7 @@ function route() {
   $("home-link").hidden = name === "inicio"
   if (name === "teste" && quiz.stage !== "question") { quiz.stage = quiz.stage === "result" ? "result" : "intro"; renderQuiz() }
   if (name === "comprovante") showComp()
+  autosizeAll()
   if (!firstRoute) {
     window.scrollTo(0, 0)
     view.querySelector("h1").focus({ preventScroll: true })
@@ -1911,6 +2208,7 @@ practiceMissing()
 practiceHunt()
 practiceFix()
 practiceGem()
+initStage()
 renderQuiz()
 refresh()
 route()
