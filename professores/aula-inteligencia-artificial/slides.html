@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides da aula sobre IA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<style>
+  * { box-sizing: border-box }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky2) }
+  body { display: grid; place-items: center; color: var(--ink); font-family: var(--font); touch-action: manipulation }
+  .g { transform-box: fill-box; transform-origin: center }
+
+  /* The deck keeps a 16:9 shape and sizes everything in its own height, so it looks the same on any projector */
+  .deck { position: relative; width: min(100vw, 177.78vh); aspect-ratio: 16 / 9; container-type: size; overflow: hidden; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 80%); user-select: none; cursor: pointer }
+  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .9; animation: drift 50s linear infinite }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50% }
+  .cloud::before { width: 55%; height: 160%; left: 15%; bottom: 20% }
+  .cloud::after { width: 40%; height: 130%; right: 12%; bottom: 25% }
+  .c1 { width: 22cqh; height: 6cqh; top: 7%; animation-delay: -10s }
+  .c2 { width: 15cqh; height: 4.4cqh; top: 30%; animation-duration: 64s; animation-delay: -40s; opacity: .75 }
+  @keyframes drift { from { transform: translateX(-30cqw) } to { transform: translateX(130cqw) } }
+  .hills { position: absolute; left: 0; right: 0; bottom: 0; height: 13cqh }
+  .hills::before, .hills::after { content: ""; position: absolute; bottom: -40%; border-radius: 50% }
+  .hills::before { left: -20%; width: 90%; height: 140%; background: var(--hill) }
+  .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
+
+  .slide { position: absolute; inset: 0; z-index: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 3.4cqh; padding: 5cqh 7cqw 10cqh; text-align: center }
+  .slide.active { display: flex; animation: enter .5s cubic-bezier(.3, 1.4, .6, 1) }
+  @keyframes enter { from { opacity: 0; transform: translateY(4cqh) scale(.97) } }
+  h1, h2 { margin: 0; font-weight: 700; color: #fff; -webkit-text-stroke: 1cqh var(--ink); paint-order: stroke fill; text-shadow: 0 1cqh 0 var(--ink) }
+  h1 { font-size: 10.5cqh; line-height: 1.05 }
+  h2 { font-size: 8.4cqh; line-height: 1.08 }
+  h1 .y, h2 .y { color: var(--yellow) } h1 .p, h2 .p { color: var(--pink) } h2 .m { color: var(--mint) }
+  p { margin: 0; max-width: 80cqw; font-size: 4.2cqh; font-weight: 600; line-height: 1.35 }
+  p b { color: var(--ink); background: linear-gradient(transparent 58%, var(--yellow) 58%) }
+  .pill { padding: 1cqh 3.4cqh; background: var(--ink); color: #fff; border-radius: 999px; font-size: 3.6cqh; font-weight: 600 }
+  .row { display: flex; gap: 4cqh; align-items: center; justify-content: center }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 1.4cqh; padding: 3cqh 3.4cqh; background: var(--c, #fff); border: .8cqh solid var(--ink); border-radius: 5cqh; box-shadow: 0 1.2cqh 0 rgba(47, 42, 74, .28); font-size: 3.8cqh; font-weight: 700; line-height: 1.15; animation: pop .6s cubic-bezier(.3, 1.5, .6, 1) backwards }
+  .active .tile:nth-child(2) { animation-delay: .12s } .active .tile:nth-child(3) { animation-delay: .24s } .active .tile:nth-child(4) { animation-delay: .36s }
+  @keyframes pop { from { opacity: 0; transform: scale(.6) rotate(-6deg) } }
+  .tile svg { width: 18cqh; height: 18cqh; overflow: visible }
+  .tile small { font-size: 2.8cqh; font-weight: 500 }
+  .tile .tag { padding: .4cqh 2cqh; background: #fff; border: .5cqh solid var(--ink); border-radius: 999px; font-size: 3.2cqh }
+  .note { position: relative; max-width: 82cqw; padding: 3cqh 4cqh 2.4cqh; background: #fff1a8; border: .7cqh solid var(--ink); border-radius: 2cqh 2cqh 5cqh 2cqh; box-shadow: 0 1cqh 0 rgba(47, 42, 74, .25); font-size: 3.5cqh; font-weight: 500; line-height: 1.35; transform: rotate(-1deg) }
+  .note::before { content: ""; position: absolute; top: -2.4cqh; left: 50%; width: 16cqh; height: 4.4cqh; margin-left: -8cqh; background: var(--pink); opacity: .75; border: .3cqh solid rgba(47, 42, 74, .35); transform: rotate(-3deg) }
+  .wave { width: 34cqh; height: 34cqh; animation: wave 2.4s ease-in-out infinite; transform-origin: 50% 90%; overflow: visible }
+  @keyframes wave { 50% { transform: rotate(6deg) translateY(-1.5cqh) } }
+
+  /* Slide 3: the robot walks while the matching step lights up */
+  .board { position: relative; display: grid; grid-template-columns: repeat(4, 13cqh); gap: 1cqh; padding: 1cqh; background: var(--ink); border-radius: 2.6cqh; box-shadow: 0 1.2cqh 0 rgba(47, 42, 74, .28) }
+  .board div { height: 13cqh; background: #fff; border-radius: 1.8cqh; display: grid; place-items: center }
+  .board svg { width: 80%; height: 80% }
+  .board .walker { position: absolute; left: 1cqh; top: 1cqh; width: 13cqh; height: 13cqh; background: none; animation: walk 5s ease-in-out infinite }
+  @keyframes walk { 0%, 14% { transform: translateX(0) } 26%, 34% { transform: translateX(14cqh) } 46%, 54% { transform: translateX(28cqh) } 66%, 92% { transform: translateX(42cqh) } 100% { transform: translateX(0) } }
+  .steps { display: grid; gap: 1.2cqh; margin: 0; padding: 0; list-style: none }
+  .steps li { display: flex; align-items: center; gap: 1.6cqh; padding: 1cqh 2.6cqh 1cqh 1.2cqh; background: #fff; border: .6cqh solid var(--ink); border-radius: 999px; font-size: 3.8cqh; font-weight: 600; text-align: left; animation: 5s infinite }
+  .steps li i { display: grid; place-items: center; width: 6cqh; height: 6cqh; background: var(--blue); border: .5cqh solid var(--ink); border-radius: 50%; font-style: normal }
+  .steps li i svg { width: 3.6cqh; height: 3.6cqh }
+  .steps li:nth-child(1) { animation-name: s1 } .steps li:nth-child(2) { animation-name: s2 } .steps li:nth-child(3) { animation-name: s3 } .steps li:nth-child(4) { animation-name: s4 }
+  @keyframes s1 { 14%, 26% { background: var(--yellow); transform: scale(1.06) } }
+  @keyframes s2 { 34%, 46% { background: var(--yellow); transform: scale(1.06) } }
+  @keyframes s3 { 54%, 66% { background: var(--yellow); transform: scale(1.06) } }
+  @keyframes s4 { 66%, 92% { background: var(--mint); transform: scale(1.06) } }
+
+  /* Slide 8: the photo travels along the cables */
+  .flow { display: flex; align-items: center; gap: 1.6cqh }
+  .flow .tile { min-width: 28cqh }
+  .cable { width: 12cqh; height: 6cqh; overflow: visible }
+  .cable .run { stroke-dasharray: 3 5; animation: run .6s linear infinite }
+  @keyframes run { to { stroke-dashoffset: -8 } }
+
+  .games { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.4cqh }
+  .games .tile { flex-direction: row; gap: 2cqh; padding: 1.6cqh 2.6cqh; border-width: .7cqh; border-radius: 3cqh; font-size: 3.4cqh; text-align: left }
+  .games .tile svg { width: 11cqh; height: 11cqh; flex: none; background: rgba(255, 255, 255, .55); border-radius: 2cqh }
+  .qr { display: flex; flex-direction: column; align-items: center; gap: 1cqh; padding: 2.2cqh; background: #fff; border: .8cqh solid var(--ink); border-radius: 4cqh; box-shadow: 0 1.2cqh 0 rgba(47, 42, 74, .28); font-size: 3.2cqh; font-weight: 700; transform: rotate(2deg) }
+  .qr svg { width: 36cqh; height: 36cqh }
+  .qr small { font-size: 2.3cqh; font-weight: 500 }
+  .highlight { padding: 1.4cqh 4cqh; background: var(--orange); border: .7cqh solid var(--ink); border-radius: 999px; box-shadow: 0 1cqh 0 var(--ink); color: #fff; -webkit-text-stroke: .9cqh var(--ink); paint-order: stroke fill; font-size: 4.6cqh; font-weight: 700; animation: breathe 1.8s ease-in-out infinite }
+  @keyframes breathe { 50% { transform: scale(1.05) } }
+  .facts { display: flex; flex-wrap: wrap; gap: 1.6cqh; justify-content: center; margin: 0; padding: 0; list-style: none; max-width: 90cqw }
+  .facts li { padding: .8cqh 2.4cqh; background: var(--c); border: .5cqh solid var(--ink); border-radius: 999px; font-size: 2.9cqh; font-weight: 600 }
+  .closing { gap: 2.4cqh; padding-top: 4cqh }
+  .frase { padding: 2cqh 4cqh; background: #fff; border: .8cqh solid var(--ink); border-radius: 4cqh; box-shadow: 0 1.2cqh 0 rgba(47, 42, 74, .28); font-size: 6.4cqh; font-weight: 700 }
+  .frase u { text-decoration: none; display: inline-block; min-width: 18cqh; border-bottom: .8cqh dashed var(--pink) }
+  .chips-slide { display: flex; gap: 2cqh; flex-wrap: wrap; justify-content: center; margin: 0; padding: 0; list-style: none }
+  .chips-slide li { padding: 1cqh 3cqh; background: var(--c); border: .6cqh solid var(--ink); border-radius: 999px; font-size: 4cqh; font-weight: 700 }
+  .ptcf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2cqh; max-width: 92cqw }
+  .ptcf .tile { gap: 1cqh; padding: 2.4cqh 2cqh; font-size: 4.2cqh }
+  .ptcf .tile small { font-size: 2.6cqh; line-height: 1.25 }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 3cqh; max-width: 88cqw }
+  .two-col .tile { align-items: flex-start; text-align: left; font-size: 3.4cqh }
+  .two-col .tile ul { margin: 0; padding-left: 3cqh; font-weight: 600; font-size: 3cqh; line-height: 1.4 }
+  .course { display: flex; align-items: center; gap: 5cqh }
+  .course .qr svg { width: 20cqh; height: 20cqh }
+  .course .qr { padding: 1.6cqh 2.4cqh; transform: rotate(-2deg) }
+
+  /* Dots and a counter at the bottom, so the presenter knows where the class is */
+  .progress { position: absolute; z-index: 2; left: 0; right: 0; bottom: 3cqh; display: flex; justify-content: center; gap: 1.6cqh }
+  .progress span { width: 2.4cqh; height: 2.4cqh; border: .5cqh solid var(--ink); border-radius: 50%; background: #fff }
+  .progress span.seen { background: var(--yellow) }
+  .progress span.now { background: var(--pink); transform: scale(1.3) }
+  .hint { position: fixed; right: 12px; bottom: 8px; color: var(--soft); font-size: 13px; font-weight: 600 }
+  .progress button { width: 2.4cqh; height: 2.4cqh; padding: 0; border: .5cqh solid var(--ink); border-radius: 50%; background: #fff; cursor: pointer; position: relative }
+  .progress button::after { content: ""; position: absolute; inset: -1.2cqh }
+  .progress button.seen { background: var(--yellow) }
+  .progress button.now { background: var(--pink); transform: scale(1.3) }
+  /* Controles na tela para quem apresenta pelo mouse ou pelo toque: anterior, contador, próximo e tela cheia */
+  .controles { position: fixed; z-index: 5; left: 12px; bottom: 10px; display: flex; align-items: center; gap: 8px; opacity: .6; transition: opacity .2s }
+  .controles:hover, .controles:focus-within { opacity: 1 }
+  .controles button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: #fff; border: 3px solid var(--ink); border-radius: 50%; box-shadow: 0 3px 0 var(--ink); cursor: pointer }
+  .controles button:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .controles svg { width: 24px; height: 24px }
+  .contador { min-width: 64px; padding: 4px 10px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; text-align: center; font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums }
+  :root:fullscreen .hint { display: none }
+  /* Tela preta (tecla B ou ponto), para a turma olhar para quem fala */
+  .preto { position: fixed; inset: 0; z-index: 20; background: #000; cursor: pointer }
+  /* Para imprimir os slides: um por folha, deitada, cada um com o seu tamanho */
+  @page { size: A4 landscape; margin: 8mm }
+  @media print {
+    html, body { height: auto; overflow: visible; display: block; background: #fff }
+    .deck { width: auto; aspect-ratio: auto; overflow: visible; container-type: normal; background: none }
+    .slide { position: relative; display: flex !important; width: 277mm; height: 155mm; container-type: size; break-after: page; animation: none !important; background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 80%); border-radius: 4mm; print-color-adjust: exact; -webkit-print-color-adjust: exact }
+    .slide:last-of-type { break-after: auto }
+    .slide *, .slide *::before, .slide *::after { animation: none !important; transition: none !important }
+    .progress, .controles, .hint, .preto, .deck > .cloud, .deck > .hills { display: none !important }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important }
+  }
+</style>
+<script src="/identidade-visual/js/barra.js" data-modo="compacta" data-impressao="propria" defer></script>
+</head>
+<body>
+<script src="/identidade-visual/js/icones.js" data-simbolos></script>
+
+<main class="deck" id="deck">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="hills"></div>
+
+  <section class="slide">
+    <svg class="wave" viewBox="0 0 100 100" aria-hidden="true"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></svg>
+    <h1>O que é <span class="y">inteligência</span> <span class="p">artificial</span>?</h1>
+    <div class="pill">IA na escola · GamificaPampa · UNIPAMPA</div>
+  </section>
+
+  <section class="slide">
+    <h2>Onde a <span class="y">IA</span> já está no seu <span class="p">dia</span>?</h2>
+    <div class="row">
+      <div class="tile" style="--c: #ffd6e3"><svg viewBox="0 0 64 64"><rect x="6" y="12" width="52" height="38" rx="8" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="4"/><path d="M27 22 L41 31 L27 40 Z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg>Vídeos<br>recomendados</div>
+      <div class="tile" style="--c: #fff1a8"><svg viewBox="0 0 64 64"><rect x="4" y="18" width="56" height="32" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M12 27h6M24 27h6M36 27h6M48 27h4M12 36h6M24 36h16M46 36h6M18 44h28" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Teclado que<br>completa</div>
+      <div class="tile" style="--c: #cfe6ff"><svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="38" rx="7" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="33" r="11" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><path d="M20 14l4-6h16l4 6" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3.5" stroke-linejoin="round"/><path d="M46 20l2-4 2 4 4 2-4 2-2 4-2-4-4-2z" fill="#ffd23f"/></svg>Filtros<br>de foto</div>
+      <div class="tile" style="--c: #c9f5e3"><svg viewBox="0 0 64 64"><rect x="22" y="6" width="20" height="32" rx="10" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4"/><path d="M14 30a18 18 0 0 0 36 0M32 48v10M22 58h20" fill="none" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/></svg>Assistente<br>de voz</div>
+    </div>
+    <p>Muita coisa que você usa todo dia tem uma <b>IA</b> por trás.</p>
+  </section>
+
+  <section class="slide">
+    <h2>A IA <span class="y">aprende</span> com <span class="p">exemplos</span></h2>
+    <div class="flow">
+      <div class="tile" style="--c: #ffdcc4"><svg viewBox="0 0 64 64"><rect x="8" y="14" width="14" height="40" rx="3" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="3.5"/><rect x="24" y="10" width="14" height="44" rx="3" fill="#4da3ff" stroke="#2f2a4a" stroke-width="3.5"/><rect x="40" y="16" width="14" height="38" rx="3" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3.5"/></svg>Milhões de<br>textos e fotos</div>
+      <svg class="cable" viewBox="0 0 60 30"><path d="M4 15 H50 M43 9 L50 15 L43 21" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path class="run" d="M4 15 H46" stroke="#fff" stroke-width="1.6"/></svg>
+      <div class="tile" style="--c: #fff1a8"><svg viewBox="0 0 64 64"><g fill="#fff" stroke="#2f2a4a" stroke-width="3.5"><circle cx="14" cy="16" r="7"/><circle cx="32" cy="16" r="7" fill="#ffd23f"/><circle cx="50" cy="16" r="7"/><circle cx="14" cy="34" r="7" fill="#ffd23f"/><circle cx="32" cy="34" r="7"/><circle cx="50" cy="34" r="7" fill="#ffd23f"/><circle cx="14" cy="52" r="7"/><circle cx="32" cy="52" r="7" fill="#ffd23f"/><circle cx="50" cy="52" r="7"/></g></svg>Padrões<br>que se repetem</div>
+      <svg class="cable" viewBox="0 0 60 30"><path d="M4 15 H50 M43 9 L50 15 L43 21" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path class="run" d="M4 15 H46" stroke="#fff" stroke-width="1.6"/></svg>
+      <div class="tile" style="--c: #e2dbff"><svg viewBox="0 0 64 64"><path d="M6 10 H58 V42 H30 L17 55 V42 H6 Z" fill="#a08bff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M16 22h32M16 31h22" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>Uma resposta<br>nova</div>
+    </div>
+    <p>Ela não <b>entende</b> como a gente: ela acha padrões e usa para responder.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Complete a <span class="y">frase</span></h2>
+    <div class="frase">No inverno do Pampa faz muito <u>&nbsp;</u></div>
+    <ul class="chips-slide"><li style="--c: #cfe6ff">frio</li><li style="--c: #fff1a8">vento</li><li style="--c: #ffd6e3">calor?</li></ul>
+    <p>Você chutou a palavra <b>mais provável</b>. A IA generativa faz isso, palavra por palavra, milhões de vezes.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Por isso ela <span class="p">parece</span> saber tudo</h2>
+    <div class="note">IA generativa, como o Gemini e o ChatGPT, escreve textos, cria imagens e responde perguntas. Mas ela não consulta a verdade: ela monta a resposta mais provável com o que aprendeu.</div>
+    <p>Se os exemplos tinham erros ou preconceitos, ela aprende isso também.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Onde a IA <span class="p">erra</span></h2>
+    <div class="row">
+      <div class="tile" style="--c: #fff1a8"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><text x="32" y="44" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="34" fill="#2f2a4a">?</text></svg>Inventa fatos<br><small>com toda a certeza</small></div>
+      <div class="tile" style="--c: #cfe6ff"><svg viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="52" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="16" y="12" width="32" height="12" rx="3" fill="#c9f5e3" stroke="#2f2a4a" stroke-width="3"/><path d="M20 34h6M38 34h6M20 46h6M38 46h6" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/></svg>Erra contas<br><small>e datas</small></div>
+      <div class="tile" style="--c: #ffd6e3"><svg viewBox="0 0 64 64"><path d="M14 6h26l10 10v42H14z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M20 24h22M20 32h22M20 40h14" stroke="#9aa3c2" stroke-width="3.5" stroke-linecap="round"/><path d="M38 44l14 14M52 44L38 58" stroke="#e53950" stroke-width="5" stroke-linecap="round"/></svg>Inventa fontes<br><small>e citações</small></div>
+      <div class="tile" style="--c: #ffdcc4"><svg viewBox="0 0 64 64"><path d="M32 10v44M18 54h28M10 20h44" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/><path d="M10 20l-6 16h12zM54 20l-6 22h12z" fill="#ff8a3d" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg>Repete<br><small>preconceitos</small></div>
+    </div>
+    <p>Quando ela inventa com cara de verdade, o nome é <b>alucinação</b>.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Quem <span class="y">confere</span> é você</h2>
+    <div class="note">Já houve advogado que levou ao tribunal processos inventados por uma IA, com nome, número e data, que nunca existiram.</div>
+    <ul class="chips-slide"><li style="--c: #c9f5e3">Site oficial</li><li style="--c: #cfe6ff">Livro didático</li><li style="--c: #fff1a8">Jornal conhecido</li><li style="--c: #ffd6e3">Professor</li></ul>
+    <p>Número, data ou frase de alguém: só vale depois de achar <b>em duas fontes</b>.</p>
+  </section>
+
+  <section class="slide">
+    <h2><span class="y">Pergunte</span> bem</h2>
+    <div class="ptcf">
+      <div class="tile" style="--c: #cfe6ff">Papel<small>Você é professor de História.</small></div>
+      <div class="tile" style="--c: #ffd6e3">Tarefa<small>Explique a Revolução Farroupilha.</small></div>
+      <div class="tile" style="--c: #c9f5e3">Contexto<small>Para um estudante de 15 anos, que vai fazer prova amanhã.</small></div>
+      <div class="tile" style="--c: #fff1a8">Formato<small>Em 5 tópicos curtos, com 3 perguntas no fim.</small></div>
+    </div>
+    <p>Pedido vago, resposta vaga. Quanto mais claro o pedido, melhor a resposta.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Cuide dos seus <span class="p">dados</span></h2>
+    <div class="row">
+      <div class="tile" style="--c: #fff1a8"><svg viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="42" r="4" fill="#2f2a4a"/></svg>Nada de senha,<br><small>endereço ou documento</small></div>
+      <div class="tile" style="--c: #ffd6e3"><svg viewBox="0 0 64 64"><circle cx="32" cy="20" r="11" fill="#ffd9b8" stroke="#2f2a4a" stroke-width="4"/><path d="M12 58c2-14 10-20 20-20s18 6 20 20z" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M44 10l12 12M56 10L44 22" stroke="#e53950" stroke-width="4" stroke-linecap="round"/></svg>Nada de foto<br><small>de colega sem permissão</small></div>
+      <div class="tile" style="--c: #e2dbff"><svg viewBox="0 0 64 64"><path d="M8 20q24-10 48 0v12q0 18-24 22Q8 50 8 32z" fill="#e2dbff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><ellipse cx="22" cy="30" rx="6" ry="4" fill="#2f2a4a"/><ellipse cx="42" cy="30" rx="6" ry="4" fill="#2f2a4a"/><path d="M24 44q8 4 16 0" fill="none" stroke="#2f2a4a" stroke-width="3.5" stroke-linecap="round"/></svg>Desconfie de vídeo<br><small>perfeito demais</small></div>
+    </div>
+    <p>O que você manda para uma IA pode ser guardado. E vídeo falso feito com IA, o <b>deepfake</b>, engana e machuca.</p>
+  </section>
+
+  <section class="slide">
+    <h2>IA para <span class="y">aprender</span>, não para <span class="p">copiar</span></h2>
+    <div class="two-col">
+      <div class="tile" style="--c: #c9f5e3">Pode ajudar a<ul><li>tirar uma dúvida, passo a passo</li><li>pedir exemplos para estudar</li><li>revisar o seu texto</li><li>treinar para a prova</li></ul></div>
+      <div class="tile" style="--c: #ffd6e3">Não vale<ul><li>entregar texto pronto como seu</li><li>usar na prova</li><li>mandar dados de outra pessoa</li><li>acreditar sem conferir</li></ul></div>
+    </div>
+    <p>Usou IA num trabalho? <b>Conte qual pedido você fez</b>.</p>
+  </section>
+
+  <section class="slide closing">
+    <h2>IA é ferramenta. Quem <span class="y">pensa</span> é você!</h2>
+    <p>Treine o olhar de detetive: ache os erros de uma IA no jogo.</p>
+    <div class="course">
+      <svg class="wave" viewBox="0 0 100 100" style="width: 18cqh; height: 18cqh"><use href="#bot"/></svg>
+      <div class="qr">
+        <svg viewBox="0 0 41 41" shape-rendering="crispEdges"><use href="#qr-detetive"/></svg>
+        Detetive da IA
+        <small>gamificapampa.github.io/<wbr>detetive-ia</small>
+      </div>
+    </div>
+  </section>
+
+  <nav class="progress" id="progress"></nav>
+</main>
+<div class="hint">← → passam os slides · F tela cheia · B tela preta</div>
+<div class="controles" id="controles">
+  <button type="button" id="anterior" aria-label="Slide anterior"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M27 16H8M15 9l-7 7 7 7" fill="none" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <span class="contador" id="contador" aria-live="polite"></span>
+  <button type="button" id="proximo" aria-label="Próximo slide"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 16h19M17 9l7 7-7 7" fill="none" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button type="button" id="cheia" aria-label="Tela cheia"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="9" y="9" width="14" height="14" rx="2" fill="#cdeeff" stroke="#2f2a4a" stroke-width="2"/><path d="M4 11V4h7M21 4h7v7M28 21v7h-7M11 28H4v-7" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+<div class="preto" id="preto" hidden></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="qr-detetive" viewBox="0 0 41 41"><rect width="41" height="41" fill="#fff"/><path stroke="#000" d="M4 4.5h7m3 0h3m3 0h1m1 0h2m1 0h1m1 0h1m2 0h7m-33 1h1m5 0h1m3 0h3m2 0h1m2 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h1m4 0h3m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h5m5 0h1m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h10m2 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h2m7 0h1m1 0h1m1 0h1m1 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m1 0h3m1 0h1m1 0h1m1 0h6m-24 1h1m1 0h5m5 0h3m2 0h1m1 0h1m2 0h3m1 0h5m-29 1h1m4 0h2m2 0h1m1 0h1m3 0h4m2 0h1m2 0h2m1 0h2m1 0h1m-33 1h4m2 0h4m1 0h5m1 0h1m4 0h1m2 0h1m2 0h1m1 0h2m-30 1h3m3 0h3m2 0h1m3 0h2m5 0h1m1 0h1m1 0h3m-30 1h1m1 0h2m1 0h1m2 0h4m1 0h3m3 0h6m2 0h2m1 0h1m-32 1h1m1 0h4m1 0h2m1 0h1m4 0h1m2 0h1m2 0h1m2 0h1m1 0h1m2 0h4m-33 1h2m3 0h4m4 0h5m2 0h1m4 0h2m2 0h3m-31 1h2m1 0h2m1 0h1m2 0h1m2 0h3m5 0h2m1 0h7m-31 1h5m1 0h1m3 0h1m3 0h2m1 0h1m2 0h1m1 0h1m1 0h2m1 0h3m2 0h1m-31 1h2m4 0h3m1 0h1m3 0h1m1 0h4m1 0h1m2 0h2m1 0h2m1 0h1m-33 1h1m1 0h2m2 0h2m2 0h2m2 0h3m1 0h1m1 0h2m3 0h1m1 0h2m1 0h2m-31 1h2m2 0h1m2 0h2m1 0h2m2 0h2m3 0h3m2 0h1m1 0h6m-32 1h2m3 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h2m2 0h3m1 0h2m-33 1h3m2 0h1m1 0h2m2 0h7m2 0h4m2 0h1m2 0h2m1 0h1m-33 1h1m3 0h3m2 0h3m2 0h1m3 0h2m1 0h1m3 0h1m1 0h1m2 0h2m-32 1h1m2 0h3m1 0h1m2 0h1m3 0h1m1 0h1m2 0h4m1 0h3m2 0h4m-33 1h1m1 0h1m3 0h1m1 0h6m2 0h2m1 0h1m2 0h7m3 0h1m-25 1h3m1 0h2m2 0h2m1 0h2m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m-33 1h7m3 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h1m1 0h2m1 0h3m1 0h2m4 0h2m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h5m1 0h1m3 0h3m1 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h6m1 0h1m2 0h1m2 0h1m1 0h3m2 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h5m1 0h3m3 0h2m2 0h1m1 0h2m1 0h2m-31 1h1m5 0h1m4 0h5m2 0h1m2 0h1m3 0h2m1 0h3m-31 1h7m1 0h2m1 0h1m1 0h1m1 0h1m1 0h1m4 0h4m1 0h1m1 0h1m1 0h1"/></symbol>
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
+</svg>
+
+<script>
+const slides = [...document.querySelectorAll(".slide")]
+const progress = document.getElementById("progress")
+let current = 0
+
+// Showing one slide and remembering it in the address, so reloading the page keeps the class where it was
+function show(index) {
+  current = Math.max(0, Math.min(slides.length - 1, index))
+  slides.forEach((slide, number) => slide.classList.toggle("active", number === current))
+  progress.innerHTML = slides.map((_, number) => `<button type="button" data-slide="${number}" aria-label="Slide ${number + 1}" class="${number < current ? "seen" : ""} ${number === current ? "now" : ""}"></button>`).join("")
+  document.getElementById("contador").textContent = `${current + 1} / ${slides.length}`
+  history.replaceState(null, "", "#" + (current + 1))
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) document.exitFullscreen()
+  else document.documentElement.requestFullscreen?.()
+}
+
+// Moving with the arrows and the keys a presentation clicker sends, and F for full screen
+document.addEventListener("keydown", event => {
+  if (event.metaKey || event.ctrlKey || event.altKey) return
+  // Enter e Espaço num botão da tela são do botão, não dos slides
+  if ((event.key === "Enter" || event.key === " ") && event.target.closest("button")) return
+  if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(event.key)) show(current + 1)
+  else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(event.key)) show(current - 1)
+  else if (event.key === "Home") show(0)
+  else if (event.key === "End") show(slides.length - 1)
+  else if (event.key === "f" || event.key === "F") toggleFullscreen()
+  else if (event.key === "b" || event.key === "B" || event.key === ".") toggleBlack()
+  else return
+  event.preventDefault()
+})
+
+// Clicking the right side of the slide goes forward and the left side goes back, and a swipe works on phones
+let swipeStart = null
+document.getElementById("deck").addEventListener("pointerdown", event => { swipeStart = event.clientX })
+document.getElementById("deck").addEventListener("pointerup", event => {
+  if (event.target.closest(".progress")) return
+  const distance = event.clientX - swipeStart
+  if (Math.abs(distance) > 50) return show(current + (distance < 0 ? 1 : -1))
+  const box = event.currentTarget.getBoundingClientRect()
+  show(current + (event.clientX - box.left > box.width / 3 ? 1 : -1))
+})
+
+// Tela preta: some tudo até a próxima tecla ou toque
+function toggleBlack() {
+  const preto = document.getElementById("preto")
+  preto.hidden = !preto.hidden
+}
+document.getElementById("preto").addEventListener("click", toggleBlack)
+document.getElementById("anterior").addEventListener("click", () => show(current - 1))
+document.getElementById("proximo").addEventListener("click", () => show(current + 1))
+document.getElementById("cheia").addEventListener("click", toggleFullscreen)
+progress.addEventListener("click", event => {
+  const bolinha = event.target.closest("[data-slide]")
+  if (bolinha) show(Number(bolinha.dataset.slide))
+})
+
+show(Number(location.hash.slice(1)) - 1 || 0)
+</script>
+</body>
+</html>
