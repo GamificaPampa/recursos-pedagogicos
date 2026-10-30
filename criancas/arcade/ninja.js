@@ -25,17 +25,17 @@
     raf = requestAnimationFrame(frame);
   }
 
-  function start(){ spawnT = setTimeout(wave, 300); }
+  function start(){ spawnT = A.later(wave, 300); }
 
   function stop(){
-    clearTimeout(spawnT);
+    A.cancel(spawnT);
     down = false;
   }
 
   function destroy(){
     if(!alive) return;
     alive = false;
-    clearTimeout(spawnT);
+    A.cancel(spawnT);
     cancelAnimationFrame(raf);
     stage.removeEventListener('pointerdown', onDown);
     stage.removeEventListener('pointermove', onMove);
@@ -47,8 +47,8 @@
     if(!api.running) return;
     var p = api.progress();
     var n = 1 + (Math.random() < 0.3 + p * 0.5 ? 1 : 0) + (p > 0.5 && Math.random() < 0.4 ? 1 : 0);
-    for(var i = 0; i < n; i++) setTimeout(launch, i * 150);
-    spawnT = setTimeout(wave, (1150 - 550 * p + Math.random() * 250) / api.speed());
+    for(var i = 0; i < n; i++) A.later(launch, i * 150);
+    spawnT = A.later(wave, (1150 - 550 * p + Math.random() * 250) / api.speed());
   }
 
   function launch(){
@@ -167,6 +167,8 @@
 
   function frame(now){
     if(!alive) return;
+    // Com o professor pausando, nada anda
+    if(A.paused){ last = now; raf = requestAnimationFrame(frame); return; }
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     update(dt, now);
@@ -320,6 +322,7 @@
       ['fogo', 'Corte 3 ou mais de uma vez só para fazer combo']
     ],
     duration:30000, lives:3, failText:'Arquivos demais apagados!',
+    goal:'Aqui não tem resposta certa: o objetivo é cortar os glitches e deixar os disquetes inteiros. Cada disquete cortado tira uma vida, e cortar 3 ou mais num só deslize dá bônus.',
     learn:'Debugar é encontrar e eliminar erros, tomando cuidado para não apagar o que já funciona. Quem programa faz isso todos os dias!',
     real:'Programadores usam depuradores (debuggers), breakpoints e logs para pausar o programa e achar a linha exata do erro. E antes de apagar código, conferem se nada importante vai quebrar junto.',
     ranks:[[450, 'trofeu', 'Ninja Lendário(a) do Debug'], [280, 'ouro', 'Mestre(a) do Debug'], [140, 'espada', 'Caçador(a) de Glitches'], [0, 'broto', 'Aprendiz de Ninja']],

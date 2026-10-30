@@ -37,14 +37,21 @@
     raf = requestAnimationFrame(frame);
   }
 
-  function start(){ spawnT = setTimeout(spawn, 400); }
+  function start(){ spawnT = A.later(spawn, 400); }
 
-  function stop(){ clearTimeout(spawnT); }
+  function stop(){ A.cancel(spawnT); }
+
+  // Os efeitos do robô (café, dano, alegria) têm hora para acabar: o tempo parado pelo professor não conta
+  function resume(gap){
+    if(slowUntil) slowUntil += gap;
+    if(hurtUntil) hurtUntil += gap;
+    if(happyUntil) happyUntil += gap;
+  }
 
   function destroy(){
     if(!alive) return;
     alive = false;
-    clearTimeout(spawnT);
+    A.cancel(spawnT);
     cancelAnimationFrame(raf);
     stage.removeEventListener('pointerdown', onPoint);
     stage.removeEventListener('pointermove', onPoint);
@@ -76,7 +83,7 @@
     };
     if(type === 'power'){ var ks = Object.keys(POWERS); it.power = ks[Math.floor(Math.random() * ks.length)]; }
     items.push(it);
-    spawnT = setTimeout(spawn, (720 - 330 * p + Math.random() * 150) / api.speed());
+    spawnT = A.later(spawn, (720 - 330 * p + Math.random() * 150) / api.speed());
   }
 
   function burst(x, y, color, n){
@@ -146,6 +153,8 @@
 
   function frame(now){
     if(!alive) return;
+    // Com o professor pausando, nada anda
+    if(A.paused){ last = now; raf = requestAnimationFrame(frame); return; }
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     var slow = now < slowUntil ? 0.45 : 1;
@@ -265,6 +274,8 @@
       ['bug', 'Fuja dos bugs! Os poderes café, escudo e teste ajudam']
     ],
     duration:40000, lives:3, failText:'Bugs demais no app!',
+    goal:'Aqui não tem resposta certa: o objetivo é pegar as peças de código e desviar dos bugs. A cada 8 peças sai uma versão nova do app, e cada bug que entra tira uma vida.',
+    resume:resume,
     learn:'Software é construído peça por peça e lançado em versões (1.0, 2.0, 3.0...). Cada versão nova traz melhorias, e o time precisa manter os bugs longe!',
     real:'O código fica guardado no Git, e cada mudança passa por testes automáticos antes de virar uma versão nova. Isso se chama CI/CD. É assim que seus apps recebem atualizações quase toda semana.',
     ranks:[[520, 'trofeu', 'Arquiteto(a) de Software'], [340, 'ouro', 'Engenheiro(a) Sênior'], [170, 'computador', 'Engenheiro(a) Júnior'], [0, 'broto', 'Aprendiz de Robótica']],

@@ -189,6 +189,9 @@
   #difficulties button:hover { transform: translateY(-3px) rotate(-2deg) }
   #difficulties button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink) }
   #difficulties button.chosen { outline: 5px solid var(--pink); outline-offset: 4px }
+  /* As estrelas guardadas no aparelho: o total de cada dificuldade */
+  #difficulties .contagem { display: inline-flex; align-items: center; gap: 3px; font: 700 min(17px, 4vw) var(--font); font-style: normal; pointer-events: none }
+  #difficulties .contagem svg { width: 22px; height: 22px }
   #start p { font-size: min(30px, 4.6vw); font-weight: 600; margin: 0; max-width: 900px; line-height: 1.35 }
   #final { overflow: auto; justify-content: flex-start; padding: 16px }
   #final > * { flex-shrink: 0 }
@@ -230,14 +233,14 @@
     #budget .plug { width: 20px; height: 20px }
     #mute { margin-left: 10px; width: 44px; height: 44px }
     #mute svg { width: 22px; height: 22px }
-    html, body { overflow: auto }
+    html, body { overflow-x: hidden; overflow-y: auto }
   }
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="hills"></div></div>
 
-<header><span id="dots"></span><span id="budget" hidden></span><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
+<header><span id="fases"><span id="dots"></span></span><span id="budget" hidden></span><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
 <main><div id="board"></div><ol id="code"></ol></main>
 <nav>
   <button class="erase" data-key="Backspace" tabindex="-1" aria-label="Apagar"><svg viewBox="0 0 24 24"><path d="M9 5 H20 A1.5 1.5 0 0 1 21.5 6.5 V17.5 A1.5 1.5 0 0 1 20 19 H9 L2.5 12 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M11.5 9.5 L16.5 14.5 M16.5 9.5 L11.5 14.5" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/></svg></button>
@@ -374,7 +377,19 @@ const board = document.getElementById("board")
 let difficulty = 0, levels = DIFFICULTIES[difficulty].levels, level, rows, nodes, budget = Infinity, cables = [], drawing = null, delivered = new Set(), missing = new Set(), flow = [], warning = ""
 let cellSize = 100, running = false, muted = false, audio, musicTimer, musicStep = 0, warningTimer
 
-const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
+// As esperas guardam quanto falta, para o modo professor poder parar o jogo e continuar de onde parou
+let frozen = false, frozenTotal = 0, frozenSince = 0, runId = 0, answer = null
+const waits = new Set()
+const wait = milliseconds => new Promise(resolve => {
+  const entry = { left: milliseconds, since: 0, timer: 0 }
+  entry.go = () => {
+    if (entry.since) return
+    entry.since = performance.now()
+    entry.timer = setTimeout(() => { waits.delete(entry); resolve() }, entry.left)
+  }
+  waits.add(entry)
+  if (!frozen) entry.go()
+})
 const isShown = id => document.getElementById(id).classList.contains("show")
 const same = (a, b) => a[0] === b[0] && a[1] === b[1]
 const key = ([row, column]) => row * rows[0].length + column
@@ -385,7 +400,7 @@ const cablesAt = cell => cables.filter(cable => same(cable.cells[0], cell) || sa
 
 // Playing a short melody with the Web Audio API, created lazily because browsers block audio before the first key press
 function beep(frequencies, { type = "triangle", volume = 0.25, spacing = 0.12, length = 0.25 } = {}) {
-  if (muted) return
+  if (muted || frozen) return
   audio ??= new AudioContext()
   audio.resume()
   frequencies.forEach((frequency, index) => {
@@ -404,6 +419,7 @@ function beep(frequencies, { type = "triangle", volume = 0.25, spacing = 0.12, l
 // Starting the soft background music once, on the first key press or click, with a bass note every four steps
 function startMusic() {
   musicTimer ??= setInterval(() => {
+    if (frozen) return
     const note = MELODY[musicStep % MELODY.length]
     if (note) beep([note], { volume: 0.04, length: 0.22 })
     if (musicStep % 4 === 0) beep([musicStep % 8 ? 196 : 131], { type: "sine", volume: 0.08, length: 0.5 })
@@ -434,6 +450,7 @@ function loadLevel(number) {
   missing = new Set()
   flow = []
   warning = ""
+  answer = null
   board.style.gridTemplateColumns = `repeat(${rows[0].length}, var(--cell))`
   board.innerHTML = rows.join("").split("").map(symbol =>
     `<div class="cell">${symbol === "#" ? '<svg><use href="#rock"/></svg>' : ""}</div>`).join("") + '<svg id="wires"></svg>'
@@ -449,9 +466,10 @@ function loadLevel(number) {
   draw()
 
   // Bit, in the corner, explains the system on the first level and asks for short cables on the next ones
-  setTimeout(() => window.Bit?.diz(level === 0 ? "acenando" : "pensando", level === 0
+  const loaded = level
+  wait(600).then(() => loaded === level && window.Bit?.diz(level === 0 ? "acenando" : "pensando", level === 0
     ? "Ligue cada celular ao servidor e o servidor ao banco de dados. Depois aperte play para ver a foto viajar!"
-    : `Fase ${level + 1}! Tente gastar o mínimo de cabo.`, level === 0 ? 6000 : 3500), 600)
+    : `Fase ${level + 1}! Tente gastar o mínimo de cabo.`, level === 0 ? 6000 : 3500))
 }
 
 // Switching to the five levels of a difficulty, starting from the first
@@ -477,7 +495,9 @@ function render() {
     return (missing.has(key(cell)) ? `<circle class="missing" cx="${x}" cy="${y}" r="${cellSize * 0.47}"/>` : "") +
       `<use href="#${icon}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}"/>`
   }).join("")
-  wires.innerHTML = `<g fill="none" stroke-linecap="round" stroke-linejoin="round">${cableMarkup}${drawing ? line(drawing.cells, "#ffd84d") : ""}</g>${nodeMarkup}<g id="packets"></g>`
+  // A resposta do modo professor: os cabos mais curtos, em laranja com brilho, até o próximo toque
+  const answerMarkup = answer ? `<g class="gp-resposta" fill="none" stroke-linecap="round" stroke-linejoin="round">${answer.map(cells => line(cells, "#ff8a3d")).join("")}</g>` : ""
+  wires.innerHTML = `<g fill="none" stroke-linecap="round" stroke-linejoin="round">${cableMarkup}${drawing ? line(drawing.cells, "#ffd84d") : ""}</g>${answerMarkup}${nodeMarkup}<g id="packets"></g>`
   const pill = document.getElementById("budget")
   pill.hidden = budget === Infinity
   pill.innerHTML = `${PLUG} ${stepsUsed()} / ${budget}`
@@ -500,8 +520,14 @@ function outOfCable() {
 
 // Writing every cable as a line of code, then the messages that run through the system, and a red line for any mistake
 function draw() {
-  document.getElementById("dots").innerHTML = levels.map((_, index) =>
-    `<span class="dot ${index < level ? "done" : ""} ${index === level ? "now" : ""}"></span>`).join(" ")
+  // Os pontinhos são as fases: ficam no lugar e só mudam de marca, para a barra do modo professor acompanhar
+  const dots = document.getElementById("dots")
+  if (dots.children.length !== levels.length) dots.innerHTML = levels.map(() => '<span class="dot fase"></span>').join(" ")
+  ;[...dots.children].forEach((dot, index) => {
+    dot.className = `dot fase ${index < level ? "done" : ""} ${index === level ? "now" : ""}`
+    dot.setAttribute("aria-pressed", String(index === level))
+    dot.title = `Fase ${index + 1}: ${Jogo.progresso.estrelas(stageKey(difficulty, index))} de 3 estrelas`
+  })
   const cableLines = cables.map(cable => {
     const [from, to] = [nodeAt(cable.cells[0]), nodeAt(cable.cells.at(-1))]
     return `<li>${from.name}.ligar(${to.name})</li>`
@@ -663,9 +689,11 @@ function fewestSteps() {
 function travel(cells, color) {
   return new Promise(resolve => {
     const points = cells.map(center), duration = (points.length - 1) * 160
-    let begin
+    let begin, skipped = 0
     const packet = document.createElementNS("http://www.w3.org/2000/svg", "circle")
     packet.setAttribute("r", cellSize * 0.16)
+    packet.setAttribute("cx", points[0][0])
+    packet.setAttribute("cy", points[0][1])
     packet.setAttribute("fill", color)
     packet.setAttribute("stroke", "#1d2a44")
     packet.setAttribute("stroke-width", 4)
@@ -674,8 +702,10 @@ function travel(cells, color) {
     // Starting the clock on the first frame, since browsers stamp a frame with the time it began,
     // which can come before the moment the packet was created
     function step(now) {
-      begin ??= now
-      const progress = Math.min(1, Math.max(0, now - begin) / duration) * (points.length - 1)
+      // Com o professor pausando, o pacote espera e o tempo parado não conta
+      if (frozen) return requestAnimationFrame(step)
+      if (begin === undefined) { begin = now; skipped = frozenTotal }
+      const progress = Math.min(1, Math.max(0, now - begin - (frozenTotal - skipped)) / duration) * (points.length - 1)
       const index = Math.min(points.length - 2, Math.floor(progress)), fraction = progress - index
       packet.setAttribute("cx", points[index][0] + (points[index + 1][0] - points[index][0]) * fraction)
       packet.setAttribute("cy", points[index][1] + (points[index + 1][1] - points[index][1]) * fraction)
@@ -711,21 +741,28 @@ async function play() {
   }
   running = true
   flow = []
+  const id = ++runId
   const phoneCables = cables.filter(cable => symbolAt(cable.cells[0]) === "P")
   const databaseCable = cables.find(cable => symbolAt(cable.cells[0]) === "S")
   say('celular.pedir("foto")')
   await Promise.all(phoneCables.map(cable => travel(cable.cells, REQUEST)))
+  if (id !== runId) return
   say('servidor.buscar("foto")')
   await travel(databaseCable.cells, REQUEST)
+  if (id !== runId) return
   say('banco.ler("foto")')
   await wait(400)
+  if (id !== runId) return
   say("servidor.responder(foto)")
   await travel(databaseCable.cells.slice().reverse(), ANSWER)
+  if (id !== runId) return
   await Promise.all(phoneCables.map(cable => travel(cable.cells.slice().reverse(), ANSWER)))
+  if (id !== runId) return
   phoneCables.forEach(cable => delivered.add(key(cable.cells[0])))
   say("celular.mostrar(foto)")
   render()
   await wait(800)
+  if (id !== runId) return
   win()
 }
 
@@ -747,7 +784,9 @@ function win() {
   // Awarding 3 stars for the shortest cables, 2 for up to two extra steps and 1 otherwise, with a chime per star
   const steps = stepsUsed(), fewest = fewestSteps()
   const stars = steps <= fewest ? 3 : steps <= fewest + 2 ? 2 : 1
-  for (let index = 0; index < stars; index++) setTimeout(() => beep([1047 + index * 262]), 600 + index * 300)
+  Jogo.progresso.guardar(stageKey(difficulty, level), stars)
+  showSavedStars()
+  for (let index = 0; index < stars; index++) wait(600 + index * 300).then(() => beep([1047 + index * 262]))
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   overlay.classList.add("show")
@@ -763,6 +802,10 @@ function win() {
 function press(key) {
   startMusic()
   if (running) return
+  if (answer) {
+    answer = null
+    render()
+  }
 
   // Showing or hiding the full screen QR code that opens the game on a phone
   const phone = document.getElementById("phone")
@@ -817,11 +860,34 @@ Jogo.som.aoMudar(ligado => {
 })
 document.querySelector("#final p").after(Jogo.acoesDoFim(() => press("Enter")))
 
+// As estrelas de cada fase ficam guardadas no aparelho. A fase é o número da dificuldade (1 a 3) e o da fase (1 a 5):
+// 11 a 15 no Fácil, 21 a 25 no Normal e 31 a 35 no Desafio
+const stageKey = (chosen, number) => (chosen + 1) * 10 + number + 1
+const STAR = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>'
+function showSavedStars() {
+  document.querySelectorAll("#difficulties button").forEach((button, index) => {
+    const count = DIFFICULTIES[index].levels.length
+    let total = 0
+    for (let number = 0; number < count; number++) total += Jogo.progresso.estrelas(stageKey(index, number))
+    const box = button.querySelector(".contagem")
+    box.setAttribute("aria-label", `${total} de ${count * 3} estrelas`)
+    box.innerHTML = `${STAR} ${total}/${count * 3}`
+  })
+}
+
+// Teclas do modo professor: P liga e desliga, e com ele ligado A, S, R e E são dele (a R do jogo vira o botão de apagar).
+// A barra e a cortina da pausa recebem Enter, espaço e Tab sem mexer no jogo
+function professorKey(event) {
+  if (Jogo.modoProfessor.pausado || event.target.closest?.(".gp-prof, .gp-prof-cortina")) return true
+  const key = event.key.toLowerCase()
+  return key === "p" || (Jogo.modoProfessor.ligado && ["a", "s", "r", "e"].includes(key))
+}
 
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
   // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
   if (/^F\d{1,2}$/.test(event.key)) return
+  if (professorKey(event)) return
   event.preventDefault()
   press(event.key)
 })
@@ -831,13 +897,112 @@ document.querySelectorAll("#win, #phone").forEach(overlay => overlay.addEventLis
 
 // Building the difficulty buttons of the first screen
 document.getElementById("difficulties").innerHTML = DIFFICULTIES.map((choice, index) =>
-  `<button data-difficulty="${index}" tabindex="-1">${LEVEL_ICONS[choice.icon]}<span>${choice.name}</span></button>`).join("")
+  `<button data-difficulty="${index}" tabindex="-1">${LEVEL_ICONS[choice.icon]}<span>${choice.name}</span><i class="contagem" role="img"></i></button>`).join("")
 document.getElementById("difficulties").addEventListener("click", event => {
   const button = event.target.closest("button")
   if (button) press(String(Number(button.dataset.difficulty) + 1))
 })
+// A marca da resposta sai no próximo toque
+addEventListener("pointerdown", event => {
+  if (!answer || event.target.closest?.(".gp-prof")) return
+  answer = null
+  render()
+}, true)
+showSavedStars()
 addEventListener("resize", resize)
 loadLevel(0)
+
+// Todos os caminhos mais curtos entre duas máquinas, andando só por casas livres
+function shortestPaths(from, to) {
+  const spread = origin => {
+    const distance = new Map([[key(origin), 0]])
+    let frontier = [origin]
+    while (frontier.length) {
+      const next = []
+      for (const [row, column] of frontier) {
+        for (const [rowStep, columnStep] of STEPS) {
+          const cell = [row + rowStep, column + columnStep]
+          if (symbolAt(cell) !== "." || distance.has(key(cell))) continue
+          distance.set(key(cell), distance.get(key([row, column])) + 1)
+          next.push(cell)
+        }
+      }
+      frontier = next
+    }
+    return distance
+  }
+  const fromHere = spread(from), toThere = spread(to), total = shortest(from, to), paths = []
+  const walk = (path, steps) => {
+    const [row, column] = path.at(-1)
+    for (const [rowStep, columnStep] of STEPS) {
+      const cell = [row + rowStep, column + columnStep]
+      if (same(cell, to)) {
+        if (steps + 1 === total) paths.push(path.concat([cell]))
+        continue
+      }
+      if (symbolAt(cell) !== "." || fromHere.get(key(cell)) !== steps + 1 || fromHere.get(key(cell)) + (toThere.get(key(cell)) ?? Infinity) !== total) continue
+      walk(path.concat([cell]), steps + 1)
+    }
+  }
+  walk([from], 0)
+  return paths
+}
+
+// Um jeito de ligar tudo com o cabo mais curto de cada ligação, sem cabos no mesmo lugar: a resposta do professor
+function solution() {
+  const server = nodes.find(node => node.symbol === "S").cell, database = nodes.find(node => node.symbol === "D").cell
+  const links = nodes.filter(node => node.symbol === "P").map(node => [node.cell, server]).concat([[server, database]])
+  const options = links.map(([from, to]) => shortestPaths(from, to)), chosen = [], used = new Set()
+  const pick = index => {
+    if (index === options.length) return true
+    for (const path of options[index]) {
+      const inner = path.slice(1, -1).map(key)
+      if (inner.some(cell => used.has(cell))) continue
+      inner.forEach(cell => used.add(cell))
+      chosen.push(path)
+      if (pick(index + 1)) return true
+      chosen.pop()
+      inner.forEach(cell => used.delete(cell))
+    }
+    return false
+  }
+  return pick(0) ? chosen : null
+}
+
+// Modo professor (tecla P ou ?professor): escolher a fase, mostrar as ligações e pausar
+Jogo.modoProfessor({
+  irParaFase(number) {
+    runId++
+    running = false
+    document.querySelectorAll("#start, #phone").forEach(overlay => overlay.classList.remove("show"))
+    loadLevel(number - 1)
+  },
+  // Desenha em laranja os cabos mais curtos. Não mexe nos cabos da turma, não conta acerto e não dá estrela
+  resposta() {
+    const overlay = document.querySelector(".overlay.show")
+    if (overlay) return window.Bit?.diz("pensando", overlay.id === "start" ? "Escolha uma dificuldade para abrir as fases." : "Termine esta tela para ver as ligações da fase.", 6000)
+    if (running) return window.Bit?.diz("pensando", "Espere a foto chegar ao celular.", 5000)
+    answer = solution()
+    if (!answer) return
+    render()
+    window.Bit?.diz("pensando", `Cada celular liga ao servidor e o servidor liga ao banco, sem cabo em cima de cabo. Os cabos laranja gastam ${fewestSteps()} casas, o mínimo desta fase.`, 14000)
+  },
+  pausar() {
+    frozen = true
+    frozenSince = performance.now()
+    for (const entry of waits) {
+      if (!entry.since) continue
+      clearTimeout(entry.timer)
+      entry.left -= performance.now() - entry.since
+      entry.since = 0
+    }
+  },
+  continuar() {
+    frozen = false
+    frozenTotal += performance.now() - frozenSince
+    for (const entry of waits) entry.go()
+  },
+})
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>

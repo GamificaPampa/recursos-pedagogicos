@@ -6,7 +6,30 @@
   var INK = '#2f2a4a';
   var A = window.Arcade = { games:{}, order:[], INK:INK, COLORS:['#ff5f8f','#8c73ff','#4fd6a6','#ff8a3d','#3fb4ff'] };
 
-  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  // Esperas que o modo professor pode parar: guardam quanto falta e recomeçam de onde pararam
+  var waits = [];
+  A.paused = false;
+  function later(fn, ms){
+    var e = { fn:fn, left:ms, since:0, timer:0 };
+    e.go = function(){
+      if(e.since) return;
+      e.since = performance.now();
+      e.timer = setTimeout(function(){
+        var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+        e.fn();
+      }, e.left);
+    };
+    waits.push(e);
+    if(!A.paused) e.go();
+    return e;
+  }
+  function cancel(e){
+    if(!e) return;
+    clearTimeout(e.timer);
+    var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+  }
+  A.later = later; A.cancel = cancel;
+  function wait(ms){ return new Promise(function(r){ later(r, ms); }); }
   A.wait = wait;
 
   var MODES = {
@@ -20,7 +43,7 @@
   // ---------- som ----------
   var ac = null, muted = false;
   function tone(f, d, type, vol, delay, slide){
-    if(muted) return;
+    if(muted || A.paused) return;
     try{
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
       var t = ac.currentTime + (delay || 0);
@@ -367,6 +390,13 @@
     A.sfx.click();
   }
 
+  // As estrelas de cada jogo em cada nível ficam guardadas no aparelho (Jogo.progresso). A fase é o número do jogo (1 a 3)
+  // e o do nível (1 a 3): 11 a 13 no Ninja, 21 a 23 na Esteira e 31 a 33 no Robô
+  function stageKey(id, m){ return (A.order.indexOf(id) + 1) * 10 + Object.keys(MODES).indexOf(m) + 1; }
+  function starsHtml(n){
+    return [0, 1, 2].map(function(i){ return A.iconHtml('estrela').replace('class="icone"', 'class="icone' + (i < n ? '' : ' off') + '"'); }).join('');
+  }
+
   function renderModes(){
     var box = $('modes');
     box.innerHTML = '';
@@ -377,6 +407,13 @@
       b.setAttribute('role', 'radio');
       b.setAttribute('aria-checked', k === mode ? 'true' : 'false');
       A.iconText(b, MODES[k].icon, MODES[k].label);
+      var saved = window.Jogo ? Jogo.progresso.estrelas(stageKey(current.id, k)) : 0;
+      var ms = document.createElement('span');
+      ms.className = 'mode-estrelas';
+      ms.setAttribute('role', 'img');
+      ms.setAttribute('aria-label', saved + ' de 3 estrelas');
+      ms.innerHTML = starsHtml(saved);
+      b.appendChild(ms);
       b.addEventListener('click', function(){
         mode = k;
         try{ localStorage.setItem('arcade-mode', k); }catch(e){}
@@ -515,6 +552,8 @@
 
   function clock(){
     if(!api.running) return;
+    // Com o professor pausando, o relógio da rodada espera
+    if(A.paused){ run.raf = requestAnimationFrame(clock); return; }
     var p = api.progress();
     $('timefill').style.transform = 'scaleX(' + (1 - p) + ')';
     var left = Math.ceil((1 - p) * current.duration / 1000);
@@ -572,6 +611,7 @@
     var rank = g.ranks.filter(function(r){ return score >= r[0]; })[0];
     var stars = starsFor(g, score), prevStars = readStars(g.id);
     if(stars > prevStars) saveNum('arcade-stars-' + g.id, stars);
+    if(window.Jogo) Jogo.progresso.guardar(stageKey(g.id, run.mode), stars);
     document.body.style.setProperty('--theme', g.color);
     document.body.style.setProperty('--theme-d', g.colorDark);
     $('end-card').style.setProperty('--c', g.color);
@@ -760,7 +800,7 @@
   ];
 
   function buildMenu(){
-    var wrap = $('cards'), dots = $('dots');
+    var wrap = $('cards'), dots = $('fases');
     wrap.innerHTML = ''; dots.innerHTML = '';
     menuArts = [];
     A.order.forEach(function(id, idx){
@@ -785,7 +825,7 @@
       });
       wrap.appendChild(card);
       var dot = document.createElement('button');
-      dot.type = 'button'; dot.className = 'dot'; dot.setAttribute('aria-label', g.title);
+      dot.type = 'button'; dot.className = 'dot fase'; dot.setAttribute('aria-label', g.title); dot.setAttribute('aria-pressed', 'false');
       dot.addEventListener('click', function(){ scrollToCard(idx); A.sfx.click(); });
       dots.appendChild(dot);
       menuArts.push({ cv:card.querySelector('canvas'), g:g, w:0, h:0 });
@@ -810,7 +850,10 @@
     if(best !== activeCard && !$('scr-menu').hidden) A.sfx.click();
     activeCard = best;
     Array.prototype.forEach.call(wrap.children, function(c, i){ c.classList.toggle('active', i === best); });
-    Array.prototype.forEach.call($('dots').children, function(d, i){ d.classList.toggle('on', i === best); });
+    Array.prototype.forEach.call($('fases').children, function(d, i){
+      d.classList.toggle('on', i === best);
+      d.setAttribute('aria-pressed', String(i === best));
+    });
   }
 
   function sizeArts(){
@@ -857,11 +900,12 @@
     [523, 784, 659].forEach(function(f, i){ tone(f, 0.09, 'triangle', 0.07, i * 0.07); });
     A.vibrate(15);
     clearInterval(bubbleT);
-    bubbleT = setInterval(function(){ if(!$('scr-menu').hidden && $('howto').hidden) nextLine(); }, 7000);
+    bubbleT = setInterval(function(){ if(!A.paused && !$('scr-menu').hidden && $('howto').hidden) nextLine(); }, 7000);
   }
 
   function menuFrame(t){
     if($('scr-menu').hidden){ menuRaf = 0; return; }
+    if(A.paused){ menuRaf = requestAnimationFrame(menuFrame); return; }
     menuArts.forEach(function(m){
       var ctx = m.cv.getContext('2d');
       ctx.clearRect(0, 0, m.w, m.h);
@@ -898,6 +942,7 @@
     if(!craf) craf = requestAnimationFrame(confTick);
   };
   function confTick(){
+    if(A.paused){ craf = requestAnimationFrame(confTick); return; }
     cx.clearRect(0, 0, cv.width, cv.height);
     parts.forEach(function(p){
       p.vy += 0.05; p.x += p.vx + Math.sin(p.a) * 0.8; p.y += p.vy; p.a += p.va;
@@ -909,6 +954,52 @@
     parts = parts.filter(function(p){ return p.y < cv.height + 30; });
     craf = parts.length ? requestAnimationFrame(confTick) : 0;
     if(!craf) cx.clearRect(0, 0, cv.width, cv.height);
+  }
+
+  // ---------- modo professor (tecla P ou ?professor) ----------
+  // As fases são os três jogos. Escolher um abre o "como jogar" dele, onde se escolhe o nível e começa
+  function profGame(n){
+    var id = A.order[n - 1];
+    if(!id) return;
+    if($('scr-menu').hidden) goMenu();
+    $('cards').children[n - 1].scrollIntoView({ behavior:'auto', inline:'center', block:'nearest' });
+    updateActive();
+    openHowto(id);
+  }
+  // Os três jogos são de reflexo ou de arrastar e não têm resposta certa, então o Bit explica o objetivo.
+  // Na Esteira de Testes há resposta: o botão certo para o app que está na tela
+  function profAnswer(){
+    if(!window.Bit) return;
+    if(!$('scr-game').hidden && current){
+      if(api.running && current.answer){
+        var a = current.answer();
+        if(a){ Jogo.modoProfessor.destacar(a.els); return Bit.diz('pensando', a.text, 12000); }
+      }
+      return Bit.diz('pensando', current.goal, 14000);
+    }
+    if(!$('howto').hidden && current) return Bit.diz('pensando', current.goal, 14000);
+    if(!$('scr-end').hidden) return Bit.diz('pensando', 'A rodada acabou. Toque em Jogar de novo ou escolha outro jogo.', 8000);
+    Bit.diz('pensando', 'Escolha um dos três jogos. Cada um tem três níveis, e as estrelas de cada nível ficam guardadas neste aparelho.', 9000);
+  }
+  var pausedAt = 0;
+  function profPause(){
+    A.paused = true;
+    pausedAt = performance.now();
+    waits.forEach(function(e){
+      if(!e.since) return;
+      clearTimeout(e.timer);
+      e.left -= performance.now() - e.since;
+      e.since = 0;
+    });
+    if(run && current && current.pause) current.pause();
+  }
+  function profResume(){
+    var gap = performance.now() - pausedAt;
+    // O tempo parado não conta na rodada
+    if(run && run.running) run.t0 += gap;
+    if(run && current && current.resume) current.resume(gap);
+    A.paused = false;
+    waits.forEach(function(e){ e.go(); });
   }
 
   // ---------- início ----------
@@ -932,7 +1023,7 @@
     document.addEventListener('pointermove', function(e){ pointer.x = e.clientX; pointer.y = e.clientY; }, { passive:true });
     document.addEventListener('pointerdown', function(e){ pointer.x = e.clientX; pointer.y = e.clientY; }, { passive:true });
     say(LINES[0]);
-    bubbleT = setInterval(function(){ if(!$('scr-menu').hidden && $('howto').hidden) nextLine(); }, 7000);
+    bubbleT = setInterval(function(){ if(!A.paused && !$('scr-menu').hidden && $('howto').hidden) nextLine(); }, 7000);
     $('ht-go').addEventListener('click', startGame);
     $('ht-back').addEventListener('click', function(){ $('howto').hidden = true; A.sfx.click(); });
     $('btn-home').addEventListener('click', function(){ A.sfx.click(); goMenu(); });
@@ -945,6 +1036,7 @@
     $('apelido-trocar').addEventListener('click', trocarApelido);
     $('sala').addEventListener('input', function(){ var v = limparSala(this.value); if(this.value !== v) this.value = v; guardarSala(v); });
     salaDoEndereco();
+    if(window.Jogo) Jogo.modoProfessor({ irParaFase:profGame, resposta:profAnswer, pausar:profPause, continuar:profResume });
     document.addEventListener('visibilitychange', function(){ if(document.hidden && api.running) finish('time'); });
     window.addEventListener('resize', function(){
       if(current && current.resize && !$('scr-game').hidden) current.resize();

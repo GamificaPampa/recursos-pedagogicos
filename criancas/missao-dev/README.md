@@ -12,3 +12,5 @@ Cinco desafios rápidos para sentir como é pensar como quem cria software: mont
 | Autoria      | Arthur Medeiros                                                                                                              |
 
 É o jogo mais antigo da coleção e ainda usa o visual escuro da primeira versão, diferente do estilo de jogo do GamificaPampa.
+
+No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.
