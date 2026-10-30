@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Adaptador de atividades · Oficina de Prompts</title>
-<meta name="description" content="Adapte uma atividade para incluir estudantes com TEA, TDAH, dislexia, baixa visão, surdez, deficiência intelectual ou altas habilidades: o antes e depois de cada caso e o pedido pronto para o Gemini, sem dados do estudante.">
+<meta name="description" content="Adapte uma atividade para incluir estudantes com TEA, TDAH, dislexia, deficiência visual, surdez, deficiência auditiva, deficiência intelectual ou altas habilidades, ou passe para leitura fácil para toda a turma: o antes e depois de cada caso e o pedido pronto para o Gemini, sem dados do estudante.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -39,6 +39,9 @@
   .chip { min-height: 48px; padding: 6px 18px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-weight: 600 }
   .chip[aria-pressed="true"] { background: var(--c); }
   .chip:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px }
+  .grupo { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: var(--soft) }
+  .chips + .grupo { margin-top: 18px }
+  .aviso { margin: 18px 0 0; padding: 10px 14px; background: #f4f1ff; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600 }
 
   /* Before and after, side by side */
   .antes-depois { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px }
@@ -95,9 +98,13 @@
     <p><b>Descreva a necessidade, nunca o estudante.</b> Nome, foto, laudo, CID, diagnóstico de alguém e a turma não vão para o Gemini. Escreva só o que ajuda a adaptar, como “um estudante de 10 anos que lê frases curtas com apoio de imagem”.</p>
   </section>
 
-  <section class="card" data-bit-dica="Cada necessidade pede um jeito diferente de mudar a mesma atividade.">
+  <section class="card" id="escolha" data-bit-dica="Cada necessidade pede um jeito diferente de mudar a mesma atividade. A leitura fácil serve para a turma toda.">
     <h2><span class="n">1</span>Para quem é a adaptação?</h2>
-    <ul class="chips" id="chips" role="group" aria-label="Necessidade"></ul>
+    <p class="grupo" id="grupo-inclusao">Inclusão: para um estudante</p>
+    <ul class="chips" id="chips" role="group" aria-labelledby="grupo-inclusao"></ul>
+    <p class="grupo" id="grupo-turma">Para toda a turma</p>
+    <ul class="chips" id="chips-turma" role="group" aria-labelledby="grupo-turma"></ul>
+    <p class="aviso">A adaptação não substitui o AEE nem o plano individual do estudante. Leia e ajuste o que o Gemini devolver antes de usar.</p>
   </section>
 
   <section class="card" data-bit-dica="Repare: o conteúdo e o objetivo continuam os mesmos da turma. Muda o caminho até eles.">
@@ -119,7 +126,7 @@
       <label for="componente">Componente<small>a matéria</small><input id="componente" placeholder="Ciências"></label>
       <label for="ano">Ano ou idade<small>da turma, sem o nome dela</small><input id="ano" placeholder="4º ano, 9 e 10 anos"></label>
     </div>
-    <label for="atividade">A atividade<small>cole aqui o texto e as perguntas, sem nome de estudante</small><textarea id="atividade" placeholder="Cole aqui a atividade da turma."></textarea></label>
+    <label for="atividade">A atividade<small>cole aqui o texto e as perguntas, sem nome de estudante e sem laudo</small><textarea id="atividade" placeholder="Cole aqui a atividade da turma."></textarea></label>
     <p class="prompt" id="prompt" aria-live="polite"></p>
     <div class="linha">
       <button class="btn btn--jogar" type="button" id="copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o pedido</button>
@@ -150,56 +157,69 @@
 <footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
 
 <script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // Each need: the chip, the adapted version of the same activity, what changes and the part of the request that describes it
 const CASOS = [
   { id: "tea", nome: "TEA", cor: "#cfe6ff",
-    depois: "<p><b>1. Leia. 2. Olhe a figura. 3. Marque a resposta.</b></p><p>O sol esquenta a água do rio. (figura: sol e rio)</p><p>A água sobe como vapor e forma as nuvens. (figura: nuvem)</p><p>Da nuvem cai a chuva, e a água volta para o rio. (figura: chuva)</p><ol><li>O que esquenta a água? ☐ o sol ☐ a lua ☐ o vento</li><li>De onde cai a chuva? ☐ da nuvem ☐ do rio ☐ da árvore</li></ol>",
-    muda: ["Passos numerados no começo", "Frases curtas e literais, sem metáforas", "Uma pergunta por vez", "Apoio visual", "Marcar em vez de escrever"],
-    pedido: "para um estudante com TEA que se organiza melhor com rotina clara: use frases curtas e literais, sem metáforas nem ironia, coloque os passos numerados no começo, uma pergunta por vez, opções para marcar e apoio visual descrito entre parênteses" },
+    depois: "<p><b>Hoje: 1. Leia. 2. Olhe a figura. 3. Marque a resposta.</b></p><p>O sol esquenta a água do rio. (figura: sol e rio)</p><p>A água sobe como vapor e forma as nuvens. (figura: nuvem)</p><p>Da nuvem cai a chuva, e a água volta para o rio. (figura: chuva)</p><ol><li>O que esquenta a água? ☐ o sol ☐ a lua ☐ o vento</li><li>De onde cai a chuva? ☐ da nuvem ☐ do rio ☐ da árvore</li></ol><p>Quando terminar, guarde a folha na pasta.</p>",
+    muda: ["Rotina no começo: o que vem antes e depois", "Frases curtas e literais, sem duplo sentido", "Um passo e uma pergunta por vez", "Apoio visual", "Marcar em vez de escrever", "Fim combinado"],
+    pedido: "para um estudante com TEA que se organiza melhor com rotina previsível: comece com os passos numerados do que vai acontecer, na ordem, e diga como a atividade termina; use instruções curtas e literais, sem metáforas, ironia nem duplo sentido; um passo e uma pergunta por vez; opções para marcar; e apoio visual descrito entre parênteses" },
   { id: "tdah", nome: "TDAH", cor: "#ffd6e3",
     depois: "<p><b>Parte 1 · A água sobe</b> (3 linhas) → pergunta 1</p><p><b>Parte 2 · A nuvem e a chuva</b> (3 linhas) → pergunta 2</p><p>Pausa: levante e beba água.</p><p><b>Parte 3 · De volta ao rio</b> (3 linhas) → perguntas 3 e 4</p><p>☐ Parte 1 ☐ Parte 2 ☐ Parte 3</p>",
-    muda: ["Partes curtas com título", "Pergunta logo depois de cada parte", "Palavras-chave em negrito", "Checklist do que já fez", "Uma pausa no meio"],
-    pedido: "para um estudante com TDAH que se perde em textos longos: divida o texto em partes curtas com título, coloque cada pergunta logo depois da parte que ela usa, destaque em negrito as palavras-chave, inclua um checklist para marcar as partes feitas e sugira uma pausa curta no meio" },
-  { id: "leitura", nome: "Dislexia e leitura", cor: "#fff1a8",
-    depois: "<p style=\"font-size: 19px; letter-spacing: .04em; line-height: 1.7\">O sol esquenta a água.<br>A água vira vapor e sobe.<br>O vapor forma as nuvens.<br>A chuva cai e volta ao rio.</p><p><b>Palavra nova:</b> evaporar = a água virar vapor.</p><p>Responda falando ou escrevendo: por que chove?</p>",
-    muda: ["Menos texto e frases curtas", "Letra maior e espaçada", "Palavras novas explicadas", "Responder falando ou escrevendo", "Avaliar a ideia, não a ortografia"],
-    pedido: "para um estudante com dislexia, que lê devagar e se cansa com textos longos: use menos texto, frases curtas, palavras do dia a dia, explique as palavras novas, sugira letra grande e espaçada para imprimir e deixe responder falando ou escrevendo" },
-  { id: "visao", nome: "Baixa visão", cor: "#e2dbff",
+    muda: ["Blocos curtos com título", "Pergunta logo depois de cada bloco", "Só o essencial em negrito", "Checklist do que já fez", "Uma pausa no meio"],
+    pedido: "para um estudante com TDAH que se perde em textos longos: divida o texto em blocos curtos com título, coloque cada pergunta logo depois do bloco que ela usa, destaque em negrito só o essencial, uma instrução por frase, inclua um checklist para marcar os blocos feitos e sugira uma pausa curta no meio" },
+  { id: "leitura", nome: "Dislexia", cor: "#fff1a8",
+    depois: "<p style=\"font-size: 19px; letter-spacing: .04em; line-height: 1.7\">O sol esquenta a água.<br>A água vira vapor e sobe.<br>O vapor forma as nuvens.<br>A chuva cai e volta ao rio.</p><p><b>Palavra nova:</b> evaporar = a água virar vapor.</p><p>Ouça o texto lido em voz alta antes.</p><p>Responda falando ou escrevendo, sem copiar a pergunta: por que chove?</p>",
+    muda: ["Menos texto e frases curtas", "Letra maior, espaçada, sem justificar", "Palavras novas explicadas", "Texto lido em voz alta", "Menos cópia", "Avaliar a ideia, não a ortografia"],
+    pedido: "para um estudante com dislexia, que lê devagar e se cansa com textos longos: use menos texto, frases curtas e palavras do dia a dia, explique as palavras novas, sugira para imprimir letra sem serifa de tamanho 14 ou maior, espaço maior entre as linhas e texto alinhado à esquerda, sem justificar; proponha que o texto seja lido em voz alta antes; deixe as perguntas já escritas na folha para não precisar copiar; e deixe responder falando ou escrevendo, avaliando a ideia e não a ortografia" },
+  { id: "visao", nome: "Deficiência visual", cor: "#e2dbff",
     depois: "<p style=\"font-size: 22px; font-weight: 700\">O CICLO DA ÁGUA</p><p style=\"font-size: 19px\">O sol esquenta a água do rio. A água sobe e forma nuvens. A chuva cai e volta ao rio.</p><p>(Imagem: um círculo com setas grossas: rio, nuvem, chuva, rio.)</p><p style=\"font-size: 19px\">1. Por que chove? ____________</p>",
-    muda: ["Letra 24 ou maior", "Alto contraste, sem texto sobre imagem", "Imagens descritas em palavras", "Espaço grande para responder", "Funciona com leitor de tela"],
-    pedido: "para um estudante com baixa visão: organize para imprimir com letra 24 ou maior e alto contraste, sem texto sobre imagem, descreva cada imagem em palavras, deixe espaço grande para responder e use títulos claros, que um leitor de tela consiga ler" },
-  { id: "surdez", nome: "Surdez", cor: "#c9f5e3",
+    muda: ["Letra 24 ou maior", "Alto contraste, sem texto sobre imagem", "Imagens descritas em palavras", "Nada que dependa só de cor", "Versão para leitor de tela"],
+    pedido: "para um estudante com deficiência visual ou baixa visão: faça uma versão para imprimir com letra 24 ou maior, alto contraste, sem texto sobre imagem e com espaço grande para responder, e uma versão em texto simples para leitor de tela, com títulos claros e listas em vez de tabelas; descreva cada imagem em palavras entre parênteses; e não use a cor como única forma de dar uma informação: escreva também a palavra ou use um símbolo" },
+  { id: "surdez", nome: "Surdez (Libras)", cor: "#c9f5e3",
     depois: "<p><b>Palavras-chave</b> (com o sinal em Libras, combine com o intérprete): SOL · ÁGUA · VAPOR · NUVEM · CHUVA · RIO</p><p>(Imagem: rio → vapor → nuvem → chuva → rio)</p><p>O sol esquenta a água. A água vira vapor. O vapor vira nuvem. A nuvem dá chuva.</p><p>Desenhe ou escreva: o que acontece depois da chuva?</p>",
     muda: ["Instruções escritas e com imagem", "Palavras-chave destacadas", "Frases diretas, português como segunda língua", "Nada que dependa só de áudio", "Responder desenhando ou escrevendo"],
-    pedido: "para um estudante surdo que usa Libras e lê o português como segunda língua: use frases curtas e diretas, destaque as palavras-chave numa lista no começo, dê apoio visual descrito entre parênteses, não dependa de áudio e deixe responder desenhando ou escrevendo" },
+    pedido: "para um estudante surdo que usa Libras e lê o português como segunda língua: use frases curtas e diretas, destaque as palavras-chave numa lista no começo, para combinar os sinais com o intérprete, dê apoio visual descrito entre parênteses, não dependa de áudio, indique vídeo só com legenda e deixe responder desenhando ou escrevendo" },
+  { id: "auditiva", nome: "Deficiência auditiva", cor: "#d9f7c4",
+    depois: "<p><b>O que fazer</b> (o mesmo que a professora fala, por escrito):</p><ol><li>Leia o texto.</li><li>Olhe o desenho.</li><li>Responda as perguntas.</li></ol><p>(Imagem: rio → vapor → nuvem → chuva → rio)</p><p>Se a aula tiver vídeo: legenda ligada e o resumo impresso junto.</p><p>1. Por que chove?</p>",
+    muda: ["Tudo o que é falado também por escrito", "Vídeos com legenda", "Apoio visual", "Palavras-chave destacadas", "Nada de ditado ou resposta só pelo som"],
+    pedido: "para um estudante com deficiência auditiva: coloque por escrito tudo o que seria dito em voz alta, como instruções, exemplos e combinados; indique que vídeos e áudios tenham legenda ou um resumo escrito; dê apoio visual descrito entre parênteses; destaque as palavras-chave; e não use ditado nem nada que dependa só de ouvir" },
   { id: "intelectual", nome: "Deficiência intelectual", cor: "#ffdcc4",
     depois: "<p>Você já viu uma poça de água secar no sol? A água subiu, virou vapor! (figura: poça e sol)</p><p>O vapor vira nuvem, e a nuvem dá chuva. (figura: nuvem com chuva)</p><ol><li>Ligue: sol → esquenta a água · nuvem → dá chuva</li><li>Desenhe a chuva caindo no rio.</li></ol>",
     muda: ["O essencial do conteúdo", "Exemplo do dia a dia", "Menos itens", "Ligar e desenhar", "A mesma atividade, mais simples"],
     pedido: "para um estudante com deficiência intelectual: mantenha só o essencial do conteúdo, comece com um exemplo concreto do dia a dia, use menos perguntas, troque perguntas abertas por ligar, marcar e desenhar, e mantenha o mesmo tema da turma" },
   { id: "altas", nome: "Altas habilidades", cor: "#fff",
-    depois: "<p>As mesmas perguntas da turma, e mais:</p><p><b>Desafio:</b> se um rio da sua cidade secasse, o que mudaria no ciclo da água por ali? Pesquise e explique com um desenho.</p><p><b>Para ensinar:</b> prepare uma explicação de 2 minutos para a turma.</p>",
-    muda: ["A mesma base da turma", "Uma pergunta de investigação", "Ligar com a cidade ou outra matéria", "Produzir e explicar para os colegas"],
-    pedido: "para um estudante com altas habilidades, que termina rápido e quer mais: mantenha a mesma base da turma e acrescente um desafio de investigação, uma ligação com a cidade ou com outra matéria e uma tarefa de produzir algo para explicar aos colegas" },
+    depois: "<p>As mesmas perguntas da turma, e mais:</p><p><b>Desafio:</b> se um rio da sua cidade secasse, o que mudaria no ciclo da água por ali? Pesquise e explique com um desenho.</p><p><b>Para ir mais fundo:</b> por que a água do mar é salgada e a da chuva não?</p><p><b>Para ensinar:</b> prepare uma explicação de 2 minutos para a turma.</p>",
+    muda: ["A mesma base da turma", "Um desafio de investigação", "Aprofundamento do tema", "Ligar com a cidade ou outra matéria", "Produzir e explicar para os colegas"],
+    pedido: "para um estudante com altas habilidades, que termina rápido e quer mais: mantenha a mesma base da turma e, em vez de mais exercícios iguais, acrescente um desafio de investigação, uma pergunta para aprofundar o tema, uma ligação com a cidade ou com outra matéria e uma tarefa de produzir algo para explicar aos colegas" },
+  { id: "leitura-facil", nome: "Leitura fácil", cor: "#f6e2ff", grupo: "turma",
+    depois: "<p><b>O ciclo da água</b></p><ul><li>O sol esquenta a água do rio.</li><li>A água vira vapor e sobe.</li><li>O vapor forma as nuvens.</li><li>Das nuvens cai a chuva.</li><li>A chuva volta para o rio.</li></ul><p><b>Vapor</b>: a água em forma de gás. Não dá para ver.</p><ol><li>Por que chove?</li><li>Para onde vai a água da chuva?</li></ol>",
+    muda: ["Uma ideia por frase", "Ordem direta, palavras do dia a dia", "Palavra difícil explicada na hora", "Listas em vez de parágrafos", "Serve para a turma toda"],
+    pedido: "em leitura fácil, para que toda a turma consiga ler, inclusive quem ainda lê com dificuldade: uma ideia por frase, frases curtas na ordem direta, palavras do dia a dia, a palavra difícil explicada logo depois dela, números em algarismos, títulos curtos, listas em vez de parágrafos longos, texto alinhado à esquerda e apoio visual descrito entre parênteses" },
 ]
 const $ = id => document.getElementById(id)
-let escolhido = CASOS[0]
-try { escolhido = CASOS.find(c => c.id === localStorage.getItem("adaptar-caso")) || CASOS[0] } catch {}
+// The choice is remembered with lembrar.js; the old key is read once so nobody loses it
+let lembrado = Lembrar.ler("adaptador", {}).caso
+if (!lembrado) try { lembrado = localStorage.getItem("adaptar-caso") } catch {}
+let escolhido = CASOS.find(c => c.id === lembrado) || CASOS[0]
 
-$("chips").innerHTML = CASOS.map(c => `<li><button class="chip" type="button" data-id="${c.id}" style="--c: ${c.cor === "#fff" ? "#ffd23f" : c.cor}">${c.nome}</button></li>`).join("")
+const chips = lista => lista.map(c => `<li><button class="chip" type="button" data-id="${c.id}" style="--c: ${c.cor === "#fff" ? "#ffd23f" : c.cor}">${c.nome}</button></li>`).join("")
+$("chips").innerHTML = chips(CASOS.filter(c => c.grupo !== "turma"))
+$("chips-turma").innerHTML = chips(CASOS.filter(c => c.grupo === "turma"))
 function montar() {
-  $("chips").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === escolhido.id)))
+  $("escolha").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === escolhido.id)))
   $("depois").innerHTML = `<b class="rotulo">Adaptada: ${escolhido.nome}</b>${escolhido.depois}`
   $("muda").innerHTML = escolhido.muda.map(m => `<li style="--light: ${escolhido.cor}">${m}</li>`).join("")
   const componente = $("componente").value.trim() || "[componente]", ano = $("ano").value.trim() || "[ano ou idade]"
   const atividade = $("atividade").value.trim() || "[cole aqui a atividade]"
-  $("prompt").textContent = `Você é professor(a) de ${componente} do ${ano}. Adapte a atividade abaixo ${escolhido.pedido}. Mantenha o mesmo conteúdo e o mesmo objetivo da atividade da turma, para que todos trabalhem o mesmo tema juntos. No fim, liste o que você mudou e por quê. Escreva em texto normal, fora de bloco de código, e descreva as imagens entre parênteses.\n\nAtividade:\n${atividade}`
+  $("prompt").textContent = `Você é professor(a) de ${componente} do ${ano}. Adapte a atividade abaixo ${escolhido.pedido}. Mantenha o mesmo conteúdo e o mesmo objetivo da atividade da turma, para que todos trabalhem o mesmo tema juntos. Não peça nome, laudo nem outros dados de estudante: trabalhe só com o que está aqui. No fim, liste o que você mudou e por quê.\n\nResponda em português do Brasil, em texto normal, fora de bloco de código. Descreva as imagens entre parênteses, sem desenhar com caracteres. Não use o teste interativo. Não cite códigos da BNCC e não invente dados, citações nem músicas: se faltar uma informação, escreva [completar].\n\nAtividade:\n${atividade}`
 }
-$("chips").addEventListener("click", e => {
+$("escolha").addEventListener("click", e => {
   const b = e.target.closest(".chip")
   if (!b) return
   escolhido = CASOS.find(c => c.id === b.dataset.id)
-  try { localStorage.setItem("adaptar-caso", escolhido.id) } catch {}
+  Lembrar.guardar("adaptador", { caso: escolhido.id })
   montar()
 })
 for (const id of ["componente", "ano", "atividade"]) $(id).addEventListener("input", montar)
