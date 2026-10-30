@@ -131,6 +131,13 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .opcao, .anima { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o desenho cabe na altura do projetor e as figuras ficam numa fileira só */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao #cena { max-height: calc(100vh / var(--telao-escala) - 270px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .opcoes--grade { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: none; }
+      .telao .opcao.figura { min-height: 0; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -213,7 +220,7 @@ p, li, blockquote {
             <li><b>Na roda, com o projetor:</b> ligue o Ler sozinho (o botão ao lado do alto-falante), deixe uma criança de cada vez tocar na tela e a turma conta junto em voz alta, apontando com o dedo.</li>
             <li><b>No tablet, em dupla:</b> uma criança toca e a outra confere, e depois trocam.</li>
             <li><b>Depois:</b> a turma procura cores e formas na sala, faz bichos do Pampa com massinha e brinca de sombra com uma lanterna na parede.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
           </ul>
         </div>
         <div class="qr">
@@ -345,7 +352,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão

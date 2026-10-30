@@ -140,6 +140,12 @@
     @media (prefers-reduced-motion: reduce) {
       .reta, .alvo use, .confete { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o desenho cabe na altura do projetor e as respostas ficam lado a lado */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao #grafico { max-height: calc(100vh / var(--telao-escala) - 290px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -237,7 +243,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma vota na lei da reta ou diz qual a e qual b vai pôr, e explica por quê.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno a função de cada situação da fase 3, com mais uma previsão feita por ele.</li>
             <li><b>Depois:</b> cada dupla inventa uma situação com valor fixo e valor por unidade, monta a função e troca com outra dupla para desenhar o gráfico.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
@@ -386,7 +392,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // The graph: the window of x and y changes with the round; phases 1 and 2 use the plane from −5 to 5

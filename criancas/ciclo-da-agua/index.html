@@ -259,7 +259,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de tocar, a turma explica em voz alta o que vai acontecer com a Gotinha. Quem acertar a etapa explica o porquê.</li>
             <li><b>No celular:</b> cada criança joga as três fases e anota as situações do dia a dia que reconheceu.</li>
             <li><b>Depois:</b> com um copo de água gelada e um espelho, a turma vê a condensação acontecer e desenha o ciclo no caderno, com setas.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
@@ -391,7 +391,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Moving the drop and turning on the animation of a stage in the scene

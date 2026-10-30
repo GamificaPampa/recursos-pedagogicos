@@ -128,6 +128,10 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
     }
+    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    @media (min-width: 900px) {
+      .telao .mesa { max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -203,7 +207,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> a turma vota na escola antes do toque e, na fase 3, diz em voz alta a pista que viu no trecho.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma característica nova de cada escola.</li>
         <li><b>Depois:</b> cada dupla escolhe um poema ou um trecho de romance do livro didático, descobre a escola e defende a resposta com duas pistas do texto.</li>
-        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
         <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
 
@@ -395,7 +399,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   const botaoOpcao = (id, rotulo, extra = "") => `<button class="opcao ${extra}" type="button" data-id="${id}">${rotulo}</button>`

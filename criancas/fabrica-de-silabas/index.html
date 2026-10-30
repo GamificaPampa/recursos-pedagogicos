@@ -117,6 +117,13 @@
     @media (prefers-reduced-motion: reduce) {
       .figura, .caixa, .silaba, .confete { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o desenho fica ao lado das sílabas, para caber na altura do projetor */
+    @media (min-width: 900px) {
+      .telao .maquina { max-width: none; grid-template-columns: auto minmax(0, 1fr); gap: 10px 32px; align-items: center; }
+      .telao .maquina > .fala-bit { grid-column: 1 / -1; }
+      .telao .maquina > .figura { grid-column: 1; grid-row: 2 / span 7; }
+      .telao .maquina > :not(.fala-bit, .figura) { grid-column: 2; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -193,7 +200,7 @@ p, li, blockquote {
             <li><b>No celular ou tablet:</b> em dupla, uma criança aperta "Ouvir a palavra" e a outra monta. Depois elas trocam.</li>
             <li><b>Dica:</b> o primeiro toque fala a palavra em sílabas; o segundo faz pular a próxima sílaba. A dica que mostra a sílaba conta nas estrelas como um erro.</li>
             <li><b>Depois:</b> recorte as sílabas em papel e peça para a turma trocar uma sílaba e formar palavras novas, como BOLA e BALA.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir do topo lê o pedido e as sílabas em voz alta, para quem ainda não lê bem, e o botão ao lado liga o Ler sozinho. O Ouvir a palavra, perto do desenho, fala só a palavra.</li>
           </ul>
         </div>
@@ -350,7 +357,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // A voz é a do kit (Jogo.ouvir) e some quando o aparelho não tem voz em português. O botão do topo lê a tela;

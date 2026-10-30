@@ -122,6 +122,10 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
     }
+    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    @media (min-width: 900px) {
+      .telao .mesa { max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -429,7 +433,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   const botaoOpcao = (i, rotulo) => `<button class="opcao" type="button" data-i="${i}">${rotulo}</button>`

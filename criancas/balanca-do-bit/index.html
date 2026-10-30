@@ -119,6 +119,11 @@
     @media (prefers-reduced-motion: reduce) {
       .braco, .prato, .confete { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): a balança cabe na altura do projetor, junto com o desafio e as respostas */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao #balanca { max-height: calc(100vh / var(--telao-escala) - 270px); width: auto; max-width: 100%; justify-self: center; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -203,7 +208,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada toque, a turma diz qual operação vai fazer e o que vai acontecer com a balança.</li>
             <li><b>No celular:</b> cada estudante resolve as três fases e escreve no caderno cada passo da equação, como na balança.</li>
             <li><b>Depois:</b> a turma inventa equações com uma balança desenhada no quadro e troca com os colegas para resolver.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
@@ -304,7 +309,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Drawing the scale: the beam tilts by the difference of weight and the pans hang from its ends

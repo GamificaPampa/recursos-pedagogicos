@@ -145,6 +145,10 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .fala-bit__bit img, .fala-bit__balao { animation: none !important; }
     }
+    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    @media (min-width: 900px) {
+      .telao .mesa { max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -224,7 +228,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> antes de cada conferência, a turma vota na ordem dos parágrafos ou no elemento da proposta e diz qual pista do texto levou a essa escolha.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e depois escreve, no caderno, uma proposta de intervenção com os cinco elementos sobre um tema da turma.</li>
         <li><b>Depois:</b> cada dupla troca a proposta com outra, que marca agente, ação, meio, finalidade e detalhamento com cinco cores.</li>
-        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
         <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
 
@@ -465,7 +469,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")

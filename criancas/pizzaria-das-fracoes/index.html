@@ -19,7 +19,7 @@
     #proxima svg { width: 22px; height: 22px; }
     /* Page in one central column that fits the phone and the projector */
     .topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px clamp(16px, 4vw, 40px); }
-    .topo .lado { display: flex; gap: 10px; }
+    .topo .lado { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
     .topo svg { width: 22px; height: 22px; }
     main { display: grid; gap: 26px; width: min(1000px, 100% - 32px); margin: 10px auto 56px; }
     header { text-align: center; }
@@ -129,6 +129,15 @@
     @media (prefers-reduced-motion: reduce) {
       .pedaco, .pizza-nova, .confete { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): a pizza e o pedido cabem na altura do projetor */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao #pizza { max-height: calc(100vh / var(--telao-escala) - 270px); width: auto; max-width: 100%; }
+      .telao .comanda { padding: 10px 18px 12px; }
+      .telao .fracao { margin: 4px 0 2px !important; font-size: 52px; }
+      .telao .controles { gap: 10px; }
+      .telao .contagem { min-height: 0; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -213,7 +222,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> uma criança lê o pedido em voz alta, a turma diz quantos pedaços são e outra criança toca na pizza.</li>
             <li><b>No celular:</b> cada criança joga as três fases e conta quantas estrelas fez.</li>
             <li><b>Depois:</b> desenhe pizzas e barras de chocolate no quadro e peça frações para a turma pintar no caderno.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
@@ -317,7 +326,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Drawing a pizza cut in n equal slices, with the crust and some pepperoni on each one
