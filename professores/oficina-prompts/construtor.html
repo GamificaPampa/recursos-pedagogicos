@@ -109,6 +109,25 @@
   .alert svg { width: 28px; height: 28px; flex: none }
   .note { margin: -6px 0 14px; color: var(--soft); font-size: 15px; font-weight: 500 }
 
+
+  /* Meus prompts: o que o professor guardou neste aparelho */
+  .btn.save svg path { fill: #fff }
+  .btn.save[aria-pressed="true"] svg path { fill: #ffd23f }
+  .meus { margin-top: 24px }
+  .local { margin: 0 0 14px; padding: 10px 14px; background: var(--sky2); border-radius: 14px; font-size: 15px; font-weight: 600 }
+  .guardados { display: grid; gap: 14px; margin: 0 0 14px; padding: 0; list-style: none }
+  .guardado { padding: 14px 16px; border: 3px solid var(--ink); border-radius: 18px; background: #fff }
+  .guardado .nome { display: block; font-size: 19px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere }
+  .guardado .meta { display: block; margin-top: 2px; color: var(--soft); font-size: 15px; font-weight: 500 }
+  .guardado .botoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px }
+  .guardado .btn { --drop-y: 4px; min-height: 48px; padding: 4px 18px; font-size: 16px }
+  .guardado .ver summary { display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px; font-weight: 700; cursor: pointer; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px }
+  .guardado .ver pre { max-height: 320px; margin: 6px 0 0; padding: 10px 12px; overflow: auto; background: var(--sky2); border-radius: 12px; font: 500 15px/1.4 var(--font); white-space: pre-wrap; overflow-wrap: anywhere }
+  .renomear { display: grid; gap: 8px; margin: 0 }
+  .renomear label { margin: 0 }
+  .renomear .botoes { margin-top: 0 }
+  #meus-vazio { margin: 0 0 14px; font-weight: 500 }
+
   @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr }
     .result { position: static }
@@ -211,6 +230,7 @@
       <div class="actions">
         <button class="btn" type="button" id="copy"><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Copiar prompt</span></button>
         <button class="btn" type="button" id="copy2" hidden><svg viewBox="0 0 24 24"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>2. Copiar a 2ª mensagem</span></button>
+        <button class="btn save" type="button" id="save"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Guardar em Meus prompts</span></button>
         <p id="copied" role="status"></p>
         <div class="open">
           <a class="btn" id="open-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 5 H20 A1.5 1.5 0 0 1 21.5 6.5 V15.5 A1.5 1.5 0 0 1 20 17 H11 L6 21 V17 H4 A1.5 1.5 0 0 1 2.5 15.5 V6.5 A1.5 1.5 0 0 1 4 5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o ChatGPT</a>
@@ -226,6 +246,14 @@
     </section>
   </aside>
 </div>
+
+<section class="card meus" id="meus" aria-labelledby="meus-titulo">
+  <h2 id="meus-titulo" tabindex="-1"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Meus prompts <small id="meus-n"></small></h2>
+  <p class="local">Ficam só neste aparelho e neste navegador. Nada vai para a internet.</p>
+  <p id="meus-vazio">Você ainda não guardou nenhum. Monte um prompt e toque em <b>Guardar em Meus prompts</b>.</p>
+  <ul class="guardados" id="guardados"></ul>
+  <p style="margin: 0">Os prompts que você guardou na Biblioteca ficam em <a href="biblioteca.html?meus=1">Biblioteca, Meus prompts</a>.</p>
+</section>
 </div>
 
 <script src="/identidade-visual/js/copiar.js"></script>
@@ -422,7 +450,7 @@ const stageOf = id => STAGES.flatMap(group => group.items).find(item => item[0] 
 const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character])
 
 // Building the four parts from the choices on the left
-function buildPrompt() {
+function buildPrompt(semMaterial = false) {
   const [, label, age, group, reading] = stageOf($("stage").value)
   const early = group === "infantil", details = KINDS[kind], area = $("area").value
   const older = group === "finais" || group === "medio"
@@ -450,7 +478,7 @@ function buildPrompt() {
 
   return {
     role, task: details.task(kind === "adaptar" ? $("topic").value.trim() : topic), context, format: details.format(early),
-    ask: $("ask").checked, material: kind === "adaptar" ? $("paste").value.trim() || "[cole aqui o texto ou a atividade]" : "",
+    ask: $("ask").checked, material: kind === "adaptar" ? (semMaterial ? "" : $("paste").value.trim()) || "[cole aqui o texto ou a atividade]" : "",
   }
 }
 
@@ -510,12 +538,15 @@ function render() {
 }
 
 // Looking for a student's data in what the teacher typed, and saying where it is
-function checkPrivacy() {
-  const found = FIELDS.flatMap(([id, name]) => {
+function privacyFound(semMaterial = false) {
+  return FIELDS.flatMap(([id, name]) => {
     const text = $(id).value
-    if (!text || (id === "paste" && kind !== "adaptar")) return []
+    if (!text || (id === "paste" && (kind !== "adaptar" || semMaterial))) return []
     return PRIVACY.filter(([pattern]) => pattern.test(text)).map(([, what]) => `${what} em "${name}"`)
   })
+}
+function checkPrivacy() {
+  const found = privacyFound()
   const alert = $("alert")
   alert.hidden = found.length === 0
   if (!found.length) return
@@ -617,6 +648,114 @@ $("next").addEventListener("click", async event => {
   button.textContent = copied ? "Copiado!" : "Não deu"
   setTimeout(() => { button.textContent = "Copiar" }, 2500)
 })
+// Meus prompts: ficam só neste aparelho (localStorage, chave com prefixo gamificapampa-) e são os mesmos da Biblioteca.
+// Cada ação lê o que está guardado, muda e grava de novo, para não apagar o que outra aba guardou.
+const CHAVE = "gamificapampa-meus-prompts", LIMITE = 200
+const lerGuardados = () => {
+  try {
+    const dados = JSON.parse(localStorage.getItem(CHAVE))
+    return Array.isArray(dados) ? dados.filter(item => item && typeof item.id === "string" && typeof item.origem === "string") : []
+  } catch { return [] }
+}
+const gravarGuardados = lista => {
+  try { localStorage.setItem(CHAVE, JSON.stringify(lista)); return true } catch { return false }
+}
+const doConstrutor = item => item.origem === "construtor" && typeof item.nome === "string" && Array.isArray(item.mensagens) && item.mensagens.every(texto => typeof texto === "string")
+const meusPrompts = () => lerGuardados().filter(doConstrutor)
+const dataCurta = iso => { const data = new Date(iso); return isNaN(data) ? "" : data.toLocaleDateString("pt-BR") }
+let renomeando = "", apagando = "", apagarTimer
+
+function desenharGuardados(foco) {
+  const lista = meusPrompts()
+  $("meus-n").textContent = lista.length ? `(${lista.length})` : ""
+  $("meus-vazio").hidden = lista.length > 0
+  $("guardados").innerHTML = lista.map(item => {
+    const id = escape(item.id), dois = item.mensagens.length > 1
+    const meta = [KINDS[item.tipo]?.label, dataCurta(item.data)].filter(Boolean).join(" · ")
+    const copiar = item.mensagens.map((_, i) => `<button class="btn" style="--c: var(--mint)" type="button" data-acao="copiar" data-i="${i}">${dois ? `Copiar a ${i + 1}ª mensagem` : "Copiar"}</button>`).join("")
+    const cabeca = renomeando === item.id
+      ? `<form class="renomear"><label>Novo nome<input type="text" maxlength="80" value="${escape(item.nome)}" required></label><div class="botoes"><button class="btn" style="--c: var(--mint)" type="submit">Salvar o nome</button><button class="btn" style="--c: #fff" type="button" data-acao="cancelar">Cancelar</button></div></form>`
+      : `<span class="nome">${escape(item.nome)}</span><span class="meta">${escape(meta)}</span>
+         <div class="botoes">${copiar}<button class="btn" style="--c: #fff" type="button" data-acao="renomear">Renomear</button><button class="btn" style="--c: ${apagando === item.id ? "var(--pink)" : "#fff"}" type="button" data-acao="apagar">${apagando === item.id ? "Apagar mesmo?" : "Apagar"}</button></div>`
+    return `<li class="guardado" data-id="${id}">${cabeca}<details class="ver"><summary>Ver o prompt inteiro</summary><pre>${escape(item.mensagens.join("\n\n-----\n\n"))}</pre></details></li>`
+  }).join("")
+  if (foco) {
+    const alvo = foco === "titulo" ? $("meus-titulo") : foco === "nome" ? $("guardados").querySelector(".renomear input") : [...$("guardados").children].find(li => li.dataset.id === foco[0])?.querySelector(`[data-acao="${foco[1]}"]`)
+    alvo?.focus()
+  }
+}
+
+function guardarPrompt() {
+  const missing = missingField()
+  if (missing) {
+    tell(missing[1], true)
+    window.Bit?.diz("ops", missing[1], 4000)
+    return $(missing[0]).focus()
+  }
+  // O material colado para adaptar nunca é guardado: pode ter dado de aluno. O prompt vai com o espaço para colar de novo
+  const found = privacyFound(true)
+  if (found.length && !confirm(`Parece que há dado de aluno: ${joinList(found)}. Nada disso deve ficar guardado. Guardar mesmo assim?`)) return
+  const [, label, age, group] = stageOf($("stage").value)
+  const turma = group === "infantil" ? `Infantil, ${age}` : label
+  const tema = $("topic").value.trim().replace(/\s+/g, " ")
+  const nome = [KINDS[kind].label, turma, tema.length > 40 ? tema.slice(0, 39).trimEnd() + "…" : tema].filter(Boolean).join(" · ")
+  const lista = lerGuardados()
+  if (lista.length >= LIMITE) return tell("Meus prompts está cheio. Apague algum para guardar outro.", true)
+  lista.unshift({
+    id: "c-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), origem: "construtor", nome,
+    mensagens: toMessages(buildPrompt(true)), tipo: kind, etapa: group, materia: group === "infantil" ? "Educação Infantil" : $("area").value, data: new Date().toISOString(),
+  })
+  if (!gravarGuardados(lista)) return tell("Não deu para guardar: este navegador não deixa guardar no aparelho.", true)
+  desenharGuardados()
+  tell(kind === "adaptar" ? "Guardado em Meus prompts, no fim da página. O material colado não é guardado." : "Guardado em Meus prompts, no fim da página. Fica só neste aparelho.")
+}
+
+$("save").addEventListener("click", guardarPrompt)
+$("guardados").addEventListener("click", async event => {
+  const botao = event.target.closest("button[data-acao]")
+  const linha = event.target.closest("li.guardado")
+  if (!botao || !linha) return
+  const id = linha.dataset.id, acao = botao.dataset.acao
+  const item = meusPrompts().find(outro => outro.id === id)
+  if (!item) return desenharGuardados()
+  if (acao === "copiar") {
+    await Copiar.texto(item.mensagens[Number(botao.dataset.i)] ?? item.mensagens[0], { aviso: "Copiado! Agora cole no ChatGPT ou no Gemini." })
+  } else if (acao === "renomear") {
+    renomeando = id; apagando = ""
+    desenharGuardados("nome")
+  } else if (acao === "cancelar") {
+    renomeando = ""
+    desenharGuardados([id, "renomear"])
+  } else if (acao === "apagar") {
+    clearTimeout(apagarTimer)
+    if (apagando !== id) {
+      apagando = id
+      apagarTimer = setTimeout(() => { apagando = ""; desenharGuardados() }, 4000)
+      return desenharGuardados([id, "apagar"])
+    }
+    apagando = ""
+    const resto = lerGuardados().filter(outro => outro.id !== id)
+    if (!gravarGuardados(resto)) return Copiar.avisar("Não deu para apagar neste navegador.")
+    desenharGuardados("titulo")
+    Copiar.avisar("Apagado de Meus prompts.")
+  }
+})
+$("guardados").addEventListener("submit", event => {
+  event.preventDefault()
+  const linha = event.target.closest("li.guardado")
+  const nome = linha.querySelector("input").value.trim().replace(/\s+/g, " ").slice(0, 80)
+  if (!nome) return linha.querySelector("input").focus()
+  const lista = lerGuardados()
+  const item = lista.find(outro => outro.id === linha.dataset.id)
+  renomeando = ""
+  if (item) {
+    item.nome = nome
+    Copiar.avisar(gravarGuardados(lista) ? "Nome salvo." : "Não deu para renomear neste navegador.")
+  }
+  desenharGuardados([linha.dataset.id, "renomear"])
+})
+window.addEventListener("storage", event => { if (event.key === CHAVE && !renomeando) desenharGuardados() })
+desenharGuardados()
 render()
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
