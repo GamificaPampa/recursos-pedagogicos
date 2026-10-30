@@ -282,6 +282,7 @@
     setup:setup, start:start, stop:stop, destroy:destroy,
     resize:function(){ if(C) C.resize(); },
     drawIcon:drawIcon,
+    errorKind:function(){ return st && st.hits > 0 ? 'bug' : ''; }, // o erro da rodada, para o resumo da turma no telão
     stats:function(){
       return [
         ['peca', st.pieces + (st.pieces === 1 ? ' peça de código' : ' peças de código')],

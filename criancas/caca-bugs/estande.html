@@ -83,6 +83,72 @@
 
   @media (max-width:900px){ body{ overflow:auto; } main{ grid-template-columns:1fr; } .qr{ width:min(80vw, 420px); } header{ flex-direction:column; align-items:flex-start; } h1{ white-space:normal; } li{ max-height:none; } .bug{ display:none; } }
   @media (prefers-reduced-motion: reduce){ *{ animation:none!important; } }
+
+  /* Resumo da turma: tela grande para o professor ver no fim da aula. Só números da sala, sem apelido e sem ranking */
+  .head-acoes{ display:flex; align-items:center; justify-content:flex-end; gap:8px 18px; flex-wrap:wrap; }
+  .board-head{ flex-wrap:wrap; }
+  .btn-branco{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:6px 22px; border:3px solid var(--ink); border-radius:999px; background:#fff; color:var(--ink);
+               font:inherit; font-weight:600; font-size:clamp(1rem, 1.3vw, 1.2rem); line-height:1.2; cursor:pointer; box-shadow:0 5px 0 var(--ink); transition:transform .12s ease, box-shadow .12s ease; }
+  .btn-branco:hover{ transform:translateY(2px); box-shadow:0 3px 0 var(--ink); }
+  .btn-branco:active{ transform:translateY(5px); box-shadow:0 0 0 var(--ink); }
+  .btn-branco:focus-visible{ outline:4px solid var(--pink); outline-offset:3px; }
+  .btn-branco[disabled]{ opacity:.5; cursor:default; transform:none; box-shadow:0 5px 0 var(--ink); }
+  .resumo{ position:fixed; inset:0; z-index:20; overflow:auto; background:linear-gradient(180deg, #6cc4ff 0%, #d2f1ff 75%); padding:2.4vh 2.6vw 3vh; }
+  .resumo[hidden]{ display:none; }
+  .resumo-folha{ max-width:1600px; margin:0 auto; display:flex; flex-direction:column; gap:2vh; }
+  .resumo-topo{ display:flex; align-items:center; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; }
+  .resumo-topo h2{ margin:0; font-size:clamp(2rem, 4.2vw, 3.8rem); line-height:1; font-weight:700; color:#fff; -webkit-text-stroke:5px var(--ink); paint-order:stroke fill; text-shadow:0 6px 0 var(--ink); }
+  .resumo-sub{ display:inline-block; margin:1.2vh 0 0; background:#fff; border-radius:16px; padding:4px 16px; font-weight:600; font-size:clamp(1rem, 1.6vw, 1.4rem); }
+  .resumo-acoes{ display:flex; gap:12px; flex-wrap:wrap; }
+  .tiles{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1.2vw; }
+  .tile{ background:#fff; border-radius:24px; border-top:8px solid var(--c); padding:1vh 1vw 1.2vh; text-align:center; box-shadow:0 8px 0 rgba(47,42,74,.14); }
+  .tile b{ display:block; font-size:clamp(2.2rem, min(4.6vw, 8vh), 4.4rem); line-height:1.05; font-variant-numeric:tabular-nums; }
+  .tile span{ display:block; font-weight:600; color:var(--soft); font-size:clamp(.95rem, 1.4vw, 1.3rem); line-height:1.2; }
+  .paineis{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1.2vw; align-items:start; }
+  .paineis.tres{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .painel{ background:#fff; border-radius:24px; padding:1.4vh 1.3vw 1.8vh; box-shadow:0 8px 0 rgba(47,42,74,.14); min-width:0; }
+  .painel h3{ margin:0 0 1vh; font-size:clamp(1.15rem, 1.8vw, 1.6rem); font-weight:700; }
+  .painel h4{ margin:1.4vh 0 .6vh; font-size:clamp(1rem, 1.4vw, 1.3rem); font-weight:700; color:var(--soft); }
+  .painel h3 + h4{ margin-top:0; }
+  .grafico svg{ display:block; width:100%; height:auto; max-height:44vh; margin:0 auto; }
+  .grafico text{ font-family:var(--font); fill:var(--ink); }
+  .lbar{ display:grid; grid-template-columns:minmax(0, 11em) minmax(0, 1fr) 2.4em; align-items:center; gap:10px; margin:.7vh 0; font-weight:600; font-size:clamp(.95rem, 1.35vw, 1.25rem); }
+  .lbar .rot{ min-width:0; line-height:1.15; overflow-wrap:break-word; }
+  .lbar .trilha{ display:block; height:1.3em; background:var(--paper, #f3f8ff); border:3px solid var(--ink); border-radius:999px; overflow:hidden; }
+  .lbar .trilha i{ display:block; height:100%; border-right:3px solid var(--ink); }
+  .lbar .val{ text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+  .tag{ display:inline-block; margin-left:.4em; padding:0 .55em; border-radius:999px; background:var(--yellow); border:2px solid var(--ink); font-style:normal; font-size:.78em; font-weight:700; white-space:nowrap; }
+  .erro-jogo{ margin:0 0 1.4vh; font-size:clamp(.95rem, 1.35vw, 1.25rem); line-height:1.25; font-weight:600; }
+  .erro-jogo b{ display:block; font-weight:700; }
+  .erro-jogo span{ color:var(--soft); }
+  .dado{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:0 0 1.2vh; font-weight:600; font-size:clamp(1rem, 1.5vw, 1.4rem); line-height:1.2; }
+  .dado b{ font-size:clamp(1.8rem, 3.4vw, 3rem); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .nota{ margin:0; color:var(--soft); font-weight:600; font-size:clamp(1rem, 1.3vw, 1.15rem); line-height:1.3; }
+  .r-vazio{ background:#fff; border-radius:24px; padding:4vh 3vw; text-align:center; font-weight:600; font-size:clamp(1.2rem, 2vw, 1.8rem); box-shadow:0 8px 0 rgba(47,42,74,.14); }
+  .print-only{ display:none; }
+  @media (max-width:1100px){ .paineis.tres{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  @media (max-width:900px){ .tiles, .paineis, .paineis.tres{ grid-template-columns:repeat(2, minmax(0, 1fr)); } .paineis, .paineis.tres{ grid-template-columns:1fr; } .tiles{ gap:12px; } .paineis{ gap:16px; } .resumo{ padding:16px; } .head-acoes{ justify-content:flex-start; } }
+  @media print{
+    @page{ margin:14mm; }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; animation:none !important; }
+    html, body{ height:auto; overflow:visible; background:#fff; }
+    body > *:not(#resumo){ display:none !important; }
+    .resumo{ position:static; overflow:visible; background:#fff; padding:0; }
+    .no-print{ display:none !important; }
+    .print-only{ display:block; }
+    .resumo-folha{ max-width:none; gap:14px; }
+    .resumo-topo h2{ color:var(--ink); -webkit-text-stroke:0; text-shadow:none; font-size:30px; }
+    .resumo-sub{ background:none; padding:0; margin-top:6px; font-size:16px; }
+    .tiles{ grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; } .paineis, .paineis.tres{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; }
+    .tile, .painel, .r-vazio{ box-shadow:none; border:2px solid var(--ink); break-inside:avoid; }
+    .tile{ border-top:8px solid var(--c); padding:8px 6px; }
+    .tile b{ font-size:34px; } .tile span{ font-size:14px; }
+    .painel{ padding:12px 16px; } .painel h3{ font-size:19px; } .painel h4{ font-size:15px; }
+    .grafico svg{ max-height:none; width:100%; }
+    .lbar{ grid-template-columns:minmax(0, 7.5em) minmax(0, 1fr) 1.8em; }
+    .lbar{ font-size:15px; } .erro-jogo{ font-size:15px; } .dado{ font-size:16px; } .dado b{ font-size:26px; } .nota{ font-size:13px; }
+    .rodape{ margin:0; font-size:12px; color:var(--soft); }
+  }
 </style>
 </head>
 <body>
@@ -104,12 +170,31 @@
     <section class="board" id="board">
       <div class="board-head">
         <h2 data-icone="trofeu">Placar de hoje</h2>
-        <div class="live" id="live"><i></i><span id="live-t">ao vivo</span></div>
+        <div class="head-acoes">
+          <button type="button" class="btn-branco" id="btn-resumo" data-icone="prancheta">Resumo da turma</button>
+          <div class="live" id="live"><i></i><span id="live-t">ao vivo</span></div>
+        </div>
       </div>
       <ol id="list"></ol>
       <div class="count" id="count"></div>
     </section>
   </main>
+</div>
+<div class="resumo" id="resumo" role="dialog" aria-modal="true" aria-labelledby="resumo-titulo" hidden>
+  <div class="resumo-folha">
+    <div class="resumo-topo">
+      <div>
+        <h2 id="resumo-titulo">Resumo da turma</h2>
+        <p class="resumo-sub">Caça aos Bugs · Sala <b id="r-sala"></b> · <span id="r-data"></span></p>
+      </div>
+      <div class="resumo-acoes no-print">
+        <button type="button" class="btn-branco" id="r-imprimir" data-icone="atividade">Imprimir resumo</button>
+        <button type="button" class="btn-branco" id="r-fechar" data-icone="errado">Fechar</button>
+      </div>
+    </div>
+    <div id="r-corpo"></div>
+    <p class="rodape print-only">Resumo da sala, sem apelidos: só números da turma.</p>
+  </div>
 </div>
 <div class="admin-bar">
   <button type="button" id="btn-reset" class="danger">Nova sala</button>
@@ -123,7 +208,7 @@
   'use strict';
   var FEED_BASE = 'https://ntfy.sh/cacabugs-es-9d27f41ac6'; // o canal de cada turma leva o código da sala no fim
   var ENDERECO = 'https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/';
-  var TOP = 10, MAX_SCORE = 1500, MAX_HITS = 70, POLL_MS = 4000; // acima do teto a jogada é ignorada (placar forjado)
+  var TOP = 10, MAX_SCORE = 1500, MAX_HITS = 70, MAX_ESC = 5, POLL_MS = 4000; // acima do teto a jogada é ignorada (placar forjado)
   var K_ENTRIES = 'cacabugs-placar', K_HIDDEN = 'cacabugs-ocultos', K_RESET = 'cacabugs-zerado', K_SINCE = 'cacabugs-since', K_SALA = 'cacabugs-sala-telao';
   // O jogo sorteia o apelido (bicho + adjetivo + número). O telão só aceita apelidos nesse formato
   var BICHOS = { 'Gato':'gato', 'Sapo':'sapo', 'Panda':'panda', 'Raposa':'raposa', 'Polvo':'polvo', 'Tatu':'', 'Quero-quero':'', 'Capivara':'', 'Ema':'', 'Graxaim':'' };
@@ -372,17 +457,144 @@
           // Cada bug vale no máximo 35 pontos: se vier a contagem de bugs, ela tem de bater com a pontuação
           if(typeof d.h === 'number' && (d.h % 1 !== 0 || d.h < 1 || d.h > MAX_HITS || d.s > d.h * 35)) return;
           var k = d.k.slice(0, 40);
-          if(!entries[k]){ entries[k] = { n:d.n, s:d.s, t:m.time }; fresh.push(k); }
+          // Bugs que escaparam (e) e consertados (h): jogada antiga não traz, e fica null
+          var esc = typeof d.e === 'number' && d.e % 1 === 0 && d.e >= 0 && d.e <= MAX_ESC ? d.e : null;
+          if(!entries[k]){ entries[k] = { n:d.n, s:d.s, t:m.time, x:esc, h:typeof d.h === 'number' ? d.h : null }; fresh.push(k); }
         }catch(e){}
       });
       save(K_SINCE, since);
-      if(fresh.length){ save(K_ENTRIES, entries); render(fresh); }
+      if(fresh.length){ save(K_ENTRIES, entries); render(fresh); if(resumoAberto) desenharResumo(); }
       setLive(true);
     }catch(err){
       if(daSala === sala) setLive(false);
     }finally{
       setTimeout(poll, POLL_MS);
     }
+  }
+
+  // ---- Resumo da turma: os números da sala para o professor ver no fim da aula. Nunca mostra apelido nem ranking ----
+  var N_FAIXAS = 6; // faixas de 100 pontos; a última é "500 ou mais"
+  function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function num(n, dec){ return n.toLocaleString('pt-BR', { maximumFractionDigits:dec || 0 }); }
+  function umOuVarios(n, um, varios){ return num(n) + ' ' + (n === 1 ? um : varios); }
+  function dataDeHoje(){
+    try{ return new Date().toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' }); }
+    catch(e){ return new Date().toISOString().slice(0, 10); }
+  }
+  function tile(cor, valor, rotulo){
+    var t = el('div', 'tile'); t.style.setProperty('--c', cor);
+    t.appendChild(el('b', null, valor)); t.appendChild(el('span', null, rotulo));
+    return t;
+  }
+  function painel(titulo){
+    var p = el('section', 'painel'); p.appendChild(el('h3', null, titulo));
+    return p;
+  }
+  // Barras em SVG: quantas jogadas caíram em cada faixa de 100 pontos
+  function graficoFaixas(cont){
+    var W = 480, base = 232, topo = 40, esp = W / N_FAIXAS, larg = 58, max = Math.max.apply(null, cont.concat([1]));
+    var rot = [['0', 'a 99'], ['100', 'a 199'], ['200', 'a 299'], ['300', 'a 399'], ['400', 'a 499'], ['500', 'ou mais']];
+    var s = '<svg viewBox="0 0 ' + W + ' 300" role="img" aria-label="Jogadas por faixa de pontos: ' +
+      cont.map(function(n, i){ return rot[i][0] + ' ' + rot[i][1] + ': ' + n; }).join('; ') + '">';
+    s += '<line x1="4" y1="' + base + '" x2="' + (W - 4) + '" y2="' + base + '" stroke="#2f2a4a" stroke-width="4" stroke-linecap="round"/>';
+    cont.forEach(function(n, i){
+      var h = n ? Math.max(10, Math.round(n / max * (base - topo))) : 0, x = i * esp + (esp - larg) / 2, cx = i * esp + esp / 2;
+      if(h) s += '<rect x="' + x + '" y="' + (base - h) + '" width="' + larg + '" height="' + h + '" rx="7" fill="#8c73ff" stroke="#2f2a4a" stroke-width="3.5"/>';
+      s += '<text x="' + cx + '" y="' + (base - h - 10) + '" text-anchor="middle" font-size="28" font-weight="700">' + n + '</text>';
+      s += '<text x="' + cx + '" y="' + (base + 28) + '" text-anchor="middle" font-size="21" font-weight="700">' + rot[i][0] + '</text>';
+      s += '<text x="' + cx + '" y="' + (base + 52) + '" text-anchor="middle" font-size="19" font-weight="500">' + rot[i][1] + '</text>';
+    });
+    return s + '</svg>';
+  }
+  function faixaDe(pontos){ return Math.min(N_FAIXAS - 1, Math.floor(pontos / 100)); }
+  // Uma linha de barra horizontal; marca o que mais apareceu com um texto, não só com a cor
+  function linhaBarra(rotulo, n, max, cor, maisUsado){
+    var r = el('div', 'lbar'), rot = el('span', 'rot', rotulo), tr = el('span', 'trilha'), v = el('span', 'val', String(n));
+    if(maisUsado){ rot.appendChild(el('em', 'tag', 'mais jogado')); }
+    if(n){ var f = el('i'); f.style.width = (n / max * 100) + '%'; f.style.background = cor; tr.appendChild(f); }
+    r.appendChild(rot); r.appendChild(tr); r.appendChild(v);
+    return r;
+  }
+
+  var resumoAberto = false, focoAntes = null;
+  function abrirResumo(){
+    focoAntes = document.activeElement;
+    resumoAberto = true;
+    document.getElementById('resumo').hidden = false;
+    document.querySelector('.wrap').inert = true;
+    desenharResumo();
+    document.getElementById('r-fechar').focus();
+  }
+  function fecharResumo(){
+    resumoAberto = false;
+    document.getElementById('resumo').hidden = true;
+    document.querySelector('.wrap').inert = false;
+    if(focoAntes && focoAntes.focus) focoAntes.focus();
+  }
+  document.getElementById('btn-resumo').addEventListener('click', abrirResumo);
+  document.getElementById('r-fechar').addEventListener('click', fecharResumo);
+  document.getElementById('r-imprimir').addEventListener('click', function(){ document.getElementById('r-data').textContent = dataDeHoje(); window.print(); });
+  document.addEventListener('keydown', function(e){
+    if(!resumoAberto) return;
+    if(e.key === 'Escape'){ e.preventDefault(); fecharResumo(); return; }
+    if(e.key !== 'Tab') return;
+    // O foco fica preso nos dois botões do resumo
+    var bs = [document.getElementById('r-imprimir'), document.getElementById('r-fechar')].filter(function(b){ return !b.disabled; });
+    if(!bs.length) return;
+    var i = bs.indexOf(document.activeElement);
+    e.preventDefault();
+    bs[(i + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus();
+  });
+  function desenharResumo(){
+    var corpo = document.getElementById('r-corpo');
+    corpo.innerHTML = '';
+    document.getElementById('r-sala').textContent = sala;
+    document.getElementById('r-data').textContent = dataDeHoje();
+    var lista = Object.keys(entries).filter(function(k){ return !hidden[k]; }).map(function(k){ return entries[k]; });
+    document.getElementById('r-imprimir').disabled = !lista.length;
+    if(!lista.length){
+      corpo.appendChild(el('div', 'r-vazio', 'Ninguém enviou jogada ainda. Quando a turma jogar e enviar, o resumo aparece aqui.'));
+      return;
+    }
+    var soma = 0, melhor = 0, apelidos = {}, nApelidos = 0, faixas = [], escapou = 0, comEsc = 0, travou = 0, consertados = 0, comHits = 0;
+    for(var i = 0; i < N_FAIXAS; i++) faixas.push(0);
+    lista.forEach(function(e){
+      soma += e.s; if(e.s > melhor) melhor = e.s;
+      if(!apelidos[e.n]){ apelidos[e.n] = 1; nApelidos++; }
+      faixas[faixaDe(e.s)]++;
+      if(typeof e.x === 'number'){ comEsc++; escapou += e.x; if(e.x >= MAX_ESC) travou++; }
+      if(typeof e.h === 'number'){ comHits++; consertados += e.h; }
+    });
+    var total = lista.length;
+
+    var tiles = el('div', 'tiles');
+    tiles.appendChild(tile('#8c73ff', num(total), total === 1 ? 'jogada' : 'jogadas'));
+    tiles.appendChild(tile('#ff5f8f', num(nApelidos), nApelidos === 1 ? 'apelido diferente' : 'apelidos diferentes'));
+    tiles.appendChild(tile('#ff8a3d', num(Math.round(soma / total)), 'pontos em média'));
+    tiles.appendChild(tile('#4fd6a6', num(melhor), 'melhor pontuação'));
+    corpo.appendChild(tiles);
+
+    var paineis = el('div', 'paineis');
+    var pf = painel('Pontos por faixa'); var gr = el('div', 'grafico'); gr.innerHTML = graficoFaixas(faixas); pf.appendChild(gr);
+    paineis.appendChild(pf);
+
+    // O que mais erraram: o jogo manda quantos bugs escaparam em cada jogada
+    var pe = painel('Bugs que escaparam');
+    if(comEsc){
+      var d1 = el('p', 'dado', 'Escaparam por jogada, em média'); d1.appendChild(el('b', null, num(escapou / comEsc, 1)));
+      var d2 = el('p', 'dado', 'Jogadas em que o app travou'); d2.appendChild(el('b', null, num(travou) + ' de ' + num(comEsc)));
+      pe.appendChild(d1); pe.appendChild(d2);
+      pe.appendChild(el('p', 'nota', 'O app trava quando escapam ' + MAX_ESC + ' bugs. Quanto antes o bug aparece, mais fácil é consertar.'));
+    } else {
+      pe.appendChild(el('p', 'nota', 'Estas jogadas não trazem a contagem de bugs que escaparam.'));
+    }
+    if(comHits){
+      var d3 = el('p', 'dado', 'Bugs consertados pela turma'); d3.appendChild(el('b', null, num(consertados)));
+      d3.style.marginTop = '2vh';
+      pe.appendChild(d3);
+    }
+    paineis.appendChild(pe);
+    corpo.appendChild(paineis);
   }
 
   document.getElementById('gear').addEventListener('click', function(){ document.body.classList.toggle('admin'); });

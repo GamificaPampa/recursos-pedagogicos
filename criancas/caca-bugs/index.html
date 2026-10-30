@@ -594,7 +594,7 @@
     if(isRecord) withIcon($('record'), 'festa', 'Novo recorde neste celular!');
     else $('record').textContent = 'Recorde neste celular: ' + best + ' pts';
     $('fact').textContent = FACTS[Math.floor(Math.random() * FACTS.length)];
-    lastRound = { score:S.score, hit:S.hit };
+    lastRound = { score:S.score, hit:S.hit, miss:S.miss };
     resetSendCard();
     show('scr-end');
     sfx.win();
@@ -715,7 +715,7 @@
     btn.disabled = true; btn.textContent = '...';
     var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     try{
-      var res = await buscar(canal(sala), { method:'POST', body: JSON.stringify({ n:nick, s:lastRound.score, h:lastRound.hit, k:key }) });
+      var res = await buscar(canal(sala), { method:'POST', body: JSON.stringify({ n:nick, s:lastRound.score, h:lastRound.hit, e:lastRound.miss, k:key }) });
       if(!res.ok) throw new Error('status ' + res.status);
       sentKey = key;
       var card = document.querySelector('.send');

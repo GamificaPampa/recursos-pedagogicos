@@ -640,7 +640,7 @@
     $('learn').textContent = g.learn;
     $('real').textContent = g.real || '';
     $('real-wrap').hidden = !g.real;
-    lastRound = { g:g.id, score:score, m:run.mode };
+    lastRound = { g:g.id, score:score, m:run.mode, e:g.errorKind ? g.errorKind() : '' }; // e: o tipo de erro mais comum da rodada, sem dado pessoal
     resetSendCard();
     $('send-card').hidden = score <= 0;
     show('scr-end');
@@ -758,7 +758,7 @@
     btn.disabled = true; btn.textContent = '...';
     var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     try{
-      var res = await buscar(canal(sala), { method:'POST', body:JSON.stringify({ g:lastRound.g, m:lastRound.m, n:nick, s:lastRound.score, k:key }) });
+      var res = await buscar(canal(sala), { method:'POST', body:JSON.stringify({ g:lastRound.g, m:lastRound.m, n:nick, s:lastRound.score, e:lastRound.e, k:key }) });
       if(!res.ok) throw new Error('status ' + res.status);
       sentKey = key;
       $('send-card').classList.add('done');

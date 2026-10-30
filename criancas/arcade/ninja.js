@@ -329,6 +329,7 @@
     setup:setup, start:start, stop:stop, destroy:destroy,
     resize:function(){ if(C) C.resize(); },
     drawIcon:drawIcon,
+    errorKind:function(){ return st && st.files > 0 ? 'arquivo' : ''; }, // o erro da rodada, para o resumo da turma no telão
     stats:function(){
       return [
         ['glitch', st.cut + (st.cut === 1 ? ' glitch cortado' : ' glitches cortados')],
