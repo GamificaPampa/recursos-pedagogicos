@@ -154,6 +154,37 @@
   .closing p { margin: 0 0 14px; font-size: 22px; font-weight: 700 }
   footer { position: relative; z-index: 1; padding: 10px 16px 26px; text-align: center; font-weight: 600 }
 
+  /* Mande um prompt que deu certo: o formulário que vai para a equipe, como o da Galeria */
+  .mandar-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 16px; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px }
+  .mandar-link svg { width: 18px; height: 18px; flex: none }
+  .mandar { max-width: 820px; margin: 40px auto 0; scroll-margin-top: 90px }
+  .mandar h2 { margin: 0 0 6px; font-size: clamp(26px, 6vw, 34px); line-height: 1.1 }
+  .mandar-sub { margin: 0 0 18px; font-weight: 500 }
+  .mandar label { display: block; margin-bottom: 14px; font-weight: 600 }
+  .mandar label small { font-weight: 500 }
+  .mandar select, .mandar input[type=text], .mandar input[type=email], .mandar textarea { display: block; width: 100%; min-height: 50px; margin-top: 6px; padding: 10px 14px; border: 3px solid var(--risco); border-radius: 14px; background: #fff; font: 500 17px var(--font); color: var(--ink) }
+  .mandar textarea { min-height: 96px; resize: vertical }
+  .mandar #m-prompt { min-height: 200px; font-size: 16px; line-height: 1.4 }
+  .mandar select:focus, .mandar input:focus, .mandar textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(77, 163, 255, .35) }
+  .mandar .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px }
+  .mandar .missing { border-color: var(--pink) !important; background: #fff4f7 }
+  .mandar .hint { display: block; margin-top: 5px; font-size: 15px; font-weight: 500; color: var(--soft) }
+  .mandar .preenchido { margin: 0 0 14px; padding: 8px 12px; background: #c9f5e3; border-radius: 14px; font-size: 15px; font-weight: 600 }
+  .mandar .confirm { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 16px; cursor: pointer }
+  .mandar .confirm input { width: 28px; height: 28px; flex: none; margin: 0; accent-color: var(--ink); cursor: pointer }
+  .mandar .confirm input:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .mandar .hp { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
+  .mandar .enviar { width: 100% }
+  .mandar .enviar[disabled] { opacity: .7; cursor: wait }
+  #m-status { margin: 14px 0 0; padding: 10px 14px; background: #ffd6e3; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600; overflow-wrap: anywhere }
+  .mandar .done { display: grid; justify-items: center; gap: 10px; padding: 10px 0; text-align: center }
+  .mandar .done .recebido svg { width: 84px; height: 84px; overflow: visible }
+  .mandar .done h3 { margin: 0; font-size: clamp(26px, 6vw, 34px) }
+  .mandar .done p { margin: 0 0 6px; font-size: 19px; font-weight: 500 }
+  @media (max-width: 600px) {
+    .mandar .pair { grid-template-columns: 1fr }
+  }
+
   @media (max-width: 480px) {
     .bot { width: 84px }
     .card { padding: 18px 16px }
@@ -208,6 +239,7 @@
     <h1><span class="w1">Biblioteca</span> <span class="w2">de</span> <span class="w3">prompts</span></h1>
     <p>Pedidos prontos para adaptar à sua turma, todos montados com as quatro partes do método.</p>
     <ul class="parts"><li class="role"><i>P</i>Papel</li><li class="task"><i>T</i>Tarefa</li><li class="context"><i>C</i>Contexto</li><li class="format"><i>F</i>Formato</li></ul>
+    <a class="mandar-link" href="#mandar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Um prompt deu certo na sua turma? Mande para a equipe</a>
   </div>
 </header>
 
@@ -261,6 +293,56 @@
   <p>Não achou o que precisava?</p>
   <a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Quer montar o seu? Use o Construtor de prompts</a>
 </div>
+
+<section class="card mandar" id="mandar" aria-labelledby="mandar-titulo">
+  <h2 id="mandar-titulo">Mande um prompt que deu certo</h2>
+  <p class="mandar-sub">Um prompt funcionou bem no Gemini? Mande para a equipe. A gente revisa e, se estiver bom, põe na Biblioteca para outros professores usarem.</p>
+  <form id="m-form" action="https://formspree.io/f/xljgodjo" method="POST" autocomplete="on" novalidate>
+    <input type="hidden" name="_subject" value="Biblioteca da Oficina: prompt novo">
+    <div class="hp" aria-hidden="true"><label>Não preencha este campo<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
+    <p class="preenchido" id="m-preenchido" role="status" hidden>Preenchemos com o prompt guardado. Confira e complete o resto.</p>
+    <label for="m-titulo">Título curto
+      <input type="text" id="m-titulo" name="titulo" maxlength="80" placeholder="Por exemplo: Bingo das sílabas" autocomplete="off" required>
+    </label>
+    <label for="m-prompt">O prompt
+      <textarea id="m-prompt" name="prompt" maxlength="8000" rows="8" placeholder="Cole aqui o prompt que você mandou para o Gemini" required aria-describedby="d-prompt"></textarea>
+      <span class="hint" id="d-prompt">Cole do jeito que mandou. Se usou duas mensagens, cole as duas.</span>
+    </label>
+    <div class="pair">
+      <label for="m-materia">Matéria
+        <input type="text" id="m-materia" name="materia" list="m-materias" maxlength="80" placeholder="Matemática" autocomplete="off" required>
+      </label>
+      <label for="m-etapa">Etapa
+        <select id="m-etapa" name="etapa" required></select>
+      </label>
+    </div>
+    <datalist id="m-materias"></datalist>
+    <label for="m-dica">O que saiu de bom ou a frase que consertou <small>(opcional)</small>
+      <textarea id="m-dica" name="o_que_deu_certo" maxlength="600" rows="3" placeholder="Por exemplo: com &quot;sem usar o teste interativo&quot; o quiz saiu em texto, pronto para imprimir"></textarea>
+    </label>
+    <div class="pair">
+      <label for="m-professor">Seu nome
+        <input type="text" id="m-professor" name="professor" maxlength="80" autocomplete="name" required>
+      </label>
+      <label for="m-escola">Escola ou cidade <small>(opcional)</small>
+        <input type="text" id="m-escola" name="escola_ou_cidade" maxlength="80" autocomplete="organization" placeholder="Por exemplo: Alegrete">
+      </label>
+    </div>
+    <label for="m-email">Seu e-mail
+      <input type="email" id="m-email" name="email" inputmode="email" maxlength="120" autocomplete="email" placeholder="nome@escola.rs.gov.br" required aria-describedby="d-email">
+      <span class="hint" id="d-email">Só para a equipe responder. Ele não aparece na Biblioteca.</span>
+    </label>
+    <label class="confirm" for="m-confirmo"><input type="checkbox" id="m-confirmo" name="confirmacao" value="Confirmo que o prompt não tem nome nem dado de aluno" required><span>Confirmo que o prompt não tem nome nem dado de aluno</span></label>
+    <button class="btn btn--falar enviar" type="submit" id="m-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Enviar para a equipe</span></button>
+    <p id="m-status" role="alert" hidden></p>
+  </form>
+  <div class="done" id="m-done" role="status" tabindex="-1" hidden>
+    <span class="recebido" aria-hidden="true"></span>
+    <h3>Recebemos!</h3>
+    <p>A equipe revisa e, se estiver bom, põe na Biblioteca.</p>
+    <button class="btn btn--white" type="button" id="m-again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Mandar outro prompt</button>
+  </div>
+</section>
 </div>
 
 <footer>Curso de Engenharia de Software · UNIPAMPA · Campus Alegrete</footer>
@@ -1529,6 +1611,7 @@ function totalDoChip(filter, value) {
 }
 
 let renomeando = "", apagando = "", apagarTimer
+const AVIAO = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 L3 10.5 L10 13.5 L13.5 21 Z M10 13.5 L21 3" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 function itemHTML(item) {
   const stage = STAGES[item.etapa], kind = KINDS[item.tipo] || { label: "Prompt", tint: "#cfe6ff" }
   const dois = item.mensagens.length > 1
@@ -1550,6 +1633,7 @@ function itemHTML(item) {
       ${nome}
       <details class="ver-prompt"><summary>Ver o prompt inteiro</summary><pre>${escape(item.mensagens.join("\n\n-----\n\n"))}</pre></details>
       ${renomeando === item.id ? "" : `<div class="actions">${copiar}
+        <button class="btn btn--falar" type="button" data-acao="mandar">${AVIAO}Mandar este prompt</button>
         <button class="btn open" type="button" data-acao="renomear">Renomear</button>
         <button class="btn open" type="button" data-acao="apagar"${apagando === item.id ? ' style="--c: var(--pink)"' : ""}>${apagando === item.id ? "Apagar mesmo?" : "Apagar"}</button>
         <span class="copied" role="status"></span></div>`}
@@ -1692,6 +1776,8 @@ $("meus-itens").addEventListener("click", async event => {
   if (acao === "copiar") {
     const ok = await copyText(item.mensagens[Number(botao.dataset.i)] ?? item.mensagens[0])
     avisarNoCartao(botao, ok ? "Copiado! Agora cole no Gemini." : "")
+  } else if (acao === "mandar") {
+    mandarGuardado(item)
   } else if (acao === "renomear") {
     renomeando = id; apagando = ""
     desenharItens("nome")
@@ -1763,6 +1849,105 @@ const anotarFiltros = () => {
 }
 const filtrar = applyFilters
 applyFilters = (animate = true) => { filtrar(animate); anotarFiltros() }
+
+// Mande um prompt que deu certo: a equipe recebe pelo Formspree, o mesmo serviço da Galeria,
+// revisa e, se estiver bom, põe o prompt na lista PROMPTS lá em cima
+const formMandar = $("m-form"), avisoMandar = $("m-status")
+const CAMPOS = [["m-titulo", "título"], ["m-prompt", "o prompt"], ["m-materia", "matéria"], ["m-etapa", "etapa"],
+  ["m-professor", "seu nome"], ["m-email", "e-mail"], ["m-confirmo", "a confirmação sobre dados de aluno"]]
+const etapaDe = id => `${STAGES[id].label} (${STAGES[id].ages})`
+$("m-etapa").innerHTML = `<option value="">Escolha</option>` + Object.keys(STAGES).map(id => `<option>${etapaDe(id)}</option>`).join("") + `<option>Serve para várias etapas</option>`
+$("m-materias").innerHTML = materiasEmOrdem.map(([, nome]) => `<option value="${escape(nome)}">`).join("")
+$("m-done").querySelector(".recebido").innerHTML = Icones.svg("estrela")
+const valorM = id => $(id).value.trim()
+const emailBom = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valorM("m-email"))
+
+function faltasM() {
+  const lista = []
+  for (const [id, nome] of CAMPOS) {
+    if (id === "m-confirmo" ? !$(id).checked : !valorM(id)) lista.push([id, nome])
+    else if (id === "m-email" && !emailBom()) lista.push([id, "um e-mail que funcione"])
+  }
+  return lista
+}
+function marcarM(lista) {
+  for (const [id] of CAMPOS) {
+    const ruim = lista.some(([outro]) => outro === id)
+    const caixa = id === "m-confirmo" ? $(id).closest(".confirm") : $(id)
+    caixa.classList.toggle("missing", ruim)
+    $(id).setAttribute("aria-invalid", ruim)
+  }
+}
+function dizerM(texto) {
+  avisoMandar.textContent = texto
+  avisoMandar.hidden = !texto
+}
+const juntarNomes = nomes => nomes.length < 2 ? nomes[0] : `${nomes.slice(0, -1).join(", ")} e ${nomes.at(-1)}`
+
+formMandar.addEventListener("input", () => { if (!avisoMandar.hidden) marcarM(faltasM()) })
+formMandar.addEventListener("change", () => { if (!avisoMandar.hidden) marcarM(faltasM()) })
+
+async function enviarPrompt(event) {
+  event.preventDefault()
+  const lista = faltasM()
+  marcarM(lista)
+  if (lista.length) {
+    dizerM(`Falta preencher: ${juntarNomes([...new Set(lista.map(([, nome]) => nome))])}.`)
+    $(lista[0][0]).focus()
+    return
+  }
+  // A mesma busca de dado de aluno do Guardar: avisa e só segue se a pessoa confirmar
+  const achados = achadosNosCampos({ titulo: valorM("m-titulo"), prompt: valorM("m-prompt"), dica: valorM("m-dica") })
+  if (achados.length && !confirm(`Parece que há dado de aluno no prompt: ${achados.join(", ")}. Nada disso pode ir para a Biblioteca. Mandar mesmo assim?`)) {
+    dizerM("Tire do prompt o nome, a turma ou o contato do aluno e envie de novo.")
+    $("m-prompt").focus()
+    return
+  }
+  dizerM("")
+  const botao = $("m-btn"), rotulo = botao.querySelector("span")
+  botao.disabled = true
+  rotulo.textContent = "Enviando..."
+  try {
+    const resposta = await fetch(formMandar.action, { method: "POST", body: new FormData(formMandar), headers: { Accept: "application/json" } })
+    if (!resposta.ok) {
+      dizerM("O serviço de envio recusou a mensagem e a equipe não recebeu. O prompt continua aqui: tente de novo em alguns minutos. Se o erro continuar, fale com a coordenação da oficina.")
+      return
+    }
+    formMandar.hidden = true
+    $("m-done").hidden = false
+    $("m-done").focus()
+  } catch (error) {
+    dizerM("Não deu para enviar: parece que a internet caiu. Confira a conexão e tente de novo. O prompt continua aqui.")
+  } finally {
+    botao.disabled = false
+    rotulo.textContent = "Enviar para a equipe"
+  }
+}
+formMandar.addEventListener("submit", enviarPrompt)
+
+function novoEnvio() {
+  formMandar.reset()
+  marcarM([])
+  dizerM("")
+  $("m-preenchido").hidden = true
+  $("m-done").hidden = true
+  formMandar.hidden = false
+}
+$("m-again").addEventListener("click", () => { novoEnvio(); $("m-titulo").focus() })
+
+// O botão Mandar este prompt, nos guardados do Construtor: preenche o formulário e leva até ele
+function mandarGuardado(item) {
+  if (!formMandar.hidden) $("m-done").hidden = true
+  else novoEnvio()
+  $("m-titulo").value = item.nome.slice(0, 80)
+  $("m-prompt").value = item.mensagens.length > 1 ? item.mensagens.map((texto, i) => `${i + 1}ª mensagem:\n${texto}`).join("\n\n") : item.mensagens[0] || ""
+  if (STAGES[item.etapa]) $("m-etapa").value = etapaDe(item.etapa)
+  if (typeof item.materia === "string" && item.materia.trim()) $("m-materia").value = item.materia.trim()
+  $("m-preenchido").hidden = false
+  if (!avisoMandar.hidden) marcarM(faltasM())
+  $("mandar").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+  $("m-titulo").focus({ preventScroll: true })
+}
 restaurarCampos()
 sincronizarCartoes()
 applyFilters(false)
