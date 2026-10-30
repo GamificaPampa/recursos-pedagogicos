@@ -15,6 +15,7 @@ Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celu
 | Arcade do Código, três jogos com placar | Todas | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/) | [criancas/arcade](criancas/arcade) |
 | Caça aos Bugs! | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/) | [criancas/caca-bugs](criancas/caca-bugs) |
 | Missão Dev, a primeira versão dos jogos | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/) | [criancas/missao-dev](criancas/missao-dev) |
+| Bichos do Pampa, exemplo para a Educação Infantil | 4 e 5 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/bichos-do-pampa/) | [criancas/bichos-do-pampa](criancas/bichos-do-pampa) |
 | Pizzaria das Frações, exemplo de Matemática | 9 e 10 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/pizzaria-das-fracoes/) | [criancas/pizzaria-das-fracoes](criancas/pizzaria-das-fracoes) |
 | Ciclo da Água, exemplo de Ciências | 10 e 11 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/ciclo-da-agua/) | [criancas/ciclo-da-agua](criancas/ciclo-da-agua) |
 | Fábrica de Sílabas, exemplo de Língua Portuguesa | 6 e 7 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/fabrica-de-silabas/) | [criancas/fabrica-de-silabas](criancas/fabrica-de-silabas) |

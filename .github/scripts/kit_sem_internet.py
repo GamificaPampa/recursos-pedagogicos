@@ -19,7 +19,7 @@ SITE = "https://gamificapampa.github.io/"
 RAIZ = Path(__file__).resolve().parents[2]
 # Os jogos do menu da turma (a lista JOGOS do jogos.js do hub) e a aula com as crianças
 RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conecta", "criancas/arcade",
-            "criancas/caca-bugs", "criancas/missao-dev", "criancas/pizzaria-das-fracoes", "criancas/balanca-do-bit",
+            "criancas/caca-bugs", "criancas/missao-dev", "criancas/bichos-do-pampa", "criancas/pizzaria-das-fracoes", "criancas/balanca-do-bit",
             "criancas/fabrica-de-silabas", "criancas/detetive-da-noticia", "criancas/ciclo-da-agua",
             "criancas/caminho-da-escola", "criancas/linha-do-tempo", "criancas/atelie-das-cores",
             "criancas/circuito-do-bit", "criancas/ingles-com-o-bit", "criancas/reta-do-bit", "criancas/laboratorio-de-equacoes",
