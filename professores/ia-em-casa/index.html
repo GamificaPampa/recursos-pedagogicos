@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IA em casa · GamificaPampa</title>
+<meta name="description" content="Uma folha para a escola mandar para as famílias: o que é inteligência artificial, o que a turma faz com ela, como conversar em casa e os cuidados com dados, golpes e vídeos falsos.">
+<meta property="og:title" content="IA em casa · GamificaPampa">
+<meta property="og:description" content="Uma folha para as famílias sobre inteligência artificial: como conversar em casa e os cuidados com dados, golpes e vídeos falsos.">
+<meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<style>
+  * { box-sizing: border-box }
+  body { margin: 0; padding: 24px 16px 40px; background: linear-gradient(180deg, var(--sky1) 0, var(--sky2) 520px) no-repeat var(--sky2); color: var(--ink); font-family: var(--font) }
+  .bar { max-width: 210mm; margin: 0 auto 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between }
+  .bar p { margin: 0; flex: 1 1 300px; padding: 10px 16px; background: #fff; border: 3px solid var(--ink); border-radius: 18px; font-size: 17px; font-weight: 500 }
+  .bar svg { width: 24px; height: 24px }
+
+  /* Each sheet is an A4 page measured in its own width, so the screen and the paper look the same */
+  .sheet { container-type: inline-size; width: min(100%, 210mm); aspect-ratio: 210 / 297; margin: 0 auto 24px; padding: 4.6cqw 5cqw; background: #fff; border: 3px solid var(--ink); border-radius: 2cqw; box-shadow: 0 8px 0 rgba(47, 42, 74, .25); display: flex; flex-direction: column; gap: 1.8cqw }
+  header { display: flex; align-items: center; gap: 3cqw }
+  header svg { width: 12cqw; height: 12cqw; flex: none }
+  header h1 { margin: 0; font-size: 7.6cqw; font-weight: 700; line-height: 1; color: #fff; -webkit-text-stroke: .7cqw var(--ink); paint-order: stroke fill; text-shadow: 0 .7cqw 0 var(--ink) }
+  header h1 .y { color: var(--yellow) } header h1 .p { color: var(--pink) }
+  header .sub { display: inline-block; margin-top: 1.6cqw; padding: .3cqw 2.4cqw; background: var(--yellow); border: .4cqw solid var(--ink); border-radius: 999px; font-size: 2.7cqw; font-weight: 600 }
+  .escola { display: flex; gap: 1.5cqw; align-items: flex-end; font-size: 2.8cqw; font-weight: 600 }
+  .escola span { flex: 1; border-bottom: .4cqw solid var(--ink); height: 4cqw }
+  .intro { margin: 0; font-size: 2.55cqw; font-weight: 600; line-height: 1.4 }
+  .bloco { border: .6cqw solid var(--ink); border-radius: 3.6cqw; padding: 2cqw 3cqw; background: linear-gradient(var(--c), var(--c)) top / 100% 1.3cqw no-repeat }
+  .bloco h2 { display: flex; align-items: center; gap: 1.8cqw; margin: .5cqw 0 .8cqw; font-size: 3.1cqw; font-weight: 700 }
+  .bloco h2 svg { width: 5.4cqw; height: 5.4cqw; flex: none }
+  .bloco p, .bloco li { margin: 0 0 .7cqw; font-size: 2.3cqw; font-weight: 500; line-height: 1.35 }
+  .bloco ul { margin: 0; padding-left: 4cqw }
+  .bloco b { font-weight: 700 }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4cqw }
+  .pode { background: #c9f5e3; border-radius: 2.4cqw; padding: 1.6cqw 2.4cqw }
+  .nao { background: #ffd6e3; border-radius: 2.4cqw; padding: 1.6cqw 2.4cqw }
+  .pode b, .nao b { display: block; margin-bottom: .4cqw; font-size: 2.45cqw }
+  .perguntas { display: grid; gap: 1cqw; margin: 0; padding: 0; list-style: none }
+  .perguntas li { margin: 0; padding: 1cqw 2.2cqw; background: #fff1a8; border: .4cqw solid var(--ink); border-radius: 2.4cqw; font-size: 2.4cqw; font-weight: 700 }
+  .rodape { margin-top: auto; display: flex; align-items: center; gap: 3cqw; padding-top: 1.4cqw; border-top: .4cqw dashed #cfcbe6 }
+  .rodape svg { width: 13cqw; height: 13cqw; flex: none }
+  .rodape p { margin: 0; font-size: 2.25cqw; font-weight: 600; line-height: 1.4 }
+  .grow { flex: 1; display: flex; flex-direction: column }
+  .escrever { flex: 1; margin-top: 1.2cqw; font-size: 2.3cqw; font-weight: 700; background: repeating-linear-gradient(transparent 0 5.6cqw, #cfcbe6 5.6cqw 5.9cqw); background-position: 0 2.2cqw; min-height: 6cqw }
+
+  @page { size: A4; margin: 0 }
+  @media print {
+    body { padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact }
+    .bar { display: none }
+    .sheet { width: 210mm; height: 297mm; margin: 0; border: none; border-radius: 0; box-shadow: none; break-after: page; page-break-after: always }
+    .sheet:last-of-type { break-after: auto; page-break-after: auto }
+  }
+</style>
+<script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
+</head>
+<body>
+
+<div class="bar">
+  <p>Uma folha para a escola mandar para casa, frente e verso. Escreva o nome da escola à mão, imprima e entregue com o bilhete do dia.</p>
+  <button class="btn btn--baixar" type="button" onclick="print()"><svg viewBox="0 0 24 24"><path d="M7 9 V3 H17 V9 M7 18 H4 V10 H20 V18 H17 M7 14 H17 V21 H7 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Imprimir</button>
+  <a class="btn" href="ia-em-casa.pdf">PDF</a>
+</div>
+
+<section class="sheet">
+  <header>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
+    <div>
+      <h1><span class="y">IA</span> em <span class="p">casa</span></h1>
+      <div class="sub">Um guia rápido para as famílias</div>
+    </div>
+  </header>
+  <div class="escola">Escola: <span></span></div>
+
+  <p class="intro">Na escola, a turma está aprendendo sobre inteligência artificial, a IA, como o Gemini e o ChatGPT. Ela pode ajudar a estudar, mas também erra. Esta folha ajuda a conversar sobre isso em casa.</p>
+
+  <div class="bloco" style="--c: var(--blue)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6c2 14 12 24 26 26-14 2-24 12-26 26-2-14-12-24-26-26 14-2 24-12 26-26z" fill="#a08bff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>O que é a IA</h2>
+    <p>É um programa que aprendeu com milhões de textos e imagens e responde perguntas, escreve textos e cria figuras. Ela <b>não pensa nem confere</b> o que diz: monta a resposta mais provável. Por isso, às vezes inventa nomes, datas e números com toda a certeza.</p>
+  </div>
+
+  <div class="bloco" style="--c: var(--mint)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 28L32 10l24 18v28H8z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><rect x="26" y="38" width="12" height="18" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/></svg>O que a escola faz</h2>
+    <ul>
+      <li>O professor usa a IA para preparar atividades e jogos, e revisa tudo antes de usar.</li>
+      <li>Os estudantes aprendem a <b>conferir</b> as respostas e a <b>pedir bem</b>.</li>
+      <li>O nome, a foto e os dados dos estudantes <b>nunca</b> vão para a IA.</li>
+    </ul>
+  </div>
+
+  <div class="bloco grow" style="--c: var(--yellow)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 10 H58 V42 H30 L17 55 V42 H6 Z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><circle cx="21" cy="26" r="4" fill="#2f2a4a"/><circle cx="32" cy="26" r="4" fill="#2f2a4a"/><circle cx="43" cy="26" r="4" fill="#2f2a4a"/></svg>Para conversar em casa</h2>
+    <ul class="perguntas">
+      <li>“O que você perguntou para a IA hoje? O que ela respondeu?”</li>
+      <li>“Como você sabe que essa resposta está certa? Onde dá para conferir?”</li>
+      <li>“Você consegue me explicar isso com as suas palavras?”</li>
+      <li>“O que você nunca mandaria para uma IA?”</li>
+    </ul>
+    <div class="escrever">O que a gente conversou:</div>
+  </div>
+
+  <div class="rodape">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
+    <p>Vire a folha: na outra página estão os cuidados com dados, golpes e vídeos falsos.</p>
+  </div>
+</section>
+
+<section class="sheet">
+  <div class="bloco" style="--c: var(--purple)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 34l16 16 32-34" fill="none" stroke="#2f2a4a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>Para estudar, a IA ajuda e atrapalha</h2>
+    <div class="duas">
+      <div class="pode"><b>Ajuda quando</b><ul><li>explica uma dúvida passo a passo</li><li>dá exemplos e perguntas para treinar</li><li>aponta erros num texto que o estudante escreveu</li></ul></div>
+      <div class="nao"><b>Atrapalha quando</b><ul><li>faz o dever inteiro no lugar do estudante</li><li>é usada na prova</li><li>a resposta é copiada sem ler nem conferir</li></ul></div>
+    </div>
+  </div>
+
+  <div class="bloco" style="--c: var(--pink)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="28" width="40" height="30" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="42" r="4" fill="#2f2a4a"/></svg>Cuide dos dados</h2>
+    <p>Não mande para nenhum app de IA: <b>senhas, documentos, endereço, telefone, fotos da família ou de colegas</b>. O que vai para a IA pode ficar guardado. Antes de instalar um app, veja a idade mínima e quem pode usar.</p>
+  </div>
+
+  <div class="bloco" style="--c: var(--orange)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6L60 56H4z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M32 24v14" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="46" r="3.5" fill="#2f2a4a"/></svg>Golpes e vídeos falsos</h2>
+    <ul>
+      <li>Com IA, dá para imitar a voz e o rosto de alguém. Desconfie de <b>áudio ou vídeo pedindo dinheiro, código ou senha com pressa</b>, mesmo com a voz de um parente: desligue e ligue de volta para a pessoa.</li>
+      <li>Vídeo perfeito demais, com alguém famoso dizendo algo absurdo, pode ser falso. Procure a notícia em jornais conhecidos antes de acreditar ou de passar adiante.</li>
+    </ul>
+  </div>
+
+  <div class="bloco grow" style="--c: var(--mint)">
+    <h2><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#c9f5e3" stroke="#2f2a4a" stroke-width="4"/><path d="M32 18v14l10 8" stroke="#2f2a4a" stroke-width="5" stroke-linecap="round"/></svg>Combinados que ajudam</h2>
+    <ul>
+      <li>Usar a IA perto de um adulto, num lugar da casa onde todos passam.</li>
+      <li>Depois de usar, contar para alguém o que perguntou e o que aprendeu.</li>
+      <li>Na dúvida sobre saúde, segurança ou dinheiro, perguntar para uma pessoa, não para a IA.</li>
+    </ul>
+    <div class="escrever">O combinado da nossa casa:</div>
+  </div>
+
+  <div class="rodape">
+    <svg viewBox="0 0 41 41" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo Detetive da IA"><use href="#qr-detetive"/></svg>
+    <p>Para jogar junto, com estudantes a partir de 13 anos: o Detetive da IA, em gamificapampa.github.io/detetive-ia. Dúvidas sobre o que a turma faz? Fale com a escola.<br>GamificaPampa · UNIPAMPA, Campus Alegrete</p>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
+  <symbol id="qr-detetive" viewBox="0 0 41 41"><rect width="41" height="41" fill="#fff"/><path stroke="#000" d="M4 4.5h7m3 0h3m3 0h1m1 0h2m1 0h1m1 0h1m2 0h7m-33 1h1m5 0h1m3 0h3m2 0h1m2 0h1m1 0h2m2 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h1m4 0h3m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h5m5 0h1m2 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h10m2 0h1m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h2m7 0h1m1 0h1m1 0h1m1 0h2m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m1 0h3m1 0h1m1 0h1m1 0h6m-24 1h1m1 0h5m5 0h3m2 0h1m1 0h1m2 0h3m1 0h5m-29 1h1m4 0h2m2 0h1m1 0h1m3 0h4m2 0h1m2 0h2m1 0h2m1 0h1m-33 1h4m2 0h4m1 0h5m1 0h1m4 0h1m2 0h1m2 0h1m1 0h2m-30 1h3m3 0h3m2 0h1m3 0h2m5 0h1m1 0h1m1 0h3m-30 1h1m1 0h2m1 0h1m2 0h4m1 0h3m3 0h6m2 0h2m1 0h1m-32 1h1m1 0h4m1 0h2m1 0h1m4 0h1m2 0h1m2 0h1m2 0h1m1 0h1m2 0h4m-33 1h2m3 0h4m4 0h5m2 0h1m4 0h2m2 0h3m-31 1h2m1 0h2m1 0h1m2 0h1m2 0h3m5 0h2m1 0h7m-31 1h5m1 0h1m3 0h1m3 0h2m1 0h1m2 0h1m1 0h1m1 0h2m1 0h3m2 0h1m-31 1h2m4 0h3m1 0h1m3 0h1m1 0h4m1 0h1m2 0h2m1 0h2m1 0h1m-33 1h1m1 0h2m2 0h2m2 0h2m2 0h3m1 0h1m1 0h2m3 0h1m1 0h2m1 0h2m-31 1h2m2 0h1m2 0h2m1 0h2m2 0h2m3 0h3m2 0h1m1 0h6m-32 1h2m3 0h2m2 0h1m1 0h4m2 0h2m1 0h1m1 0h2m2 0h3m1 0h2m-33 1h3m2 0h1m1 0h2m2 0h7m2 0h4m2 0h1m2 0h2m1 0h1m-33 1h1m3 0h3m2 0h3m2 0h1m3 0h2m1 0h1m3 0h1m1 0h1m2 0h2m-32 1h1m2 0h3m1 0h1m2 0h1m3 0h1m1 0h1m2 0h4m1 0h3m2 0h4m-33 1h1m1 0h1m3 0h1m1 0h6m2 0h2m1 0h1m2 0h7m3 0h1m-25 1h3m1 0h2m2 0h2m1 0h2m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m-33 1h7m3 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1m1 0h1m1 0h1m-31 1h1m5 0h1m1 0h1m1 0h2m1 0h3m1 0h2m4 0h2m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h5m1 0h1m3 0h3m1 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h6m1 0h1m2 0h1m2 0h1m1 0h3m2 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h5m1 0h3m3 0h2m2 0h1m1 0h2m1 0h2m-31 1h1m5 0h1m4 0h5m2 0h1m2 0h1m3 0h2m1 0h3m-31 1h7m1 0h2m1 0h1m1 0h1m1 0h1m1 0h1m4 0h4m1 0h1m1 0h1m1 0h1"/></symbol>
+</svg>
+</body>
+</html>
