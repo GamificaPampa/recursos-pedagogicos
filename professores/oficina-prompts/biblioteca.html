@@ -131,6 +131,20 @@
   .tip { display: flex; align-items: flex-start; gap: 8px; margin: 14px 0 0; padding: 8px 12px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 14px; font-size: 15px; font-weight: 500 }
   .tip svg { width: 22px; height: 22px; flex: none; margin-top: 1px }
 
+
+  /* Meus prompts: o botão Guardar de cada cartão, o filtro e os cartões simples dos guardados no Construtor */
+  .btn.save svg path { fill: #fff }
+  .btn.save[aria-pressed="true"] svg path { fill: #ffd23f }
+  .chip.meus svg path { fill: #ffd23f; stroke: #2f2a4a; stroke-width: 2.4; stroke-linejoin: round }
+  .meus-chips { margin-bottom: 4px }
+  .local { margin: 8px 0 14px; font-size: 15px; font-weight: 600; color: var(--soft) }
+  .pcard.simples pre { max-height: 320px; margin: 0; padding: 10px 12px; overflow: auto; background: var(--sky2); border-radius: 12px; font: 500 15px/1.4 var(--font); white-space: pre-wrap; overflow-wrap: anywhere }
+  .pcard.simples .renomear { display: grid; gap: 8px; margin: 4px 0 10px }
+  .pcard.simples .renomear label { display: grid; gap: 4px; font-weight: 600; font-size: 15px }
+  .pcard.simples .renomear input { min-height: 44px; padding: 6px 12px; border: 3px solid var(--ink); border-radius: 12px; font: inherit; font-weight: 500 }
+  .pcard.simples .actions .btn { --drop-y: 4px; min-height: 48px; padding: 4px 18px; font-size: 16px }
+  .pcard.simples .quando { margin: 0 0 8px; color: var(--soft); font-size: 15px; font-weight: 500 }
+
   .empty { margin-top: 26px; padding: 26px 22px; background: rgba(255, 255, 255, .9); border: 4px dashed var(--ink); border-radius: 26px; text-align: center }
   .empty svg { width: 86px; height: 86px; overflow: visible }
   .empty h2 { margin: 6px 0 4px; font-size: 26px }
@@ -207,6 +221,8 @@
 </section>
 
 <section class="card filters" aria-label="Filtros">
+  <div class="chips meus-chips" role="group" aria-label="Meus prompts"><button type="button" class="chip has-icon meus" data-filter="meus" data-value="1" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Meus prompts<small>os que você guardou</small></span><span class="n"></span></button></div>
+  <p class="local">Ficam só neste aparelho e neste navegador. Nada vai para a internet.</p>
   <label class="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff1a8" stroke="#2f2a4a" stroke-width="2.6"/><path d="M15 15 L21 21" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/></svg>
     <input type="search" id="search" placeholder="Buscar: frações, Pampa, redação, Enem..." aria-label="Buscar nos prompts" autocomplete="off">
@@ -225,6 +241,14 @@
 
 <h2 class="sr-only">Prompts</h2>
 <div class="library" id="library"></div>
+<div class="library" id="meus-itens"></div>
+
+<div class="empty" id="empty-meus" hidden>
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#fff" stroke="#2f2a4a" stroke-width="2" stroke-linejoin="round"/></svg>
+  <h2>Você ainda não guardou nenhum prompt</h2>
+  <p>Para guardar, toque em <b>Guardar</b>, a estrela de cada cartão da biblioteca. No Construtor, use <b>Guardar em Meus prompts</b>. Os guardados aparecem aqui.</p>
+  <a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use o Construtor de prompts</a>
+</div>
 
 <div class="empty" id="empty" hidden>
   <svg viewBox="0 0 90 90" aria-hidden="true"><circle cx="38" cy="38" r="26" fill="#fff1a8" stroke="#2f2a4a" stroke-width="5"/><path d="M57 57 L80 80" stroke="#2f2a4a" stroke-width="9" stroke-linecap="round"/><text x="38" y="50" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="34" font-weight="700" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="4" paint-order="stroke">?</text></svg>
@@ -1350,7 +1374,7 @@ const $ = id => document.getElementById(id)
 const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[character])
 const fold = text => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 const iconOf = kind => Icones.svg(kind)
-const filters = { stage: "", materia: "", kind: "", words: [] }
+const filters = { stage: "", materia: "", kind: "", meus: "", words: [] }
 
 // A matéria vem do campo area. Os campos de experiência da Educação Infantil entram juntos,
 // e nomes iguais viram uma matéria só (o endereço usa o nome sem acento, em minúsculas, com hífen)
@@ -1419,6 +1443,7 @@ function cardHTML(prompt, index) {
       </details>
       <div class="actions">
         <button class="btn copy" type="button" data-copy="${index}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar prompt</button>
+        <button class="btn save" type="button" data-save="${index}" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Guardar</span></button>
         <a class="btn open" href="${GEMINI}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
         <span class="copied" role="status"></span>
       </div>
@@ -1453,30 +1478,137 @@ const matches = (index, ignore) => {
     && filters.words.every(word => haystacks[index].includes(word))
 }
 
+// Meus prompts: o que o professor guardou fica só neste aparelho (localStorage, chave com prefixo gamificapampa-),
+// na mesma chave do Construtor. Cada ação lê o que está guardado, muda e grava de novo.
+// Do Construtor vêm cartões simples (origem "construtor"); da biblioteca, só o id e o que foi escrito nos campos.
+const CHAVE = "gamificapampa-meus-prompts", LIMITE = 200
+const lerGuardados = () => {
+  try {
+    const dados = JSON.parse(localStorage.getItem(CHAVE))
+    return Array.isArray(dados) ? dados.filter(item => item && typeof item.id === "string" && typeof item.origem === "string") : []
+  } catch { return [] }
+}
+const gravarGuardados = lista => {
+  try { localStorage.setItem(CHAVE, JSON.stringify(lista)); return true } catch { return false }
+}
+const idDe = index => "b-" + slug(PROMPTS[index].title)
+const doConstrutor = item => item.origem === "construtor" && typeof item.nome === "string" && Array.isArray(item.mensagens) && item.mensagens.every(texto => typeof texto === "string")
+const dataCurta = iso => { const data = new Date(iso); return isNaN(data) ? "" : data.toLocaleDateString("pt-BR") }
+// Dados de quem escreveu nos campos: avisa antes de guardar (as mesmas buscas do Construtor)
+const PRIVACY = [
+  [/\bnome\s*(do aluno|da aluna|completo)?\s*:/i, "um campo de nome"],
+  [/\b(alun[oa]s?|menin[oa]s?|crian[cç]as?|estudantes?)\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+/, "um nome perto de aluno ou criança"],
+  [/(\b[Tt]urma[ \t]+\d{1,2}[ \t]?[A-H]|\b\d{1,2}[ \t]?[ºo°][ \t]?(ano[ \t])?[A-H])(?![\w)])/, "o nome de uma turma, como 3º B"],
+  [/\(?\b\d{2}\)?\s?9?\d{4}[-\s]?\d{4}\b/, "um telefone"],
+  [/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/, "um CPF"],
+  [/[\w.+-]+@[\w-]+\.[\w.]+/, "um e-mail"],
+  [/\bmatr[ií]cula\b/i, "uma matrícula"],
+]
+const achadosNosCampos = valores => [...new Set(Object.values(valores).flatMap(texto => PRIVACY.filter(([padrao]) => padrao.test(texto)).map(([, o]) => o)))]
+const valoresDoCartao = index => Object.fromEntries([...document.querySelectorAll(`input[data-prompt="${index}"]`)].filter(campo => campo.value.trim()).map(campo => [campo.dataset.lacuna, campo.value.trim()]))
+
+let guardados = lerGuardados()
+const guardadoB = index => guardados.some(item => item.id === idDe(index))
+const itensC = () => guardados.filter(doConstrutor)
+// Um guardado do Construtor também responde aos filtros de turma, matéria, tipo e busca
+const valorItem = { stage: item => item.etapa, materia: item => slug(String(item.materia || "")), kind: item => item.tipo }
+const itemCasa = (item, ignore) =>
+  (ignore === "stage" || !filters.stage || valorItem.stage(item) === filters.stage)
+  && (ignore === "materia" || !filters.materia || valorItem.materia(item) === filters.materia)
+  && (ignore === "kind" || !filters.kind || valorItem.kind(item) === filters.kind)
+  && filters.words.every(word => fold(item.nome + " " + item.mensagens.join(" ")).includes(word))
+const visivelB = index => matches(index) && (!filters.meus || guardadoB(index))
+const itensVisiveis = () => filters.meus ? itensC().filter(item => itemCasa(item)) : []
+// Quantos prompts cada chip mostraria. O chip Meus prompts conta como se estivesse ligado
+function totalDoChip(filter, value) {
+  const meus = filter === "meus" || Boolean(filters.meus)
+  const bate = valor => filter === "meus" || !value || valor === value
+  const dosPrompts = PROMPTS.filter((prompt, index) => matches(index, filter) && (filter === "meus" || bate(valorDe[filter](prompt))) && (!meus || guardadoB(index))).length
+  const dosItens = meus ? itensC().filter(item => itemCasa(item, filter) && (filter === "meus" || bate(valorItem[filter](item)))).length : 0
+  return dosPrompts + dosItens
+}
+
+let renomeando = "", apagando = "", apagarTimer
+function itemHTML(item) {
+  const stage = STAGES[item.etapa], kind = KINDS[item.tipo] || { label: "Prompt", tint: "#cfe6ff" }
+  const dois = item.mensagens.length > 1
+  const copiar = item.mensagens.map((_, i) => `<button class="btn copy" type="button" data-acao="copiar" data-i="${i}">${dois ? `Copiar a ${i + 1}ª mensagem` : "Copiar prompt"}</button>`).join("")
+  const nome = renomeando === item.id
+    ? `<form class="renomear"><label>Novo nome<input type="text" maxlength="80" value="${escape(item.nome)}" required></label><div class="actions"><button class="btn copy" type="submit">Salvar o nome</button><button class="btn open" type="button" data-acao="cancelar">Cancelar</button></div></form>`
+    : ""
+  return `
+  <article class="pcard simples" style="--tint: ${kind.tint}" data-id="${escape(item.id)}">
+    <div class="pcard-head">
+      <span class="kind-icon">${iconOf(item.tipo)}</span>
+      <div>
+        <h3>${escape(item.nome)}</h3>
+        <div class="tags">${stage ? `<span class="tag" style="--c: ${stage.light}">${stage.label}</span>` : ""}<span class="tag">${kind.label}</span><span class="tag">Do Construtor</span></div>
+      </div>
+    </div>
+    <div class="pcard-body">
+      ${dataCurta(item.data) ? `<p class="quando">Guardado em ${dataCurta(item.data)}</p>` : ""}
+      ${nome}
+      <details class="ver-prompt"><summary>Ver o prompt inteiro</summary><pre>${escape(item.mensagens.join("\n\n-----\n\n"))}</pre></details>
+      ${renomeando === item.id ? "" : `<div class="actions">${copiar}
+        <button class="btn open" type="button" data-acao="renomear">Renomear</button>
+        <button class="btn open" type="button" data-acao="apagar"${apagando === item.id ? ' style="--c: var(--pink)"' : ""}>${apagando === item.id ? "Apagar mesmo?" : "Apagar"}</button>
+        <span class="copied" role="status"></span></div>`}
+    </div>
+  </article>`
+}
+function desenharItens(foco) {
+  $("meus-itens").innerHTML = itensVisiveis().map(itemHTML).join("")
+  if (!foco) return
+  const alvo = foco === "nome" ? $("meus-itens").querySelector(".renomear input")
+    : [...$("meus-itens").children].find(cartao => cartao.dataset.id === foco[0])?.querySelector(`[data-acao="${foco[1]}"]`)
+  alvo?.focus()
+}
+// O botão Guardar de cada cartão e os campos preenchidos voltam como estavam
+function sincronizarCartoes() {
+  cards.forEach((card, index) => {
+    const botao = card.querySelector("[data-save]"), salvo = guardadoB(index)
+    botao.setAttribute("aria-pressed", String(salvo))
+    botao.lastElementChild.textContent = salvo ? "Guardado" : "Guardar"
+  })
+}
+function restaurarCampos() {
+  guardados.forEach(item => {
+    if (item.origem !== "biblioteca" || !item.valores || typeof item.valores !== "object") return
+    const index = PROMPTS.findIndex((_, i) => idDe(i) === item.id)
+    if (index < 0) return
+    document.querySelectorAll(`input[data-prompt="${index}"]`).forEach(campo => {
+      if (typeof item.valores[campo.dataset.lacuna] === "string") campo.value = item.valores[campo.dataset.lacuna]
+    })
+  })
+}
+
 // Filtering the cards, updating the counts and showing the empty message when nothing is left
 function applyFilters(animate = true) {
   let shown = 0
   cards.forEach((card, index) => {
-    const visible = matches(index)
+    const visible = visivelB(index)
     card.hidden = !visible
     if (!visible) return
     shown++
     if (animate) { card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop") }
   })
+  desenharItens()
+  shown += itensVisiveis().length
   chips.forEach(chip => {
     const { filter, value } = chip.dataset
-    const total = PROMPTS.filter((prompt, index) => matches(index, filter) && (!value || valorDe[filter](prompt) === value)).length
-    chip.querySelector(".n").textContent = total
-    chip.classList.toggle("zero", total === 0)
+    chip.querySelector(".n").textContent = totalDoChip(filter, value)
+    chip.classList.toggle("zero", totalDoChip(filter, value) === 0)
     chip.setAttribute("aria-pressed", String(filters[filter] === value))
   })
-  $("count").textContent = `${shown} ${shown === 1 ? "prompt" : "prompts"}`
-  $("empty").hidden = shown > 0
-  $("clear").hidden = !filters.stage && !filters.materia && !filters.kind && !filters.words.length
+  $("count").textContent = `${shown} ${shown === 1 ? "prompt" : "prompts"}${filters.meus ? " em Meus prompts" : ""}`
+  const semGuardados = filters.meus && !guardados.some(item => item.origem === "biblioteca" ? PROMPTS.some((_, i) => idDe(i) === item.id) : doConstrutor(item))
+  $("empty-meus").hidden = !semGuardados
+  $("empty").hidden = shown > 0 || semGuardados
+  $("clear").hidden = !filters.stage && !filters.materia && !filters.kind && !filters.words.length && !filters.meus
 }
 
 function clearFilters() {
-  Object.assign(filters, { stage: "", materia: "", kind: "", words: [] })
+  Object.assign(filters, { stage: "", materia: "", kind: "", meus: "", words: [] })
   $("search").value = ""
   applyFilters()
 }
@@ -1509,20 +1641,115 @@ $("library").addEventListener("click", async event => {
   clearTimeout(status.timer)
   status.timer = setTimeout(() => { status.textContent = "" }, 4000)
 })
+
+// Guardar e tirar de Meus prompts, no cartão da biblioteca
+function avisarNoCartao(botao, texto) {
+  const status = botao.parentElement.querySelector(".copied")
+  status.textContent = texto
+  clearTimeout(status.timer)
+  status.timer = setTimeout(() => { status.textContent = "" }, 4000)
+}
+function guardarCartao(index, botao) {
+  const lista = lerGuardados(), id = idDe(index), atual = lista.findIndex(item => item.id === id)
+  if (atual >= 0) {
+    lista.splice(atual, 1)
+    if (!gravarGuardados(lista)) return avisarNoCartao(botao, "Não deu para tirar neste navegador.")
+    guardados = lista
+    avisarNoCartao(botao, "Tirado de Meus prompts.")
+  } else {
+    const valores = valoresDoCartao(index), achados = achadosNosCampos(valores)
+    if (achados.length && !confirm(`Parece que há dado de aluno no que você escreveu: ${achados.join(", ")}. Nada disso deve ficar guardado. Guardar mesmo assim?`)) return
+    if (lista.length >= LIMITE) return avisarNoCartao(botao, "Meus prompts está cheio. Apague algum para guardar outro.")
+    lista.unshift({ id, origem: "biblioteca", titulo: PROMPTS[index].title, valores, data: new Date().toISOString() })
+    if (!gravarGuardados(lista)) return avisarNoCartao(botao, "Não deu para guardar: este navegador não deixa guardar no aparelho.")
+    guardados = lista
+    avisarNoCartao(botao, "Guardado em Meus prompts. Fica só neste aparelho.")
+  }
+  sincronizarCartoes()
+  applyFilters(false)
+}
+$("library").addEventListener("click", event => {
+  const botao = event.target.closest("[data-save]")
+  if (botao) guardarCartao(Number(botao.dataset.save), botao)
+})
+// Quem muda um campo de um prompt guardado muda também o que ficou guardado
+$("library").addEventListener("change", event => {
+  const campo = event.target.closest("input[data-prompt]")
+  if (!campo) return
+  const index = Number(campo.dataset.prompt), lista = lerGuardados(), item = lista.find(outro => outro.id === idDe(index))
+  if (!item) return
+  const valores = valoresDoCartao(index), achados = achadosNosCampos(valores)
+  if (achados.length && !confirm(`Parece que há dado de aluno no que você escreveu: ${achados.join(", ")}. Nada disso deve ficar guardado. Guardar mesmo assim?`)) return
+  item.valores = valores
+  if (gravarGuardados(lista)) guardados = lista
+})
+$("meus-itens").addEventListener("click", async event => {
+  const botao = event.target.closest("button[data-acao]"), cartao = event.target.closest(".pcard.simples")
+  if (!botao || !cartao) return
+  const id = cartao.dataset.id, acao = botao.dataset.acao
+  const item = lerGuardados().find(outro => outro.id === id)
+  if (!item) { guardados = lerGuardados(); return applyFilters(false) }
+  if (acao === "copiar") {
+    const ok = await copyText(item.mensagens[Number(botao.dataset.i)] ?? item.mensagens[0])
+    avisarNoCartao(botao, ok ? "Copiado! Agora cole no Gemini." : "")
+  } else if (acao === "renomear") {
+    renomeando = id; apagando = ""
+    desenharItens("nome")
+  } else if (acao === "cancelar") {
+    renomeando = ""
+    desenharItens([id, "renomear"])
+  } else if (acao === "apagar") {
+    clearTimeout(apagarTimer)
+    if (apagando !== id) {
+      apagando = id
+      apagarTimer = setTimeout(() => { apagando = ""; desenharItens() }, 4000)
+      return desenharItens([id, "apagar"])
+    }
+    apagando = ""
+    const resto = lerGuardados().filter(outro => outro.id !== id)
+    if (!gravarGuardados(resto)) return Copiar.avisar("Não deu para apagar neste navegador.")
+    guardados = resto
+    applyFilters(false)
+    Copiar.avisar("Apagado de Meus prompts.")
+    $("count").setAttribute("tabindex", "-1")
+    $("count").focus()
+  }
+})
+$("meus-itens").addEventListener("submit", event => {
+  event.preventDefault()
+  const cartao = event.target.closest(".pcard.simples"), campo = cartao.querySelector("input")
+  const nome = campo.value.trim().replace(/\s+/g, " ").slice(0, 80)
+  if (!nome) return campo.focus()
+  const lista = lerGuardados(), item = lista.find(outro => outro.id === cartao.dataset.id)
+  renomeando = ""
+  if (item) {
+    item.nome = nome
+    if (gravarGuardados(lista)) { guardados = lista; Copiar.avisar("Nome salvo.") } else Copiar.avisar("Não deu para renomear neste navegador.")
+  }
+  desenharItens([cartao.dataset.id, "renomear"])
+})
+// Se outra aba guardar ou apagar, esta página acompanha
+window.addEventListener("storage", event => {
+  if (event.key !== CHAVE || renomeando) return
+  guardados = lerGuardados()
+  sincronizarCartoes()
+  applyFilters(false)
+})
 // O site lembra os filtros: eles vão para o endereço, para mandar o link já filtrado, e ficam guardados no aparelho
 const pedidos = new URLSearchParams(location.search)
-const guardados = pedidos.has("etapa") || pedidos.has("materia") || pedidos.has("tipo") || pedidos.has("busca")
-  ? { stage: pedidos.get("etapa") || "", materia: pedidos.get("materia") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "" }
+const salvos = pedidos.has("etapa") || pedidos.has("materia") || pedidos.has("tipo") || pedidos.has("busca") || pedidos.has("meus")
+  ? { stage: pedidos.get("etapa") || "", materia: pedidos.get("materia") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "", meus: pedidos.get("meus") === "1" }
   : Lembrar.ler("biblioteca", {})
 // A matéria aceita o nome do jeito que vier: "Língua Inglesa", "lingua-inglesa"...
-if (typeof guardados.materia === "string") guardados.materia = slug(guardados.materia)
-if (chips.some(chip => chip.dataset.filter === "stage" && chip.dataset.value === guardados.stage)) filters.stage = guardados.stage
-if (guardados.materia && chips.some(chip => chip.dataset.filter === "materia" && chip.dataset.value === guardados.materia)) filters.materia = guardados.materia
-if (chips.some(chip => chip.dataset.filter === "kind" && chip.dataset.value === guardados.kind)) filters.kind = guardados.kind
-if (typeof guardados.busca === "string" && guardados.busca) {
-  $("search").value = guardados.busca
-  filters.words = fold(guardados.busca).split(/\s+/).filter(Boolean)
+if (typeof salvos.materia === "string") salvos.materia = slug(salvos.materia)
+if (chips.some(chip => chip.dataset.filter === "stage" && chip.dataset.value === salvos.stage)) filters.stage = salvos.stage
+if (salvos.materia && chips.some(chip => chip.dataset.filter === "materia" && chip.dataset.value === salvos.materia)) filters.materia = salvos.materia
+if (chips.some(chip => chip.dataset.filter === "kind" && chip.dataset.value === salvos.kind)) filters.kind = salvos.kind
+if (typeof salvos.busca === "string" && salvos.busca) {
+  $("search").value = salvos.busca
+  filters.words = fold(salvos.busca).split(/\s+/).filter(Boolean)
 }
+if (salvos.meus === true) filters.meus = "1"
 const anotarFiltros = () => {
   const dados = { stage: filters.stage, materia: filters.materia, kind: filters.kind, busca: $("search").value.trim() }
   Lembrar.guardar("biblioteca", dados)
@@ -1531,10 +1758,13 @@ const anotarFiltros = () => {
   if (dados.materia) endereco.set("materia", dados.materia)
   if (dados.kind) endereco.set("tipo", dados.kind)
   if (dados.busca) endereco.set("busca", dados.busca)
+  if (filters.meus) endereco.set("meus", "1")
   history.replaceState(null, "", endereco.size ? "?" + endereco : location.pathname)
 }
 const filtrar = applyFilters
 applyFilters = (animate = true) => { filtrar(animate); anotarFiltros() }
+restaurarCampos()
+sincronizarCartoes()
 applyFilters(false)
 </script>
 </body>
