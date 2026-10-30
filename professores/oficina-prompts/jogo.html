@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jogo do Prompt</title>
-<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o Gemini, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos.">
+<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o Gemini, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos. Rodadas da Educação Infantil ao Ensino Médio.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -143,7 +143,7 @@
 
   /* Start, round and final screens */
   /* Centred when it fits, and scrolling from the top when it does not, so the title is never cut on a phone */
-  .overlay { position: fixed; inset: 0; z-index: 20; display: none; flex-direction: column; align-items: center; justify-content: flex-start; justify-content: safe center; gap: 20px; padding: 20px 16px; overflow-x: hidden; overflow-y: auto; background: rgba(205, 238, 255, .96); text-align: center }
+  .overlay { position: fixed; inset: 0; z-index: 20; display: none; flex-direction: column; align-items: center; justify-content: flex-start; justify-content: safe center; gap: 20px; padding: 80px 16px 20px; overflow-x: hidden; overflow-y: auto; background: rgba(205, 238, 255, .96); text-align: center }
   .overlay.show { display: flex }
   .overlay > * { flex-shrink: 0 }
   h1 { margin: 0; font-size: clamp(46px, 12vw, 84px); font-weight: 700; line-height: 1; color: #fff; -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink) }
@@ -179,6 +179,39 @@
   .saves { display: grid; gap: 8px; max-width: 640px; margin: 0; padding: 0; list-style: none; text-align: left }
   .saves li { padding: 8px 14px; background: #fff; border: 3px solid var(--ink); border-radius: 16px; font-weight: 500 }
   .saves b { display: block; font-size: 14px; color: var(--soft) }
+
+  /* "Para quem você dá aula?": three big options, one chosen, remembered on this device */
+  .stages { display: grid; gap: 10px; width: min(100%, 640px); text-align: left }
+  .stages h2 { margin: 0 0 2px; font-size: 22px; font-weight: 700; text-align: center }
+  .stage { position: relative; display: block }
+  .stage input { position: absolute; opacity: 0; width: 1px; height: 1px }
+  .stage span { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 60px; padding: 8px 16px 8px 54px; background: #fff; border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink); cursor: pointer }
+  .stage span::before { content: ""; position: absolute; left: 14px; top: 50%; width: 24px; height: 24px; margin-top: -12px; background: #fff; border: 3px solid var(--ink); border-radius: 50% }
+  .stage b { font-size: 19px; font-weight: 700; line-height: 1.2 }
+  .stage small { color: var(--soft); font-size: 15px; font-weight: 500 }
+  .stage input:checked + span { background: var(--yellow) }
+  .stage input:checked + span::before { background: var(--pink); box-shadow: inset 0 0 0 3px #fff }
+  .stage input:checked + span small { color: var(--ink) }
+  .stage input:focus-visible + span { outline: 4px solid var(--pink); outline-offset: 3px }
+
+  /* More shapes of answer: Enem options, essay prompt, comparison table, lesson plan, glossary */
+  .shape .key { display: inline-block; margin-top: 4px }
+  .options.enem { gap: 4px }
+  .options.enem span { padding: 3px 10px }
+  .options.enem span em { flex: 1; height: 10px; background: #b9b4d6; border-radius: 6px }
+  .theme { width: 90%; height: 16px; margin: 6px 0 10px; background: var(--format); border: 2px solid var(--ink); border-radius: 8px }
+  .texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px }
+  .texts span { display: grid; gap: 5px; padding: 6px; background: #fff; border: 3px solid var(--ink); border-radius: 10px }
+  .texts b { font-size: 14px }
+  .texts i { display: block; height: 8px; background: #b9b4d6; border-radius: 5px }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0 10px }
+  .compare b { padding: 2px 8px; background: var(--task); border: 2px solid var(--ink); border-radius: 10px; font-size: 14px; text-align: center }
+  .compare span { height: 12px; background: #b9b4d6; border-radius: 6px }
+  .times { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px }
+  .times span { padding: 1px 10px; background: var(--context); border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 600 }
+  .terms { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px }
+  .terms span { padding: 1px 12px; background: var(--task-light); border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 600 }
+  .questions { flex-wrap: wrap }
 
   /* bit.js promises that the Bit never takes a tap in a game; this keeps that true while its balloon is hidden */
   .bit-fala__balao { pointer-events: none !important }
@@ -247,6 +280,12 @@
     <li class="context"><i>C</i>Contexto: para quem</li>
     <li class="format"><i>F</i>Formato: como sai</li>
   </ul>
+  <div class="stages" role="radiogroup" aria-labelledby="stages-title">
+    <h2 id="stages-title">Para quem você dá aula?</h2>
+    <label class="stage"><input type="radio" name="etapa" value="iniciais"><span><b>Educação Infantil e anos iniciais</b><small>Crianças pequenas até o 5º ano</small></span></label>
+    <label class="stage"><input type="radio" name="etapa" value="finais"><span><b>Anos finais</b><small>Do 6º ao 9º ano</small></span></label>
+    <label class="stage"><input type="radio" name="etapa" value="medio"><span><b>Ensino Médio</b><small>Do 1º ao 3º ano</small></span></label>
+  </div>
   <p class="how">São 5 pedidos. Cada parte tem três blocos e só um é bom. Cuidado: o mais comprido nem sempre é o certo. Acerte de primeira para ganhar 3 estrelas.</p>
   <button class="btn" type="button" id="begin">Começar<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></button>
 </div>
@@ -270,13 +309,14 @@
   <div class="score" id="score"></div>
   <div class="hello">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
-    <p>Agora você sabe o segredo: Papel, Tarefa, Contexto e Formato, mais as frases que livram o Gemini das armadilhas. E nunca o nome das crianças!</p>
+    <p id="final-text"></p>
   </div>
   <ul class="saves" id="saves" aria-label="As frases que evitam as armadilhas do Gemini"></ul>
   <div class="actions">
     <a class="btn" href="construtor.html">Abrir o Construtor<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></a>
     <a class="btn calm" href="biblioteca.html">Ver a Biblioteca de prompts</a>
     <button class="btn calm" type="button" id="again">Jogar de novo</button>
+    <button class="btn calm" type="button" id="change">Trocar a etapa</button>
   </div>
 </div>
 
@@ -295,6 +335,7 @@
 </svg>
 
 <script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/lembrar.js"></script>
 <script>
 // The four parts of a prompt, in the order they are written
 const PARTS = [
@@ -307,8 +348,9 @@ const PARTS = [
 // Every round: the vague request, how the answer looks when the prompt is complete,
 // three blocks for each part (the first is the good one, then a weak one and a long one that only looks complete),
 // each with the reason shown after it is picked, and the Gemini trap that the round teaches to avoid
-const ROUNDS = [
+const ALL_ROUNDS = [
   {
+    id: "jogo",
     vague: "Faça um jogo de matemática.",
     answer: { who: "Professor(a) de Matemática · 2º ano", title: "Jogo das somas até 20", audience: "7 anos · no celular", shape: "game" },
     role: [["Você é professor(a) de Matemática do 2º ano.", "Agora o Gemini usa a linguagem e o conteúdo do 2º ano."],
@@ -326,6 +368,7 @@ const ROUNDS = [
     trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
+    id: "historia",
     vague: "Escreva uma história sobre animais.",
     answer: { who: "Professor(a) de Educação Infantil", title: "O quero-quero que perdeu o ninho", audience: "4 anos · leitura em voz alta", shape: "story" },
     role: [["Você é professor(a) de Educação Infantil e conta histórias para crianças pequenas.", "Agora ele escreve com o jeito de quem conta histórias para os pequenos."],
@@ -343,6 +386,7 @@ const ROUNDS = [
     trap: { text: "Quando a história pede imagens, o Gemini desenha com letras e símbolos, e o desenho sai torto. Peça assim:", say: "Descreva as imagens entre parênteses." },
   },
   {
+    id: "fracoes",
     vague: "Faça uma atividade de frações.",
     answer: { who: "Professor(a) de Matemática · 5º ano", title: "Frações do dia a dia", audience: "10 anos · 50 minutos", shape: "sheet" },
     role: [["Você é professor(a) de Matemática do 5º ano.", "Matéria e ano certos: ele pensa como quem planeja essa aula."],
@@ -360,6 +404,7 @@ const ROUNDS = [
     trap: { text: "O Gemini às vezes põe a folha inteira num bloco de código e inventa códigos da BNCC. Peça assim:", say: "Escreva fora de bloco de código e não cite códigos da BNCC." },
   },
   {
+    id: "quiz",
     vague: "Faça um quiz de ciências.",
     answer: { who: "Professor(a) de Ciências · 8º ano", title: "Quiz: fontes de energia", audience: "13 anos · revisão para a prova", shape: "quiz" },
     role: [["Você é professor(a) de Ciências do 8º ano.", "Matéria e ano certos: o nível das perguntas acerta."],
@@ -368,15 +413,16 @@ const ROUNDS = [
     task: [["Crie um quiz de 8 perguntas sobre fontes de energia.", "Quantidade e tema definidos."],
            ["Faça perguntas difíceis.", "Difíceis para quem? Sobre qual assunto?"],
            ["Crie um quiz enorme sobre ciências.", "Enorme quanto? Sobre qual assunto? Defina o número e o tema."]],
-    context: [["Para revisar antes da prova, com alunos de 13 anos.", "Ele foca no que é importante revisar."],
+    context: [["Para revisar antes da prova, com estudantes de 13 anos.", "Ele foca no que é importante revisar."],
               ["Para usar na escola.", "Toda atividade é para a escola. Diga o objetivo e a idade."],
-              ["Para usar na escola, com alunos, numa aula, em algum momento do ano, quando eu precisar.", "Muitas palavras e nenhuma informação. Diga o objetivo e a idade."]],
+              ["Para usar na escola, com estudantes, numa aula, em algum momento do ano, quando eu precisar.", "Muitas palavras e nenhuma informação. Diga o objetivo e a idade."]],
     format: [["Múltipla escolha com 3 alternativas, sem usar o teste interativo, e o gabarito explicado.", "Sai em texto, pronto para imprimir ou passar para o Google Forms."],
              ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
              ["Como teste interativo, com cronômetro e pontuação.", "O teste interativo abre dentro do Gemini e não dá para imprimir nem levar ao Forms."]],
     trap: { text: "No quiz, o Gemini às vezes abre um teste interativo, que não dá para imprimir nem passar para o Google Forms. Peça assim:", say: "Sem usar o teste interativo." },
   },
   {
+    id: "adaptar",
     vague: "Adapte este texto.",
     answer: { who: "Professor(a) do 3º ano · inclusão", title: "Texto adaptado: o ciclo da água", audience: "8 anos · TEA · frases curtas", shape: "text" },
     role: [["Você é professor(a) do 3º ano e adapta materiais para a inclusão.", "Ele assume o olhar de quem adapta materiais para incluir."],
@@ -393,7 +439,209 @@ const ROUNDS = [
              ["Frases curtas e instruções numeradas, na língua que você achar melhor.", "O Gemini às vezes responde em inglês. Peça português do Brasil."]],
     trap: { text: "O Gemini às vezes começa a resposta em inglês. E o que você escreve pode ficar guardado na conta, por isso nada de nomes. Peça assim:", say: "Responda em português do Brasil." },
   },
+  {
+    id: "cantiga",
+    vague: "Faça uma música para as crianças.",
+    answer: { who: "Professor(a) de Educação Infantil", title: "Cantiga dos dias da semana", audience: "5 anos · roda de música", shape: "song" },
+    role: [["Você é professor(a) de Educação Infantil e faz cantigas.", "Ele escreve do jeito de quem canta com os pequenos, na roda."],
+           ["Você é um cantor.", "Cantor de quê, para quem? Diga que a cantiga é para a Educação Infantil."],
+           ["Você é um compositor premiado que conhece todas as músicas infantis do mundo.", "Conhecer todas as músicas não ajuda: ele pode copiar uma que já existe. Diga que ele é professor(a) de Educação Infantil."]],
+    task: [["Crie uma letra inédita de 4 versos para ensinar os dias da semana.", "Letra nova, número de versos e tema: ele sabe o que criar."],
+           ["Faça uma música legal.", "Legal como? Sobre o quê? Sem tema, a letra sai genérica."],
+           ["Escreva a letra completa da cantiga mais famosa dos dias da semana, com todos os versos.", "O Gemini não sabe letras de cantigas de cor: inventa e erra. Peça uma letra nova, com o tema e o número de versos."]],
+    context: [["Para crianças de 5 anos que cantam na roda, com palmas e um gesto para cada dia da semana.", "Com a idade e o jeito de cantar, os versos saem curtos e fáceis de repetir."],
+              ["Para a turma.", "Que idade? Onde vão cantar? Sem isso, ele adivinha."],
+              ["Para crianças que gostam de música, com bastante energia e que cantam o dia todo.", "Gostar de música não diz a idade nem como a cantiga vai ser usada. Conte a idade e o momento: a roda, com palmas."]],
+    format: [["Versos curtos que rimam, um refrão que se repete e, entre parênteses, o gesto de cada verso.", "Você recebe a letra pronta para a roda, com o refrão e os gestos."],
+             ["Do jeito que quiser.", "Sem dizer como, a música sai comprida e sem refrão."],
+             ["Com a cifra dos acordes, a partitura e o link do vídeo para ouvir.", "O Gemini não toca, não manda partitura e inventa links que não existem. Peça versos, refrão e gestos."]],
+    trap: { text: "Quando você pede uma música, o Gemini às vezes entrega a letra de outra música como se fosse nova, ou diz que a cantiga é antiga e conhecida. Peça assim:", say: "Crie uma letra inédita. Não copie músicas existentes." },
+  },
+  {
+    id: "geografia",
+    vague: "Faça uma aula de Geografia.",
+    answer: { who: "Professor(a) de Geografia · 7º ano", title: "Aula: os biomas do Brasil", audience: "12 anos · 2 aulas de 50 minutos", shape: "plan", note: "Uma pergunta para a turma em cada etapa" },
+    role: [["Você é professor(a) de Geografia do 7º ano.", "Matéria e ano certos: ele explica no nível da turma."],
+           ["Você sabe de Geografia.", "Saber não diz para quem ele escreve. Diga a matéria e o ano."],
+           ["Você é um geógrafo do IBGE com 30 anos de pesquisa, especialista em todos os países do mundo.", "Geógrafo de pesquisa escreve para especialistas. Diga a matéria e o ano: Geografia do 7º ano."]],
+    task: [["Planeje duas aulas sobre os seis biomas brasileiros, com mais tempo para o Pampa.", "Tema, número de aulas e um destaque perto da turma."],
+           ["Fale sobre o Brasil.", "O quê sobre o Brasil? Sem tema, vem uma aula sobre tudo e sobre nada."],
+           ["Planeje uma aula sobre o Brasil: clima, relevo, população, economia, hidrografia, vegetação e cultura.", "Assunto demais para duas aulas. Escolha um tema, como os biomas."]],
+    context: [["Estudantes de 12 anos do Rio Grande do Sul, em 2 aulas de 50 minutos, sem projetor, só com o mapa da parede.", "Ele ajusta o roteiro ao tempo e ao que a escola tem, e traz exemplos do Pampa."],
+              ["Uma turma de Geografia.", "Que idade? Quanto tempo? O que a escola tem? Sem isso, ele adivinha."],
+              ["Para estudantes do Ensino Fundamental de escolas públicas de todas as regiões do Brasil.", "Todas as regiões ao mesmo tempo não cabem na aula. Diga a idade, o lugar e o tempo."]],
+    format: [["Roteiro em 3 etapas, com o tempo de cada uma, uma pergunta para a turma e sem inventar números.", "Sai um roteiro que cabe na aula, e sem número inventado."],
+             ["Como achar melhor.", "Sem formato, você perde tempo arrumando depois."],
+             ["Com gráficos de pizza da porcentagem de desmatamento de cada bioma, ano a ano.", "O Gemini inventa números, e porcentagem errada vira informação errada na sala. Peça o roteiro e cole só os dados em que você confia."]],
+    trap: { text: "Em Geografia, o Gemini coloca números de população, área e desmatamento, e inventa pesquisas para sustentar. Muitos saem errados. Peça assim:", say: "Não invente números nem pesquisas. Use só os dados que eu colar aqui." },
+  },
+  {
+    id: "independencia",
+    vague: "Faça um jogo de História.",
+    answer: { who: "Professor(a) de História · 8º ano", title: "Jogo: a ordem da Independência", audience: "13 anos · no celular", shape: "order" },
+    role: [["Você é professor(a) de História do 8º ano.", "Matéria e ano certos: o jogo usa a linguagem da turma."],
+           ["Você sabe História.", "Saber História não diz para quem é o jogo. Diga a matéria e o ano."],
+           ["Você é um historiador com doutorado, que escreve livros para especialistas sobre todos os períodos da História.", "Livro para especialista deixa o jogo difícil demais. Diga a matéria e o ano."]],
+    task: [["Crie um jogo para ordenar 5 fatos da Independência do Brasil.", "Um conteúdo só e uma ação clara: ordenar."],
+           ["Faça um jogo de História.", "De qual assunto? O que o estudante faz no jogo?"],
+           ["Crie um jogo sobre toda a História do Brasil, da chegada dos portugueses até hoje.", "Toda a História do Brasil não cabe num jogo. Escolha um tema só, como a Independência."]],
+    context: [["Para estudantes de 13 anos que acabaram de estudar a Independência e vão jogar no celular, em duplas, na sala de aula.", "Ele ajusta o nível ao que a turma já viu e ao aparelho."],
+              ["Para os estudantes.", "Que idade? O que já estudaram? Jogam onde?"],
+              ["Para estudantes de qualquer idade, em computador, celular, tablet ou projetor, ao mesmo tempo.", "Um jogo para todas as idades e aparelhos não acerta nenhum. Escolha a turma."]],
+    format: [["Arrastar as cartas para a ordem certa, 3 fases, som no acerto e pontos no final, sem pedir o nome do estudante.", "Você disse como quer: o jogo sai pronto para usar."],
+             ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato."],
+             ["Com 15 fases, vídeos dos fatos, a voz de Dom Pedro I e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, que não cria vídeo nem voz, e o ranking pede nome de estudante."]],
+    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+  },
+  {
+    id: "leitura",
+    vague: "Faça uma atividade de leitura.",
+    answer: { who: "Professor(a) de Língua Portuguesa · 9º ano", title: "Interpretação do texto", audience: "14 anos · aula de 50 minutos", shape: "sheet" },
+    role: [["Você é professor(a) de Língua Portuguesa do 9º ano.", "Matéria e ano certos: as questões saem no nível da turma."],
+           ["Você é um professor.", "Professor de quê? Diga a matéria e o ano."],
+           ["Você é um crítico literário e escritor premiado, que leu todos os livros importantes.", "Crítico escreve para especialistas. Diga a matéria e o ano."]],
+    task: [["Crie 5 questões de interpretação sobre o texto que vou colar no fim.", "Número de questões e texto definidos: ele trabalha com o que você escolheu."],
+           ["Faça perguntas de leitura.", "Sobre qual texto? Quantas?"],
+           ["Escolha um poema famoso e crie questões de interpretação, citando alguns versos dele.", "O Gemini inventa versos e diz que são de poetas famosos. Cole o texto que você quer trabalhar."]],
+    context: [["Para estudantes de 14 anos que leem bem, mas escrevem pouco, em uma aula de 50 minutos, com o texto impresso.", "Com o nível de leitura e o tempo, as questões cabem na aula."],
+              ["Para a turma do 9º ano.", "Todo 9º ano é diferente. Conte o que a turma já faz bem e o tempo."],
+              ["Para uma turma de 9º ano, de qualquer escola, com qualquer nível de leitura e em qualquer horário.", "Qualquer nível e qualquer horário não é contexto. Conte a idade, o que a turma já faz e o tempo."]],
+    format: [["Uma folha para imprimir, com 5 questões, o gabarito no fim e só trechos que estejam no texto que colei.", "Pronto para imprimir, com gabarito e sem versos inventados."],
+             ["Como preferir.", "Sem formato, você gasta tempo arrumando depois."],
+             ["Folha em 3 colunas, com ilustrações, moldura decorada e 20 questões para a turma escolher.", "Vinte questões não cabem em 50 minutos. Peça uma folha simples com 5."]],
+    trap: { text: "O Gemini inventa trechos de poemas, músicas e frases de autores, e diz que são de verdade. Peça assim:", say: "Use só o texto que eu colar. Não cite músicas, versos nem autores que não estejam nele." },
+  },
+  {
+    id: "pitagoras",
+    vague: "Faça exercícios de geometria.",
+    answer: { who: "Professor(a) de Matemática · 9º ano", title: "O teorema de Pitágoras na prática", audience: "14 anos · aula de 50 minutos", shape: "sheet" },
+    role: [["Você é professor(a) de Matemática do 9º ano.", "Matéria e ano certos: os problemas saem no nível da turma."],
+           ["Você é bom em matemática.", "Ser bom não diz para quem ele escreve. Diga a matéria e o ano."],
+           ["Você é professor(a) de Matemática do 9º ano e desenha cada figura com letras e traços.", "Figura desenhada com letras sai torta. Peça a figura descrita entre parênteses."]],
+    task: [["Crie 5 problemas do dia a dia sobre o teorema de Pitágoras.", "Um conteúdo só, com uma quantidade definida."],
+           ["Faça umas contas.", "Que contas? Sobre qual assunto?"],
+           ["Crie exercícios sobre triângulos, círculos, polígonos, volumes, áreas e trigonometria.", "Assunto demais para uma folha. Escolha um tema só, como o teorema de Pitágoras."]],
+    context: [["Para estudantes de 14 anos que já viram raiz quadrada e potências, em uma aula de 50 minutos, sem calculadora.", "Ele usa só o que a turma já sabe e a quantidade cabe na aula."],
+              ["Uma turma de 9º ano.", "O que a turma já viu? Quanto tempo ela tem?"],
+              ["Para estudantes do 9º ano de uma escola com 600 estudantes, dois turnos, aulas às terças e quintas.", "Detalhe que não muda os problemas só confunde. Conte o que a turma já sabe e o tempo."]],
+    format: [["Uma folha A4 com 5 problemas, a figura de cada um descrita entre parênteses e o gabarito com a conta.", "Pronta para imprimir, com as figuras descritas e a conta de cada resposta."],
+             ["Algumas questões.", "Quantas? Com gabarito?"],
+             ["Folha com as figuras desenhadas com asteriscos e traços, uma ao lado de cada problema.", "O Gemini desenha mal com asteriscos e traços. Peça a figura descrita entre parênteses."]],
+    trap: { text: "Em Geometria, o Gemini tenta desenhar triângulos com letras e traços, e a figura sai torta. Peça assim:", say: "Descreva cada figura entre parênteses, sem desenhar com letras e símbolos." },
+  },
+  {
+    id: "simulado",
+    vague: "Faça um simulado de Matemática.",
+    answer: { who: "Professor(a) de Matemática · Ensino Médio", title: "Simulado: porcentagem e juros", audience: "17 anos · estilo Enem", shape: "enem" },
+    role: [["Você é professor(a) de Matemática do Ensino Médio e prepara estudantes para o Enem.", "Ele escreve como quem prepara a turma para o Enem."],
+           ["Você é bom em provas.", "Bom em provas de quê? Diga a matéria e a etapa."],
+           ["Você é da banca do Enem e conhece as questões de todos os anos e das provas anteriores.", "O Gemini não tem acesso à banca nem às provas. Diga que ele é professor(a) de Matemática."]],
+    task: [["Crie 5 questões inéditas, no estilo do Enem, sobre porcentagem e juros.", "Questões novas, com tema e quantidade: ele não precisa lembrar de prova nenhuma."],
+           ["Faça questões difíceis.", "Difíceis para quem? Sobre qual assunto?"],
+           ["Copie 5 questões de Matemática de provas antigas do Enem, com o ano de cada uma.", "Ele não consulta as provas e inventa a questão e o ano. Peça questões inéditas, no estilo do Enem."]],
+    context: [["Para estudantes do 3º ano, de 17 anos, que têm duas semanas para a prova e erram mais nos problemas com texto.", "Ele foca no tipo de problema em que a turma mais erra."],
+              ["Para o Ensino Médio.", "Qual ano? O que a turma precisa treinar? Sem isso, ele adivinha."],
+              ["Para estudantes que vão fazer o Enem, de qualquer escola, com qualquer nível de preparo e de qualquer ano.", "Qualquer nível e qualquer ano não é contexto. Conte a idade, o prazo e onde a turma erra."]],
+    format: [["Alternativas de A a E, só uma correta, e gabarito com a conta passo a passo, sem dizer que são de um ano do Enem.", "Sai no formato da prova, com a conta explicada, e sem ano inventado."],
+             ["Pode ser em qualquer formato.", "Sem formato, você gasta tempo arrumando depois."],
+             ["Uma prova completa de 45 questões, com cartão-resposta para imprimir.", "Quarenta e cinco questões é uma prova inteira, e o Gemini perde o fio. Peça poucas questões, de A a E, com gabarito."]],
+    trap: { text: "O Gemini às vezes diz que a questão é de uma prova do Enem e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de um ano do Enem." },
+  },
+  {
+    id: "redacao",
+    vague: "Dê um tema de redação.",
+    answer: { who: "Professor(a) de Redação · Ensino Médio", title: "Proposta: o tempo de tela dos jovens", audience: "17 anos · texto dissertativo-argumentativo", shape: "essay" },
+    role: [["Você é professor(a) de Redação e prepara estudantes do Ensino Médio para o Enem.", "Ele escreve como quem prepara a turma para o texto dissertativo-argumentativo."],
+           ["Você escreve bem.", "Escrever bem não é ensinar a escrever. Diga que ele é professor(a) de Redação."],
+           ["Você é o corretor oficial do Enem e dá a nota exata que o Inep daria a cada texto.", "O Gemini não é corretor oficial, e a nota dele não vale a do Inep. Diga que ele é professor(a) de Redação."]],
+    task: [["Crie uma proposta de redação com um tema social atual e 3 textos de apoio.", "Um tema, com os textos de apoio no padrão da prova."],
+           ["Dê um tema bom.", "Bom como? De que área? Sem isso, vem um tema genérico."],
+           ["Crie 10 propostas com todos os temas já cobrados no Enem desde 1998, com o ano de cada um.", "O Gemini não lembra o tema de cada ano e inventa. Peça uma proposta nova, com um tema só."]],
+    context: [["Para estudantes do 3º ano, de 17 anos, que treinam a proposta de intervenção, em uma aula de 100 minutos.", "Ele monta o tema para o ponto que a turma precisa treinar."],
+              ["Para o Ensino Médio.", "Qual ano? O que a turma precisa treinar?"],
+              ["Para estudantes que querem tirar nota mil, de qualquer escola e de qualquer nível.", "Nota mil não diz o nível da turma. Conte a idade, o que treinar e o tempo."]],
+    format: [["O tema em uma frase e 3 textos de apoio curtos, sem números nem pesquisas, no modelo da proposta do Enem.", "Sai no modelo da prova, e os dados você escolhe, com fonte."],
+             ["Como achar melhor.", "Sem formato, o texto sai solto e longo."],
+             ["Textos de apoio com estatísticas do IBGE e de pesquisas recentes, para dar mais credibilidade.", "O Gemini inventa o número e a fonte, e o estudante usa como verdade. Peça textos sem números e escolha os dados."]],
+    trap: { text: "Nos textos de apoio, o Gemini coloca números de institutos e pesquisas com tanta segurança que parecem verdadeiros, mas muitas vezes são inventados. Peça assim:", say: "Nos textos de apoio, não use números nem pesquisas. Os dados e as fontes eu busco." },
+  },
+  {
+    id: "mitose",
+    vague: "Faça uma revisão de Biologia.",
+    answer: { who: "Professor(a) de Biologia · Ensino Médio", title: "Revisão: mitose e meiose", audience: "16 anos · antes da avaliação", shape: "compare" },
+    role: [["Você é professor(a) de Biologia do Ensino Médio.", "Matéria e etapa certas: a revisão sai no nível da turma."],
+           ["Você gosta de Biologia.", "Gostar não diz para quem ele escreve. Diga a matéria e a etapa."],
+           ["Você é um biólogo com doutorado que publica artigos científicos sobre células e genética.", "Artigo científico é para especialistas. Diga a matéria e a etapa: Biologia do Ensino Médio."]],
+    task: [["Monte uma revisão de mitose e meiose, com as diferenças entre as duas.", "Um tema, e a comparação que a turma mais precisa."],
+           ["Resuma Biologia.", "Qual parte? Sem tema, vem um resumo sobre tudo."],
+           ["Monte uma revisão de toda a Biologia do ano: células, genética, evolução, ecologia e fisiologia.", "A matéria do ano inteiro não cabe numa revisão. Escolha um tema, como mitose e meiose."]],
+    context: [["Para estudantes de 16 anos que fazem a avaliação na semana que vem e confundem mitose com meiose.", "Ele foca na confusão da turma e no prazo."],
+              ["Para a turma.", "Que idade? Quando é a prova? Onde eles erram?"],
+              ["Para estudantes que gostam de ciência e querem aprender tudo sobre a vida.", "Gostar de ciência não diz o que a turma já sabe nem o prazo. Conte a idade, a dúvida e quando é a prova."]],
+    format: [["Um quadro comparando mitose e meiose e 5 perguntas com gabarito, escrito fora de bloco de código.", "Você cola o quadro direto no documento, com as perguntas para a turma se testar."],
+             ["Como achar melhor.", "Sem formato, a revisão sai solta."],
+             ["Um quadro dentro de um bloco de código, para copiar sem perder as colunas.", "No bloco de código o quadro vira texto de programa. Peça o quadro fora do bloco de código."]],
+    trap: { text: "Quando você pede um quadro ou uma tabela, o Gemini às vezes põe tudo num bloco de código, e não dá para colar no documento. Peça assim:", say: "Escreva o quadro fora de bloco de código." },
+  },
+  {
+    id: "velocidade",
+    vague: "Faça um plano de aula de Física.",
+    answer: { who: "Professor(a) de Física · 1º ano do Ensino Médio", title: "Aula: velocidade média com um carrinho", audience: "15 anos · 2 aulas de 50 minutos", shape: "plan", note: "Materiais: régua, celular e um carrinho de brinquedo" },
+    role: [["Você é professor(a) de Física do 1º ano do Ensino Médio.", "Matéria e ano certos: ele planeja no nível da turma."],
+           ["Você é um físico.", "Físico de quê, para quem? Diga a matéria e o ano."],
+           ["Você é um físico do CERN, que explica toda a Física moderna, da mecânica à relatividade.", "Físico do CERN fala com físicos. Diga a matéria e o ano: Física do 1º ano."]],
+    task: [["Planeje 2 aulas sobre velocidade média, com um experimento barato.", "Tema, número de aulas e a condição do experimento."],
+           ["Faça uma aula legal.", "Sobre qual assunto? Sem tema, o plano sai genérico."],
+           ["Planeje 2 aulas sobre velocidade média, com um experimento no laboratório de Física.", "Muitas escolas não têm laboratório. Peça um experimento barato, com materiais que se acham em casa."]],
+    context: [["Para estudantes de 15 anos, sem laboratório, com régua, celular e brinquedos de casa, em 2 aulas de 50 minutos.", "Ele monta o experimento com o que a turma tem de verdade."],
+              ["Para a escola.", "Que ano? Que material? Quanto tempo?"],
+              ["Para estudantes do 1º ano, com laboratório equipado, projetor, computadores e material de sobra.", "Material de sobra não é a realidade da maioria das escolas. Conte o que você tem de verdade."]],
+    format: [["Passo a passo de cada aula com o tempo, 3 exercícios com gabarito e a conta mostrada em cada etapa.", "Você confere cada conta, e o plano cabe na aula."],
+             ["Como quiser.", "Sem formato, o plano vem solto, sem tempo e sem exercícios."],
+             ["Um plano de 20 páginas, com o passo a passo, os cálculos e o gabarito de tudo.", "Plano longo demais para ler e conferir. Peça por aula, com 3 exercícios e a conta em cada etapa."]],
+    trap: { text: "O Gemini erra contas, principalmente com unidades, e o gabarito sai errado com toda a segurança. Peça assim:", say: "Mostre a conta em cada etapa, com as unidades, e confira o resultado antes de responder." },
+  },
+  {
+    id: "quimica",
+    vague: "Adapte este texto de Química.",
+    answer: { who: "Professor(a) de Química · inclusão", title: "Texto adaptado: ácidos e bases", audience: "16 anos · dislexia · frases curtas", shape: "glossary" },
+    role: [["Você é professor(a) de Química do Ensino Médio e adapta materiais para a inclusão.", "Ele assume o olhar de quem adapta materiais para incluir."],
+           ["Você é um revisor de textos.", "Revisar não é adaptar. Diga que a ideia é incluir."],
+           ["Você é um redator que reescreve qualquer texto científico, em qualquer língua, para qualquer público.", "Adaptar para incluir não é reescrever para qualquer público. Diga que é para a inclusão."]],
+    task: [["Adapte o texto que vou colar no fim, mantendo os conceitos de ácidos e bases.", "Ele sabe que deve manter os conceitos e onde está o texto."],
+           ["Mude o texto.", "Mudar como? Pode até mudar o conteúdo sem querer."],
+           ["Reescreva o texto do seu jeito, trocando os termos químicos por palavras do dia a dia.", "Trocar os termos tira o conteúdo da aula. Mantenha os termos e explique cada um."]],
+    context: [["Para um estudante de 16 anos com dislexia, que lê melhor frases curtas e termos explicados, sem identificar ninguém.", "Você descreveu a necessidade sem identificar o estudante. Perfeito!"],
+              ["Para um estudante.", "Qual é a necessidade? Diga a necessidade e a idade, sem o nome."],
+              ["Para a Marina Souza, do 2º B, que tem dislexia e vai mal em Química desde o ano passado.", "Nunca escreva o nome nem dados do estudante no Gemini! Descreva a necessidade sem identificar ninguém."]],
+    format: [["Em português do Brasil, com frases curtas, cada termo químico explicado em uma linha e uma lista do que mudou.", "Você recebe o texto pronto, com os termos explicados, e sabe o que foi alterado."],
+             ["Deixe mais fácil.", "Mais fácil como? Diga o formato que ajuda esse estudante."],
+             ["Frases curtas e um glossário no fim, na língua que você achar melhor.", "O Gemini às vezes responde em inglês. Peça português do Brasil."]],
+    trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem turma do estudante. Peça assim:", say: "Descreva a necessidade, sem nome nem turma. Responda em português do Brasil." },
+  },
 ]
+
+// The five rounds of each stage; the Educação Infantil and anos iniciais ones are the first Oficina rounds,
+// and the Ensino Médio ones never repeat the ones of the anos finais
+const STAGES = {
+  iniciais: { who: "das crianças", ids: ["jogo", "historia", "cantiga", "fracoes", "adaptar"] },
+  finais: { who: "dos estudantes", ids: ["quiz", "geografia", "independencia", "leitura", "pitagoras"] },
+  medio: { who: "dos estudantes", ids: ["simulado", "redacao", "mitose", "velocidade", "quimica"] },
+}
+let ROUNDS = [], stage = "iniciais"
+function setStage(id) {
+  stage = STAGES[id] ? id : "iniciais"
+  ROUNDS = STAGES[stage].ids.map(roundId => ALL_ROUNDS.find(data => data.id === roundId))
+}
+// The chosen stage stays on this device (lembrar.js keeps it in localStorage, never anything about students)
+const savedStage = () => window.Lembrar?.ler("jogo-do-prompt", {}).etapa
+const pickedStage = () => document.querySelector('input[name="etapa"]:checked')?.value
+document.querySelectorAll('input[name="etapa"]').forEach(input => input.addEventListener("change", () => window.Lembrar?.guardar("jogo-do-prompt", { etapa: input.value })))
+{
+  const first = STAGES[savedStage()] ? savedStage() : "iniciais"
+  document.querySelector(`input[name="etapa"][value="${first}"]`).checked = true
+  setStage(first)
+}
 
 const $ = id => document.getElementById(id)
 let round = 0, filled = {}, mistakes = 0, totalStars = 0, muted = false, audio, busy = false
@@ -482,7 +730,7 @@ function drawAnswer(final = false) {
   $("screen").innerHTML = `
     <div class="head">${avatar}<span class="who">${who}</span></div>
     ${title}${chip}
-    ${has("format") ? `<div class="shape">${SHAPES[answer.shape]()}</div>` : '<div class="gray"><span></span><span></span><span></span></div>'}`
+    ${has("format") ? `<div class="shape">${SHAPES[answer.shape](answer)}</div>` : '<div class="gray"><span></span><span></span><span></span></div>'}`
 }
 
 // What each kind of answer looks like once the format is known
@@ -492,6 +740,13 @@ const SHAPES = {
   sheet: () => `<div class="exercises">${[1, 2, 3, 4, 5].map(n => `<span>${n}</span>`).join("")}</div><span class="key">Gabarito no fim da folha</span>`,
   quiz: () => `<div class="options"><span><b>A</b>Energia solar</span><span class="right"><b>B</b>Energia eólica</span><span><b>C</b>Carvão</span></div>`,
   text: () => `<ol class="numbered">${[1, 2, 3, 4].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><span class="key">O que mudou no texto</span>`,
+  song: () => `<div class="lines">${"<span></span>".repeat(4)}</div><span class="key">Refrão e gestos entre parênteses</span>`,
+  order: () => `<ol class="numbered">${[1, 2, 3, 4, 5].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><div class="stars-row">${STAR.repeat(3)}</div>`,
+  enem: () => `<div class="options enem">${["A", "B", "C", "D", "E"].map(letter => `<span class="${letter === "D" ? "right" : ""}"><b>${letter}</b><em></em></span>`).join("")}</div><span class="key">Gabarito com a conta passo a passo</span>`,
+  essay: () => `<div class="theme"></div><div class="texts">${[1, 2, 3].map(n => `<span><b>${n}</b><i></i><i></i></span>`).join("")}</div><span class="key">Textos de apoio sem números</span>`,
+  compare: () => `<div class="compare"><b>Mitose</b><b>Meiose</b>${"<span></span>".repeat(6)}</div><div class="questions">${"<span>?</span>".repeat(5)}</div><span class="key">Gabarito no fim</span>`,
+  plan: answer => `<div class="times"><span>10 min</span><span>25 min</span><span>15 min</span></div><ol class="numbered">${[1, 2, 3].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><span class="key">${answer.note}</span>`,
+  glossary: () => `<div class="lines">${"<span></span>".repeat(3)}</div><div class="terms"><span>ácido</span><span>base</span><span>pH</span></div><span class="key">O que mudou no texto</span>`,
 }
 
 // Putting a block in its slot: the good block fills it and the other two of that part are crossed out;
@@ -590,6 +845,7 @@ function confetti(overlay) {
 function nextRound() {
   $("win").classList.remove("show")
   if (round + 1 < ROUNDS.length) return loadRound(round + 1)
+  $("final-text").textContent = `Agora você sabe o segredo: Papel, Tarefa, Contexto e Formato, mais as frases que livram o Gemini das armadilhas. E nunca o nome ${STAGES[stage].who}!`
   $("score").innerHTML = `${totalStars} de ${ROUNDS.length * 3} estrelas`
   // The sentences of the five traps, to take to Gemini
   $("saves").innerHTML = ROUNDS.map(data => `<li><b>${escape(data.vague)}</b>${escape(data.trap.say)}</li>`).join("")
@@ -674,6 +930,9 @@ $("copy").addEventListener("click", async () => {
 })
 $("begin").addEventListener("click", () => {
   beep([523, 659, 784])
+  setStage(pickedStage())
+  window.Lembrar?.guardar("jogo-do-prompt", { etapa: stage })
+  totalStars = 0
   $("start").classList.remove("show")
   loadRound(0)
   focusTray()
@@ -683,6 +942,12 @@ $("again").addEventListener("click", () => {
   $("final").classList.remove("show")
   loadRound(0)
   focusTray()
+})
+$("change").addEventListener("click", () => {
+  $("final").classList.remove("show")
+  $("start").classList.add("show")
+  $("start").scrollTop = 0
+  document.querySelector('input[name="etapa"]:checked').focus({ preventScroll: true })
 })
 const drawMute = () => {
   $("mute").innerHTML = muted ? SILENT : SOUND
