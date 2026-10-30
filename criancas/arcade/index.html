@@ -14,7 +14,7 @@
   #scr-end > .ouvir-grupo { margin: 0 0 8px; }
 </style>
 </head>
-<body>
+<body data-telao="sem-zoom">
 <div class="sky" aria-hidden="true">
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
   <span class="bit b1">&lt;/&gt;</span><span class="bit b2">{ }</span><span class="bit b3">01</span><span class="bit b4">;</span><span class="bit b5">if</span><span class="bit b6">[ ]</span>
@@ -138,7 +138,7 @@
     return g;
   };
   var topo = document.querySelector('.menu-topo');
-  if (topo) topo.insertBefore(grupo(true), topo.lastChild);
+  if (topo) { topo.insertBefore(grupo(true), topo.lastChild); topo.append(Jogo.botao('telao')); }
   document.getElementById('ht-card').prepend(grupo(true));
   document.getElementById('scr-end').prepend(grupo(false));
   // Cada jogo do menu é lido pelo título

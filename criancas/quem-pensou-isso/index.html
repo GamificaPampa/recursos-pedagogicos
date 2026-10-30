@@ -125,6 +125,11 @@
     @media (prefers-reduced-motion: reduce) {
       .fala-bit__bit img, .fala-bit__balao, .confete, .carta, .opcao { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas e as respostas ficam lado a lado */
+    @media (min-width: 900px) {
+      .telao .missao, .telao .opcoes { max-width: none; }
+      .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -200,7 +205,7 @@ p, li, blockquote {
         <li><b>No projetor:</b> a turma vota na carta antes do toque e quem votou diferente explica a sua escolha. O Bit confirma e conta o porquê.</li>
         <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno uma ideia de que gostou e uma situação da vida dele em que ela ajudaria.</li>
         <li><b>Depois:</b> cada dupla escolhe um filósofo, pesquisa em um livro ou site confiável e escreve uma ideia nova no formato do jogo, com três situações de hoje, para a outra dupla responder.</li>
-        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+        <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
         <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
 
@@ -400,7 +405,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Uma carta de filósofo: marca, nome, época e (quando pedido) os anos

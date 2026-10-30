@@ -122,6 +122,12 @@
     @media (prefers-reduced-motion: reduce) {
       .alvo .anel, .confete, .fala-bit__bit img, .fala-bit__balao { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o desenho cabe na altura do projetor e as respostas ficam lado a lado */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao #quadro { max-height: calc(100vh / var(--telao-escala) - 290px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -655,7 +661,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   /* ------------------------------------------------------------------ */

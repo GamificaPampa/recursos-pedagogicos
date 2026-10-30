@@ -124,6 +124,29 @@
   .recap-item b{display:block; font-size:14px; letter-spacing:.06em; text-transform:uppercase;}
 
   footer{text-align:center; padding-top:18px; font-size:14px; font-weight:600; opacity:.75;}
+
+  /* Modo telão (tecla T): o kit aumenta tudo; aqui cada desafio fica mais baixo, para caber na altura do projetor.
+     Com a escala do telão, 100vh passa da tela: a altura certa é 100vh dividido pela escala */
+  @media (min-width:900px){
+    .telao .wrap{min-height:calc(100vh / var(--telao-escala)); min-height:calc(100svh / var(--telao-escala)); padding-top:10px; padding-bottom:10px;}
+    .telao #topbar{margin-bottom:10px;}
+    .telao .card{padding:14px 20px;}
+    .telao .hero{width:64px;}
+    .telao .start-title{font-size:52px;}
+    .telao .fases-rotulo{margin:8px 0 6px;}
+    .telao #start-stage{gap:8px;}
+    .telao .lede{margin-bottom:10px;}
+    .telao #screen-seq .card{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); column-gap:20px; align-items:start;}
+    .telao #screen-seq .card > :not(#seq-slots, #seq-pool){grid-column:1 / -1;}
+    .telao #screen-seq .eyebrow{justify-self:start;}
+    .telao #seq-pool{flex-direction:column; align-items:stretch;}
+    .telao #loop-target{font-size:60px;}
+    .telao .timerbar{margin-bottom:14px;}
+    .telao #loop-tap{width:128px; height:128px; margin-bottom:14px;}
+    .telao .recap{flex-direction:row; margin:12px 0 16px;}
+    .telao .recap-item{flex:1; align-items:flex-start;}
+    .telao #result-badge{width:88px; height:88px; margin-bottom:8px;}
+  }
 </style>
 </head>
 <body class="ceu">
@@ -227,7 +250,7 @@
     </div>
   </section>
 
-  <footer>GamificaPampa · Engenharia de Software</footer>
+  <footer data-telao-esconder>GamificaPampa · Engenharia de Software</footer>
 </div>
 
 <script src="/identidade-visual/js/icones.js"></script>
@@ -644,7 +667,7 @@
   // Kit de jogo do identidade-visual: Outros jogos e tela cheia no topo, e a tela final com Jogar de novo e Outros jogos
   document.getElementById('btn-restart').replaceWith(Jogo.acoesDoFim(restart));
   document.getElementById('topbar').prepend(Jogo.botao('casa'));
-  document.getElementById('topbar').append(Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'));
+  document.getElementById('topbar').append(Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'), Jogo.botao('telao'));
 
   buildStages();
   updateDots();

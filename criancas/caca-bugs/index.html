@@ -193,7 +193,7 @@
   @media (prefers-reduced-motion: reduce){ .cloud,.logo span,.hero,.medal,.bug svg,.bug .legs{animation:none!important;} }
 </style>
 </head>
-<body>
+<body data-telao="sem-zoom">
 <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
 <div class="hills"></div>
 
@@ -360,7 +360,7 @@
   });
   var topoJogo = document.createElement('div');
   topoJogo.className = 'topo-jogo';
-  topoJogo.append(Jogo.botao('casa'), Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'));
+  topoJogo.append(Jogo.botao('casa'), Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'), Jogo.botao('telao'));
   // Ouvir: lê as instruções e o resultado, não o que acontece no meio da rodada
   Jogo.ouvir.bit = false;
   document.querySelector('.app').prepend(topoJogo);

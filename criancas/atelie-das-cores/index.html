@@ -127,6 +127,13 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .opcao, .anima { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): o desenho cabe na altura do projetor, junto com o desafio e as respostas */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; }
+      .telao .cena { max-height: calc(100vh / var(--telao-escala) - 270px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .opcoes--potes { gap: 8px; max-width: none; }
+      .telao .opcao.pote { min-width: 84px; padding: 6px 8px; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {
@@ -209,7 +216,7 @@ p, li, blockquote {
             <li><b>No projetor:</b> antes de cada mistura, a turma diz que cor vai sair; depois, alguém confere com guache de verdade.</li>
             <li><b>No celular:</b> cada estudante joga as três fases e pinta no caderno um círculo cromático com as seis cores.</li>
             <li><b>Depois:</b> cada criança faz um desenho só com cores quentes e outro só com cores frias, e a turma conversa sobre o que cada um faz sentir.</li>
-            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
@@ -333,7 +340,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
-  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
+  $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
