@@ -424,6 +424,11 @@
     body:not([data-view="comprovante"]) .page { padding: 12mm }
     body[data-view="comprovante"] .page { max-width: none; margin: 0; padding: 0 }
     body[data-view="comprovante"] #v-comprovante > :not(.comp-wrap) { display: none !important }
+    /* Na folha do comprovante só entra o comprovante: sem a barra do topo, o céu, o rodapé, o Bit e o resto da página */
+    body[data-view="comprovante"] > :not(.page),
+    body[data-view="comprovante"] .page > :not(main),
+    body[data-view="comprovante"] main > :not(#v-comprovante) { display: none !important }
+    body[data-view="comprovante"] main, body[data-view="comprovante"] #v-comprovante { margin: 0 !important; padding: 0 !important }
     .comp-wrap { margin: 0; height: auto !important; overflow: visible; border: 0; border-radius: 0; box-shadow: none }
     .comp { position: relative; width: 297mm; height: 210mm; transform: none !important; break-inside: avoid; page-break-inside: avoid }
   }
