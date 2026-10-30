@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+<style>
+.g { transform-box: fill-box; transform-origin: center }
+.a-tw { animation: twinkle 1.8s ease-in-out infinite }
+@keyframes twinkle { 50% { transform: scale(.6) rotate(30deg) } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<path d="M0 70q50-14 100 0t100 0V120H0z" fill="#8ddf6a"/><path d="M0 70q50-14 100 0t100 0" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="172" cy="24" r="12" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/>
+          <g transform="translate(18 34) scale(.62)"><rect x="30" y="58" width="8" height="26" rx="3" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="92" y="58" width="8" height="26" rx="3" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="26" y="28" width="80" height="38" rx="16" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><ellipse cx="62" cy="40" rx="11" ry="7" fill="#2f2a4a"/><rect x="6" y="20" width="28" height="28" rx="10" fill="#fff" stroke="#2f2a4a" stroke-width="3.5"/><rect x="2" y="36" width="22" height="15" rx="7" fill="#ffc6d2" stroke="#2f2a4a" stroke-width="3"/><circle cx="17" cy="30" r="3" fill="#2f2a4a"/></g>
+          <circle cx="118" cy="40" r="13" fill="#e53950" stroke="#2f2a4a" stroke-width="3"/><path d="M140 52l12-22 12 22z" fill="#2f6fd6" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/>
+          <g class="g a-tw"><path d="M128 84l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></g>
+          <text x="172" y="104" text-anchor="middle" font-family='Fredoka, "Trebuchet MS", "Arial Rounded MT Bold", sans-serif' font-weight="700" font-size="22" fill="#2f2a4a">3</text>
+</svg>
