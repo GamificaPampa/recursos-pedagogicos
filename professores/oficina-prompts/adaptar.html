@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adaptador de atividades · Oficina de Prompts</title>
+<meta name="description" content="Adapte uma atividade para incluir estudantes com TEA, TDAH, dislexia, baixa visão, surdez, deficiência intelectual ou altas habilidades: o antes e depois de cada caso e o pedido pronto para o Gemini, sem dados do estudante.">
+<meta name="theme-color" content="#5fbcff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { background: var(--sky2) }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.45 }
+  a { color: var(--ink); font-weight: 600 }
+  button, input, textarea { font: inherit; color: inherit }
+  button { cursor: pointer }
+  .page { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 14px 0 26px }
+  header .boia { width: clamp(80px, 20vw, 110px); flex: none; animation: boia 3s ease-in-out infinite }
+  @keyframes boia { 50% { transform: translateY(-8px) rotate(-4deg) } }
+  h1 { margin: 0; font-size: clamp(40px, 9vw, 66px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  h1 .y { color: var(--yellow) } h1 .p { color: var(--pink) }
+  header p { max-width: 680px; margin: 10px 0 0; font-size: 19px; font-weight: 600 }
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 24px; line-height: 1.15 }
+  h2 .n { display: grid; place-items: center; width: 36px; height: 36px; flex: none; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 20px }
+
+  .card { margin-bottom: 24px; padding: 20px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .regra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; background: #fff1a8 }
+  .regra svg { width: 54px; height: 54px; flex: none }
+  .regra p { flex: 1 1 300px; margin: 0; font-weight: 600 }
+
+  /* Choosing the need: one chip per case, only one at a time */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none }
+  .chip { min-height: 48px; padding: 6px 18px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-weight: 600 }
+  .chip[aria-pressed="true"] { background: var(--c); }
+  .chip:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px }
+
+  /* Before and after, side by side */
+  .antes-depois { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px }
+  .folha { padding: 14px 16px; border: 3px solid var(--ink); border-radius: 18px }
+  .folha b.rotulo { display: inline-block; margin-bottom: 8px; padding: 1px 12px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; font-size: 15px }
+  .folha p, .folha li { margin: 0 0 6px; font-weight: 500 }
+  .folha ul, .folha ol { margin: 0; padding-left: 22px }
+  .antes { background: #f1eff8 }
+  .depois { background: #c9f5e3 }
+  .muda { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none }
+  .muda li { padding: 4px 12px; background: var(--light, #fff); border: 3px solid var(--ink); border-radius: 14px; font-weight: 600; font-size: 16px }
+
+  /* The request: fields and the prompt that updates as you type */
+  .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; margin-bottom: 12px }
+  label { display: grid; gap: 4px; font-weight: 700 }
+  label small { font-weight: 500; color: var(--soft) }
+  input, textarea { width: 100%; padding: 10px 12px; background: #fff; border: 3px solid var(--ink); border-radius: 14px; font-weight: 500 }
+  textarea { min-height: 120px; resize: vertical }
+  input:focus-visible, textarea:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .prompt { margin: 14px 0; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 18px; white-space: pre-wrap; font-weight: 600 }
+  .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px }
+  .btn svg { width: 22px; height: 22px }
+  .copiado { font-weight: 700; color: #17694a }
+  .lembretes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px 22px; margin: 0; padding: 0; list-style: none }
+  .lembretes li { position: relative; padding-left: 36px; font-weight: 500 }
+  .lembretes li::before { content: ""; position: absolute; left: 0; top: 1px; width: 24px; height: 24px; background: #c9f5e3; border: 3px solid var(--ink); border-radius: 7px }
+  .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
+  footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
+  @media print { .page { max-width: none } .chips, .mais, .linha, .regra svg { display: none } .card { box-shadow: none; break-inside: avoid } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 8%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -30s"></span>
+  <span class="simbolo" style="left: 4%; top: 40%">Aa</span>
+  <span class="simbolo" style="right: 5%; top: 18%; --d: -3s">1 2 3</span>
+  <span class="morros" style="--altura: 13vh"></span>
+</div>
+
+<div class="page">
+  <header data-bit-pose="acenando" data-bit-dica="Escolha a necessidade, veja o antes e depois e copie o pedido. Nada de nome ou laudo do estudante.">
+    <svg class="boia" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 26h16v-10a8 8 0 0 1 16 0v10h16v16h-10a8 8 0 0 0 0 16H32v-6a8 8 0 0 0-16 0v6H8z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>
+    <div>
+      <h1><span class="y">Adaptador</span> de <span class="p">atividades</span></h1>
+      <p>A mesma atividade da turma, adaptada para que todo mundo participe. Escolha a necessidade, veja o antes e o depois e leve o pedido pronto para o Gemini.</p>
+    </div>
+  </header>
+
+  <section class="card regra" data-bit-pose="ops" data-bit-dica="Descreva a necessidade, nunca o estudante. Nome, laudo, CID e turma não vão para o Gemini.">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="28" width="40" height="30" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="42" r="4" fill="#2f2a4a"/></svg>
+    <p><b>Descreva a necessidade, nunca o estudante.</b> Nome, foto, laudo, CID, diagnóstico de alguém e a turma não vão para o Gemini. Escreva só o que ajuda a adaptar, como “um estudante de 10 anos que lê frases curtas com apoio de imagem”.</p>
+  </section>
+
+  <section class="card" data-bit-dica="Cada necessidade pede um jeito diferente de mudar a mesma atividade.">
+    <h2><span class="n">1</span>Para quem é a adaptação?</h2>
+    <ul class="chips" id="chips" role="group" aria-label="Necessidade"></ul>
+  </section>
+
+  <section class="card" data-bit-dica="Repare: o conteúdo e o objetivo continuam os mesmos da turma. Muda o caminho até eles.">
+    <h2><span class="n">2</span>Antes e depois</h2>
+    <div class="antes-depois">
+      <div class="folha antes">
+        <b class="rotulo">Atividade da turma</b>
+        <p>Leia o texto sobre o ciclo da água (15 linhas, sem imagens) e responda no caderno:</p>
+        <ol><li>O que é evaporação?</li><li>Por que chove?</li><li>Para onde vai a água da chuva?</li><li>Explique o ciclo da água com as suas palavras.</li><li>Por que é importante cuidar dos rios?</li></ol>
+      </div>
+      <div class="folha depois" id="depois"></div>
+    </div>
+    <ul class="muda" id="muda" aria-label="O que muda"></ul>
+  </section>
+
+  <section class="card" data-bit-pose="pensando" data-bit-dica="Preencha os campos e o pedido se monta sozinho. Depois, revise a resposta com o olhar de quem conhece a turma.">
+    <h2><span class="n">3</span>O pedido para o Gemini</h2>
+    <div class="campos">
+      <label for="componente">Componente<small>a matéria</small><input id="componente" placeholder="Ciências"></label>
+      <label for="ano">Ano ou idade<small>da turma, sem o nome dela</small><input id="ano" placeholder="4º ano, 9 e 10 anos"></label>
+    </div>
+    <label for="atividade">A atividade<small>cole aqui o texto e as perguntas, sem nome de estudante</small><textarea id="atividade" placeholder="Cole aqui a atividade da turma."></textarea></label>
+    <p class="prompt" id="prompt" aria-live="polite"></p>
+    <div class="linha">
+      <button class="btn btn--jogar" type="button" id="copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o pedido</button>
+      <a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">Abrir o Gemini</a>
+      <span class="copiado" id="copiado" role="status"></span>
+    </div>
+  </section>
+
+  <section class="card" data-bit-dica="A IA ajuda a começar. Quem conhece o estudante é você, a família e a equipe da escola.">
+    <h2><span class="n">4</span>Antes de usar</h2>
+    <ul class="lembretes">
+      <li>Confira se o conteúdo e o objetivo continuam os mesmos da turma: adaptar não é dar outra atividade.</li>
+      <li>Leia a lista do que mudou que o Gemini escreveu no fim e corte o que não serve para o seu estudante.</li>
+      <li>Converse com o professor do AEE e com a família: eles sabem o que funciona com aquele estudante.</li>
+      <li>Ofereça a versão adaptada a quem precisar, sem expor ninguém na frente da turma.</li>
+      <li>Imagens descritas entre parênteses viram figura de verdade: recorte, desenhe ou imprima.</li>
+      <li>Depois da aula, anote o que deu certo e ajuste o pedido para a próxima vez.</li>
+    </ul>
+  </section>
+
+  <div class="mais">
+    <a class="btn btn--conhecer" href="biblioteca.html">Biblioteca de prompts</a>
+    <a class="btn" href="frases.html">Frases que salvam</a>
+    <a class="btn" href="curso.html#modulo-2">Curso: módulo 2</a>
+  </div>
+</div>
+
+<footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
+
+<script src="/identidade-visual/js/copiar.js"></script>
+<script>
+// Each need: the chip, the adapted version of the same activity, what changes and the part of the request that describes it
+const CASOS = [
+  { id: "tea", nome: "TEA", cor: "#cfe6ff",
+    depois: "<p><b>1. Leia. 2. Olhe a figura. 3. Marque a resposta.</b></p><p>O sol esquenta a água do rio. (figura: sol e rio)</p><p>A água sobe como vapor e forma as nuvens. (figura: nuvem)</p><p>Da nuvem cai a chuva, e a água volta para o rio. (figura: chuva)</p><ol><li>O que esquenta a água? ☐ o sol ☐ a lua ☐ o vento</li><li>De onde cai a chuva? ☐ da nuvem ☐ do rio ☐ da árvore</li></ol>",
+    muda: ["Passos numerados no começo", "Frases curtas e literais, sem metáforas", "Uma pergunta por vez", "Apoio visual", "Marcar em vez de escrever"],
+    pedido: "para um estudante com TEA que se organiza melhor com rotina clara: use frases curtas e literais, sem metáforas nem ironia, coloque os passos numerados no começo, uma pergunta por vez, opções para marcar e apoio visual descrito entre parênteses" },
+  { id: "tdah", nome: "TDAH", cor: "#ffd6e3",
+    depois: "<p><b>Parte 1 · A água sobe</b> (3 linhas) → pergunta 1</p><p><b>Parte 2 · A nuvem e a chuva</b> (3 linhas) → pergunta 2</p><p>Pausa: levante e beba água.</p><p><b>Parte 3 · De volta ao rio</b> (3 linhas) → perguntas 3 e 4</p><p>☐ Parte 1 ☐ Parte 2 ☐ Parte 3</p>",
+    muda: ["Partes curtas com título", "Pergunta logo depois de cada parte", "Palavras-chave em negrito", "Checklist do que já fez", "Uma pausa no meio"],
+    pedido: "para um estudante com TDAH que se perde em textos longos: divida o texto em partes curtas com título, coloque cada pergunta logo depois da parte que ela usa, destaque em negrito as palavras-chave, inclua um checklist para marcar as partes feitas e sugira uma pausa curta no meio" },
+  { id: "leitura", nome: "Dislexia e leitura", cor: "#fff1a8",
+    depois: "<p style=\"font-size: 19px; letter-spacing: .04em; line-height: 1.7\">O sol esquenta a água.<br>A água vira vapor e sobe.<br>O vapor forma as nuvens.<br>A chuva cai e volta ao rio.</p><p><b>Palavra nova:</b> evaporar = a água virar vapor.</p><p>Responda falando ou escrevendo: por que chove?</p>",
+    muda: ["Menos texto e frases curtas", "Letra maior e espaçada", "Palavras novas explicadas", "Responder falando ou escrevendo", "Avaliar a ideia, não a ortografia"],
+    pedido: "para um estudante com dislexia, que lê devagar e se cansa com textos longos: use menos texto, frases curtas, palavras do dia a dia, explique as palavras novas, sugira letra grande e espaçada para imprimir e deixe responder falando ou escrevendo" },
+  { id: "visao", nome: "Baixa visão", cor: "#e2dbff",
+    depois: "<p style=\"font-size: 22px; font-weight: 700\">O CICLO DA ÁGUA</p><p style=\"font-size: 19px\">O sol esquenta a água do rio. A água sobe e forma nuvens. A chuva cai e volta ao rio.</p><p>(Imagem: um círculo com setas grossas: rio, nuvem, chuva, rio.)</p><p style=\"font-size: 19px\">1. Por que chove? ____________</p>",
+    muda: ["Letra 24 ou maior", "Alto contraste, sem texto sobre imagem", "Imagens descritas em palavras", "Espaço grande para responder", "Funciona com leitor de tela"],
+    pedido: "para um estudante com baixa visão: organize para imprimir com letra 24 ou maior e alto contraste, sem texto sobre imagem, descreva cada imagem em palavras, deixe espaço grande para responder e use títulos claros, que um leitor de tela consiga ler" },
+  { id: "surdez", nome: "Surdez", cor: "#c9f5e3",
+    depois: "<p><b>Palavras-chave</b> (com o sinal em Libras, combine com o intérprete): SOL · ÁGUA · VAPOR · NUVEM · CHUVA · RIO</p><p>(Imagem: rio → vapor → nuvem → chuva → rio)</p><p>O sol esquenta a água. A água vira vapor. O vapor vira nuvem. A nuvem dá chuva.</p><p>Desenhe ou escreva: o que acontece depois da chuva?</p>",
+    muda: ["Instruções escritas e com imagem", "Palavras-chave destacadas", "Frases diretas, português como segunda língua", "Nada que dependa só de áudio", "Responder desenhando ou escrevendo"],
+    pedido: "para um estudante surdo que usa Libras e lê o português como segunda língua: use frases curtas e diretas, destaque as palavras-chave numa lista no começo, dê apoio visual descrito entre parênteses, não dependa de áudio e deixe responder desenhando ou escrevendo" },
+  { id: "intelectual", nome: "Deficiência intelectual", cor: "#ffdcc4",
+    depois: "<p>Você já viu uma poça de água secar no sol? A água subiu, virou vapor! (figura: poça e sol)</p><p>O vapor vira nuvem, e a nuvem dá chuva. (figura: nuvem com chuva)</p><ol><li>Ligue: sol → esquenta a água · nuvem → dá chuva</li><li>Desenhe a chuva caindo no rio.</li></ol>",
+    muda: ["O essencial do conteúdo", "Exemplo do dia a dia", "Menos itens", "Ligar e desenhar", "A mesma atividade, mais simples"],
+    pedido: "para um estudante com deficiência intelectual: mantenha só o essencial do conteúdo, comece com um exemplo concreto do dia a dia, use menos perguntas, troque perguntas abertas por ligar, marcar e desenhar, e mantenha o mesmo tema da turma" },
+  { id: "altas", nome: "Altas habilidades", cor: "#fff",
+    depois: "<p>As mesmas perguntas da turma, e mais:</p><p><b>Desafio:</b> se um rio da sua cidade secasse, o que mudaria no ciclo da água por ali? Pesquise e explique com um desenho.</p><p><b>Para ensinar:</b> prepare uma explicação de 2 minutos para a turma.</p>",
+    muda: ["A mesma base da turma", "Uma pergunta de investigação", "Ligar com a cidade ou outra matéria", "Produzir e explicar para os colegas"],
+    pedido: "para um estudante com altas habilidades, que termina rápido e quer mais: mantenha a mesma base da turma e acrescente um desafio de investigação, uma ligação com a cidade ou com outra matéria e uma tarefa de produzir algo para explicar aos colegas" },
+]
+const $ = id => document.getElementById(id)
+let escolhido = CASOS[0]
+try { escolhido = CASOS.find(c => c.id === localStorage.getItem("adaptar-caso")) || CASOS[0] } catch {}
+
+$("chips").innerHTML = CASOS.map(c => `<li><button class="chip" type="button" data-id="${c.id}" style="--c: ${c.cor === "#fff" ? "#ffd23f" : c.cor}">${c.nome}</button></li>`).join("")
+function montar() {
+  $("chips").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === escolhido.id)))
+  $("depois").innerHTML = `<b class="rotulo">Adaptada: ${escolhido.nome}</b>${escolhido.depois}`
+  $("muda").innerHTML = escolhido.muda.map(m => `<li style="--light: ${escolhido.cor}">${m}</li>`).join("")
+  const componente = $("componente").value.trim() || "[componente]", ano = $("ano").value.trim() || "[ano ou idade]"
+  const atividade = $("atividade").value.trim() || "[cole aqui a atividade]"
+  $("prompt").textContent = `Você é professor(a) de ${componente} do ${ano}. Adapte a atividade abaixo ${escolhido.pedido}. Mantenha o mesmo conteúdo e o mesmo objetivo da atividade da turma, para que todos trabalhem o mesmo tema juntos. No fim, liste o que você mudou e por quê. Escreva em texto normal, fora de bloco de código, e descreva as imagens entre parênteses.\n\nAtividade:\n${atividade}`
+}
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip")
+  if (!b) return
+  escolhido = CASOS.find(c => c.id === b.dataset.id)
+  try { localStorage.setItem("adaptar-caso", escolhido.id) } catch {}
+  montar()
+})
+for (const id of ["componente", "ano", "atividade"]) $(id).addEventListener("input", montar)
+$("copiar").addEventListener("click", async () => {
+  const ok = await Copiar.texto($("prompt").textContent, { avisar: false })
+  $("copiado").textContent = ok ? "Copiado! Cole no Gemini." : ""
+  setTimeout(() => { $("copiado").textContent = "" }, 4000)
+})
+montar()
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+</body>
+</html>
