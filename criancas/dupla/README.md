@@ -12,3 +12,5 @@ Uma criança é o piloto e monta o caminho do robô. A outra é o navegador: vê
 | Autoria      | Arthur Medeiros                                                                                                                                     |
 
 Os mapas do navegador, para quando as crianças não usam celular, estão em [mapas.html](mapas.html) e [mapas.pdf](mapas.pdf).
+
+No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. Com o modo ligado, as teclas A, S, R e E passam a ser dele (a R e a E do jogo, de apagar as setas e espiar, ficam nos botões).

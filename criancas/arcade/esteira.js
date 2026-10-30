@@ -59,7 +59,7 @@
 
   function stop(){
     decided = true;
-    clearTimeout(cardT); clearTimeout(nextT);
+    A.cancel(cardT); A.cancel(nextT);
     if(el.fill){ el.fill.style.transition = 'none'; }
     if(el.belt) el.belt.style.animationPlayState = 'paused';
   }
@@ -139,8 +139,8 @@
     void el.fill.offsetWidth;
     el.fill.style.transition = 'transform ' + windowMs + 'ms linear 350ms';
     el.fill.style.transform = 'scaleX(0)';
-    clearTimeout(cardT);
-    cardT = setTimeout(function(){ decide('timeout'); }, windowMs + 350);
+    A.cancel(cardT);
+    cardT = A.later(function(){ decide('timeout'); }, windowMs + 350);
     A.sfx.whoosh();
   }
 
@@ -183,9 +183,9 @@
   }
 
   function decide(choice){
-    if(decided || !api.running) return;
+    if(decided || !api.running || A.paused) return;
     decided = true;
-    clearTimeout(cardT);
+    A.cancel(cardT);
     var good = isGood(cur);
     var correct = (choice === 'ok' && good) || (choice === 'fix' && !good);
     var card = curEl;
@@ -208,12 +208,38 @@
       if(cur.bug) api.toast('Bug encontrado! Muito bem, testador(a)!', 'good');
       A.sfx.good(); A.vibrate(15);
       if(streak === 5 || streak === 10 || streak === 15) api.banner(streak + ' seguidos!');
-      nextT = setTimeout(nextCard, 420);
+      nextT = A.later(nextCard, 420);
     } else {
       streak = 0; st.wrong++;
       api.loseLife(explain(choice));
-      nextT = setTimeout(nextCard, 1100);
+      nextT = A.later(nextCard, 1100);
     }
+  }
+
+  // Modo professor: a resposta é o botão certo para o app da tela; a barra de tempo do app congela onde está
+  function answer(){
+    if(!alive || decided || !cur) return null;
+    var good = isGood(cur);
+    return {
+      els:[$(good ? '#es-ok' : '#es-fix')],
+      text:good ? 'Este app bate com o pedido do cliente: aprove (arraste para a direita).' : 'Mande consertar (arraste para a esquerda). ' + explain('ok')
+    };
+  }
+  function pause(){
+    if(!alive || decided || !el.fill) return;
+    // Guarda a largura atual como scaleX, para a transição seguinte poder descer a partir dela
+    var scale = parseFloat(getComputedStyle(el.fill).transform.split('(')[1]) || 0;
+    el.fill.style.transition = 'none';
+    el.fill.style.transform = 'scaleX(' + scale + ')';
+  }
+  function resume(gap){
+    if(!alive) return;
+    shownAt += gap;
+    if(decided || !cardT) return;
+    var left = Math.max(0, cardT.left), bar = Math.min(left, windowMs), delay = Math.max(0, left - windowMs);
+    void el.fill.offsetWidth;
+    el.fill.style.transition = 'transform ' + bar + 'ms linear ' + delay + 'ms';
+    el.fill.style.transform = 'scaleX(0)';
   }
 
   function drawIcon(ctx, w, h, t){
@@ -277,6 +303,8 @@
       ['seta-esquerda', 'Arraste para a ESQUERDA se estiver diferente ou com bug']
     ],
     duration:40000, lives:3, failText:'O cliente ficou bravo!',
+    goal:'O objetivo é aprovar só os apps que batem com o pedido do cliente (cor, bichinho e botão) e mandar consertar os que estão diferentes ou com bug.',
+    answer:answer, pause:pause, resume:resume,
     learn:'Antes de entregar um app, engenheiros de software conferem se ele faz exatamente o que o cliente pediu. O pedido se chama requisito, e conferir se chama testar!',
     real:'Times de QA (qualidade) escrevem testes de aceitação baseados nos requisitos do cliente. Muitos são testes automatizados, que rodam sozinhos toda vez que alguém muda o código.',
     ranks:[[380, 'trofeu', 'Chefe de Qualidade'], [240, 'ouro', 'Testador(a) Expert'], [120, 'lupa', 'Testador(a)'], [0, 'broto', 'Estagiário(a) de Testes']],

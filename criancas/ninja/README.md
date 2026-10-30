@@ -10,3 +10,5 @@ Deslizando o dedo, a criança corta os bugs que aparecem na tela, sem cortar o r
 | Como usar    | Celular ou tablet, deslizando o dedo na tela                                    |
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/ninja/            |
 | Autoria      | Arthur Medeiros                                                                 |
+
+No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.

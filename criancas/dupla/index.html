@@ -229,6 +229,13 @@
   #difficulties button:hover { transform: translateY(-3px) rotate(-2deg) }
   #difficulties button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink) }
   #difficulties button.chosen { outline: 5px solid var(--pink); outline-offset: 4px }
+  /* As estrelas guardadas no aparelho: o total de cada dificuldade */
+  #difficulties .contagem { display: inline-flex; align-items: center; gap: 3px; font: 700 min(17px, 4vw) var(--font); font-style: normal; pointer-events: none }
+  #difficulties .contagem svg { width: 22px; height: 22px }
+  /* A resposta do modo professor: uma seta em cada casa do caminho, só enquanto estiver marcada */
+  .cell { position: relative }
+  .cell svg.seta-resposta { position: absolute; inset: 18%; width: 64%; height: 64%; overflow: visible; pointer-events: none }
+  .seta-resposta g:not(.gp-resposta) { display: none }
   #swap { display: flex; align-items: center; gap: 10px; padding: 8px 24px; background: var(--yellow); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: min(28px, 5.2vw); font-weight: 700 }
   #swap[hidden] { display: none }
   #final { overflow: auto; justify-content: flex-start; padding: 16px }
@@ -270,20 +277,21 @@
     nav .erase, nav .play { order: 1; margin: 0 }
     #queue { gap: 3px }
     #queue li { width: 6.8vw; border-width: 3px }
-    header, #dots { gap: 8px }
+    header, #dots { gap: 6px }
+    header { flex-wrap: wrap; justify-content: center }
     .dot { width: 22px; height: 22px }
     #tries svg { width: 26px; height: 26px }
     #peek, #mute { width: 44px; height: 44px }
     #peek svg, #mute svg { width: 22px; height: 22px }
-    #peek { margin-left: 8px }
-    html, body { overflow: auto }
+    #peek { margin-left: 0 }
+    html, body { overflow-x: hidden; overflow-y: auto }
   }
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="hills"></div></div>
 
-<header><span id="dots"></span><span id="tries"></span><button id="peek" tabindex="-1" aria-label="Espiar os bugs"><svg viewBox="0 0 24 24"><path d="M2 12 Q12 3 22 12 Q12 21 2 12 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="12" cy="12" r="4.2" fill="#4da3ff" stroke="#2f2a4a" stroke-width="2"/><circle cx="12" cy="12" r="1.7" fill="#2f2a4a"/></svg></button><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
+<header><span id="fases"><span id="dots"></span></span><span id="tries"></span><button id="peek" tabindex="-1" aria-label="Espiar os bugs"><svg viewBox="0 0 24 24"><path d="M2 12 Q12 3 22 12 Q12 21 2 12 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="12" cy="12" r="4.2" fill="#4da3ff" stroke="#2f2a4a" stroke-width="2"/><circle cx="12" cy="12" r="1.7" fill="#2f2a4a"/></svg></button><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
 <div id="pick"></div>
 <div id="role"></div>
 <main><div id="board"></div><ol id="code"></ol></main>
@@ -434,12 +442,24 @@ robot.id = "robot"
 robot.innerHTML = '<svg viewBox="0 0 100 100"><use href="#bot"/></svg>'
 let difficulty = 0, levels = DIFFICULTIES[difficulty].levels, level, rows, start, queue = [], culprit = -1, running = false, runs = 0, peeked = false, muted = false, audio, musicTimer, musicStep = 0
 
-const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
+// As esperas guardam quanto falta, para o modo professor poder parar o jogo e continuar de onde parou
+let frozen = false, runId = 0
+const waits = new Set()
+const wait = milliseconds => new Promise(resolve => {
+  const entry = { left: milliseconds, since: 0, timer: 0 }
+  entry.go = () => {
+    if (entry.since) return
+    entry.since = performance.now()
+    entry.timer = setTimeout(() => { waits.delete(entry); resolve() }, entry.left)
+  }
+  waits.add(entry)
+  if (!frozen) entry.go()
+})
 const isShown = id => document.getElementById(id).classList.contains("show")
 
 // Playing a short melody with the Web Audio API, created lazily because browsers block audio before the first key press
 function beep(frequencies, { type = "triangle", volume = 0.25, spacing = 0.12, length = 0.25 } = {}) {
-  if (muted || NAVIGATOR) return
+  if (muted || NAVIGATOR || frozen) return
   audio ??= new AudioContext()
   audio.resume()
   frequencies.forEach((frequency, index) => {
@@ -458,6 +478,7 @@ function beep(frequencies, { type = "triangle", volume = 0.25, spacing = 0.12, l
 // Starting the soft background music once, on the first key press or click, with a bass note every four steps
 function startMusic() {
   musicTimer ??= setInterval(() => {
+    if (frozen) return
     const note = MELODY[musicStep % MELODY.length]
     if (note) beep([note], { volume: 0.04, length: 0.22 })
     if (musicStep % 4 === 0) beep([musicStep % 8 ? 196 : 131], { type: "sine", volume: 0.08, length: 0.5 })
@@ -503,15 +524,24 @@ function loadLevel(number) {
   document.getElementById("role").innerHTML = `${LEVEL_ICONS[DIFFICULTIES[difficulty].icon]} Fase ${level + 1}: diga o caminho ao piloto e avise onde estão os bugs!`
   document.querySelectorAll("#difficulties button, #pick button").forEach(button => button.classList.toggle("chosen", Number(button.dataset.difficulty) === difficulty))
   draw()
-  setTimeout(() => bitSays(level === 0 ? "acenando" : "pensando", level === 0
+  const loaded = level
+  wait(600).then(() => loaded === level && bitSays(level === 0 ? "acenando" : "pensando", level === 0
     ? "Um pilota e o outro navega. O navegador vê os bugs e diz o caminho. Conversem antes de apertar play!"
-    : `Fase ${level + 1}! Navegador, conte ao piloto onde estão os bugs.`, level === 0 ? 6000 : 3500), 600)
+    : `Fase ${level + 1}! Navegador, conte ao piloto onde estão os bugs.`, level === 0 ? 6000 : 3500))
 }
 
 // Redrawing the level dots, the tries left, the command queue and its code version, marking the current and the wrong step
 function draw(current = -1) {
-  document.getElementById("dots").innerHTML = levels.map((_, index) =>
-    `<span data-level="${index}" class="dot ${index < level ? "done" : ""} ${index === level ? "now" : ""}"></span>`).join(" ")
+  // Os pontinhos são as fases: ficam no lugar e só mudam de marca, para a barra do modo professor acompanhar
+  const dots = document.getElementById("dots")
+  if (dots.children.length !== levels.length) dots.innerHTML = levels.map(() => '<span class="dot fase"></span>').join(" ")
+  ;[...dots.children].forEach((dot, index) => {
+    const saved = Jogo.progresso.estrelas(stageKey(difficulty, index))
+    dot.dataset.level = index
+    dot.className = `dot fase ${index < level ? "done" : ""} ${index === level ? "now" : ""}`
+    dot.setAttribute("aria-pressed", String(index === level))
+    dot.title = `Fase ${index + 1}: ${saved} de 3 estrelas`
+  })
   const { tries } = DIFFICULTIES[difficulty]
   document.getElementById("tries").innerHTML = NAVIGATOR || tries === Infinity ? "" : Array.from({ length: tries }, (_, index) =>
     `<svg viewBox="0 0 100 100" class="${index < tries - runs ? "" : "lost"}"><use href="#bot"/></svg>`).join("")
@@ -530,6 +560,7 @@ async function play() {
   running = true
   culprit = -1
   runs++
+  const id = ++runId
   let position = start
   let crash = ""
   for (const [index, key] of queue.entries()) {
@@ -547,6 +578,7 @@ async function play() {
     // Stepping onto the hidden bug before revealing it, so both players see where it was
     if (symbol === "B") {
       await wait(400)
+      if (id !== runId) return
       board.children[row * rows[0].length + column].querySelector(".bug").classList.add("found")
       culprit = index
       crash = "bug"
@@ -554,6 +586,7 @@ async function play() {
     }
     beep([MOVES[key][4] / 2], { type: "square", volume: 0.08, length: 0.1 })
     await wait(500)
+    if (id !== runId) return
     if (symbol === "*") return win()
   }
 
@@ -567,6 +600,7 @@ async function play() {
   robot.classList.add("shake")
   draw()
   await wait(700)
+  if (id !== runId) return
   robot.classList.remove("shake")
   placeRobot(start, false)
   running = false
@@ -596,7 +630,9 @@ function win() {
 
   // Awarding 3 stars for reaching the star on the first try, one less for each extra try and one less for peeking
   const stars = Math.max(1, 3 - (runs - 1) - (peeked ? 1 : 0))
-  for (let index = 0; index < stars; index++) setTimeout(() => beep([1047 + index * 262]), 600 + index * 300)
+  Jogo.progresso.guardar(stageKey(difficulty, level), stars)
+  showSavedStars()
+  for (let index = 0; index < stars; index++) wait(600 + index * 300).then(() => beep([1047 + index * 262]))
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   const swap = document.getElementById("swap")
@@ -618,7 +654,7 @@ function peek() {
   peeked = true
   board.classList.add("peek")
   beep([660, 880], { volume: 0.12 })
-  setTimeout(() => board.classList.remove("peek"), 2000)
+  wait(2000).then(() => board.classList.remove("peek"))
 }
 
 // Switching to the five levels of a difficulty, starting from the first
@@ -705,11 +741,35 @@ Jogo.som.aoMudar(ligado => {
 })
 document.querySelector("#final p").after(Jogo.acoesDoFim(() => press("Enter")))
 
+// As estrelas de cada fase ficam guardadas no aparelho. A fase é o número da dificuldade (1 a 3) e o da fase (1 a 5):
+// 11 a 15 no Fácil, 21 a 25 no Normal e 31 a 35 no Desafio
+const stageKey = (chosen, number) => (chosen + 1) * 10 + number + 1
+const STAR = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>'
+function showSavedStars() {
+  document.querySelectorAll("#difficulties button").forEach((button, index) => {
+    const count = DIFFICULTIES[index].levels.length
+    let total = 0
+    for (let number = 0; number < count; number++) total += Jogo.progresso.estrelas(stageKey(index, number))
+    const box = button.querySelector(".contagem")
+    box.setAttribute("aria-label", `${total} de ${count * 3} estrelas`)
+    box.innerHTML = `${STAR} ${total}/${count * 3}`
+  })
+}
+
+// Teclas do modo professor: P liga e desliga, e com ele ligado A, S, R e E são dele (a R e a E do jogo viram botões).
+// A barra e a cortina da pausa recebem Enter, espaço e Tab sem mexer no jogo
+function professorKey(event) {
+  if (NAVIGATOR) return false
+  if (Jogo.modoProfessor.pausado || event.target.closest?.(".gp-prof, .gp-prof-cortina")) return true
+  const key = event.key.toLowerCase()
+  return key === "p" || (Jogo.modoProfessor.ligado && ["a", "s", "r", "e"].includes(key))
+}
 
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
   // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
   if (/^F\d{1,2}$/.test(event.key)) return
+  if (professorKey(event)) return
   event.preventDefault()
   press(event.key)
 })
@@ -720,7 +780,7 @@ document.querySelectorAll("#win, #lost, #phone").forEach(overlay => overlay.addE
 
 // Building the difficulty buttons of the first screen and of the navigator's map
 document.getElementById("difficulties").innerHTML = DIFFICULTIES.map((choice, index) =>
-  `<button data-difficulty="${index}" tabindex="-1">${LEVEL_ICONS[choice.icon]}<span>${choice.name}</span></button>`).join("")
+  `<button data-difficulty="${index}" tabindex="-1">${LEVEL_ICONS[choice.icon]}<span>${choice.name}</span><i class="contagem" role="img"></i></button>`).join("")
 document.getElementById("pick").innerHTML = DIFFICULTIES.map((choice, index) =>
   `<button data-difficulty="${index}" tabindex="-1">${LEVEL_ICONS[choice.icon]} ${choice.name}</button>`).join("")
 document.getElementById("difficulties").addEventListener("click", event => {
@@ -748,12 +808,78 @@ board.addEventListener("pointerdown", event => { swipeStart = event.clientX })
 board.addEventListener("pointerup", event => {
   if (NAVIGATOR && Math.abs(event.clientX - swipeStart) > 50) turnPage(event.clientX < swipeStart ? "ArrowRight" : "ArrowLeft")
 })
+showSavedStars()
 addEventListener("resize", resize)
 if (NAVIGATOR) {
   document.body.classList.add("navigator")
   document.getElementById("start").classList.remove("show")
 }
 loadLevel(0)
+
+// O caminho mais curto até a estrela sem pisar em bug: a resposta que o professor pode mostrar
+function safePath() {
+  const seen = new Map([[start.join(), null]])
+  let frontier = [start]
+  while (frontier.length) {
+    const next = []
+    for (const [row, column] of frontier) {
+      for (const key of Object.keys(MOVES)) {
+        const cell = [row + MOVES[key][0], column + MOVES[key][1]], symbol = rows[cell[0]]?.[cell[1]]
+        if (symbol === undefined || symbol === "B" || seen.has(cell.join())) continue
+        seen.set(cell.join(), { from: [row, column], key })
+        if (symbol === "*") {
+          const path = []
+          for (let step = { from: [row, column], key }, at = cell; step; at = step.from, step = seen.get(at.join())) path.unshift({ cell: at, key: step.key })
+          return path
+        }
+        next.push(cell)
+      }
+    }
+    frontier = next
+  }
+  return null
+}
+
+// Modo professor (tecla P ou ?professor): escolher a fase, mostrar o caminho e pausar. Na tela do navegador não existe
+const ANGLES = { ArrowUp: 0, ArrowRight: 90, ArrowDown: 180, ArrowLeft: -90 }
+if (!NAVIGATOR) Jogo.modoProfessor({
+  irParaFase(number) {
+    runId++
+    running = false
+    robot.classList.remove("shake")
+    document.querySelectorAll("#start, #phone").forEach(overlay => overlay.classList.remove("show"))
+    loadLevel(number - 1)
+  },
+  // Põe uma seta em cada casa do caminho seguro e o Bit lê as setas. Não mexe na fila, não gasta tentativa e não dá estrela
+  resposta() {
+    const overlay = document.querySelector(".overlay.show")
+    if (overlay) return window.Bit?.diz("pensando", overlay.id === "start" ? "Escolha uma dificuldade para abrir as fases." : "Termine esta tela para ver o caminho da fase.", 6000)
+    if (running) return window.Bit?.diz("pensando", "Espere o robô terminar o caminho.", 5000)
+    const path = safePath()
+    if (!path) return
+    board.querySelectorAll(".seta-resposta").forEach(arrow => arrow.remove())
+    const marks = path.map(({ cell: [row, column], key }) => {
+      const cell = board.children[row * rows[0].length + column]
+      cell.insertAdjacentHTML("beforeend", `<svg class="seta-resposta" viewBox="0 0 24 24" style="transform: rotate(${ANGLES[key]}deg)"><g><path d="M12 20 V5 M5.5 11 L12 4.5 L18.5 11" stroke="#2f2a4a" stroke-width="7.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 20 V5 M5.5 11 L12 4.5 L18.5 11" stroke="#ff8a3d" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`)
+      return cell.lastElementChild.firstElementChild
+    })
+    Jogo.modoProfessor.destacar(marks)
+    window.Bit?.diz("pensando", `Caminho seguro: ${path.map(({ key }) => MOVES[key][2]).join(" ")}. O navegador sabe onde estão os bugs; o piloto monta as setas.`, 14000)
+  },
+  pausar() {
+    frozen = true
+    for (const entry of waits) {
+      if (!entry.since) continue
+      clearTimeout(entry.timer)
+      entry.left -= performance.now() - entry.since
+      entry.since = 0
+    }
+  },
+  continuar() {
+    frozen = false
+    for (const entry of waits) entry.go()
+  },
+})
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
 </body>

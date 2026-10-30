@@ -173,6 +173,11 @@
   .send-note{margin-top:8px; font-size:.92rem; font-weight:500; opacity:.95;}
   .send.done{background:var(--mint);}
   .send.done .send-title{font-size:1.3rem; margin:0;}
+  /* A melhor rodada deste aparelho, em estrelas */
+  .melhor{display:flex; align-items:center; justify-content:center; gap:8px; min-height:30px; font-weight:700; font-size:.95rem;}
+  .melhor-estrelas{display:inline-flex; gap:1px;}
+  .melhor-estrelas svg{width:22px; height:22px;}
+  .melhor-estrelas .apagada path{fill:#e6e3f2;}
   .fact{background:var(--yellow); text-align:left; font-weight:500; font-size:1.02rem; line-height:1.4;}
   .fact b{display:block; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; font-weight:700;}
 
@@ -203,6 +208,7 @@
     </h1>
     <div class="story">O app da escola ficou cheio de <b>bugs</b>, que são erros no programa! Toque nos insetos para consertar o app antes que eles quebrem tudo.</div>
     <button class="btn" id="btn-start" type="button" data-icone="play">Jogar!</button>
+    <div class="melhor"><span>Sua melhor rodada</span><span class="melhor-estrelas" id="melhor" role="img"></span></div>
     <div class="how"><span data-icone="toque">Toque rápido</span><span data-icone="estrela">Dourado vale mais</span><span data-icone="relogio">30 segundos</span></div>
   </section>
 
@@ -358,11 +364,43 @@
   document.querySelector('.app').prepend(topoJogo);
 
   // ---- state ----
-  var S = { running:false, score:0, hearts:MAX_HEARTS, combo:0, t0:0, hit:0, miss:0, spawnT:0, raf:0, lastTick:-1 };
+  var S = { round:0, running:false, score:0, hearts:MAX_HEARTS, combo:0, t0:0, hit:0, miss:0, spawnT:0, raf:0, lastTick:-1 };
   var bugsEl = $('bugs'), screenEl = $('screen');
 
   function show(id){ ['scr-start','scr-game','scr-end'].forEach(function(s){ $(s).hidden = s !== id; }); }
-  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  // As esperas guardam quanto falta, para o modo professor poder parar a rodada e continuar de onde parou
+  var frozen = false, frozenSince = 0, waits = [];
+  function later(fn, ms){
+    var e = { fn:fn, left:ms, since:0, timer:0 };
+    e.go = function(){
+      if(e.since) return;
+      e.since = performance.now();
+      e.timer = setTimeout(function(){
+        var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+        e.fn();
+      }, e.left);
+    };
+    waits.push(e);
+    if(!frozen) e.go();
+    return e;
+  }
+  function cancelLater(e){
+    if(!e) return;
+    clearTimeout(e.timer);
+    var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+  }
+  function wait(ms){ return new Promise(function(r){ later(r, ms); }); }
+
+  // As estrelas da rodada ficam guardadas no aparelho (a rodada é a fase 1): o placar de cada posto vira estrela
+  var STAR = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+  function starsFor(score){ return score >= RANKS[0][0] ? 3 : score >= RANKS[1][0] ? 2 : score >= RANKS[2][0] ? 1 : 0; }
+  function showSavedStars(){
+    var saved = Jogo.progresso.estrelas(1), box = $('melhor');
+    box.setAttribute('aria-label', saved + ' de 3 estrelas');
+    box.innerHTML = [0, 1, 2].map(function(n){ return n < saved ? STAR : STAR.replace('<svg ', '<svg class="apagada" '); }).join('');
+  }
+  showSavedStars();
 
   function renderHearts(){
     var h = '';
@@ -382,6 +420,7 @@
     screenEl.querySelectorAll('.toast,.combo,.pts,.burst').forEach(function(e){ e.remove(); });
     document.querySelectorAll('.breakable').forEach(function(e){ e.classList.remove('broken'); });
     var cd = $('count'), n = $('count-n');
+    var started = ++S.round;
     cd.hidden = false;
     var seq = ['3', '2', '1', 'Já!'];
     for(var i = 0; i < seq.length; i++){
@@ -389,6 +428,7 @@
       n.style.animation = 'none'; void n.offsetWidth; n.style.animation = '';
       if(i < 3) sfx.beep(); else sfx.go();
       await wait(i < 3 ? 650 : 450);
+      if(started !== S.round) return;
     }
     cd.hidden = true;
     S.running = true;
@@ -401,6 +441,8 @@
 
   function frame(){
     if(!S.running) return;
+    // Com o professor pausando, o relógio da rodada para
+    if(frozen){ S.raf = requestAnimationFrame(frame); return; }
     var p = progress();
     $('timefill').style.transform = 'scaleX(' + (1 - p) + ')';
     var left = Math.ceil((1 - p) * ROUND_MS / 1000);
@@ -416,8 +458,8 @@
     if(!S.running) return;
     var p = progress();
     spawn();
-    if(p > 0.45 && Math.random() < 0.35) setTimeout(spawn, 180);
-    S.spawnT = setTimeout(spawnLoop, 820 - 420 * p + Math.random() * 180);
+    if(p > 0.45 && Math.random() < 0.35) later(spawn, 180);
+    S.spawnT = later(spawnLoop, 820 - 420 * p + Math.random() * 180);
   }
 
   function spawn(){
@@ -437,7 +479,7 @@
     b.style.setProperty('--dy', (Math.random() * 16 - 8) + 'px');
     b.gold = gold;
     var life = (gold ? 1300 : 2000) - 900 * progress();
-    b.timer = setTimeout(function(){ escape(b); }, life);
+    b.timer = later(function(){ escape(b); }, life);
     b.addEventListener('pointerdown', function(e){ e.preventDefault(); squash(b); });
     bugsEl.appendChild(b);
   }
@@ -445,7 +487,7 @@
   function squash(b){
     if(!S.running || b.done) return;
     b.done = true;
-    clearTimeout(b.timer);
+    cancelLater(b.timer);
     S.combo++; S.hit++;
     var pts = (b.gold ? 30 : 10) + (S.combo >= 3 ? 5 : 0);
     S.score += pts;
@@ -530,9 +572,9 @@
   async function endRound(reason){
     if(!S.running) return;
     S.running = false;
-    clearTimeout(S.spawnT);
+    cancelLater(S.spawnT);
     cancelAnimationFrame(S.raf);
-    Array.prototype.forEach.call(bugsEl.children, function(b){ clearTimeout(b.timer); b.done = true; b.classList.add('flee'); });
+    Array.prototype.forEach.call(bugsEl.children, function(b){ cancelLater(b.timer); b.done = true; b.classList.add('flee'); });
     if(reason === 'crash'){ sfx.crash(); toast('O app travou!'); }
     if(window.Bit) Bit.diz(reason === 'crash' ? 'ops' : 'comemorando', reason === 'crash'
       ? 'O app travou! Quanto antes a gente acha um bug, mais fácil é consertar.'
@@ -540,6 +582,8 @@
     await wait(1100);
     var best = readBest(), isRecord = S.score > best;
     if(isRecord) saveBest(S.score);
+    Jogo.progresso.guardar(1, starsFor(S.score));
+    showSavedStars();
     var r = RANKS.filter(function(x){ return S.score >= x[0]; })[0];
     $('end-head').textContent = reason === 'crash' ? 'O app travou!' : 'Tempo esgotado!';
     $('medal').innerHTML = icon(r[1]);
@@ -700,6 +744,31 @@
   $('sala').addEventListener('input', function(){ var v = limparSala(this.value); if(this.value !== v) this.value = v; guardarSala(v); });
 
   $('btn-start').addEventListener('click', startRound);
+
+  // Modo professor (tecla P ou ?professor): explicar o objetivo e pausar. O jogo tem uma rodada só e nenhuma resposta
+  // certa, então não há fases para escolher e o botão de resposta faz o Bit explicar o objetivo
+  Jogo.modoProfessor({
+    resposta: function(){
+      if(S.running) Jogo.modoProfessor.destacar(Array.prototype.slice.call(bugsEl.children));
+      if(window.Bit) Bit.diz('pensando', 'Aqui não tem resposta certa: o objetivo é tocar em cada bug antes que ele escape. O dourado vale 30 pontos. Cada bug que escapa quebra uma parte do app e tira um coração. Com ' + RANKS[2][0] + ' pontos, 1 estrela; com ' + RANKS[1][0] + ', 2; com ' + RANKS[0][0] + ', 3.', 14000);
+    },
+    pausar: function(){
+      frozen = true;
+      frozenSince = performance.now();
+      waits.forEach(function(e){
+        if(!e.since) return;
+        clearTimeout(e.timer);
+        e.left -= performance.now() - e.since;
+        e.since = 0;
+      });
+    },
+    continuar: function(){
+      frozen = false;
+      // O tempo parado não conta na rodada
+      if(S.running) S.t0 += performance.now() - frozenSince;
+      waits.forEach(function(e){ e.go(); });
+    }
+  });
   $('btn-again').replaceWith(Jogo.acoesDoFim(startRound));
   document.addEventListener('visibilitychange', function(){ if(document.hidden && S.running) endRound('time'); });
 

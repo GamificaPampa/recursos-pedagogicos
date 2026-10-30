@@ -54,6 +54,7 @@
   #start-stage .eyebrow{align-self:center; margin:0;}
   .hero{width:140px; height:auto;}
   .start-title{font-size:clamp(46px, 13vw, 64px); line-height:1;}
+  @media (max-height:780px){ .hero{width:96px;} #start-stage{gap:10px;} }
   .pill-row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
   .pill .icone{width:22px; height:22px;}
 
@@ -94,6 +95,20 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; -webkit-user-select:none; user-select:none; touch-action:manipulation; transition:transform .08s, box-shadow .08s;}
   #loop-tap .icone{width:46px; height:46px;}
   #loop-tap:active{transform:translateY(7px); box-shadow:inset 0 -8px 0 rgb(47 42 74 / .16), inset 0 5px 0 rgb(255 255 255 / .55), 0 2px 0 var(--ink);}
+
+  /* escolha do desafio, com as estrelas guardadas no aparelho */
+  #fases{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 0 6px;}
+  .fase{display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-width:52px; min-height:56px; padding:5px 6px 6px; background:var(--white); border:4px solid var(--ink); border-radius:18px; box-shadow:0 5px 0 var(--ink); font:600 16px var(--font); color:var(--ink); cursor:pointer;}
+  .fase:active{transform:translateY(4px); box-shadow:0 1px 0 var(--ink);}
+  .fase b{display:grid; place-items:center; width:28px; height:28px; background:var(--sky2); border:3px solid var(--ink); border-radius:50%; font-size:15px;}
+  .fase-estrelas{display:inline-flex; gap:1px; font-style:normal;}
+  .fase-estrelas svg{width:14px; height:14px;}
+  .fase-estrelas .apagada path{fill:#e6e3f2;}
+  .fase[aria-pressed="true"]{background:var(--yellow);}
+  .fase[aria-pressed="true"] b{background:var(--white);}
+  .fase:focus-visible{outline:4px solid var(--pink); outline-offset:3px;}
+  @media (max-width:400px){ #fases{gap:5px;} .fase{min-width:0; padding:4px 3px 5px; border-width:3px;} .fase-estrelas svg{width:12px; height:12px;} }
+  .fases-rotulo{font-size:15px; font-weight:700; color:var(--soft); margin:14px 0 8px;}
 
   /* resultado */
   #result-stage{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;}
@@ -147,6 +162,8 @@
           <span class="pill" style="--c: var(--pink)" data-icone="bug">Debug</span>
           <span class="pill" style="--c: var(--mint)" data-icone="repetir">Loop</span>
         </div>
+        <div class="fases-rotulo" id="fases-rotulo">Ou escolha um desafio</div>
+        <div id="fases" role="group" aria-labelledby="fases-rotulo"></div>
       </div>
       <button class="btn btn--jogar btn--big" id="btn-start" type="button" data-icone="play">Começar missão</button>
     </div>
@@ -229,6 +246,61 @@
     score: 0
   };
 
+  // As esperas guardam quanto falta, para o modo professor poder parar o jogo e continuar de onde parou
+  var frozen = false, waits = [];
+  function later(fn, ms){
+    var e = { fn: fn, left: ms, since: 0, timer: 0 };
+    e.go = function(){
+      if(e.since) return;
+      e.since = performance.now();
+      e.timer = setTimeout(function(){
+        var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+        e.fn();
+      }, e.left);
+    };
+    waits.push(e);
+    if(!frozen) e.go();
+    return e;
+  }
+  function cancelLater(e){
+    if(!e) return;
+    clearTimeout(e.timer);
+    var i = waits.indexOf(e); if(i >= 0) waits.splice(i, 1);
+  }
+  // Depois de uma resposta certa, passa para o próximo desafio, a menos que o professor já tenha mudado de desafio
+  function advanceLater(ms){
+    var from = state.step;
+    later(function(){ if(state.step === from) nextStep(); }, ms);
+  }
+
+  // As estrelas de cada desafio ficam guardadas no aparelho: o desafio é a fase 1 a 5
+  var STAR = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+  var CHALLENGES = ['Algoritmo', 'Debug', 'Debug', 'Laço', 'Laço'];
+  function buildStages(){
+    var box = document.getElementById('fases');
+    box.innerHTML = CHALLENGES.map(function(name, i){
+      return '<button class="fase" type="button" aria-pressed="false"><b>' + (i + 1) + '</b><i class="fase-estrelas" role="img"></i></button>';
+    }).join('');
+    Array.prototype.forEach.call(box.children, function(button, i){
+      button.addEventListener('click', function(){ startAt(i); });
+    });
+    showSavedStars();
+  }
+  function showSavedStars(){
+    var box = document.getElementById('fases');
+    Array.prototype.forEach.call(box.children, function(button, i){
+      var saved = Jogo.progresso.estrelas(i + 1);
+      var stars = button.querySelector('.fase-estrelas');
+      stars.setAttribute('aria-label', saved + ' de 3 estrelas');
+      stars.innerHTML = [0, 1, 2].map(function(n){ return n < saved ? STAR : STAR.replace('<svg ', '<svg class="apagada" '); }).join('');
+      button.setAttribute('aria-label', 'Desafio ' + (i + 1) + ', ' + CHALLENGES[i] + ': ' + saved + ' de 3 estrelas');
+    });
+  }
+  function saveStars(stage, stars){
+    Jogo.progresso.guardar(stage, stars);
+    showSavedStars();
+  }
+
   var screens = {
     start: document.getElementById('screen-start'),
     seq: document.getElementById('screen-seq'),
@@ -249,6 +321,9 @@
       d.classList.toggle('done', i < state.step);
       d.classList.toggle('active', i === state.step);
     });
+    Array.prototype.forEach.call(document.querySelectorAll('#fases .fase'), function(f, i){
+      f.setAttribute('aria-pressed', String(i === state.step));
+    });
   }
 
   function showScreen(name){
@@ -267,6 +342,7 @@
   ];
   var seqChosen = [];       // índices escolhidos até agora
   var seqAttemptedWrong = false;
+  var seqWrongs = 0;
 
   function shuffle(arr){
     var a = arr.slice();
@@ -280,6 +356,7 @@
   function initSeq(){
     seqChosen = [];
     seqAttemptedWrong = false;
+    seqWrongs = 0;
     var slotsEl = document.getElementById('seq-slots');
     var poolEl = document.getElementById('seq-pool');
     slotsEl.innerHTML = '';
@@ -324,10 +401,12 @@
       fb.textContent = seqAttemptedWrong ? 'Certo agora! +10 pts' : 'Perfeito na primeira! +20 pts';
       fb.className = 'feedback show ok';
       addScore(seqAttemptedWrong ? 10 : 20);
+      saveStars(1, seqWrongs === 0 ? 3 : seqWrongs === 1 ? 2 : 1);
       vibrate(30);
-      setTimeout(nextStep, 900);
+      advanceLater(900);
     } else {
       seqAttemptedWrong = true;
+      seqWrongs++;
       fb.textContent = 'Ainda não é essa ordem. Reveja e confirme de novo.';
       fb.className = 'feedback';
       void fb.offsetWidth;
@@ -380,7 +459,7 @@
     codeEl.innerHTML = '';
     var fb = document.getElementById('bug-feedback');
     fb.className = 'feedback';
-    var wrongTried = false;
+    var wrongTried = false, wrongs = 0;
     r.lines.forEach(function(text, i){
       var line = document.createElement('div');
       line.className = 'code-line';
@@ -399,17 +478,19 @@
           fb.textContent = (wrongTried ? 'Encontrou! +10 pts. ' : 'Na mosca! +20 pts. ') + r.explain;
           fb.className = 'feedback show ok';
           addScore(wrongTried ? 10 : 20);
+          saveStars(roundIdx + 2, wrongs === 0 ? 3 : wrongs === 1 ? 2 : 1);
           vibrate(30);
-          setTimeout(nextStep, 2800);
+          advanceLater(2800);
         } else {
           wrongTried = true;
+          wrongs++;
           line.classList.add('wrong-pick');
           fb.textContent = 'Essa linha está ok. Tente outra.';
           fb.className = 'feedback';
           void fb.offsetWidth;
           fb.className = 'feedback show bad';
           vibrate([20,40,20]);
-          setTimeout(function(){ line.classList.remove('wrong-pick'); }, 500);
+          later(function(){ line.classList.remove('wrong-pick'); }, 500);
         }
       });
       codeEl.appendChild(line);
@@ -436,20 +517,28 @@
     var fill = document.getElementById('loop-timerfill');
     fill.style.transition = 'none';
     fill.style.transform = 'scaleX(1)';
-    clearTimeout(loopState.timer);
+    cancelLater(loopState.timer);
+    loopState.deferred = null;
 
     // O cronômetro só começa depois de 3, 2, 1, Já!, para a criança ler quantas vezes tocar
     Jogo.contagem().then(function(){
       if(state.step !== (roundIdx === 0 ? 3 : 4)) return;
-      loopState.active = true;
-      // força o recálculo e depois anima
-      void fill.offsetWidth;
-      fill.style.transition = 'transform ' + r.seconds + 's linear';
-      fill.style.transform = 'scaleX(0)';
-      loopState.timer = setTimeout(function(){
-        if(loopState.active) finishLoop(roundIdx, true);
-      }, r.seconds * 1000);
+      // Se o professor pausou durante a contagem, o cronômetro espera o Continuar
+      if(frozen){ loopState.deferred = function(){ startLoopTimer(roundIdx, r); }; return; }
+      startLoopTimer(roundIdx, r);
     });
+  }
+
+  function startLoopTimer(roundIdx, r){
+    var fill = document.getElementById('loop-timerfill');
+    loopState.active = true;
+    // força o recálculo e depois anima
+    void fill.offsetWidth;
+    fill.style.transition = 'transform ' + r.seconds + 's linear';
+    fill.style.transform = 'scaleX(0)';
+    loopState.timer = later(function(){
+      if(loopState.active) finishLoop(roundIdx, true);
+    }, r.seconds * 1000);
   }
 
   document.getElementById('loop-tap').addEventListener('click', function(){
@@ -469,7 +558,7 @@
   function finishLoop(roundIdx, timedOut){
     if(!loopState.active) return;
     loopState.active = false;
-    clearTimeout(loopState.timer);
+    cancelLater(loopState.timer);
     var exact = loopState.taps === loopState.target;
     var pts = timedOut ? 0 : (exact ? 20 : 8);
     // O desafio do laço não tem caixa de resposta, então o Bit explica o resultado no canto
@@ -478,8 +567,9 @@
       : exact ? 'Exato! Um laço repete um passo o número certo de vezes.'
       : 'Você tocou ' + loopState.taps + ' vezes, mas o laço pedia ' + loopState.target + '. Na programação, a conta precisa ser exata.', 4500);
     addScore(pts);
+    saveStars(roundIdx + 4, timedOut ? 0 : exact ? 3 : Math.abs(loopState.taps - loopState.target) === 1 ? 2 : 1);
     vibrate(exact ? 30 : [20,40,20]);
-    setTimeout(nextStep, 500);
+    advanceLater(500);
   }
 
   // ---------- FLUXO ----------
@@ -531,12 +621,97 @@
     updateDots();
     render();
   });
+
+  // Escolher um desafio: a missão começa nele, com os pontos zerados
+  function startAt(i){
+    stopLoop();
+    state.step = i;
+    state.score = 0;
+    scoreEl.textContent = '0 pts';
+    updateDots();
+    render();
+  }
+  function stopLoop(){
+    loopState.active = false;
+    loopState.deferred = null;
+    cancelLater(loopState.timer);
+    var fill = document.getElementById('loop-timerfill');
+    fill.style.transition = 'none';
+    fill.style.transform = 'scaleX(1)';
+  }
   // Kit de jogo do identidade-visual: Outros jogos e tela cheia no topo, e a tela final com Jogar de novo e Outros jogos
   document.getElementById('btn-restart').replaceWith(Jogo.acoesDoFim(restart));
   document.getElementById('topbar').prepend(Jogo.botao('casa'));
   document.getElementById('topbar').append(Jogo.botao('tela-cheia'));
 
+  buildStages();
   updateDots();
+
+  // Modo professor (tecla P ou ?professor): escolher o desafio, mostrar a resposta e pausar
+  function say(pose, text, ms){ if(window.Bit) Bit.diz(pose, text, ms); }
+  Jogo.modoProfessor({
+    irParaFase: function(n){
+      var fromResult = state.step > 4;
+      stopLoop();
+      state.step = n - 1;
+      if(fromResult || !screens.start.hidden){
+        state.score = 0;
+        scoreEl.textContent = '0 pts';
+      }
+      updateDots();
+      render();
+    },
+    // Marca a resposta do desafio atual. Não conta ponto, não dá estrela e não passa de desafio
+    resposta: function(){
+      var P = Jogo.modoProfessor;
+      if(!screens.start.hidden) return say('pensando', 'Toque em Começar missão ou escolha um desafio.', 6000);
+      if(state.step === 0){
+        var ok = seqChosen.every(function(v, i){ return v === i; });
+        var next = document.querySelector('#seq-pool .chip[data-idx="' + seqChosen.length + '"]');
+        if(ok && next && !next.classList.contains('used')) P.destacar(next);
+        return say('pensando', 'A ordem certa: ' + seqSteps.map(function(t, i){ return (i + 1) + ') ' + t; }).join('; ') + '.', 14000);
+      }
+      if(state.step === 1 || state.step === 2){
+        var round = bugRounds[state.step - 1];
+        var line = document.querySelectorAll('#bug-code .code-line')[round.bugIndex];
+        if(line) P.destacar(line);
+        return say('pensando', 'O bug está na linha ' + (round.bugIndex + 1) + '. ' + round.explain, 14000);
+      }
+      if(state.step === 3 || state.step === 4){
+        P.destacar(document.getElementById('loop-target'));
+        return say('pensando', 'O laço pede ' + loopState.target + ' toques, nem um a mais nem um a menos. Conte junto com a turma: laço é repetir o passo o número exato de vezes.', 12000);
+      }
+      say('pensando', 'A missão acabou. Escolha um desafio para jogar de novo.', 7000);
+    },
+    pausar: function(){
+      frozen = true;
+      waits.forEach(function(e){
+        if(!e.since) return;
+        clearTimeout(e.timer);
+        e.left -= performance.now() - e.since;
+        e.since = 0;
+      });
+      // A barra do tempo congela onde está
+      if(loopState.active){
+        var fill = document.getElementById('loop-timerfill');
+        // Guarda a largura atual como scaleX, para a transição seguinte poder descer a partir dela
+        var scale = parseFloat(getComputedStyle(fill).transform.split('(')[1]) || 0;
+        fill.style.transition = 'none';
+        fill.style.transform = 'scaleX(' + scale + ')';
+      }
+    },
+    continuar: function(){
+      frozen = false;
+      if(loopState.active && loopState.timer){
+        var fill = document.getElementById('loop-timerfill');
+        void fill.offsetWidth;
+        fill.style.transition = 'transform ' + (Math.max(0, loopState.timer.left) / 1000) + 's linear';
+        fill.style.transform = 'scaleX(0)';
+      }
+      waits.forEach(function(e){ e.go(); });
+      if(loopState.deferred){ var go = loopState.deferred; loopState.deferred = null; go(); }
+    }
+  });
 })();
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>

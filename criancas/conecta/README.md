@@ -10,3 +10,5 @@ A criança liga celulares, servidor e banco de dados com cabos e vê os dados co
 | Como usar    | Celular, tablet ou projetor, arrastando os cabos                                                       |
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/conecta/                                 |
 | Autoria      | Arthur Medeiros                                                                                        |
+
+No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. Com o modo ligado, as teclas A, S, R e E passam a ser dele (a R do jogo, de apagar os cabos, fica no botão).
