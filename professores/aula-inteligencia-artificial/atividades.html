@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folha de atividades da aula sobre IA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<style>
+  :root { --risco: #b9d3ee;
+  }
+  * { box-sizing: border-box }
+  body { margin: 0; padding: 24px 16px 40px; background: linear-gradient(180deg, var(--sky1) 0, var(--sky2) 520px) no-repeat var(--sky2); color: var(--ink); font-family: var(--font) }
+  .bar { max-width: 210mm; margin: 0 auto 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between }
+  .bar p { margin: 0; flex: 1 1 300px; padding: 10px 16px; background: #fff; border: 3px solid var(--ink); border-radius: 18px; font-size: 17px; font-weight: 500 }
+  .bar svg { width: 24px; height: 24px }
+
+  /* Each sheet is an A4 page measured in its own width, so the screen and the paper look the same */
+  .sheet {
+    container-type: inline-size;
+    width: min(100%, 210mm);
+    aspect-ratio: 210 / 297;
+    margin: 0 auto 24px;
+    padding: 5.5cqw;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 2cqw;
+    box-shadow: 0 8px 0 rgba(47, 42, 74, .25);
+    display: flex;
+    flex-direction: column;
+    gap: 2.4cqw;
+  }
+  header { display: flex; align-items: center; gap: 3cqw }
+  header svg { width: 13cqw; height: 13cqw; flex: none }
+  header h1 { margin: 0; font-size: 7.4cqw; font-weight: 700; line-height: 1; white-space: nowrap; color: #fff; -webkit-text-stroke: .7cqw var(--ink); paint-order: stroke fill; text-shadow: 0 .7cqw 0 var(--ink) }
+  header h1 .y { color: var(--yellow) } header h1 .p { color: var(--pink) }
+  header .sub { display: inline-block; margin-top: 1.6cqw; padding: .3cqw 2.4cqw; background: var(--yellow); border: .4cqw solid var(--ink); border-radius: 999px; font-size: 2.6cqw; font-weight: 600 }
+  .name { display: flex; gap: 1.5cqw; align-items: flex-end; font-size: 3cqw; font-weight: 600 }
+  .name span { flex: 1; border-bottom: .4cqw solid var(--ink); height: 4cqw }
+  .name span.short { flex: 0 0 22cqw }
+  .task { border: .7cqw solid var(--ink); border-radius: 4cqw; padding: 3cqw 3.6cqw; background: linear-gradient(var(--c), var(--c)) top / 100% 1.4cqw no-repeat }
+  .task h2 { display: flex; align-items: center; gap: 1.8cqw; margin: .8cqw 0 1.2cqw; font-size: 3.8cqw; font-weight: 700 }
+  .task h2 i { display: grid; place-items: center; width: 6.4cqw; height: 6.4cqw; flex: none; background: var(--c); border: .5cqw solid var(--ink); border-radius: 50%; color: #fff; -webkit-text-stroke: .6cqw var(--ink); paint-order: stroke fill; font-style: normal; font-size: 3.8cqw }
+  .task p { margin: 0 0 2.4cqw; font-size: 2.6cqw; font-weight: 500; line-height: 1.35 }
+  .task p b { font-weight: 700 }
+  .task .row { display: flex; gap: 4cqw; align-items: center }
+  .boxes { display: flex; flex-wrap: wrap; gap: 1.2cqw }
+  .boxes span { width: 6.4cqw; height: 6.4cqw; border: .45cqw dashed var(--risco); border-radius: 1.4cqw; display: grid; place-items: center; font: 700 4.4cqw system-ui, sans-serif }
+  .boxes.given span { border-style: solid; border-color: var(--ink) }
+  .arrows { font-family: system-ui, sans-serif }
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6cqw 4cqw }
+  .steps li { display: flex; gap: 2cqw; align-items: center; font-size: 2.9cqw; font-weight: 600 }
+  .steps li span { width: 6.4cqw; height: 6.4cqw; flex: none; border: .45cqw solid var(--ink); border-radius: 1.4cqw }
+  .grow { flex: 1 }
+  table { border-collapse: separate; border-spacing: .5cqw; margin: 0 auto }
+  td { width: 6.6cqw; height: 6.6cqw; text-align: center; font-size: 4cqw; font-weight: 600; background: var(--sky2); border-radius: 1cqw }
+  .words { display: flex; flex-wrap: wrap; gap: 1.4cqw; justify-content: center; margin-top: 2.4cqw; padding: 0; list-style: none }
+  .words li { padding: .4cqw 2.2cqw; background: var(--c); border: .4cqw solid var(--ink); border-radius: 999px; font-size: 2.5cqw; font-weight: 600 }
+  .words li:nth-child(4n+1) { --c: #cfe6ff } .words li:nth-child(4n+2) { --c: #ffd6e3 } .words li:nth-child(4n+3) { --c: #c9f5e3 } .words li:nth-child(4n+4) { --c: #fff1a8 }
+  .app { display: flex; gap: 5cqw; align-items: center }
+  .app svg { width: 30cqw; flex: none }
+  .lines { flex: 1; display: flex; flex-direction: column; gap: 3cqw; font-size: 2.8cqw; font-weight: 600 }
+  .lines div { border-bottom: .35cqw solid var(--ink); padding-bottom: 1cqw; min-height: 6cqw; display: flex; align-items: flex-end }
+  .lines div.blank { min-height: 5cqw }
+  .frases { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.6cqw }
+  .frases li { display: flex; align-items: flex-end; gap: 1.6cqw; font-size: 3cqw; font-weight: 600 }
+  .frases li span { flex: 1; border-bottom: .4cqw solid var(--ink); min-width: 14cqw; height: 4cqw }
+  .resposta { margin: 0 0 .8cqw; padding: 1.2cqw 2.4cqw; background: #f4f1ff; border: .4cqw dashed var(--ink); border-radius: 2.4cqw; font-size: 2.55cqw; font-weight: 600; line-height: 1.3 }
+  .resposta b { display: block; font-size: 2.3cqw; color: var(--soft) }
+  .confere { display: flex; align-items: flex-end; gap: 1.4cqw; margin: 0 0 1.1cqw; font-size: 2.5cqw; font-weight: 600 }
+  .confere span { flex: 1; border-bottom: .35cqw solid var(--ink); height: 3.6cqw }
+  .ptcf { display: grid; grid-template-columns: 1fr; gap: 1.8cqw }
+  .ptcf div { display: grid; grid-template-columns: 16cqw 1fr; align-items: end; gap: 2cqw; font-size: 2.8cqw; font-weight: 700 }
+  .ptcf div span { border-bottom: .35cqw solid var(--ink); height: 4.4cqw }
+  .ptcf i { font-style: normal; padding: .4cqw 1.4cqw; background: var(--c); border: .4cqw solid var(--ink); border-radius: 999px; text-align: center }
+  .marcar { margin: 0; padding: 0; list-style: none; display: grid; gap: .9cqw }
+  .marcar li { display: grid; grid-template-columns: 1fr auto auto; gap: 2cqw; align-items: center; font-size: 2.55cqw; font-weight: 600 }
+  .marcar em { font-style: normal; display: flex; align-items: center; gap: 1cqw; font-size: 2.3cqw }
+  .marcar em::before { content: ""; width: 4.4cqw; height: 4.4cqw; border: .45cqw solid var(--ink); border-radius: 1cqw }
+  .regras { display: flex; flex-direction: column; gap: 2.2cqw; font-size: 2.9cqw; font-weight: 700 }
+  .regras div { border-bottom: .35cqw solid var(--ink); min-height: 5cqw; display: flex; align-items: flex-end }
+  .regras div.blank { min-height: 4.6cqw; font-weight: 500 }
+  footer { margin-top: auto; text-align: center; font-size: 2.1cqw; font-weight: 500; color: var(--soft) }
+
+  /* Printing each sheet on its own A4 page, without the bar on top */
+  @page { size: A4; margin: 0 }
+  @media print {
+    body { padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact }
+    .bar { display: none }
+    .sheet { width: 210mm; height: 297mm; margin: 0; border: none; border-radius: 0; box-shadow: none; break-after: page; page-break-after: always }
+    .sheet:last-of-type { break-after: auto; page-break-after: auto }
+  }
+</style>
+<script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
+</head>
+<body>
+
+<div class="bar">
+  <p>Três folhas A4 para cada estudante, que podem ser impressas frente e verso. As respostas estão no fim do roteiro da aula.</p>
+  <button class="btn btn--baixar" type="button" onclick="print()"><svg viewBox="0 0 24 24"><path d="M7 9 V3 H17 V9 M7 18 H4 V10 H20 V18 H17 M7 14 H17 V21 H7 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Imprimir</button>
+</div>
+
+<section class="sheet">
+  <header>
+    <svg viewBox="0 0 100 100"><use href="#bot"/></svg>
+    <div>
+      <h1><span class="y">Folha</span> de <span class="p">atividades</span></h1>
+      <div class="sub">Aula sobre IA</div>
+    </div>
+  </header>
+  <div class="name">Nome: <span></span> Turma: <span class="short"></span></div>
+
+  <div class="task" style="--c: var(--blue)">
+    <h2><i>1</i>Complete a frase como uma IA</h2>
+    <p>Escreva a palavra que você acha <b>mais provável</b> para terminar cada frase e compare com os colegas. A IA generativa faz isso: escolhe a palavra mais provável, uma depois da outra.</p>
+    <ul class="frases">
+      <li>Bom dia, tudo <span></span>?</li>
+      <li>No inverno do Pampa faz muito <span></span>.</li>
+      <li>Antes de atravessar a rua, olhe para os dois <span></span>.</li>
+    </ul>
+  </div>
+
+  <div class="task grow" style="--c: var(--mint)">
+    <h2><i>2</i>Pergunte bem</h2>
+    <p>Este pedido é vago: <b>“Me ajuda com o trabalho de história.”</b> Reescreva com as quatro partes de um bom pedido.</p>
+    <div class="ptcf">
+      <div><i style="--c: #cfe6ff">Papel</i><span></span></div>
+      <div><i style="--c: #ffd6e3">Tarefa</i><span></span></div>
+      <div><i style="--c: #c9f5e3">Contexto</i><span></span></div>
+      <div><i style="--c: #fff1a8">Formato</i><span></span></div>
+    </div>
+  </div>
+
+  <footer>Aula sobre IA · GamificaPampa · UNIPAMPA</footer>
+</section>
+
+<section class="sheet">
+  <div class="task" style="--c: var(--pink)">
+    <h2><i>3</i>Ache o erro da IA</h2>
+    <p>Cada resposta abaixo foi escrita por uma IA e tem um erro. <b>Circule o erro</b> e escreva como você conferiria.</p>
+    <p class="resposta"><b>a) Pergunta: quando foi a Independência do Brasil?</b>A Independência do Brasil foi proclamada em 7 de setembro de 1922, por Dom Pedro I.</p>
+    <div class="confere">Como eu confiro: <span></span></div>
+    <p class="resposta"><b>b) Pergunta: quanto é 27 + 48?</b>A soma de 27 com 48 é igual a 65.</p>
+    <div class="confere">Como eu confiro: <span></span></div>
+    <p class="resposta"><b>c) Pergunta: os jovens leem muito?</b>Segundo um estudo famoso, 98% dos jovens leem um livro inteiro por semana.</p>
+    <div class="confere">Como eu confiro: <span></span></div>
+  </div>
+
+
+  <div class="task grow" style="--c: var(--orange)">
+    <h2><i>4</i>Pode ou não pode?</h2>
+    <p>Marque o que <b>pode</b> e o que <b>não pode</b> num bom uso da IA.</p>
+    <ul class="marcar">
+      <li>Pedir que a IA explique uma conta de matemática passo a passo.<em>Pode</em><em>Não pode</em></li>
+      <li>Mandar a foto de um colega para a IA transformar num meme.<em>Pode</em><em>Não pode</em></li>
+      <li>Entregar como sua uma redação inteira feita pela IA.<em>Pode</em><em>Não pode</em></li>
+      <li>Pedir que a IA revise a ortografia do texto que você escreveu.<em>Pode</em><em>Não pode</em></li>
+      <li>Contar seu endereço e seu telefone para um app de IA.<em>Pode</em><em>Não pode</em></li>
+    </ul>
+  </div>
+
+  <footer>Aula sobre IA · GamificaPampa · UNIPAMPA</footer>
+</section>
+
+<section class="sheet">
+  <div class="task grow" style="--c: var(--purple)">
+    <h2><i>5</i>O combinado da turma</h2>
+    <p>Em grupo, escrevam as regras da turma para usar IA. Depois, a turma junta as ideias num cartaz.</p>
+    <div class="regras">
+      <div>Na nossa turma, a IA pode ajudar a…</div><div class="blank"></div><div class="blank"></div><div class="blank"></div>
+      <div>A IA não pode…</div><div class="blank"></div><div class="blank"></div><div class="blank"></div>
+      <div>Quando usarmos IA num trabalho, nós vamos…</div><div class="blank"></div><div class="blank"></div>
+      <div>Antes de acreditar numa resposta da IA, nós vamos…</div><div class="blank"></div><div class="blank"></div>
+    </div>
+  </div>
+
+  <footer>Treine em casa: gamificapampa.github.io/detetive-ia · IA é ferramenta, quem pensa é você!</footer>
+</section>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
+</svg>
+</body>
+</html>

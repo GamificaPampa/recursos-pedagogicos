@@ -25,7 +25,8 @@ RECURSOS = ["criancas/robo", "criancas/ninja", "criancas/dupla", "criancas/conec
             "criancas/circuito-do-bit", "criancas/ingles-com-o-bit", "criancas/reta-do-bit", "criancas/laboratorio-de-equacoes",
             "criancas/genetica-do-bit", "criancas/lampada-do-bit", "criancas/quem-pensou-isso",
             "criancas/dados-em-jogo", "criancas/escolas-literarias", "criancas/monte-a-redacao",
-            "criancas/mapa-do-bit", "criancas/detetive-da-historia", "criancas/galeria-do-bit", "criancas/cozinha-das-misturas", "professores/aula-engenharia-de-software"]
+            "criancas/mapa-do-bit", "criancas/detetive-da-historia", "criancas/galeria-do-bit", "criancas/cozinha-das-misturas", "criancas/detetive-da-ia", "professores/aula-engenharia-de-software",
+            "professores/aula-inteligencia-artificial"]
 FONTE = "identidade-visual/fontes/fredoka/fredoka.woff2"
 # Pastas do identidade-visual que as páginas do kit carregam: CSS, scripts (Bit que fala e ícones), poses do Bit e logos
 PASTAS_IDENTIDADE = ["css", "js", "mascote", "logos"]

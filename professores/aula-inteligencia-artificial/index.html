@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula sobre IA · GamificaPampa</title>
+<meta name="description" content="Tudo para uma aula de 50 minutos sobre inteligência artificial com o 9º ano e o Ensino Médio: roteiro, slides, folha de atividades e o jogo Detetive da IA.">
+<meta property="og:title" content="Aula sobre IA · GamificaPampa">
+<meta property="og:description" content="Tudo para uma aula de 50 minutos sobre inteligência artificial com o 9º ano e o Ensino Médio: roteiro, slides, folha de atividades e o jogo Detetive da IA.">
+<meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<style>
+  .btn { flex: 1 1 auto }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  body { margin: 0; min-height: 100vh; background: var(--sky2); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.45 }
+  a { color: inherit }
+
+  /* The scenery behind everything: sky, drifting clouds, floating bits of code and two hills */
+  @keyframes float { 50% { transform: translateY(-16px) rotate(8deg) } }
+  .page { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 16px 40px }
+
+  /* Title, the facts of the class and Bit the robot talking */
+  header { text-align: center }
+  .brand { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 10px; padding: 3px 16px 3px 8px; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font-size: clamp(16px, 4.4vw, 21px); font-weight: 700; text-decoration: none; transform: rotate(-2deg); transition: transform .15s }
+  .brand:hover { transform: rotate(0) translateY(-2px) }
+  .brand svg { width: 1.6em; height: 1.6em; flex: none }
+  .brand .b1 { color: #2470c4 } .brand .b2 { color: #c92a62 }
+  h1 { margin: 6px 0 0; font-size: clamp(40px, 10vw, 72px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink) }
+  h1 span { display: inline-block; animation: hop 3.4s ease-in-out infinite }
+  h1 .w1 { color: var(--yellow) } h1 .w2 { animation-delay: .2s } h1 .w3 { color: var(--pink); animation-delay: .4s }
+  @keyframes hop { 0%, 78%, 100% { transform: translateY(0) } 86% { transform: translateY(-9px) rotate(-3deg) } 93% { transform: translateY(0) rotate(1deg) } }
+  .sub { margin: 14px auto 0; max-width: 640px; font-size: clamp(18px, 4.6vw, 22px); font-weight: 600 }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none }
+  .chips li { padding: 3px 14px; background: var(--c); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font-size: 16px; font-weight: 600 }
+  .hello { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 22px auto 0; max-width: 760px }
+  .bot { width: clamp(84px, 22vw, 116px); flex: none; overflow: visible; cursor: pointer }
+  .bot-body { animation: bob 2.6s ease-in-out infinite }
+  .bot.jump .bot-body { animation: jump .7s cubic-bezier(.3, 1.4, .6, 1) }
+  @keyframes bob { 50% { transform: translateY(-5px) } }
+  @keyframes jump { 40% { transform: translateY(-26px) rotate(-10deg) } 70% { transform: translateY(2px) rotate(4deg) } }
+  .bubble { position: relative; max-width: 440px; padding: 12px 18px; background: #fff; border: 4px solid var(--ink); border-radius: 24px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); font: 600 clamp(17px, 4.4vw, 21px) var(--font); color: var(--ink); text-align: left; cursor: pointer }
+  .bubble::before { content: ""; position: absolute; left: -15px; top: 50%; margin-top: -11px; border: 11px solid transparent; border-right-color: var(--ink); border-left: 0 }
+  .bubble::after { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-right-color: #fff; border-left: 0 }
+  .bubble.pop { animation: pop .35s cubic-bezier(.3, 1.6, .6, 1) }
+  @keyframes pop { from { transform: scale(.85); opacity: .3 } }
+
+  /* Section titles as stickers */
+  h2 { display: table; margin: 44px auto 18px; padding: 4px 22px; background: var(--c, var(--yellow)); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: clamp(24px, 6vw, 30px); font-weight: 700; text-align: center; transform: rotate(-1.5deg) }
+
+  /* One card per material, with its buttons */
+  .materials { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 22px; margin: 0; padding: 0; list-style: none }
+  .item { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28); animation: rise .6s cubic-bezier(.3, 1.4, .6, 1) backwards }
+  .item:nth-child(2) { animation-delay: .08s } .item:nth-child(3) { animation-delay: .16s } .item:nth-child(4) { animation-delay: .24s } .item:nth-child(5) { animation-delay: .32s } .item:nth-child(6) { animation-delay: .4s }
+  @keyframes rise { from { opacity: 0; transform: translateY(34px) scale(.94) } }
+  .item h3 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 25px; font-weight: 700; line-height: 1.1 }
+  .item h3 svg { width: 54px; height: 54px; flex: none; padding: 4px; background: var(--c); border: 3px solid var(--ink); border-radius: 16px }
+  .item p { margin: 0; font-weight: 500; color: var(--soft) }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 8px }
+  .btn.white { background: #fff; color: var(--ink); -webkit-text-stroke: 0 }
+  .item.games { background: var(--yellow) }
+  .item.games p { color: var(--ink) }
+  :focus-visible { outline: 4px solid var(--purple); outline-offset: 3px }
+
+  /* The 50 minutes as a path of stops */
+  .card { padding: 22px clamp(16px, 4vw, 30px); background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 8px 0 rgba(47, 42, 74, .28) }
+  .steps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none }
+  .steps li { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 4px 16px; padding: 12px 0; border-top: 3px dashed #cfcbe6 }
+  .steps li:first-child { border-top: none; padding-top: 0 }
+  .steps li:last-child { padding-bottom: 0 }
+  .time { padding: 6px 0; background: var(--c); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 3px 0 var(--ink); color: var(--ink); text-align: center; font-size: 19px; font-weight: 700; line-height: 1.1; white-space: nowrap }
+  .steps b { display: block; font-size: 21px; line-height: 1.2 }
+  .steps span { font-weight: 500; color: var(--soft) }
+
+  /* Before class: a checklist */
+  .check { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none }
+  .check li { position: relative; padding-left: 42px; font-weight: 500 }
+  .check li::before { content: ""; position: absolute; left: 0; top: 1px; width: 26px; height: 26px; background: #c9f5e3; border: 3px solid var(--ink); border-radius: 8px }
+  .check li::after { content: ""; position: absolute; left: 9px; top: 5px; width: 8px; height: 14px; border: solid var(--ink); border-width: 0 4px 4px 0; transform: rotate(45deg) }
+  .check a { font-weight: 700 }
+
+  footer { margin-top: 44px; text-align: center; font-weight: 600 }
+  footer a { font-weight: 700 }
+
+  @media (max-width: 480px) {
+    .hello { flex-direction: column }
+    .bubble::before, .bubble::after { display: none }
+    .steps li { grid-template-columns: 78px minmax(0, 1fr); gap: 4px 12px }
+    .time { font-size: 17px }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important }
+  }
+</style>
+<style>/* tipografia automatica (viuvas, orfas e forcas) */
+p, li, blockquote {
+  orphans: 2;
+  widows: 2;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<script src="/identidade-visual/js/icones.js" data-simbolos></script>
+
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 7%; --w: 170px; --t: 70s; --d: -10s"></span>
+  <span class="nuvem" style="top: 24%; --w: 120px; --t: 55s; --d: -35s"></span>
+  <span class="nuvem" style="top: 4%; --w: 210px; --t: 90s; --d: -60s"></span>
+  <span class="simbolo" style="left: 5%; top: 20%">IA</span><span class="simbolo" style="right: 7%; top: 13%; --d: -2s">?</span><span class="simbolo" style="left: 10%; top: 62%; --d: -4s">01</span><span class="simbolo" style="right: 12%; top: 48%; --d: -1s">&gt;_</span>
+  <span class="morros" style="--altura: 17vh"></span>
+</div>
+
+<div class="page">
+<header>
+  <h1><span class="w1">Aula</span> <span class="w2">sobre</span> <span class="w3">IA</span></h1>
+  <p class="sub">Como a inteligência artificial funciona, onde ela erra e como usar com cuidado.</p>
+  <ul class="chips">
+    <li style="--c: var(--mint)">9º ano e Ensino Médio</li>
+    <li style="--c: var(--yellow)">50 minutos</li>
+    <li style="--c: #8cc4ff">Notebook e projetor</li>
+  </ul>
+  <div class="hello">
+    <svg class="bot" id="bot" viewBox="0 0 100 100" role="button" tabindex="0" aria-label="Bit, o robô. Toque nele para outra dica.">
+      <g class="bot-body"><use href="#robot"/></g>
+    </svg>
+    <button class="bubble" type="button" id="bubble" aria-live="polite">Oi! Eu sou o Bit, e hoje o assunto sou eu: inteligência artificial. Comece pelo roteiro!</button>
+  </div>
+</header>
+
+<main>
+  <h2 style="--c: var(--yellow)">Materiais</h2>
+  <ul class="materials">
+    <li class="item" style="--c: #fff1a8">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 L22 8 L42 14 L58 8 V50 L42 56 L22 50 L6 56 Z" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M12 46 Q20 30 29 37 T47 22" stroke="#ff5f8f" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round" fill="none"/><path d="M45 15 l8 8 m0 -8 l-8 8" stroke="#ff5f8f" stroke-width="4" stroke-linecap="round"/></svg>Roteiro da aula</h3>
+      <p>O que fazer e o que perguntar em cada parte, como adaptar por série, as palavras para explicar e as respostas da folha.</p>
+      <p class="links"><a class="btn" style="--c: var(--yellow)" href="roteiro.html">Ver na tela</a><a class="btn" style="--c: var(--orange)" href="roteiro.pdf">PDF</a></p>
+    </li>
+    <li class="item" style="--c: #cfe6ff">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="8" width="52" height="36" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><rect x="14" y="16" width="22" height="6" rx="3" fill="#ff5f8f"/><rect x="14" y="26" width="34" height="5" rx="2.5" fill="#4da3ff"/><rect x="14" y="34" width="26" height="5" rx="2.5" fill="#4fd6a6"/><path d="M32 44 V54 M21 59 L32 52 L43 59" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Slides</h3>
+      <p>Onze telas para o projetor, da abertura ao combinado da turma. Passe com as setas e use F para tela cheia.</p>
+      <p class="links"><a class="btn" style="--c: var(--yellow)" href="slides.html">Abrir os slides</a></p>
+    </li>
+    <li class="item" style="--c: #c9f5e3">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="6" width="38" height="52" rx="5" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M16 19 H38 M16 28 H38 M16 37 H30" stroke="#8cc4ff" stroke-width="4" stroke-linecap="round"/><g transform="rotate(32 48 36)"><rect x="43" y="14" width="11" height="34" rx="2" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><path d="M43 48 L48.5 59 L54 48 Z" fill="#ffe1b0" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></g></svg>Folha de atividades</h3>
+      <p>Complete a frase como uma IA, ache o erro, pergunte bem, pode ou não pode e o combinado da turma. Três folhas por estudante.</p>
+      <p class="links"><a class="btn" style="--c: var(--yellow)" href="atividades.html">Ver na tela</a><a class="btn" style="--c: var(--orange)" href="atividades.pdf">PDF</a></p>
+    </li>
+    <li class="item" style="--c: #ffd6e3">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="26" cy="26" r="17" fill="#fff" stroke="#2f2a4a" stroke-width="5"/><use href="#robot" x="14" y="14" width="24" height="24"/><path d="M39 39 L56 56" stroke="#2f2a4a" stroke-width="8" stroke-linecap="round"/></svg>Detetive da IA</h3>
+      <p>O jogo para fechar a aula ou fazer em casa: o estudante acha o erro nas respostas de uma IA e decide o que fazer.</p>
+      <p class="links"><a class="btn" style="--c: var(--mint)" href="https://gamificapampa.github.io/recursos-pedagogicos/criancas/detetive-da-ia/">Jogar</a></p>
+    </li>
+    <li class="item" style="--c: #e2dbff">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6c2 14 12 24 26 26-14 2-24 12-26 26-2-14-12-24-26-26 14-2 24-12 26-26z" fill="#a08bff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>Gemini no projetor</h3>
+      <p>Na parte Pergunte bem, você digita no Gemini, com a sua conta, os pedidos que a turma inventar. Os estudantes não precisam de conta.</p>
+      <p class="links"><a class="btn white" href="https://gemini.google.com/app">Abrir o Gemini</a></p>
+    </li>
+  </ul>
+
+  <h2 style="--c: var(--mint)">A aula em 50 minutos</h2>
+  <section class="card" aria-label="A aula em 50 minutos">
+    <ol class="steps">
+      <li><span class="time" style="--c: var(--blue)">0–5</span><p><b>Abertura</b><span>Slides 1 e 2: onde a IA já está no seu dia?</span></p></li>
+      <li><span class="time" style="--c: var(--orange)">5–15</span><p><b>Como a IA aprende</b><span>Slides 3 a 5 e a folha 1: complete a frase como uma IA.</span></p></li>
+      <li><span class="time" style="--c: var(--pink)">15–25</span><p><b>Onde ela erra</b><span>Slides 6 e 7 e a folha 2: ache o erro da IA.</span></p></li>
+      <li><span class="time" style="--c: var(--mint)">25–35</span><p><b>Pergunte bem</b><span>Slide 8 e a folha 1, com o Gemini no projetor.</span></p></li>
+      <li><span class="time" style="--c: var(--purple)">35–45</span><p><b>Use com cuidado</b><span>Slides 9 e 10 e a folha 3: o combinado da turma.</span></p></li>
+      <li><span class="time" style="--c: var(--yellow)">45–50</span><p><b>Fechamento</b><span>Slide 11 e o Detetive da IA para jogar em casa.</span></p></li>
+    </ol>
+  </section>
+
+  <h2 style="--c: #8cc4ff">Antes da aula</h2>
+  <section class="card" aria-label="Antes da aula">
+    <ul class="check">
+      <li>Ligue o notebook no projetor e deixe os <a href="slides.html">slides</a> na primeira tela.</li>
+      <li>Imprima uma <a href="atividades.html">folha de atividades</a> por estudante (três folhas, que podem ir frente e verso).</li>
+      <li>Abra o <a href="https://gemini.google.com/app">Gemini</a> numa aba, com a sua conta, de preferência a da escola, numa conversa nova.</li>
+      <li>Sem internet na escola? Os slides e as folhas funcionam sem o Gemini: faça a parte Pergunte bem no quadro, comparando os pedidos.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>GamificaPampa · UNIPAMPA, Campus Alegrete · <a href="https://gamificapampa.github.io/">gamificapampa.github.io</a></footer>
+</div>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="robot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
+</svg>
+
+<script>
+  // Bit gives a new tip every time the teacher taps him
+  const LINES = [
+    "Oi! Eu sou o Bit, e hoje o assunto sou eu: inteligência artificial. Comece pelo roteiro!",
+    "No roteiro, cada parte da aula diz o que fazer, o que perguntar e a ideia que a turma precisa levar.",
+    "A turma não precisa de conta no Gemini: quem digita no projetor é você.",
+    "A folha 3 vira o combinado da turma sobre IA. Vale colar na parede da sala!",
+    "Para fechar, o Detetive da IA: dá para jogar no celular, em casa.",
+  ]
+  let line = 0
+  function talk() {
+    line = (line + 1) % LINES.length
+    const bubble = document.getElementById("bubble"), bot = document.getElementById("bot")
+    bubble.textContent = LINES[line]
+    bubble.classList.remove("pop")
+    bot.classList.remove("jump")
+    void bubble.offsetWidth
+    bubble.classList.add("pop")
+    bot.classList.add("jump")
+  }
+  document.getElementById("bot").onclick = document.getElementById("bubble").onclick = talk
+  document.getElementById("bot").onkeydown = event => (event.key === "Enter" || event.key === " ") && (event.preventDefault(), talk())
+</script>
+</body>
+</html>
