@@ -174,7 +174,7 @@ p, li, blockquote {
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
         </div>
-        <div class="missao">
+        <div class="missao" data-ouvir>
           <p class="missao__topo" id="topo"></p>
           <p class="missao__pergunta" id="pergunta"></p>
           <p class="missao__texto" id="texto"></p>
@@ -184,7 +184,7 @@ p, li, blockquote {
           <p class="nota" id="nota"></p>
         </div>
         <div class="controles">
-          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas" data-ouvir-lista="Respostas"></div>
           <div class="acoes">
             <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
@@ -194,7 +194,7 @@ p, li, blockquote {
         </div>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -214,6 +214,7 @@ p, li, blockquote {
             <li><b>No celular:</b> em dupla, um lê a frase da fase 2 em voz alta e o outro escolhe o desenho, e depois trocam.</li>
             <li><b>Depois:</b> as duplas fazem a conversa da fase 3 de verdade, com os próprios nomes e idades, e apresentam para a turma.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>O botão Ouvir do topo lê o pedido e a fala do Bit em português, para quem ainda não lê bem, e o botão ao lado liga o Ler sozinho. O Ouvir da rodada fala a palavra em inglês.</li>
           </ul>
         </div>
         <div class="qr">
@@ -335,6 +336,7 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
@@ -443,6 +445,7 @@ p, li, blockquote {
   }
 
   function mostrarRodada() {
+    Jogo.ouvir.novaTela()
     const r = atual()
     $("acao").innerHTML = ALTO_FALANTE.replace('class="alto-falante" ', "") + "<span>Ouvir</span>"
     $("acao").hidden = !temVoz

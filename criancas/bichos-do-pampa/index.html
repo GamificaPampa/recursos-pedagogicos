@@ -174,7 +174,7 @@ p, li, blockquote {
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
         </div>
-        <div class="missao">
+        <div class="missao" data-ouvir>
           <p class="missao__topo" id="topo"></p>
           <p class="missao__pergunta" id="pergunta"></p>
           <p class="missao__texto" id="texto"></p>
@@ -184,7 +184,7 @@ p, li, blockquote {
           <p class="nota" id="nota"></p>
         </div>
         <div class="controles">
-          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas"></div>
+          <div class="opcoes" id="opcoes" role="group" aria-label="Respostas" data-ouvir-lista="Respostas"></div>
           <div class="acoes">
             <button class="btn btn--jogar" type="button" id="acao" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Começar</span></button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
@@ -194,7 +194,7 @@ p, li, blockquote {
         </div>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -207,10 +207,10 @@ p, li, blockquote {
       <div class="usos">
         <div>
           <h3>O que a turma aprende</h3>
-          <p>Para crianças de 4 e 5 anos, que ainda não leem: reconhecer as cores e as formas básicas, contar de 1 a 6 apontando um bicho de cada vez, e observar detalhes para ligar cada sombra ao seu bicho. Os bichos são do Pampa: vaca, ovelha, cavalo, quero-quero, capivara e tatu. O Bit fala cada pedido em voz alta, com o som ligado.</p>
+          <p>Para crianças de 4 e 5 anos, que ainda não leem: reconhecer as cores e as formas básicas, contar de 1 a 6 apontando um bicho de cada vez, e observar detalhes para ligar cada sombra ao seu bicho. Os bichos são do Pampa: vaca, ovelha, cavalo, quero-quero, capivara e tatu. A criança aperta o botão Ouvir (o alto-falante) e o Bit lê o pedido em voz alta; com o Ler sozinho ligado, ele lê cada pedido sem ninguém apertar. A leitura funciona mesmo com o som desligado.</p>
           <h3>Como jogar com a turma</h3>
           <ul>
-            <li><b>Na roda, com o projetor:</b> ligue o som, deixe uma criança de cada vez tocar na tela e a turma conta junto em voz alta, apontando com o dedo.</li>
+            <li><b>Na roda, com o projetor:</b> ligue o Ler sozinho (o botão ao lado do alto-falante), deixe uma criança de cada vez tocar na tela e a turma conta junto em voz alta, apontando com o dedo.</li>
             <li><b>No tablet, em dupla:</b> uma criança toca e a outra confere, e depois trocam.</li>
             <li><b>Depois:</b> a turma procura cores e formas na sala, faz bichos do Pampa com massinha e brinca de sombra com uma lanterna na parede.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
@@ -258,7 +258,7 @@ p, li, blockquote {
   }
   const FASES = [
     { nome: "Cores e formas", tipo: "formas", rotulo: "rodada",
-      abertura: "Oi! Eu sou o Bit. Ligue o som para ouvir o que eu peço. Toque na figura certa!",
+      abertura: "Oi! Eu sou o Bit. Aperte o alto-falante para ouvir o que eu peço. Toque na figura certa!",
       rodadas: [
         { alvo: { cor: "vermelho" }, opcoes: [["quadrado", "vermelho"], ["circulo", "azul"], ["triangulo", "amarelo"], ["estrela", "verde"]], explica: "Vermelho, como o morango e o tomate." },
         { alvo: { cor: "amarelo" }, opcoes: [["estrela", "azul"], ["circulo", "amarelo"], ["quadrado", "verde"], ["triangulo", "vermelho"]], explica: "Amarelo, como o sol e a flor do ipê." },
@@ -344,6 +344,7 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
@@ -409,23 +410,11 @@ p, li, blockquote {
   }
 
   const I = "#2f2a4a"
-  // The Bit also speaks what he says, when the sound is on: the children may not read yet
-  const temVoz = "speechSynthesis" in window
-  function falar(texto) {
-    if (!temVoz) return
-    try {
-      speechSynthesis.cancel()
-      const fala = new SpeechSynthesisUtterance(texto)
-      fala.lang = "pt-BR"
-      fala.rate = .9
-      const voz = speechSynthesis.getVoices().find(v => v.lang.replace("_", "-").startsWith("pt-BR"))
-      if (voz) fala.voice = voz
-      speechSynthesis.speak(fala)
-    } catch {}
-  }
-  const dizSo = window.Bit.diz
-  window.Bit.diz = (pose, texto) => { dizSo(pose, texto); if (comSom) falar(texto) }
-  function pararRodada() { if (temVoz) try { speechSynthesis.cancel() } catch {} }
+  // A voz é a do kit (Jogo.ouvir): o botão Ouvir do topo lê a tela, o Ler sozinho lê cada rodada e cada fala do Bit,
+  // e este botão da rodada lê só a pergunta. Os números da contagem só saem em voz alta com o som ligado
+  const falar = texto => Jogo.ouvir.falar(texto)
+  function pararRodada() { Jogo.ouvir.parar() }
+  Jogo.ouvir.aoMudar(() => { if ($("acao").innerHTML) $("acao").hidden = !Jogo.ouvir.disponivel })
 
   // Shapes in a box of 100 by 100
   function forma(nome, cor) {
@@ -517,9 +506,9 @@ p, li, blockquote {
   function mostrarRodada() {
     const r = atual()
     $("acao").innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg><span>Ouvir</span>'
-    $("acao").hidden = !temVoz
+    $("acao").hidden = !Jogo.ouvir.disponivel
     $("pergunta").textContent = textoDaRodada()
-    setTimeout(() => { if (comSom && !ocupado) falar(textoDaRodada()) }, 600)
+    Jogo.ouvir.novaTela()
     if (tipo() === "formas") {
       $("texto").textContent = "Toque numa figura."
       $("nota").textContent = ""

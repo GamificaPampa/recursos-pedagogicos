@@ -160,20 +160,20 @@ p, li, blockquote {
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
         </div>
-        <p class="topo-fase" id="topo">Duas sílabas · palavra 1 de 5</p>
+        <p class="topo-fase" id="topo" data-ouvir>Duas sílabas · palavra 1 de 5</p>
         <div class="figura" id="figura" role="img" aria-label="Desenho"></div>
-        <p class="pedido" id="pedido" aria-live="polite">Monte a palavra do desenho.</p>
+        <p class="pedido" id="pedido" aria-live="polite" data-ouvir>Monte a palavra do desenho.</p>
         <div class="ajudas">
           <button class="btn btn--small" type="button" id="ouvir" aria-label="Ouvir a palavra"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg>Ouvir<span class="longo"> a palavra</span></button>
           <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
         </div>
         <ol class="caixas" id="caixas" aria-label="Palavra"></ol>
-        <div class="silabas" id="silabas" role="group" aria-label="Sílabas"></div>
+        <div class="silabas" id="silabas" role="group" aria-label="Sílabas" data-ouvir-lista="Sílabas"></div>
         <button class="btn btn--jogar" type="button" id="proxima" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima questão</span></button>
         <ol class="placar" id="placar" aria-label="Palavras da fase"></ol>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -194,6 +194,7 @@ p, li, blockquote {
             <li><b>Dica:</b> o primeiro toque fala a palavra em sílabas; o segundo faz pular a próxima sílaba. A dica que mostra a sílaba conta nas estrelas como um erro.</li>
             <li><b>Depois:</b> recorte as sílabas em papel e peça para a turma trocar uma sílaba e formar palavras novas, como BOLA e BALA.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>O botão Ouvir do topo lê o pedido e as sílabas em voz alta, para quem ainda não lê bem, e o botão ao lado liga o Ler sozinho. O Ouvir a palavra, perto do desenho, fala só a palavra.</li>
           </ul>
         </div>
         <div class="qr">
@@ -348,28 +349,15 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
-  // The browser reads the word aloud, when the device has a Portuguese voice
-  const podeFalar = "speechSynthesis" in window
-  function falar(texto) {
-    if (!podeFalar) return
-    speechSynthesis.cancel()
-    const fala = new SpeechSynthesisUtterance(texto.toLowerCase())
-    fala.lang = "pt-BR"
-    fala.rate = .8
-    speechSynthesis.speak(fala)
-  }
-  function falarSilabas(silabas) {
-    if (!podeFalar) return
-    speechSynthesis.cancel()
-    const fala = new SpeechSynthesisUtterance(silabas.join(", ").toLowerCase())
-    fala.lang = "pt-BR"
-    fala.rate = .6
-    speechSynthesis.speak(fala)
-  }
-  if (!podeFalar) $("ouvir").hidden = true
+  // A voz é a do kit (Jogo.ouvir) e some quando o aparelho não tem voz em português. O botão do topo lê a tela;
+  // este, ao lado do desenho, fala só a palavra, devagar
+  const falar = texto => Jogo.ouvir.falar(texto.toLowerCase(), .8)
+  const falarSilabas = silabas => Jogo.ouvir.falar(silabas.join(", ").toLowerCase(), .6)
+  Jogo.ouvir.aoMudar(() => { $("ouvir").hidden = !Jogo.ouvir.disponivel })
   $("ouvir").onclick = () => falar(atual().palavra)
 
   const atual = () => FASES[fase].palavras[item]
@@ -387,6 +375,7 @@ p, li, blockquote {
   }
 
   function mostrarPalavra() {
+    Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     const f = FASES[fase], p = atual()
     passo = 0
@@ -601,7 +590,7 @@ p, li, blockquote {
         : `A palavra é ${p.palavra}: ${p.silabas.join(" - ")}. A sílaba que falta é ${certa}.`, 12000)
     },
     // A leitura em voz alta para quando o professor pausa
-    pausar() { if (podeFalar) speechSynthesis.cancel() },
+    pausar() { Jogo.ouvir.parar() },
   })
 
   desenharSom()

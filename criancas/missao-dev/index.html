@@ -18,8 +18,9 @@
   .icone{display:inline-block; width:1.15em; height:1.15em; vertical-align:-.22em; flex:none;}
 
   /* barra de cima: uma bolinha por desafio e os pontos */
-  #topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
+  #topbar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
   #dots{display:flex; gap:8px;}
+  @media (max-width:480px){ #topbar{justify-content:center;} }
   .dot{width:18px; height:18px; border-radius:50%; background:var(--white); border:3px solid var(--ink); transition:background .2s, transform .2s var(--bounce);}
   .dot.done{background:var(--mint);}
   /* A fase feita tem um visto, além da cor */
@@ -150,7 +151,7 @@
 
   <!-- INÍCIO -->
   <section class="screen" id="screen-start">
-    <div id="start-stage">
+    <div id="start-stage" data-ouvir>
       <img class="hero anima-flutuar" src="/identidade-visual/mascote/bit-acenando.svg" alt="O robô Bit acenando" width="140" height="140">
       <div class="eyebrow">Engenharia de Software</div>
       <h1 class="start-title loud">Missão <span class="yellow">Dev</span></h1>
@@ -171,31 +172,31 @@
 
   <!-- DESAFIO 1: SEQUÊNCIA -->
   <section class="screen" id="screen-seq" hidden>
-    <div class="card anima-subir">
+    <div class="card anima-subir" data-ouvir>
       <div class="eyebrow">Desafio 1 · Algoritmo</div>
       <h2 class="title">Monte os passos do robô</h2>
       <p class="lede">O robô quer fazer um sanduíche de manteiga de amendoim. Toque os passos na ordem certa.</p>
       <div class="feedback" id="seq-feedback"></div>
-      <div id="seq-slots"></div>
-      <div id="seq-pool"></div>
+      <div id="seq-slots" data-ouvir-nao></div>
+      <div id="seq-pool" data-ouvir-botoes></div>
       <button class="btn btn--jogar" id="seq-confirm" type="button" data-icone="certo" disabled>Confirmar ordem</button>
     </div>
   </section>
 
   <!-- DESAFIOS 2 E 3: ACHAR O BUG -->
   <section class="screen" id="screen-bug" hidden>
-    <div class="card anima-subir">
+    <div class="card anima-subir" data-ouvir>
       <div class="eyebrow">Desafio <span id="bug-round-label">2</span> · Debug</div>
       <h2 class="title" id="bug-title">Ache o bug no código</h2>
       <p class="lede" id="bug-lede">Toque na linha que está com o erro.</p>
       <div class="feedback" id="bug-feedback"></div>
-      <div class="code-block" id="bug-code"></div>
+      <div class="code-block" id="bug-code" data-ouvir-botoes></div>
     </div>
   </section>
 
   <!-- DESAFIOS 4 E 5: LAÇO -->
   <section class="screen" id="screen-loop" hidden>
-    <div class="card anima-subir">
+    <div class="card anima-subir" data-ouvir>
       <div class="eyebrow">Desafio <span id="loop-round-label">4</span> · Laço de repetição</div>
       <h2 class="title">Execute o laço certinho</h2>
       <p class="lede">Toque no botão exatamente o número de vezes pedido, antes que o tempo acabe.</p>
@@ -212,7 +213,7 @@
 
   <!-- RESULTADO -->
   <section class="screen" id="screen-result" hidden>
-    <div id="result-stage">
+    <div id="result-stage" data-ouvir>
       <div id="result-badge" class="anima-pular"></div>
       <div class="eyebrow">Missão concluída</div>
       <div id="result-score" class="loud yellow">100 pts</div>
@@ -328,6 +329,7 @@
 
   function showScreen(name){
     Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+    Jogo.ouvir.novaTela();
     window.scrollTo(0, 0);
   }
 
@@ -642,7 +644,7 @@
   // Kit de jogo do identidade-visual: Outros jogos e tela cheia no topo, e a tela final com Jogar de novo e Outros jogos
   document.getElementById('btn-restart').replaceWith(Jogo.acoesDoFim(restart));
   document.getElementById('topbar').prepend(Jogo.botao('casa'));
-  document.getElementById('topbar').append(Jogo.botao('tela-cheia'));
+  document.getElementById('topbar').append(Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'));
 
   buildStages();
   updateDots();

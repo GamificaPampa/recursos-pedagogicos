@@ -206,10 +206,10 @@
       <span class="l5">&nbsp;</span><span class="l2">a</span><span class="l3">o</span><span class="l1">s</span><br>
       <span class="l4">B</span><span class="l5">u</span><span class="l2">g</span><span class="l3">s</span><span class="l1">!</span>
     </h1>
-    <div class="story">O app da escola ficou cheio de <b>bugs</b>, que são erros no programa! Toque nos insetos para consertar o app antes que eles quebrem tudo.</div>
+    <div class="story" data-ouvir>O app da escola ficou cheio de <b>bugs</b>, que são erros no programa! Toque nos insetos para consertar o app antes que eles quebrem tudo.</div>
     <button class="btn" id="btn-start" type="button" data-icone="play">Jogar!</button>
     <div class="melhor"><span>Sua melhor rodada</span><span class="melhor-estrelas" id="melhor" role="img"></span></div>
-    <div class="how"><span data-icone="toque">Toque rápido</span><span data-icone="estrela">Dourado vale mais</span><span data-icone="relogio">30 segundos</span></div>
+    <div class="how" data-ouvir><span data-icone="toque">Toque rápido</span><span data-icone="estrela">Dourado vale mais</span><span data-icone="relogio">30 segundos</span></div>
   </section>
 
   <!-- GAME -->
@@ -242,8 +242,8 @@
 
   <!-- END -->
   <section class="end" id="scr-end" hidden>
-    <div class="end-head" id="end-head">Tempo esgotado!</div>
-    <div class="card">
+    <div class="end-head" id="end-head" data-ouvir>Tempo esgotado!</div>
+    <div class="card" data-ouvir>
       <div class="medal" id="medal"></div>
       <div class="big" id="final">0</div>
       <div class="rank" id="rank">Caçador(a) de Bugs</div>
@@ -268,7 +268,7 @@
       </form>
       <div class="send-note" id="send-note">Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.</div>
     </div>
-    <div class="card fact"><b>Você sabia?</b><span id="fact"></span></div>
+    <div class="card fact" data-ouvir><b>Você sabia?</b><span id="fact"></span></div>
     <button class="btn" id="btn-again" type="button" data-icone="repetir">Jogar de novo</button>
   </section>
 </div>
@@ -360,14 +360,19 @@
   });
   var topoJogo = document.createElement('div');
   topoJogo.className = 'topo-jogo';
-  topoJogo.append(Jogo.botao('casa'), Jogo.botao('tela-cheia'));
+  topoJogo.append(Jogo.botao('casa'), Jogo.botao('ouvir'), Jogo.botao('ler-sozinho'), Jogo.botao('tela-cheia'));
+  // Ouvir: lê as instruções e o resultado, não o que acontece no meio da rodada
+  Jogo.ouvir.bit = false;
   document.querySelector('.app').prepend(topoJogo);
 
   // ---- state ----
   var S = { round:0, running:false, score:0, hearts:MAX_HEARTS, combo:0, t0:0, hit:0, miss:0, spawnT:0, raf:0, lastTick:-1 };
   var bugsEl = $('bugs'), screenEl = $('screen');
 
-  function show(id){ ['scr-start','scr-game','scr-end'].forEach(function(s){ $(s).hidden = s !== id; }); }
+  function show(id){
+    ['scr-start','scr-game','scr-end'].forEach(function(s){ $(s).hidden = s !== id; });
+    if(id === 'scr-game') Jogo.ouvir.parar(); else Jogo.ouvir.novaTela();
+  }
 
   // As esperas guardam quanto falta, para o modo professor poder parar a rodada e continuar de onde parou
   var frozen = false, frozenSince = 0, waits = [];
