@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jogo do Prompt</title>
-<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o Gemini, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos. Rodadas da Educação Infantil ao Ensino Médio.">
+<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o Gemini, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos. Rodadas da Educação Infantil ao Ensino Médio e da EJA.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -285,6 +285,7 @@
     <label class="stage"><input type="radio" name="etapa" value="iniciais"><span><b>Educação Infantil e anos iniciais</b><small>Crianças pequenas até o 5º ano</small></span></label>
     <label class="stage"><input type="radio" name="etapa" value="finais"><span><b>Anos finais</b><small>Do 6º ao 9º ano</small></span></label>
     <label class="stage"><input type="radio" name="etapa" value="medio"><span><b>Ensino Médio</b><small>Do 1º ao 3º ano</small></span></label>
+    <label class="stage"><input type="radio" name="etapa" value="eja"><span><b>EJA</b><small>Jovens e adultos, da alfabetização ao Ensino Médio</small></span></label>
   </div>
   <p class="how">São 5 pedidos. Cada parte tem três blocos e só um é bom. Cuidado: o mais comprido nem sempre é o certo. Acerte de primeira para ganhar 3 estrelas.</p>
   <button class="btn" type="button" id="begin">Começar<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></button>
@@ -619,6 +620,97 @@ const ALL_ROUNDS = [
              ["Frases curtas e um glossário no fim, na língua que você achar melhor.", "O Gemini às vezes responde em inglês. Peça português do Brasil."]],
     trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem turma do estudante. Peça assim:", say: "Descreva a necessidade, sem nome nem turma. Responda em português do Brasil." },
   },
+  // EJA: turmas de jovens e adultos, da alfabetização ao Ensino Médio. O bloco ruim comprido muitas vezes infantiliza
+  {
+    id: "eja-alfabetizacao",
+    vague: "Faça uma atividade de alfabetização.",
+    answer: { who: "Professor(a) da EJA · alfabetização", title: "Palavras do trabalho", audience: "adultos · 30 minutos", shape: "sheet" },
+    role: [["Você é professor(a) de alfabetização da EJA e cria atividades para adultos.", "Agora o Gemini escreve para adultos que estão aprendendo a ler, e não para crianças."],
+           ["Você é professor(a) do 1º ano.", "O 1º ano é turma de criança. Diga que é a EJA, para ele escrever para adultos."],
+           ["Você é professor(a) alfabetizador(a) com 30 anos de experiência, especialista em crianças de 6 e 7 anos.", "Experiência com crianças leva o Gemini a infantilizar. Diga que a turma é da EJA."]],
+    task: [["Crie uma atividade para imprimir a partir da palavra TRABALHO, com sílabas e palavras novas.", "Uma palavra da vida da turma e um caminho claro: sílabas e palavras novas."],
+           ["Faça uma atividade de letras.", "De quais letras? Para imprimir? Parta de uma palavra que a turma usa."],
+           ["Crie uma atividade com o alfabeto inteiro, do A ao Z, com um bichinho desenhado para cada letra.", "Bichinho para cada letra é atividade de criança. Parta de uma palavra da vida da turma, como TRABALHO."]],
+    context: [["Para adultos de 20 a 60 anos que estão aprendendo a ler, muitos trabalhadores, que chegam cansados à aula da noite.", "Com a idade e o cansaço da turma, a atividade sai curta e no tom certo para adultos."],
+              ["Para alunos que não sabem ler.", "Que idade? Adultos que não leem sabem muita coisa. Conte quem é a turma."],
+              ["Para adultos que não sabem nada e precisam começar do zero, como crianças.", "Adulto que não lê sabe muita coisa: reconhece preços, placas e rótulos. Valorize o que a turma já sabe."]],
+    format: [["Folha A4 em letra de forma grande, com 4 exercícios curtos, imagens descritas entre parênteses e o gabarito.", "Pronta para imprimir, com a letra que a turma reconhece e sem desenho torto."],
+             ["Bem bonitinha.", "Bonitinha como? E o diminutivo puxa o tom infantil. Diga a letra, quantos exercícios e o gabarito."],
+             ["Folha cheia de estrelinhas e carinhas felizes, desenhadas com letras e símbolos.", "Estrelinha e carinha infantilizam, e o Gemini desenha mal com letras e símbolos. Peça as imagens descritas entre parênteses."]],
+    trap: { text: "Quando lê \"alfabetização\", o Gemini costuma escrever como para crianças, com bichinhos e diminutivos, e ainda desenha com letras e símbolos. Peça assim:", say: "Linguagem adulta, sem nada infantil. Descreva as imagens entre parênteses." },
+  },
+  {
+    id: "eja-encceja",
+    vague: "Faça questões para o Encceja.",
+    answer: { who: "Professor(a) de Matemática · EJA", title: "Encceja: porcentagem nas contas de casa", audience: "adultos · Ensino Fundamental", shape: "encceja" },
+    role: [["Você é professor(a) de Matemática da EJA e prepara adultos para o Encceja.", "Matéria, etapa e prova certas: as questões saem no nível da turma."],
+           ["Você é bom em provas.", "Bom em provas de quê? Diga a matéria, a etapa e a prova."],
+           ["Você é da banca do Encceja e conhece todas as provas do Inep desde a primeira edição.", "O Gemini não é da banca nem consulta as provas. Diga que ele é professor(a) de Matemática da EJA."]],
+    task: [["Crie 5 questões inéditas, no estilo do Encceja, sobre porcentagem nas contas de casa.", "Questões novas, com tema e quantidade: ele não precisa lembrar de prova nenhuma."],
+           ["Faça umas questões.", "Quantas? Sobre o quê? Para qual prova?"],
+           ["Copie 5 questões de provas antigas do Encceja, com o ano de cada uma.", "Ele não consulta as provas e inventa a questão e o ano. Peça questões inéditas, no estilo do Encceja."]],
+    context: [["Para adultos que vão fazer o Encceja do Ensino Fundamental, estão há anos sem estudar e erram mais nos problemas com texto.", "Ele foca no que a turma precisa e escreve enunciados que ela consegue ler."],
+              ["Para a EJA.", "Qual parte da EJA? Qual prova? Onde a turma erra?"],
+              ["Para estudantes de qualquer idade, de qualquer escola, que vão fazer alguma prova um dia.", "Qualquer idade e alguma prova não é contexto. Conte a prova, a etapa e onde a turma erra."]],
+    format: [["Alternativas de A a D, uma conta de casa em cada questão e o gabarito com a conta, sem dizer de que ano é.", "Sai no formato da prova, com a conta explicada, e sem ano inventado."],
+             ["Qualquer formato.", "Sem formato, você gasta tempo arrumando depois."],
+             ["Uma prova completa do Encceja, com todas as áreas, a redação e o cartão-resposta, para aplicar numa noite só.", "Uma prova inteira é longa demais, e o Gemini perde o fio. Peça poucas questões, de A a D, com gabarito."]],
+    trap: { text: "O Gemini às vezes diz que a questão caiu numa prova do Encceja e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de uma prova do Encceja." },
+  },
+  {
+    id: "eja-juros",
+    vague: "Faça um jogo de matemática para adultos.",
+    answer: { who: "Professor(a) de Matemática · EJA", title: "À vista ou parcelado?", audience: "adultos · no celular", shape: "price" },
+    role: [["Você é professor(a) de Matemática da EJA, no Ensino Médio.", "Matéria e etapa certas: o jogo fala com adultos, no nível da turma."],
+           ["Você é um gamer.", "Gamer de quê, para quem? Diga a matéria e que a turma é da EJA."],
+           ["Você é um economista do mercado financeiro, especialista em investimentos, ações e criptomoedas.", "Economista do mercado fala com investidor. Diga a matéria e a etapa: Matemática da EJA."]],
+    task: [["Crie um jogo para comparar o preço à vista com o total parcelado.", "Um conteúdo só e uma ação clara: comparar."],
+           ["Faça um jogo de contas.", "Contas de quê? O que o estudante faz no jogo?"],
+           ["Crie um jogo sobre toda a educação financeira: juros, investimentos, impostos e previdência.", "Educação financeira inteira não cabe num jogo. Escolha um tema só, como os juros do crediário."]],
+    context: [["Para adultos que compram no crediário e vão jogar no celular, em duplas, no começo da aula.", "Ele parte do que a turma vive e ajusta o jogo ao aparelho e ao tempo."],
+              ["Para a turma.", "Que turma? Que idade? Jogam onde?"],
+              ["Para estudantes de todas as idades, das crianças aos idosos, em qualquer aparelho e a qualquer hora.", "Um jogo para todas as idades não acerta nenhuma. Diga que são adultos da EJA."]],
+    format: [["Botões grandes, visual adulto, 3 fases, som no acerto e pontos no final, com preços de exemplo.", "Você disse como quer: o jogo sai adulto, com valores que não confundem ninguém."],
+             ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato, até um jogo com cara de criança."],
+             ["Com 12 fases, os preços reais das lojas da cidade e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, ele inventa os preços das lojas, e o ranking pede nome de estudante."]],
+    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+  },
+  {
+    id: "eja-saude",
+    vague: "Faça um quiz de saúde.",
+    answer: { who: "Professor(a) de Ciências · EJA", title: "Quiz: pressão alta e o sal da comida", audience: "adultos · aula de 30 minutos", shape: "health" },
+    role: [["Você é professor(a) de Ciências da EJA.", "Matéria e etapa certas: as perguntas saem no nível de adultos."],
+           ["Você é médico.", "Médico dá diagnóstico, e a aula não é consulta. Diga que ele é professor(a) de Ciências da EJA."],
+           ["Você é um cardiologista famoso, que receita o melhor remédio para cada caso de pressão alta.", "Receitar remédio não é papel da aula, e o Gemini pode errar. Diga que ele é professor(a) de Ciências."]],
+    task: [["Crie um quiz de 8 perguntas sobre a pressão alta e o sal da comida.", "Quantidade e tema definidos, perto da vida da turma."],
+           ["Pergunte coisas de saúde.", "Quantas perguntas? Sobre qual assunto?"],
+           ["Crie um quiz enorme sobre todas as doenças, remédios e exames.", "Assunto demais. Escolha um tema perto da turma, como a pressão alta."]],
+    context: [["Para adultos que leem rótulos no mercado, muitos com alguém com pressão alta em casa, numa aula de 30 minutos.", "Ele parte do que a turma vive e faz perguntas que cabem na aula."],
+              ["Para adultos.", "Quais adultos? O que eles já sabem? Quanto tempo há?"],
+              ["Para adultos que não entendem nada de saúde e precisam aprender tudo do zero.", "Adulto sabe muito de saúde, pela vida. Valorize o que a turma já sabe."]],
+    format: [["Múltipla escolha com 3 alternativas, sem usar o teste interativo, e o gabarito explicado.", "Sai em texto, pronto para imprimir ou passar para o Google Forms."],
+             ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
+             ["Como teste interativo, com os números das pesquisas mais recentes sobre a pressão alta no Brasil.", "O teste interativo não dá para imprimir, e o Gemini inventa números de pesquisa. Peça o quiz em texto."]],
+    trap: { text: "No quiz, o Gemini às vezes abre o teste interativo, que não dá para imprimir, e cita números de saúde que ninguém conferiu. Peça assim:", say: "Sem usar o teste interativo. Não invente números de saúde." },
+  },
+  {
+    id: "eja-curriculo",
+    vague: "Faça um currículo para um aluno.",
+    answer: { who: "Professor(a) de Língua Portuguesa · EJA", title: "Aula: o currículo de quem trabalha", audience: "adultos · aula de 50 minutos", shape: "plan", note: "Modelo inventado e escrita em 5 passos" },
+    role: [["Você é professor(a) de Língua Portuguesa da EJA e ensina os textos do dia a dia.", "Ele ensina a turma a escrever, em vez de escrever pela turma."],
+           ["Você é do RH.", "O RH escolhe candidato, não ensina. Diga que ele é professor(a) de Língua Portuguesa da EJA."],
+           ["Você é um consultor de carreira que escreve currículos perfeitos para executivos de grandes empresas.", "Currículo de executivo não é a realidade da turma. Diga a matéria e a etapa."]],
+    task: [["Planeje uma aula sobre o currículo, com um modelo inventado e uma escrita guiada.", "Tema e modelo inventado: ninguém precisa expor a própria vida."],
+           ["Faça um currículo.", "De quem? A aula é para a turma aprender a fazer o seu."],
+           ["Escreva o currículo de cada estudante da turma, com os dados que eu mandar.", "Dado de estudante não vai para o Gemini. Peça um modelo inventado e uma escrita guiada."]],
+    context: [["Para adultos da EJA, no Ensino Médio, muitos procurando emprego e com experiência de trabalho informal.", "Você descreveu a turma sem identificar ninguém. Perfeito!"],
+              ["Para um aluno.", "Qual turma? O que ela precisa? Descreva a turma, sem nome."],
+              ["Para o Seu Antônio Pereira, de 52 anos, da turma da noite, que trabalhou na obra.", "Nunca escreva o nome nem dados do estudante no Gemini! Descreva a turma sem identificar ninguém."]],
+    format: [["Em português do Brasil, com o tempo de cada parte, o modelo fora de bloco de código e 5 passos de escrita.", "Você recebe a aula pronta, em português, e o modelo dá para copiar."],
+             ["Do jeito que achar melhor.", "Sem formato, a aula vem solta e sem tempo."],
+             ["Um currículo chique, em inglês, com foto e todos os documentos, para impressionar.", "Currículo de treino vai em português e sem documentos. E o Gemini às vezes responde em inglês: peça português do Brasil."]],
+    trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem dado de estudante. Peça assim:", say: "Descreva a turma, sem nome de estudante. Responda em português do Brasil." },
+  },
 ]
 
 // The five rounds of each stage; the Educação Infantil and anos iniciais ones are the first Oficina rounds,
@@ -627,6 +719,7 @@ const STAGES = {
   iniciais: { who: "das crianças", ids: ["jogo", "historia", "cantiga", "fracoes", "adaptar"] },
   finais: { who: "dos estudantes", ids: ["quiz", "geografia", "independencia", "leitura", "pitagoras"] },
   medio: { who: "dos estudantes", ids: ["simulado", "redacao", "mitose", "velocidade", "quimica"] },
+  eja: { who: "dos estudantes", ids: ["eja-alfabetizacao", "eja-encceja", "eja-juros", "eja-saude", "eja-curriculo"] },
 }
 let ROUNDS = [], stage = "iniciais"
 function setStage(id) {
@@ -747,6 +840,9 @@ const SHAPES = {
   compare: () => `<div class="compare"><b>Mitose</b><b>Meiose</b>${"<span></span>".repeat(6)}</div><div class="questions">${"<span>?</span>".repeat(5)}</div><span class="key">Gabarito no fim</span>`,
   plan: answer => `<div class="times"><span>10 min</span><span>25 min</span><span>15 min</span></div><ol class="numbered">${[1, 2, 3].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><span class="key">${answer.note}</span>`,
   glossary: () => `<div class="lines">${"<span></span>".repeat(3)}</div><div class="terms"><span>ácido</span><span>base</span><span>pH</span></div><span class="key">O que mudou no texto</span>`,
+  encceja: () => `<div class="options enem">${["A", "B", "C", "D"].map(letter => `<span class="${letter === "C" ? "right" : ""}"><b>${letter}</b><em></em></span>`).join("")}</div><span class="key">Gabarito com a conta de cada questão</span>`,
+  price: () => `<div class="options"><span><b>A</b>À vista: R$ 1.200</span><span class="right"><b>B</b>12 de R$ 125: R$ 1.500</span></div><span class="key">Juros: R$ 300 · pontos no final</span>`,
+  health: () => `<div class="options"><span><b>A</b>Arroz sem sal</span><span class="right"><b>B</b>Tempero pronto</span><span><b>C</b>Banana</span></div><span class="key">Gabarito explicado no fim</span>`,
 }
 
 // Putting a block in its slot: the good block fills it and the other two of that part are crossed out;

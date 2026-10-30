@@ -206,14 +206,14 @@
       </label>
       <label id="place-box">Onde vai usar
         <select id="place">
-          <option value="no celular ou tablet de cada criança">No celular ou tablet de cada criança</option>
-          <option value="no projetor, com a turma toda junta">No projetor, com a turma toda</option>
-          <option value="no celular das crianças e também no projetor">Nos dois</option>
+          <option value="no celular ou tablet de cada criança" data-child="No celular ou tablet de cada criança" data-adult="No celular de cada estudante">No celular ou tablet de cada criança</option>
+          <option value="no projetor, com a turma toda junta" data-child="No projetor, com a turma toda" data-adult="No projetor, com a turma toda">No projetor, com a turma toda</option>
+          <option value="no celular das crianças e também no projetor" data-child="Nos dois" data-adult="Nos dois">Nos dois</option>
         </select>
       </label>
-      <span class="needs-title">Na turma há crianças com:</span>
+      <span class="needs-title" id="needs-title">Na turma há crianças com:</span>
       <div class="checks" id="needs"></div>
-      <p class="note">Marque só a necessidade. Nunca escreva o nome ou a turma da criança.</p>
+      <p class="note" id="needs-note">Marque só a necessidade. Nunca escreva o nome ou a turma da criança.</p>
       <label>Algo mais que a IA precisa saber? <small>(opcional)</small>
         <textarea id="extra" placeholder="Por exemplo: a turma adora futebol; não temos impressora colorida"></textarea>
       </label>
@@ -285,6 +285,12 @@ const STAGES = [
     ["em2", "2ª série do Ensino Médio", "16 e 17 anos", "medio", "fluent"],
     ["em3", "3ª série do Ensino Médio", "17 e 18 anos", "medio", "fluent"],
   ] },
+  // Na EJA a etapa é uma só (a mesma da Biblioteca); o sexto campo diz em que parte da escolaridade a turma está
+  { group: "EJA · Educação de Jovens e Adultos", items: [
+    ["eja1", "EJA · anos iniciais (alfabetização)", "15 anos ou mais", "eja", "adultStart", "nos anos iniciais do Ensino Fundamental"],
+    ["eja2", "EJA · anos finais do Ensino Fundamental", "15 anos ou mais", "eja", "fluent", "nos anos finais do Ensino Fundamental"],
+    ["eja3", "EJA · Ensino Médio", "18 anos ou mais", "eja", "fluent", "no Ensino Médio"],
+  ] },
 ]
 
 const READING = {
@@ -292,13 +298,18 @@ const READING = {
   start: "As crianças estão começando a ler: use palavras simples, frases bem curtas e apoio de imagens.",
   short: "As crianças já leem frases curtas: use linguagem simples e direta.",
   fluent: "",
+  adultStart: "Os estudantes estão aprendendo a ler e escrever: use letra de forma, frases curtas, palavras do dia a dia e apoio de imagens, sem tratar ninguém como criança.",
 }
+
+// What every EJA prompt asks, so the material is for adults and fits a tired evening after work
+const ADULT = "Use linguagem adulta e respeitosa, nada infantilizado: nada de bichinhos, personagens de desenho ou tom de criança. Traga exemplos do trabalho, da casa, da saúde e da cidade, valorize o que os estudantes já sabem da vida e proponha atividades curtas, para quem chega cansado do trabalho."
 
 // Using the BNCC fields of experience for early childhood and the school subjects for the other years
 const AREAS = {
   infantil: ["O eu, o outro e o nós", "Corpo, gestos e movimentos", "Traços, sons, cores e formas", "Escuta, fala, pensamento e imaginação", "Espaços, tempos, quantidades, relações e transformações"],
   fundamental: ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos"],
   medio: ["Língua Portuguesa", "Matemática", "Física", "Química", "Biologia", "História", "Geografia", "Filosofia", "Sociologia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos"],
+  ejaIniciais: ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Vários componentes juntos"],
 }
 
 // Each need brings a concrete adaptation, so Gemini knows what to change and not only that something must change
@@ -319,26 +330,29 @@ const KINDS = {
   atividade: {
     label: "Atividade para imprimir", maker: "atividades impressas",
     task: topic => `Crie uma atividade para imprimir sobre "${topic}".`,
-    format: early => [
-      "Uma folha A4 com título, espaço para o nome e uma instrução curta para a criança.",
-      early ? "De 3 a 4 exercícios com desenhos e quase sem texto (ligar, circular, pintar, desenhar), com instruções que o professor lê em voz alta." : "De 3 a 5 exercícios variados (ligar, completar, circular, desenhar, marcar X), do mais fácil para o mais difícil.",
+    format: (early, adult) => [
+      `Uma folha A4 com título, espaço para o nome e uma instrução curta para ${adult ? "o estudante" : "a criança"}.`,
+      early ? "De 3 a 4 exercícios com desenhos e quase sem texto (ligar, circular, pintar, desenhar), com instruções que o professor lê em voz alta."
+        : adult ? "De 3 a 5 exercícios curtos e variados (completar, ligar, marcar X, responder com uma frase), do mais fácil para o mais difícil, que caibam em 20 minutos."
+        : "De 3 a 5 exercícios variados (ligar, completar, circular, desenhar, marcar X), do mais fácil para o mais difícil.",
       "Descreva cada desenho entre parênteses, sem desenhar com letras ou símbolos.",
       "Escreva a folha em texto normal, fora de bloco de código.",
       "No fim, separado, o gabarito e uma dica para o professor.",
     ],
     next: ["Crie mais 3 exercícios no mesmo estilo.", "Transforme essa atividade em um jogo no Canvas, com estrelas no final."],
+    nextAdult: ["Crie mais 3 exercícios no mesmo estilo.", "Troque os exemplos por situações de [o trabalho da turma, como comércio ou obra]."],
     tip: "O Gemini às vezes põe a folha inteira num bloco de código. O prompt já pede para escrever fora dele.",
   },
   jogo: {
     label: "Jogo interativo", maker: "jogos educativos digitais",
     // The Canvas refuses a game asked in one long message: the first message is only the short idea
-    task: topic => `Crie uma página HTML interativa sobre "${topic}": aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, visual de desenho, em português do Brasil.`,
-    format: early => [
+    task: (topic, adult) => `Crie uma página HTML interativa sobre "${topic}": aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, ${adult ? "visual limpo e adulto" : "cores alegres, visual de desenho"}, em português do Brasil.`,
+    format: (early, adult) => [
       "Funcione no celular e no computador, sem instalar nada.",
       "Uma tela inicial com o nome do jogo e instruções bem curtas.",
       "3 fases, da mais fácil para a mais difícil.",
       "Retorno na hora a cada resposta: verde e um som alegre no acerto, vermelho e uma dica no erro.",
-      "No fim, estrelas pelo desempenho e um botão para jogar de novo.",
+      adult ? "No fim, a pontuação e um botão para jogar de novo." : "No fim, estrelas pelo desempenho e um botão para jogar de novo.",
       ...(early ? ["Instruções faladas em voz alta pela voz do navegador, e nada que dependa de saber ler para jogar."] : []),
       "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
@@ -346,14 +360,20 @@ const KINDS = {
   },
   historia: {
     label: "História", maker: "histórias para ler com a turma",
-    task: topic => `Escreva uma história curta e divertida sobre "${topic}".`,
-    format: early => [
+    task: (topic, adult) => adult ? `Escreva uma crônica curta, do dia a dia de adultos, sobre "${topic}".` : `Escreva uma história curta e divertida sobre "${topic}".`,
+    format: (early, adult) => adult ? [
+      "Um título e de 5 a 8 parágrafos curtos, para ler junto com a turma em poucos minutos.",
+      "Personagens adultos com nomes brasileiros, numa situação do trabalho, da família ou do bairro.",
+      "Se sugerir imagens, descreva cada uma entre parênteses, sem desenhar com letras ou símbolos.",
+      "No fim, 3 perguntas para conversar com a turma, ligando o texto ao que os estudantes já viveram.",
+    ] : [
       `Um título e ${early ? "de 5 a 7 parágrafos bem curtos" : "de 6 a 10 parágrafos curtos"}, para ler em voz alta em poucos minutos.`,
       "Personagens com nomes brasileiros e um problema que eles resolvem juntos.",
       "Se sugerir imagens, descreva cada uma entre parênteses, sem desenhar com letras ou símbolos.",
       "No fim, 3 perguntas para conversar com a turma e uma sugestão de desenho ou brincadeira.",
     ],
     next: ["Transforme a história em um teatrinho para 5 crianças.", "Sugira 4 cenas da história para as crianças desenharem."],
+    nextAdult: ["Crie 5 perguntas de interpretação sobre essa crônica, com o gabarito.", "Proponha uma escrita curta: a turma conta uma situação parecida que viveu."],
     tip: "Se o Gemini desenhar com letras e símbolos, peça de novo: descreva as imagens entre parênteses.",
   },
   plano: {
@@ -366,6 +386,7 @@ const KINDS = {
       "Uma adaptação para quem tiver dificuldade e um desafio extra para quem terminar antes.",
     ],
     next: ["Crie a atividade impressa que acompanha esse plano.", "Sugira uma brincadeira de 5 minutos para começar a aula."],
+    nextAdult: ["Crie a atividade impressa que acompanha esse plano.", "Sugira uma conversa de 5 minutos para começar a aula, puxando o que a turma já sabe do assunto."],
     tip: "O modelo rápido do Gemini inventa códigos da BNCC e nomes de músicas. Por isso o prompt pede para não citar.",
   },
   quiz: {
@@ -384,6 +405,7 @@ const KINDS = {
       "Escreva o quiz em texto, sem usar o teste interativo.",
     ],
     next: ["Transforme esse quiz em um jogo no Canvas, com estrelas no final.", "Crie mais 8 perguntas no mesmo nível."],
+    nextAdult: ["Transforme esse quiz em um jogo no Canvas, com a pontuação no final.", "Crie mais 8 perguntas no mesmo nível."],
     tip: "O teste interativo do Gemini não dá para imprimir nem passar para o Google Forms. O prompt já pede para não usar.",
   },
   adaptar: {
@@ -398,10 +420,19 @@ const KINDS = {
     next: ["Crie também uma versão com letras maiores e mais espaço entre as linhas.", "Sugira como apresentar esse material para a turma inteira."],
     tip: "Antes de colar o material, apague nomes, turma e notas dos alunos.",
   },
+  // Na EJA, o mesmo botão vira Questões do Encceja: 4 alternativas e situações da vida adulta
   enem: {
     label: "Questões do Enem", maker: "questões no estilo do Enem",
-    task: topic => `Crie 5 questões no estilo do Enem sobre "${topic}".`,
-    format: () => [
+    labelAdult: "Questões do Encceja", makerAdult: "questões no estilo do Encceja",
+    task: (topic, adult) => `Crie 5 questões no estilo do ${adult ? "Encceja" : "Enem"} sobre "${topic}".`,
+    format: (early, adult) => adult ? [
+      "Cada questão com um texto-base curto, ligado a uma situação do trabalho ou da vida adulta, um comando claro e 4 alternativas, de A a D.",
+      "As questões vão da mais fácil para a mais difícil, em linguagem simples.",
+      "Se a questão tiver gráfico ou tabela, monte a tabela no texto ou descreva o gráfico entre parênteses.",
+      "Escreva tudo em texto normal, fora de bloco de código e sem usar o teste interativo.",
+      "No fim, separado, o gabarito com a resolução explicada em poucas linhas.",
+      "Não diga que as questões são de provas reais do Encceja e não invente o ano de uma prova.",
+    ] : [
       "Cada questão com um texto-base curto, ligado a uma situação real, um comando claro e 5 alternativas, de A a E.",
       "As questões vão da mais fácil para a mais difícil.",
       "Se a questão tiver gráfico ou tabela, monte a tabela no texto ou descreva o gráfico entre parênteses.",
@@ -410,6 +441,7 @@ const KINDS = {
       "Não diga que as questões são de provas reais do Enem e não invente o ano de uma prova.",
     ],
     next: ["Crie mais 5 questões no mesmo estilo, um pouco mais difíceis.", "Transforme essas questões num simulado de 30 minutos, com folha de respostas."],
+    nextAdult: ["Crie mais 5 questões no mesmo estilo, um pouco mais difíceis.", "Monte um roteiro de estudo de 4 semanas para o Encceja, com 20 minutos por dia."],
     tip: "Confira as contas e os dados de cada questão antes de aplicar: o modelo rápido do Gemini às vezes erra uma conta no meio da resolução.",
   },
   sequencia: {
@@ -430,6 +462,7 @@ const KINDS = {
 
 // Asking the same final checks of every material, the habit the workshop wants teachers to keep
 const COMMON_NEXT = ["Deixe mais simples, para crianças com dificuldade.", "Revise o que você escreveu: tem algum erro de conteúdo ou palavra difícil para essa idade?", "Escreva tudo em português do Brasil."]
+const COMMON_NEXT_ADULT = ["Deixe mais simples, sem infantilizar, para quem tem dificuldade de leitura.", "Revise o que você escreveu: tem algum erro de conteúdo ou algo que soe infantil para adultos?", "Escreva tudo em português do Brasil."]
 
 // Things that look like a student's data. They only warn, because a topic can look like a name by chance.
 const PRIVACY = [
@@ -451,33 +484,42 @@ const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<"
 
 // Building the four parts from the choices on the left
 function buildPrompt(semMaterial = false) {
-  const [, label, age, group, reading] = stageOf($("stage").value)
-  const early = group === "infantil", details = KINDS[kind], area = $("area").value
+  const [, label, age, group, reading, segment] = stageOf($("stage").value)
+  const early = group === "infantil", adult = group === "eja", details = KINDS[kind], area = $("area").value
   const older = group === "finais" || group === "medio"
-  const students = older ? "alunos" : "crianças"
-  // "do 6º ano do Ensino Fundamental" or "da 1ª série do Ensino Médio"
-  const classLabel = group === "medio" ? `da ${label}` : `do ${label} do Ensino Fundamental`
+  const students = adult ? "estudantes" : older ? "alunos" : "crianças"
+  // "do 6º ano do Ensino Fundamental", "da 1ª série do Ensino Médio" or "da EJA, nos anos finais do Ensino Fundamental"
+  const classLabel = adult ? `da EJA (Educação de Jovens e Adultos), ${segment}` : group === "medio" ? `da ${label}` : `do ${label} do Ensino Fundamental`
   const topic = $("topic").value.trim() || "[escreva o tema]"
+  const subject = area === "Vários componentes juntos" ? "vários componentes" : area
+  const maker = adult ? details.makerAdult || details.maker : details.maker
   const role = early
-    ? `Você é um(a) professor(a) de Educação Infantil experiente, que sabe criar ${details.maker} para crianças pequenas.`
-    : `Você é um(a) professor(a) experiente de ${area === "Vários componentes juntos" ? "vários componentes" : area} ${classLabel}, que sabe criar ${details.maker}.`
+    ? `Você é um(a) professor(a) de Educação Infantil experiente, que sabe criar ${maker} para crianças pequenas.`
+    : adult
+      ? `Você é um(a) professor(a) experiente de ${subject} ${classLabel}, que sabe criar ${maker} para jovens e adultos.`
+      : `Você é um(a) professor(a) experiente de ${subject} ${classLabel}, que sabe criar ${maker}.`
   const needs = selectedNeeds()
+  // Onde vai usar: as opções falam de criança; na EJA o texto do prompt fala de estudante
+  const place = adult ? $("place").value.replace("cada criança", "cada estudante").replace("das crianças", "dos estudantes") : $("place").value
 
   const context = [
-    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".` : `A turma é ${classLabel}, com ${students} de ${age}, e o componente é ${area}.`,
+    early ? `A turma é da Educação Infantil, com crianças de ${age}, e o trabalho é no campo de experiência "${area}".`
+      : adult ? `A turma é ${classLabel}, com jovens e adultos de ${age} e idades bem diferentes, muitos trabalhadores, e o componente é ${area}.`
+      : `A turma é ${classLabel}, com ${students} de ${age}, e o componente é ${area}.`,
     READING[reading],
-    $("goal").value.trim() && `${older ? "Os alunos" : "As crianças"} devem aprender: ${$("goal").value.trim().replace(/\.$/, "")}.`,
+    adult && ADULT,
+    $("goal").value.trim() && `${adult ? "Os estudantes" : older ? "Os alunos" : "As crianças"} devem aprender: ${$("goal").value.trim().replace(/\.$/, "")}.`,
     $("time").value && `O tempo disponível é ${$("time").value}.`,
-    (kind === "jogo" || kind === "quiz") && `Vai ser usado ${$("place").value}.`,
+    (kind === "jogo" || kind === "quiz") && `Vai ser usado ${place}.`,
     needs.length && `Na turma há ${students} com ${joinList(needs)}. Inclua adaptações: ${needs.map(need => `para ${need}, ${NEEDS[need]}`).join("; ")}.`,
     (kind === "plano" || kind === "atividade" || kind === "sequencia") && "Não cite códigos de habilidades da BNCC.",
     (kind === "plano" || kind === "historia") && "Não cite músicas nem livros que você não tenha certeza de que existem.",
-    `Responda em português do Brasil, com exemplos do dia a dia ${older ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
+    `Responda em português do Brasil, com exemplos do dia a dia ${adult ? "de jovens e adultos brasileiros" : older ? "dos alunos brasileiros" : "das crianças brasileiras"}.`,
     $("extra").value.trim(),
   ].filter(Boolean)
 
   return {
-    role, task: details.task(kind === "adaptar" ? $("topic").value.trim() : topic), context, format: details.format(early),
+    role, task: details.task(kind === "adaptar" ? $("topic").value.trim() : topic, adult), context, format: details.format(early, adult),
     ask: $("ask").checked, material: kind === "adaptar" ? (semMaterial ? "" : $("paste").value.trim()) || "[cole aqui o texto ou a atividade]" : "",
   }
 }
@@ -530,12 +572,23 @@ function render() {
   $("tip").innerHTML = game
     ? "<b>Dica:</b> no Gemini, ligue o <b>Canvas</b> antes de enviar: toque em <b>+</b>, depois em <b>Mais ferramentas</b> e <b>Canvas</b>. Mande a 1ª mensagem, espere a página aparecer e mande a 2ª. Se ele recusar, toque em <b>Refazer</b>."
     : `<b>Dica:</b> ${details.tip} Leia a resposta antes de usar com a turma: a IA pode errar fatos. Se ela errar mesmo assim, veja as <a href="frases.html">frases que salvam</a>.`
-  $("next").innerHTML = details.next.concat(COMMON_NEXT).map(text =>
+  const adult = isAdult()
+  $("next").innerHTML = (adult ? (details.nextAdult || details.next).concat(COMMON_NEXT_ADULT) : details.next.concat(COMMON_NEXT)).map(text =>
     `<li><span>${escape(text)}</span><button type="button" data-copy="${escape(text)}">Copiar</button></li>`).join("")
   $("paste-box").hidden = $("paste-note").hidden = kind !== "adaptar"
   $("place-box").hidden = kind !== "jogo" && kind !== "quiz"
+  // Na EJA, os textos da página falam de estudantes, e o botão do Enem vira Encceja
+  $("needs-title").textContent = adult ? "Na turma há estudantes com:" : "Na turma há crianças com:"
+  $("needs-note").textContent = adult ? "Marque só a necessidade. Nunca escreva o nome ou a turma do estudante." : "Marque só a necessidade. Nunca escreva o nome ou a turma da criança."
+  for (const option of $("place").options) option.textContent = adult ? option.dataset.adult : option.dataset.child
+  Object.entries(KINDS).forEach(([id, item]) => {
+    const name = document.querySelector(`#kinds [data-kind="${id}"] .kind-name`)
+    if (name) name.textContent = adult && item.labelAdult ? item.labelAdult : item.label
+  })
   checkPrivacy()
 }
+const isAdult = () => stageOf($("stage").value)[3] === "eja"
+const labelOf = (id, adult) => (adult && KINDS[id].labelAdult) || KINDS[id].label
 
 // Looking for a student's data in what the teacher typed, and saying where it is
 function privacyFound(semMaterial = false) {
@@ -587,8 +640,8 @@ async function copyMessage(index) {
 }
 
 function fillAreas() {
-  const group = stageOf($("stage").value)[3], early = group === "infantil", previous = $("area").value
-  const areas = AREAS[early ? "infantil" : group === "medio" ? "medio" : "fundamental"]
+  const [stageId, , , group] = stageOf($("stage").value), early = group === "infantil", previous = $("area").value
+  const areas = AREAS[early ? "infantil" : stageId === "eja1" ? "ejaIniciais" : group === "medio" || stageId === "eja3" ? "medio" : "fundamental"]
   $("area-label").textContent = early ? "Campo de experiência (BNCC)" : "Componente curricular"
   $("area").innerHTML = areas.map(area => `<option>${area}</option>`).join("")
   if (areas.includes(previous)) $("area").value = previous
@@ -598,7 +651,7 @@ function fillAreas() {
 const lembrado = Lembrar.ler("construtor", {})
 if (KINDS[lembrado.kind]) kind = lembrado.kind
 $("kinds").innerHTML = Object.entries(KINDS).map(([id, details]) =>
-  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}">${Icones.svg(id)}${details.label}</button>`).join("")
+  `<button type="button" data-kind="${id}" class="${id === kind ? "chosen" : ""}" aria-pressed="${id === kind}">${Icones.svg(id)}<span class="kind-name">${details.label}</span></button>`).join("")
 $("stage").innerHTML = STAGES.map(group => `<optgroup label="${group.group}">${group.items.map(([id, label]) => `<option value="${id}">${label}</option>`).join("")}</optgroup>`).join("")
 $("stage").value = "f2"
 $("needs").innerHTML = Object.keys(NEEDS).map(need => `<label><input type="checkbox" value="${need}">${need}</label>`).join("")
@@ -671,7 +724,7 @@ function desenharGuardados(foco) {
   $("meus-vazio").hidden = lista.length > 0
   $("guardados").innerHTML = lista.map(item => {
     const id = escape(item.id), dois = item.mensagens.length > 1
-    const meta = [KINDS[item.tipo]?.label, dataCurta(item.data)].filter(Boolean).join(" · ")
+    const meta = [item.tipo === "encceja" ? KINDS.enem.labelAdult : KINDS[item.tipo]?.label, dataCurta(item.data)].filter(Boolean).join(" · ")
     const copiar = item.mensagens.map((_, i) => `<button class="btn" style="--c: var(--mint)" type="button" data-acao="copiar" data-i="${i}">${dois ? `Copiar a ${i + 1}ª mensagem` : "Copiar"}</button>`).join("")
     const cabeca = renomeando === item.id
       ? `<form class="renomear"><label>Novo nome<input type="text" maxlength="80" value="${escape(item.nome)}" required></label><div class="botoes"><button class="btn" style="--c: var(--mint)" type="submit">Salvar o nome</button><button class="btn" style="--c: #fff" type="button" data-acao="cancelar">Cancelar</button></div></form>`
@@ -696,14 +749,16 @@ function guardarPrompt() {
   const found = privacyFound(true)
   if (found.length && !confirm(`Parece que há dado de aluno: ${joinList(found)}. Nada disso deve ficar guardado. Guardar mesmo assim?`)) return
   const [, label, age, group] = stageOf($("stage").value)
+  const adult = group === "eja"
   const turma = group === "infantil" ? `Infantil, ${age}` : label
   const tema = $("topic").value.trim().replace(/\s+/g, " ")
-  const nome = [KINDS[kind].label, turma, tema.length > 40 ? tema.slice(0, 39).trimEnd() + "…" : tema].filter(Boolean).join(" · ")
+  const nome = [labelOf(kind, adult), turma, tema.length > 40 ? tema.slice(0, 39).trimEnd() + "…" : tema].filter(Boolean).join(" · ")
   const lista = lerGuardados()
   if (lista.length >= LIMITE) return tell("Meus prompts está cheio. Apague algum para guardar outro.", true)
   lista.unshift({
     id: "c-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), origem: "construtor", nome,
-    mensagens: toMessages(buildPrompt(true)), tipo: kind, etapa: group, materia: group === "infantil" ? "Educação Infantil" : $("area").value, data: new Date().toISOString(),
+    // Questões do Encceja vão para a Biblioteca com o tipo próprio, para o filtro achar
+    mensagens: toMessages(buildPrompt(true)), tipo: adult && kind === "enem" ? "encceja" : kind, etapa: group, materia: group === "infantil" ? "Educação Infantil" : $("area").value, data: new Date().toISOString(),
   })
   if (!gravarGuardados(lista)) return tell("Não deu para guardar: este navegador não deixa guardar no aparelho.", true)
   desenharGuardados()
