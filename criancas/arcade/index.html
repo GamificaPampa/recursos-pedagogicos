@@ -8,6 +8,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <style>@font-face { font-family: "Fredoka"; src: url("/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap }</style>
 <link rel="stylesheet" href="estilo.css?v=8">
+<style>
+  .ouvir-grupo { display: flex; gap: 10px; justify-content: center; }
+  #ht-card > .ouvir-grupo { justify-content: flex-end; margin: -6px -4px 4px 0; }
+  #scr-end > .ouvir-grupo { margin: 0 0 8px; }
+</style>
 </head>
 <body>
 <div class="sky" aria-hidden="true">
@@ -19,7 +24,7 @@
 <div class="app">
   <!-- MENU -->
   <section class="menu" id="scr-menu">
-    <h1 class="logo"><span class="y">Arcade</span> do <span class="p">Código</span></h1>
+    <h1 class="logo" data-ouvir="Arcade do Código"><span class="y">Arcade</span> do <span class="p">Código</span></h1>
     <div class="hero">
       <canvas id="mascot" role="button" tabindex="0" aria-label="Bit, o robô. Toque nele!"></canvas>
       <button type="button" class="bubble" id="bubble">Oi! Eu sou o Bit.</button>
@@ -30,7 +35,7 @@
       <span class="p-title" id="p-title">Dev Iniciante</span>
     </div>
     <h2 class="sr-only">Jogos</h2>
-    <div class="carousel" id="cards"></div>
+    <div class="carousel" id="cards" data-ouvir-lista="Jogos"></div>
     <div class="dots" id="fases"></div>
     <button type="button" id="mute-menu" class="mute-menu">Som ligado</button>
   </section>
@@ -51,8 +56,8 @@
   <!-- FIM -->
   <section class="end" id="scr-end" hidden>
     <div class="ribbon" id="end-game"></div>
-    <div class="end-head" id="end-head">Tempo esgotado!</div>
-    <div class="card result" id="end-card">
+    <div class="end-head" id="end-head" data-ouvir>Tempo esgotado!</div>
+    <div class="card result" id="end-card" data-ouvir>
       <div class="medal-wrap"><div class="rays"></div><div class="medal" id="medal"></div></div>
       <div class="end-stars" id="end-stars"><span data-icone="estrela"></span><span data-icone="estrela"></span><span data-icone="estrela"></span></div>
       <div class="big" id="final">0 pts</div>
@@ -79,7 +84,7 @@
       </form>
       <div class="send-note" id="send-note">Digite o código que aparece no telão da sala. Sem código, a jogada não vai para o placar.</div>
     </div>
-    <div class="card fact">
+    <div class="card fact" data-ouvir>
       <b id="learn-title">Você praticou</b><span id="learn"></span>
       <div class="real" id="real-wrap"><b data-icone="maleta">Na vida real</b><span id="real"></span></div>
     </div>
@@ -91,7 +96,7 @@
 </div>
 
 <!-- COMO JOGAR -->
-<div class="overlay" id="howto" hidden>
+<div class="overlay" id="howto" hidden data-ouvir-sobre>
   <div class="ht-card" id="ht-card">
     <h2 id="ht-title"></h2>
     <div class="ht-concept" id="ht-concept"></div>
@@ -120,6 +125,34 @@
 <script src="esteira.js?v=7"></script>
 <script src="robo.js?v=5"></script>
 <script>Arcade.boot();</script>
+<script>
+// Ouvir, do kit de jogo: lê o menu, o "como jogar" e o resultado. Jogo de reflexo: só as instruções e o resultado, sem as falas do Bit
+(function () {
+  if (!window.Jogo || !Jogo.ouvir) return;
+  Jogo.ouvir.bit = false;
+  var grupo = function (comSozinho) {
+    var g = document.createElement('div');
+    g.className = 'ouvir-grupo';
+    g.append(Jogo.botao('ouvir'));
+    if (comSozinho) g.append(Jogo.botao('ler-sozinho'));
+    return g;
+  };
+  var topo = document.querySelector('.menu-topo');
+  if (topo) topo.insertBefore(grupo(true), topo.lastChild);
+  document.getElementById('ht-card').prepend(grupo(true));
+  document.getElementById('scr-end').prepend(grupo(false));
+  // Cada jogo do menu é lido pelo título
+  document.querySelectorAll('#cards .gcard').forEach(function (c) { c.dataset.ouvir = c.querySelector('h3').textContent; });
+  var telas = ['scr-menu', 'scr-end', 'howto'].map(function (id) { return document.getElementById(id); });
+  var ultima = '';
+  new MutationObserver(function () {
+    var agora = telas.map(function (e) { return e.hidden ? '0' : '1'; }).join('');
+    if (agora === ultima) return;
+    ultima = agora;
+    if (agora.indexOf('1') >= 0) Jogo.ouvir.novaTela(); else Jogo.ouvir.parar();
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+})();
+</script>
 <script src="/identidade-visual/js/bit.js" data-canto="topo-direita" defer></script>
 </body>
 </html>

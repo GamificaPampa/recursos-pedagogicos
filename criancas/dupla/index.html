@@ -734,7 +734,32 @@ function toggleMute() {
 // Kit de jogo do identidade-visual: casa para voltar ao menu da turma e tela cheia no topo, som guardado para todos
 // os jogos, e a tela final com Jogar de novo e Outros jogos
 document.querySelector("header").prepend(Jogo.botao("casa"))
-document.getElementById("mute").before(Jogo.botao("tela-cheia"))
+document.getElementById("mute").before(Jogo.botao("ouvir"), Jogo.botao("ler-sozinho"), Jogo.botao("tela-cheia"))
+// Ouvir: lê as instruções e o resultado de cada tela que abre (o Bit não entra, para não atrapalhar o jogo)
+Jogo.ouvir.bit = true
+{
+  const telaAberta = () => document.querySelector(".overlay.show:not(#phone)")
+  let ultima = telaAberta()?.id
+  new MutationObserver(() => {
+    const id = telaAberta()?.id
+    if (id === ultima) return
+    ultima = id
+    if (id) Jogo.ouvir.novaTela()
+    else Jogo.ouvir.parar()
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] })
+}
+Jogo.ouvir.textoDaTela(() => {
+  const aberta = document.querySelector(".overlay.show:not(#phone)")
+  if (aberta?.id === "start") return ["Programação em Dupla.", "O piloto monta as setas, mas não vê os bugs.", "O navegador escaneia o QR, vê os bugs e diz o caminho.",
+    "Escolha a dificuldade para começar.", "Sozinho? Toque no olho para espiar os bugs. No Desafio não dá para espiar!"]
+  if (aberta?.id === "win") {
+    const n = document.querySelectorAll("#stars svg:not(.off)").length, troca = document.getElementById("swap")
+    return [`Vocês fizeram ${n} ${n === 1 ? "estrela" : "estrelas"}.`, troca.hidden ? "" : troca.innerText]
+  }
+  if (aberta?.id === "lost" || aberta?.id === "final") return aberta.querySelector("p").textContent
+  return [document.getElementById("role").textContent.trim(), "Monte o caminho com as setas e aperte o botão de rodar."]
+})
+
 Jogo.som.aoMudar(ligado => {
   muted = !ligado
   document.getElementById("mute").innerHTML = muted ? SILENT : SOUND

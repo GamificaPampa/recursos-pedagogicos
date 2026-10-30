@@ -167,7 +167,7 @@ p, li, blockquote {
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
         </div>
-        <div class="missao">
+        <div class="missao" data-ouvir>
           <p class="missao__topo" id="topo">Estados da matéria · desafio 1 de 6</p>
           <p class="missao__texto" id="texto"></p>
           <p class="missao__pergunta" id="pergunta" aria-live="polite"></p>
@@ -177,7 +177,7 @@ p, li, blockquote {
           <p class="nota" id="nota"></p>
         </div>
         <div class="controles">
-          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha uma resposta"></div>
+          <div class="opcoes" id="opcoes" role="group" aria-label="Escolha uma resposta" data-ouvir-lista="Respostas"></div>
           <div class="acoes">
             <button class="btn btn--jogar" type="button" id="conferir" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Conferir os sinais</span></button>
             <button class="btn btn--small" type="button" id="dica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5 1 1.2 1 2v.7h5.6v-.7c0-.8.4-1.5 1-2A6.5 6.5 0 0 0 12 2.5z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M9.4 19.5h5.2M10.4 22h3.2" stroke="#2f2a4a" stroke-width="2.2" stroke-linecap="round"/></svg>Dica</button>
@@ -187,7 +187,7 @@ p, li, blockquote {
         </div>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -205,6 +205,7 @@ p, li, blockquote {
         <li><b>No celular:</b> cada estudante joga as três fases e anota no caderno um exemplo do dia a dia para cada mudança de estado.</li>
         <li><b>Depois:</b> em duplas, com a professora e só com materiais de cozinha, sem fogo: dissolver sal na água e deixar o prato ao sol até a água evaporar, e observar uma maçã cortada ao ar durante uma hora, anotando o que muda na cor.</li>
         <li><b>Cuidado com o tema:</b> água fervendo tem bolhas e vapor, mas é transformação física. Os sinais ajudam, mas o que decide é aparecer ou não uma substância nova.</li>
+        <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
       <p class="seguranca">Segurança: o jogo só observa. Fogo, forno e panela quente são coisa de adulto. Nunca misture produtos de limpeza, porque algumas misturas soltam gases perigosos, e não prove leite ou comida estragada.</p>
 
@@ -640,6 +641,7 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
@@ -677,6 +679,7 @@ p, li, blockquote {
   }
 
   function mostrarRodada() {
+    Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
     $("conferir").hidden = true

@@ -11,6 +11,6 @@ Um jogo para a Educação Infantil: a criança toca nas cores e nas formas que o
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/bichos-do-pampa/ |
 | Autoria      | Arthur Medeiros e Paulo Severo |
 
-Os bichos são do Pampa: vaca, ovelha, cavalo, quero-quero, capivara e tatu. Com o som ligado, o Bit fala cada pedido e cada número em voz alta, com a voz do próprio navegador, e o botão Ouvir repete o pedido. Nenhuma resposta depende de ler. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. No projetor, a tecla P liga o modo professor. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
+Os bichos são do Pampa: vaca, ovelha, cavalo, quero-quero, capivara e tatu. O botão Ouvir lê o pedido em voz alta, com a voz do próprio aparelho, e o Ler sozinho lê cada pedido e cada número assim que aparecem. Nenhuma resposta depende de ler. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. No projetor, a tecla P liga o modo professor. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
 
 Nada do que a criança faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado e as estrelas de cada fase.

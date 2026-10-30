@@ -228,6 +228,7 @@
     body { padding: 8px 12px }
     nav button { width: 80px; height: 80px }
     header, #dots { gap: 8px }
+    header { flex-wrap: wrap; justify-content: center }
     .dot { width: 22px; height: 22px }
     #budget { margin-left: 10px; padding: 1px 10px 1px 6px; font-size: 18px; border-width: 3px }
     #budget .plug { width: 20px; height: 20px }
@@ -853,7 +854,32 @@ function toggleMute() {
 // Kit de jogo do identidade-visual: casa para voltar ao menu da turma e tela cheia no topo, som guardado para todos
 // os jogos, e a tela final com Jogar de novo e Outros jogos
 document.querySelector("header").prepend(Jogo.botao("casa"))
-document.getElementById("mute").before(Jogo.botao("tela-cheia"))
+document.getElementById("mute").before(Jogo.botao("ouvir"), Jogo.botao("ler-sozinho"), Jogo.botao("tela-cheia"))
+// Ouvir: lê as instruções e o resultado de cada tela que abre (o Bit não entra, para não atrapalhar o jogo)
+Jogo.ouvir.bit = true
+{
+  const telaAberta = () => document.querySelector(".overlay.show:not(#phone)")
+  let ultima = telaAberta()?.id
+  new MutationObserver(() => {
+    const id = telaAberta()?.id
+    if (id === ultima) return
+    ultima = id
+    if (id) Jogo.ouvir.novaTela()
+    else Jogo.ouvir.parar()
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] })
+}
+Jogo.ouvir.textoDaTela(() => {
+  const aberta = document.querySelector(".overlay.show:not(#phone)")
+  const jogar = "Arraste cabos do celular até o servidor e do servidor até o banco de dados. Depois aperte o botão de ligar."
+  if (aberta?.id === "start") return ["Conecta o Sistema.", jogar, "No Normal e no Desafio o cabo é limitado: olhe o medidor lá em cima.", "Escolha a dificuldade para começar."]
+  if (aberta?.id === "win") {
+    const n = document.querySelectorAll("#stars svg:not(.off)").length
+    return `Você fez ${n} ${n === 1 ? "estrela" : "estrelas"}.`
+  }
+  if (aberta?.id === "final") return aberta.querySelector("p").textContent
+  return jogar
+})
+
 Jogo.som.aoMudar(ligado => {
   muted = !ligado
   document.getElementById("mute").innerHTML = muted ? SILENT : SOUND

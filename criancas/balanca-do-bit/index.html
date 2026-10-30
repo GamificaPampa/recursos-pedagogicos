@@ -162,7 +162,7 @@ p, li, blockquote {
           <span class="fala-bit__bit anima-flutuar"><img id="bit-img" src="/identidade-visual/mascote/bit-acenando.svg" alt="" width="128" height="128"></span>
           <p class="bubble fala-bit__balao" id="bit-balao" role="status" aria-live="polite">Oi! Eu sou o Bit.</p>
         </div>
-        <div class="missao">
+        <div class="missao" data-ouvir>
           <p class="missao__topo" id="topo">Tirar dos dois lados · equação 1 de 5</p>
           <p class="equacao" id="equacao" aria-live="polite">x + 3 = 7</p>
           <p class="missao__texto">Quanto vale o x? Deixe a caixa x sozinha num prato, sem desequilibrar a balança.</p>
@@ -184,7 +184,7 @@ p, li, blockquote {
         </div>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -204,6 +204,7 @@ p, li, blockquote {
             <li><b>No celular:</b> cada estudante resolve as três fases e escreve no caderno cada passo da equação, como na balança.</li>
             <li><b>Depois:</b> a turma inventa equações com uma balança desenhada no quadro e troca com os colegas para resolver.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
         <div class="qr">
@@ -302,6 +303,7 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
@@ -346,6 +348,7 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
   function mostrarRodada() {
+    Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("desfazer").hidden = false
     $("dica").hidden = false

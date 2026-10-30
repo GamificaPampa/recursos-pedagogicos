@@ -205,7 +205,8 @@
   /* Stacking the code under the field and shrinking the header on phones */
   @media (max-width: 600px) {
     body { padding: 8px 10px; gap: 8px }
-    header { gap: 8px }
+    header { gap: 8px; flex-wrap: wrap; justify-content: center }
+    #time { min-width: 90px }
     #lives { gap: 2px }
     #lives svg { width: 28px; height: 28px }
     #time { height: 20px; border-width: 3px }
@@ -883,7 +884,31 @@ function toggleMute() {
 // Kit de jogo do identidade-visual: casa para voltar ao menu da turma e tela cheia no topo, som guardado para todos
 // os jogos, e a tela final com Jogar de novo e Outros jogos
 document.querySelector("header").prepend(Jogo.botao("casa"))
-document.getElementById("mute").before(Jogo.botao("tela-cheia"))
+document.getElementById("mute").before(Jogo.botao("ouvir"), Jogo.botao("ler-sozinho"), Jogo.botao("tela-cheia"))
+// Ouvir: lê as instruções e o resultado de cada tela que abre (o Bit não entra, para não atrapalhar o jogo)
+Jogo.ouvir.bit = false
+{
+  const telaAberta = () => document.querySelector(".overlay.show:not(#phone)")
+  let ultima = telaAberta()?.id
+  new MutationObserver(() => {
+    const id = telaAberta()?.id
+    if (id === ultima) return
+    ultima = id
+    if (id) Jogo.ouvir.novaTela()
+    else Jogo.ouvir.parar()
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] })
+}
+Jogo.ouvir.textoDaTela(() => {
+  const aberta = document.querySelector(".overlay.show:not(#phone)")
+  if (aberta?.id === "start") return "Ninja dos Bugs. Deslize o dedo para cortar os bugs. Não corte o robô! Escolha Fácil, Normal ou Desafio para começar."
+  if (aberta?.id === "win") {
+    const n = document.querySelectorAll("#stars svg:not(.off)").length
+    return [`Você fez ${n} ${n === 1 ? "estrela" : "estrelas"}.`, document.getElementById("result").innerText]
+  }
+  if (aberta?.id === "final") return aberta.querySelector("p").textContent
+  return "Deslize o dedo para cortar os bugs. Não corte o robô!"
+})
+
 Jogo.som.aoMudar(ligado => {
   muted = !ligado
   document.getElementById("mute").innerHTML = muted ? SILENT : SOUND

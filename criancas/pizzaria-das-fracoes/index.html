@@ -194,7 +194,7 @@ p, li, blockquote {
         </div>
       </div>
 
-      <div class="fim" id="fim" hidden>
+      <div class="fim" id="fim" hidden data-ouvir-sobre>
         <div class="estrelas" id="estrelas-fim" aria-hidden="true"></div>
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
@@ -214,6 +214,7 @@ p, li, blockquote {
             <li><b>No celular:</b> cada criança joga as três fases e conta quantas estrelas fez.</li>
             <li><b>Depois:</b> desenhe pizzas e barras de chocolate no quadro e peça frações para a turma pintar no caderno.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.</li>
+            <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
           </ul>
         </div>
         <div class="qr">
@@ -315,6 +316,7 @@ p, li, blockquote {
   // e o topo ganha Outros jogos (o menu da turma) e a tela cheia
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
+  $("som").before(Jogo.botao("ouvir", { classe: "btn btn--small" }), Jogo.botao("ler-sozinho", { classe: "btn btn--small" }))
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
@@ -366,8 +368,16 @@ p, li, blockquote {
       : `Você escolheu ${k} de ${n} pedaços: <b>${k}/${n}</b>`
   }
 
+  // Ouvir: a comanda e o que fazer; a fração sai em palavras, como a criança diz ("um quarto")
+  Jogo.ouvir.textoDaTela(() => {
+    const [a, b, n] = FASES[fase].pedidos[pedido]
+    return [`${FASES[fase].nome}, pedido ${pedido + 1} de ${FASES[fase].pedidos.length}`, $("cliente").textContent,
+      NOMES[`${a}/${b}`], `A pizza está cortada em ${n} pedaços iguais. Toque nos pedaços que vão para o cliente e aperte Entregar.`]
+  })
+
   // Showing the order on the ticket and a new pizza in the oven
   function mostrarPedido() {
+    Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("entregar").hidden = false
     $("limpar").hidden = false
