@@ -332,10 +332,12 @@ p, li, blockquote {
 
   // Bit in the game card: the same Bit.diz(pose, text) the games of the org use, but big and always on screen
   const POSES = ["acenando", "pensando", "feliz", "comemorando", "ops", "formatura"]
-  POSES.forEach(pose => { new Image().src = `/identidade-visual/mascote/bit-${pose}.svg` })
+  // A pasta das poses sai da imagem do Bit, que o kit sem internet troca por um caminho relativo
+  const MASCOTE = new URL(".", document.getElementById("bit-img").src).href
+  POSES.forEach(pose => { new Image().src = `${MASCOTE}bit-${pose}.svg` })
   window.Bit = {
     diz(pose, texto) {
-      $("bit-img").src = `/identidade-visual/mascote/${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
+      $("bit-img").src = `${MASCOTE}${pose === "normal" ? "bit" : `bit-${pose}`}.svg`
       $("bit-balao").textContent = texto
       for (const parte of [$("bit-img"), $("bit-balao")]) {
         parte.classList.remove("nova")
@@ -390,7 +392,7 @@ p, li, blockquote {
   $("som").onclick = () => Jogo.som.mudar()
   Jogo.som.aoMudar(ligado => { comSom = ligado; desenharSom() })
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }))
-  document.querySelector('.topo > a.btn[href$="/turma/"]').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
+  document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // ---- The circuit drawing: loop from x 40 to 360, top wire at y 60, bottom wire at y 250 ----
   const X0 = 40, X1 = 360, YT = 60, YB = 250, YM = 155, TINTA = "#2f2a4a"
