@@ -49,7 +49,7 @@
     $('#es-fix').addEventListener('click', function(){ decide('fix'); });
     $('#es-ok').addEventListener('click', function(){ decide('ok'); });
     window.addEventListener('keydown', onKey);
-    count = 0; streak = 0; st = { right:0, wrong:0, bugs:0 };
+    count = 0; streak = 0; st = { right:0, wrong:0, bugs:0, kinds:{} };
     decided = true;
     newOrder(false);
     alive = true;
@@ -182,6 +182,21 @@
     return 'O botão devia ser "' + BTNS[order.btn].n + '"!';
   }
 
+  // O tipo do erro da rodada, para o resumo da turma no telão (sem dado pessoal)
+  function errorKindOf(choice){
+    if(choice === 'timeout') return 'tempo';
+    if(choice === 'fix') return 'certo';
+    if(cur.bug) return 'bug';
+    if(cur.pet !== order.pet) return 'bicho';
+    if(cur.color !== order.color) return 'cor';
+    return 'botao';
+  }
+  function errorKind(){
+    var best = '', n = 0;
+    ['bug', 'bicho', 'cor', 'botao', 'certo', 'tempo'].forEach(function(k){ if((st.kinds[k] || 0) > n){ best = k; n = st.kinds[k]; } });
+    return best;
+  }
+
   function decide(choice){
     if(decided || !api.running || A.paused) return;
     decided = true;
@@ -211,6 +226,7 @@
       nextT = A.later(nextCard, 420);
     } else {
       streak = 0; st.wrong++;
+      var kind = errorKindOf(choice); st.kinds[kind] = (st.kinds[kind] || 0) + 1;
       api.loseLife(explain(choice));
       nextT = A.later(nextCard, 1100);
     }
@@ -309,7 +325,7 @@
     real:'Times de QA (qualidade) escrevem testes de aceitação baseados nos requisitos do cliente. Muitos são testes automatizados, que rodam sozinhos toda vez que alguém muda o código.',
     ranks:[[380, 'trofeu', 'Chefe de Qualidade'], [240, 'ouro', 'Testador(a) Expert'], [120, 'lupa', 'Testador(a)'], [0, 'broto', 'Estagiário(a) de Testes']],
     setup:setup, start:start, stop:stop, destroy:destroy,
-    drawIcon:drawIcon,
+    drawIcon:drawIcon, errorKind:errorKind,
     stats:function(){
       return [
         ['certo', st.right + (st.right === 1 ? ' acerto' : ' acertos')],
