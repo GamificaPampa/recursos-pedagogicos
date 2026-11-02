@@ -20,3 +20,5 @@ O botão "Resumo da turma" do telão abre os números da sala (jogadas, apelidos
 Para testar mudanças, use uma cópia com outro canal de placar: o canal deste jogo, com o código da sala no fim, é o que aparece no telão das turmas.
 
 No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.
+
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.

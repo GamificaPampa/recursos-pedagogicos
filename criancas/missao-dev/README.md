@@ -14,3 +14,5 @@ Cinco desafios rápidos para sentir como é pensar como quem cria software: mont
 É o jogo mais antigo da coleção e ainda usa o visual escuro da primeira versão, diferente do estilo de jogo do GamificaPampa.
 
 No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar.
+
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.

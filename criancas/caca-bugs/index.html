@@ -193,6 +193,44 @@
   }
   @media (prefers-reduced-motion: reduce){ .cloud,.logo span,.hero,.medal,.bug svg,.bug .legs{animation:none!important;} }
 </style>
+
+<style>
+  /* Para usar na aula: a parte do professor, embaixo do jogo, com o cartão e os botões das páginas do GamificaPampa.
+     Fica toda aqui dentro de #na-aula para não se misturar com o .btn e o .card do jogo. O modo telão (T) a esconde */
+  #na-aula { position: relative; z-index: 1; box-sizing: border-box; width: min(1000px, 100% - 32px); margin: 24px auto 56px; padding: clamp(18px, 3vw, 30px); background: #fff; color: #2f2a4a; border: 4px solid #2f2a4a; border-radius: clamp(22px, 3vw, 32px); box-shadow: 0 8px 0 #2f2a4a; font: 500 18px/1.45 "Fredoka", "Trebuchet MS", system-ui, sans-serif; text-align: left; -webkit-user-select: text; user-select: text; cursor: auto }
+  #na-aula *, #na-aula *::before, #na-aula *::after { box-sizing: border-box }
+  #na-aula h2, #na-aula h3 { color: #2f2a4a; font-weight: 700; line-height: 1.05; letter-spacing: -.012em; text-wrap: balance }
+  #na-aula h2 { margin: 0 0 14px; font-size: clamp(28px, 5vw, 40px) }
+  #na-aula h3 { margin: 22px 0 8px; font-size: 22px }
+  #na-aula p, #na-aula li { margin: 0 0 8px; font-size: 18px }
+  #na-aula ul { margin: 0; padding-left: 22px }
+  #na-aula a:not(.btn) { color: #2f2a4a; font-weight: 600; text-underline-offset: 3px }
+  #na-aula .usos { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: start }
+  #na-aula .qr { display: grid; justify-items: center; gap: 4px; padding: 12px; background: #fff; border: 4px solid #2f2a4a; border-radius: 20px; text-align: center; font-size: 14px; font-weight: 600 }
+  #na-aula .qr svg { width: 150px; height: 150px }
+  #na-aula .mensagem { margin: 0 0 10px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed #2f2a4a; border-radius: 16px; white-space: pre-wrap; font-weight: 500 }
+  #na-aula .mensagem b { display: block; margin-bottom: 4px }
+  #na-aula .linha { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 0 }
+  #na-aula .btn { --c: #fff; --drop-y: 5px; position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: auto; min-height: 48px; margin: 0; padding: 4px 20px; border: 3px solid #2f2a4a; border-radius: 999px; background: var(--c); color: #2f2a4a; font: 600 16px/1.2 "Fredoka", "Trebuchet MS", system-ui, sans-serif; letter-spacing: .005em; text-align: center; text-decoration: none; box-shadow: inset 0 -5px 0 rgb(47 42 74 / .14), inset 0 3px 0 rgb(255 255 255 / .6), 0 var(--drop-y) 0 #2f2a4a, 0 calc(var(--drop-y) + 6px) 12px rgb(47 42 74 / .12); cursor: pointer; transition: transform .12s ease, box-shadow .12s ease }
+  #na-aula .btn::after { content: ""; position: absolute; inset: -4px; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .65) 50%, transparent 65%); translate: -110% 0; transition: translate .6s ease }
+  #na-aula .btn:hover::after { translate: 110% 0 }
+  #na-aula .btn:hover { --drop-y: 2px; transform: translateY(3px) }
+  #na-aula .btn:active { --drop-y: 0px; transform: translateY(5px) }
+  #na-aula .btn:focus-visible { outline: 4px solid #ff5f8f; outline-offset: 3px }
+  #na-aula .btn--conhecer { --c: #ffd23f }
+  #na-aula .btn svg { flex: none; width: 22px; height: 22px }
+  @media (max-width: 760px) {
+    #na-aula .usos { grid-template-columns: minmax(0, 1fr) }
+    #na-aula .qr { display: none }
+  }
+  @media (prefers-reduced-motion: reduce) { #na-aula .btn { transition: none } #na-aula .btn::after { display: none } }
+
+  /* O jogo ocupa a tela e a página rola até "Para usar na aula". Durante a rodada a tela é só do jogo, sem rolar */
+  html { overflow-y: auto; background: var(--sky2) }
+  body { overflow-x: clip; overflow-y: visible }
+  html:has(#scr-game:not([hidden])) { overflow: hidden }
+  body:has(#scr-game:not([hidden])) #na-aula { display: none }
+</style>
 </head>
 <body data-telao="sem-zoom">
 <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
@@ -273,6 +311,58 @@
     <button class="btn" id="btn-again" type="button" data-icone="repetir">Jogar de novo</button>
   </section>
 </div>
+<section class="card aula" id="na-aula" aria-labelledby="titulo-aula">
+  <h2 id="titulo-aula">Para usar na aula</h2>
+  <div class="usos">
+    <div>
+      <h3>O que a turma aprende</h3>
+      <p>Que bug é um erro no programa e que quem cria software passa muito tempo testando para achar os bugs antes de quem usa o app. Cada bug que escapa estraga uma parte do app da escola, como o menu, a foto do dia ou a lição de casa.</p>
+      <h3>Como jogar com a turma</h3>
+      <ul>
+      <li><b>No projetor:</b> abra a <a href="estande.html">tela do placar</a>, com o QR code e o código da sala. A turma joga no celular e o placar aparece ao vivo, só com apelidos sorteados, sem nome.</li>
+      <li><b>No celular:</b> cada criança joga rodadas de 30 segundos e tenta bater o próprio recorde. Os bugs dourados valem mais.</li>
+      <li><b>Depois:</b> pergunte que bugs a turma já viu em apps e jogos (travou, fechou sozinho, a foto não carregou) e quem deveria ter achado esse erro antes.</li>
+      <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) deixa a tela só para o jogo, no telão, e esconde esta parte.</li>
+      <li>O botão Ouvir, o alto-falante no topo da tela de início, lê a história, as regras e o resultado em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
+      </ul>
+    </div>
+    <div class="qr">
+      <svg viewBox="0 0 45 45" shape-rendering="crispEdges" role="img" aria-label="QR code do jogo"><use href="#qr-jogo"/></svg>
+      Jogue no celular
+    </div>
+  </div>
+
+  <h3>Faça um jogo parecido com o Gemini</h3>
+  <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+  <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo para crianças de [7 a 10 anos] em que [insetos] aparecem na tela de [um celular desenhado] e a criança toca neles para consertar [o app da escola] antes que o tempo acabe.</p>
+  <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases, com os insetos cada vez mais rápidos], [insetos dourados que valem mais], rodadas de [30 segundos], alvos grandes para o dedo, um som curto no acerto, uma frase no fim explicando o que é um bug e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
+  <div class="linha">
+    <button class="btn btn--small" type="button" data-copiar="msg1">Copiar a mensagem 1</button>
+    <button class="btn btn--small" type="button" data-copiar="msg2">Copiar a mensagem 2</button>
+    <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/passo-a-passo.html#canvas"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Como abrir o Canvas</a>
+    <a class="btn btn--small btn--conhecer" href="https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/biblioteca.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Mais prompts na Biblioteca</a>
+  </div>
+</section>
+<!-- QR code do endereço do jogo, gerado com equipe/ferramentas/qr.py -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><symbol id="qr-jogo" viewBox="0 0 45 45"><rect width="45" height="45" fill="#fff"/><path stroke="#000" d="M4 4.5h7m4 0h1m2 0h2m5 0h1m1 0h1m4 0h1m1 0h7m-37 1h1m5 0h1m2 0h5m1 0h1m4 0h3m4 0h1m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h4m4 0h1m4 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m6 0h1m4 0h2m1 0h2m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h1m1 0h6m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m3 0h3m1 0h2m7 0h1m1 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m1 0h1m3 0h1m1 0h4m1 0h1m2 0h1m1 0h1m-27 1h1m1 0h5m2 0h2m1 0h1m3 0h1m5 0h6m2 0h5m-35 1h3m5 0h1m6 0h1m2 0h1m1 0h1m1 0h3m3 0h2m1 0h1m1 0h1m1 0h1m-36 1h1m1 0h1m2 0h2m1 0h1m1 0h2m2 0h6m1 0h1m5 0h6m2 0h2m-37 1h1m3 0h2m1 0h1m7 0h1m3 0h3m2 0h1m2 0h1m1 0h1m1 0h2m3 0h1m-37 1h2m2 0h5m1 0h1m1 0h1m2 0h3m1 0h2m1 0h1m1 0h4m1 0h2m1 0h5m-36 1h1m1 0h1m3 0h1m2 0h1m2 0h2m1 0h1m2 0h5m4 0h1m2 0h1m-30 1h2m2 0h1m1 0h2m1 0h3m1 0h2m1 0h1m1 0h3m4 0h2m1 0h4m1 0h2m-36 1h1m5 0h1m2 0h1m2 0h1m1 0h2m2 0h5m2 0h2m1 0h1m1 0h2m3 0h1m-37 1h1m3 0h3m2 0h1m1 0h1m1 0h1m4 0h3m1 0h1m1 0h3m3 0h1m1 0h1m1 0h3m-36 1h1m3 0h1m2 0h1m1 0h1m2 0h4m4 0h1m1 0h1m2 0h1m1 0h1m2 0h1m3 0h1m-36 1h1m1 0h5m1 0h1m3 0h1m7 0h3m4 0h2m1 0h3m1 0h3m-36 1h2m2 0h1m3 0h1m1 0h2m3 0h1m4 0h4m1 0h2m1 0h2m5 0h1m-37 1h1m1 0h1m2 0h3m1 0h3m1 0h2m2 0h1m4 0h1m1 0h3m2 0h2m1 0h3m-34 1h1m1 0h3m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m-32 1h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4m2 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-37 1h2m2 0h1m4 0h1m2 0h2m3 0h7m2 0h1m1 0h2m1 0h2m2 0h2m-37 1h2m2 0h1m1 0h2m6 0h3m2 0h1m2 0h4m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h6m1 0h1m1 0h1m1 0h1m3 0h1m2 0h1m1 0h4m1 0h1m2 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m1 0h1m1 0h2m1 0h1m5 0h5m6 0h2m1 0h1m1 0h1m2 0h3m-37 1h1m1 0h1m4 0h2m1 0h4m1 0h1m2 0h4m2 0h1m1 0h1m2 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h4m2 0h1m2 0h3m1 0h1m4 0h11m-27 1h1m2 0h2m1 0h1m1 0h1m2 0h3m1 0h6m3 0h2m-34 1h7m2 0h3m1 0h4m1 0h1m1 0h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h3m-37 1h1m5 0h1m1 0h2m3 0h1m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m3 0h2m2 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h2m3 0h2m4 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h4m6 0h1m5 0h2m1 0h1m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h4m5 0h2m1 0h1m1 0h1m4 0h2m5 0h3m-37 1h1m5 0h1m3 0h1m5 0h1m2 0h3m1 0h2m3 0h1m1 0h1m1 0h1m3 0h1m-37 1h7m1 0h1m2 0h1m1 0h2m2 0h1m1 0h1m2 0h1m1 0h3m2 0h1m2 0h5"/></symbol></svg>
+<script>
+  // Copiar as mensagens para o Gemini
+  document.querySelectorAll("#na-aula [data-copiar]").forEach(botao => {
+    botao.onclick = async () => {
+      const caixa = document.getElementById(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
+      const original = botao.textContent
+      try {
+        await navigator.clipboard.writeText(texto)
+        botao.textContent = "Copiada!"
+      } catch {
+        getSelection().selectAllChildren(caixa)
+        botao.textContent = "Selecionada: copie com Ctrl+C"
+      }
+      setTimeout(() => botao.textContent = original, 2500)
+    }
+  })
+</script>
+
 <canvas id="confetti"></canvas>
 
 <script src="/identidade-visual/js/icones.js"></script>
