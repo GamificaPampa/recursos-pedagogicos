@@ -137,6 +137,12 @@
   .btn.save[aria-pressed="true"] svg path { fill: #ffd23f }
   .chip.meus svg path { fill: #ffd23f; stroke: #2f2a4a; stroke-width: 2.4; stroke-linejoin: round }
   .meus-chips { margin-bottom: 4px }
+  /* Calendário da escola: a etiqueta com a data, o aviso da próxima data e o destaque dos cartões do mês */
+  .tag.data { --c: #fff1a8 }
+  .tag.vem { display: none; --c: var(--yellow) }
+  .pcard.proxima { outline: 4px dashed var(--ink); outline-offset: 5px; scroll-margin-top: 90px }
+  .pcard.proxima .tag.vem { display: inline-block }
+  .cal-proxima { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; padding: 8px 12px; background: #fff1a8; border: 3px dashed var(--ink); border-radius: 14px; font-weight: 600 }
   .local { margin: 8px 0 14px; font-size: 15px; font-weight: 600; color: var(--soft) }
   .pcard.simples pre { max-height: 320px; margin: 0; padding: 10px 12px; overflow: auto; background: var(--sky2); border-radius: 12px; font: 500 15px/1.4 var(--font); white-space: pre-wrap; overflow-wrap: anywhere }
   .pcard.simples .renomear { display: grid; gap: 8px; margin: 4px 0 10px }
@@ -201,6 +207,8 @@
     .pcard h3 { font-size: 20px }
     .part { padding: 8px 10px 10px; border-left-width: 8px }
     .own { font-size: 17px }
+    /* Meus prompts e Calendário ficam um embaixo do outro, sem deslizar */
+    .chips.meus-chips { flex-wrap: wrap; margin: 0; padding: 0 0 4px; overflow: visible }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important }
@@ -253,8 +261,8 @@
 </section>
 
 <section class="card filters" aria-label="Filtros">
-  <div class="chips meus-chips" role="group" aria-label="Meus prompts"><button type="button" class="chip has-icon meus" data-filter="meus" data-value="1" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Meus prompts<small>os que você guardou</small></span><span class="n"></span></button></div>
-  <p class="local">Ficam só neste aparelho e neste navegador. Nada vai para a internet.</p>
+  <div class="chips meus-chips" role="group" aria-label="Meus prompts e Calendário da escola"><button type="button" class="chip has-icon meus" data-filter="meus" data-value="1" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Meus prompts<small>os que você guardou</small></span><span class="n"></span></button><button type="button" class="chip has-icon cal" data-filter="cal" data-value="1" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="21" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><path d="M4 11 A4 4 0 0 1 8 7 H24 A4 4 0 0 1 28 11 V14 H4 Z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M11 4 V9 M21 4 V9" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/><rect x="17" y="18" width="6" height="6" rx="1.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2"/></svg><span>Calendário da escola<small>as datas do ano, em ordem</small></span><span class="n"></span></button></div>
+  <p class="local">Os prompts guardados ficam só neste aparelho e neste navegador. Nada vai para a internet.</p>
   <label class="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff1a8" stroke="#2f2a4a" stroke-width="2.6"/><path d="M15 15 L21 21" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/></svg>
     <input type="search" id="search" placeholder="Buscar: frações, Pampa, redação, Enem..." aria-label="Buscar nos prompts" autocomplete="off">
@@ -269,6 +277,7 @@
     <span id="count" aria-live="polite"></span>
     <button type="button" class="light-btn" id="clear" hidden>Limpar filtros</button>
   </div>
+  <p class="cal-proxima" id="cal-proxima" hidden><span id="cal-texto"></span><button type="button" class="light-btn" id="cal-ir">Ir para lá</button></p>
 </section>
 
 <h2 class="sr-only">Prompts</h2>
@@ -355,6 +364,8 @@
 // stage: "infantil", "iniciais", "finais", "medio" or "eja". kind: one of the keys of KINDS, further down.
 // The parts the teacher should change go between [colchetes]. "tip" is optional.
 // A format line that starts with "MATERIAL" becomes the space where the teacher pastes the material.
+// Calendário da escola: "data" (opcional) é "MM-DD", ou só "MM" quando o dia muda a cada ano (Festa junina, volta às aulas).
+// "dataNome" é o nome da data, e "dataTexto" troca o que aparece na etiqueta quando o mês sozinho não basta.
 const PROMPTS = [
   // Educação Infantil
   {
@@ -537,6 +548,81 @@ const PROMPTS = [
     tip: "Confira as datas e os pedidos antes de enviar. Quem conhece as famílias da turma é você.",
   },
 
+  // Calendário da escola, Educação Infantil
+  {
+    title: "Volta às aulas: história para os primeiros dias",
+    stage: "infantil", kind: "historia",
+    data: "02", dataNome: "Volta às aulas", dataTexto: "Início do ano letivo",
+    area: "Escuta, fala, pensamento e imaginação",
+    role: "Você é um(a) professor(a) de Educação Infantil experiente, que conhece a BNCC e sabe acolher crianças pequenas nos primeiros dias de aula.",
+    task: "Escreva uma história curta e acolhedora sobre [um tatu que chega com medo no primeiro dia de escola e descobre que ali também tem gente para cuidar dele].",
+    context: [
+      "A turma é da Educação Infantil, com crianças de [4 anos], e muitas estão chegando à escola pela primeira vez.",
+      "A história vai ser lida em voz alta na roda, nos primeiros dias, para conversar sobre o medo, a saudade de casa e as novidades da escola.",
+      "As crianças devem perceber: [que é normal sentir saudade, que a família volta para buscar e que na escola tem adultos e colegas para brincar e ajudar].",
+      "Use português do Brasil e exemplos do dia a dia das crianças brasileiras.",
+    ],
+    format: [
+      "Um título e de 5 a 7 parágrafos bem curtos, para ler em voz alta em poucos minutos.",
+      "Uma frase que se repete, como um combinado da turma, para as crianças falarem junto.",
+      "Nada de música nem letra de canção: só a história.",
+      "Onde sugerir imagem, descreva entre parênteses, para eu desenhar ou buscar.",
+      "No fim, 3 perguntas para a roda e uma ideia de brincadeira para as crianças aprenderem o nome dos colegas.",
+    ],
+    tip: "Leia a história antes, em voz alta. Na roda, deixe cada criança falar só se quiser: nos primeiros dias, ouvir já é participar.",
+  },
+  {
+    title: "Dia do Folclore: brincadeiras de antigamente no pátio",
+    stage: "infantil", kind: "brincadeira",
+    data: "08-22", dataNome: "Dia do Folclore",
+    area: "Corpo, gestos e movimentos",
+    role: "Você é um(a) professor(a) de Educação Infantil experiente, que conhece a BNCC e sabe criar brincadeiras de movimento para crianças pequenas.",
+    task: "Crie uma manhã de brincadeiras tradicionais para o Dia do Folclore, com [amarelinha, cabra-cega, passa-anel e corrida do saco].",
+    context: [
+      "A turma é da Educação Infantil, com [20] crianças de [5 anos], e o trabalho é no campo de experiência \"Corpo, gestos e movimentos\".",
+      "As crianças ainda não leem: todas as instruções são faladas e mostradas pelo professor.",
+      "A ideia é valorizar o que as famílias brincavam quando eram crianças.",
+      "O espaço é [o pátio da escola], e o tempo disponível é [40 minutos].",
+      "Ninguém fica de fora: sem eliminação e com um jeito de participar para quem tem pouca mobilidade.",
+      "Não escreva letras de cantigas nem de músicas. Se uma brincadeira tiver cantiga, diga só o nome dela, para eu procurar.",
+      "Use português do Brasil e exemplos do dia a dia das crianças brasileiras.",
+    ],
+    format: [
+      "As regras de cada brincadeira em frases curtas, do jeito que o professor vai falar para as crianças.",
+      "A ordem das brincadeiras, da mais calma para a mais agitada, com o tempo de cada uma, e um momento final para voltar à calma.",
+      "A lista de materiais, de preferência de sucata.",
+      "Cuidados de segurança e uma versão para dia de chuva, dentro da sala.",
+      "No fim, um bilhete curto convidando as famílias a contar uma brincadeira da infância delas, sem pedir nenhum dado pessoal.",
+    ],
+    tip: "Se o Gemini escrever a letra de uma cantiga mesmo assim, confira com alguém que conhece: ele costuma inventar versos.",
+  },
+  {
+    title: "Dia das Crianças: oficina de brinquedos de sucata",
+    stage: "infantil", kind: "plano",
+    data: "10-12", dataNome: "Dia das Crianças",
+    area: "O eu, o outro e o nós",
+    role: "Você é um(a) professor(a) de Educação Infantil experiente, que conhece a BNCC e sabe criar planos de aula para crianças pequenas.",
+    task: "Crie um plano de aula para o Dia das Crianças: uma oficina em que as crianças montam [brinquedos de sucata, como vai e vem de garrafa PET e bilboquê] e depois brincam juntas.",
+    context: [
+      "A turma é da Educação Infantil, com [20] crianças de [5 anos], e o trabalho é no campo de experiência \"O eu, o outro e o nós\".",
+      "As crianças ainda não leem: as instruções são faladas e mostradas pelo professor, passo a passo.",
+      "O dia é para lembrar que toda criança tem direito de brincar. Ninguém precisa trazer brinquedo comprado nem presente.",
+      "As crianças devem aprender: [montar um brinquedo com ajuda, dividir os materiais e brincar junto com os colegas].",
+      "Materiais que temos: [garrafas PET, tampinhas, barbante, fita crepe e papel colorido]. Nada cortante nem peça pequena que a criança possa engolir.",
+      "O tempo disponível é [uma manhã de 2 horas].",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Use português do Brasil e exemplos do dia a dia das crianças brasileiras.",
+    ],
+    format: [
+      "Uma tabela com objetivos de aprendizagem da BNCC, materiais e tempo total.",
+      "O passo a passo da oficina com o tempo de cada parte, e o que o professor prepara antes.",
+      "O jeito de montar cada brinquedo em passos curtos, com a imagem de cada passo descrita entre parênteses.",
+      "Um momento final em roda para cada criança mostrar o brinquedo, só se quiser.",
+      "Uma adaptação para quem tiver dificuldade com as mãos.",
+    ],
+    tip: "Monte um brinquedo de cada antes da aula, para saber quanto tempo leva e o que a criança consegue fazer sozinha.",
+  },
+
   // Ensino Fundamental, anos iniciais
   {
     title: "Frações na pizza: metade, terço e quarto",
@@ -585,6 +671,7 @@ const PROMPTS = [
   {
     title: "O Saci na Semana do Folclore",
     stage: "iniciais", kind: "historia",
+    data: "08-22", dataNome: "Dia do Folclore",
     area: "Língua Portuguesa",
     role: "Você é um(a) professor(a) experiente de Língua Portuguesa dos anos iniciais do Ensino Fundamental, que conhece a BNCC e sabe escrever histórias para ler com a turma.",
     task: "Escreva uma história curta e divertida sobre [o Saci, que aparece na escola durante a Semana do Folclore].",
@@ -711,6 +798,84 @@ const PROMPTS = [
       "MATERIAL PARA REVISAR:\n[cole aqui o seu material, sem nomes de alunos]",
     ],
     tip: "Quem decide o que mudar é você: o Gemini também pode apontar problemas que não existem.",
+  },
+
+  // Calendário da escola, anos iniciais
+  {
+    title: "Dia do Livro Infantil: ficha de indicação e troca de livros",
+    stage: "iniciais", kind: "atividade",
+    data: "04-18", dataNome: "Dia Nacional do Livro Infantil",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa dos anos iniciais do Ensino Fundamental, que conhece a BNCC e sabe formar leitores.",
+    task: "Crie uma atividade para imprimir para o Dia Nacional do Livro Infantil: uma ficha em que cada criança indica a um colega um livro que leu.",
+    context: [
+      "A turma é do [3º ano] do Ensino Fundamental, com crianças de [8 e 9 anos], e o componente é Língua Portuguesa.",
+      "O 18 de abril é a data do nascimento de Monteiro Lobato. A atividade é sobre o gosto de ler, não sobre um autor só.",
+      "As crianças escolhem livros da [biblioteca da escola]. Não indique títulos nem autores: quem escolhe o livro é a criança.",
+      "As crianças devem aprender: [contar do que trata um livro sem contar o final e dizer por que um colega gostaria de ler].",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Use português do Brasil e exemplos do dia a dia das crianças brasileiras.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e campos para preencher: título do livro, autor, um desenho da parte preferida e \"leia porque...\".",
+      "Uma fileira de 1 a 5 estrelas para a criança dar a nota do livro.",
+      "Onde houver desenho, descreva a imagem entre parênteses, sem desenhar com letras e símbolos.",
+      "Escreva a folha em texto normal, fora de bloco de código.",
+      "No fim, separado, um passo a passo curto para o professor montar um varal de indicações e uma troca de livros na sala.",
+    ],
+    tip: "Se for ler Monteiro Lobato com a turma, leia o livro antes: algumas obras dele têm trechos racistas, que hoje são discutidos nas escolas e pedem uma conversa com as crianças.",
+  },
+  {
+    title: "Dia dos Povos Indígenas: os povos que vivem no RS hoje",
+    stage: "iniciais", kind: "plano",
+    data: "04-19", dataNome: "Dia dos Povos Indígenas",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História dos anos iniciais do Ensino Fundamental, que conhece a BNCC e trata a diversidade com respeito.",
+    task: "Crie um plano de aula para o Dia dos Povos Indígenas sobre [os povos indígenas que vivem no Rio Grande do Sul hoje, como os Kaingang, os Guarani Mbya e os Charrua].",
+    context: [
+      "A turma é do [4º ano] do Ensino Fundamental, com [25] crianças de [9 e 10 anos], e o componente é História.",
+      "Até 2022, a data se chamava Dia do Índio. Explique às crianças por que o nome mudou: são muitos povos, cada um com a sua língua e o seu jeito de viver.",
+      "Mostre os indígenas como povos de hoje, que estudam, trabalham e vivem em aldeias e em cidades. Nada de cocar de papel, pintura no rosto ou fantasia.",
+      "As crianças devem aprender: [que existem muitos povos indígenas diferentes, que eles fazem parte do Brasil de hoje e que muitas palavras e alimentos do nosso dia a dia vêm deles].",
+      "Não invente palavras em línguas indígenas, nomes de aldeias nem números de população. Onde precisar de um desses dados, escreva [conferir a fonte].",
+      "O tempo disponível é [uma aula de 50 minutos].",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Use português do Brasil.",
+    ],
+    format: [
+      "Uma tabela com objetivos, habilidades da BNCC, materiais e tempo total.",
+      "O passo a passo da aula com o tempo de cada parte: abertura, desenvolvimento e fechamento.",
+      "Uma conversa de abertura que parta do que as crianças já sabem e desfaça ideias erradas sem expor ninguém.",
+      "Como perceber se as crianças aprenderam.",
+      "No fim, uma lista do que o professor precisa conferir antes da aula.",
+    ],
+    tip: "Procure livros e vídeos feitos por autores indígenas para mostrar à turma. Confira cada palavra em língua indígena antes de usar: o Gemini pode inventar.",
+  },
+  {
+    title: "Semana do Meio Ambiente: jogo Guardiões do Pampa",
+    stage: "iniciais", kind: "jogo",
+    data: "06-05", dataNome: "Semana do Meio Ambiente",
+    area: "Ciências",
+    role: "Você é um(a) professor(a) experiente de Ciências dos anos iniciais do Ensino Fundamental, que conhece a BNCC e sabe criar jogos educativos digitais.",
+    task: "Crie um jogo educativo interativo chamado [Guardiões do Pampa], sobre [cuidar do bioma Pampa], para jogar no navegador.",
+    context: [
+      "É para a Semana do Meio Ambiente, na semana de 5 de junho, o Dia Mundial do Meio Ambiente.",
+      "A turma é do [5º ano] do Ensino Fundamental, com crianças de [10 e 11 anos], e o componente é Ciências.",
+      "As crianças devem aprender: [reconhecer bichos e plantas do Pampa, como o quero-quero, o graxaim e o umbu, e o que ajuda ou prejudica o bioma, como o lixo no campo, as queimadas e o cuidado com a água].",
+      "Não invente números sobre o Pampa, como área ou quantidade de espécies.",
+      "Vai ser usado [no celular ou tablet de cada criança].",
+      "Use português do Brasil e exemplos do dia a dia das crianças gaúchas.",
+    ],
+    format: [
+      "Um único arquivo HTML que funcione no navegador do celular e do computador, sem instalar nada.",
+      "Botões grandes e fáceis de tocar, cores alegres e visual de desenho.",
+      "Uma tela inicial com o nome do jogo e instruções bem curtas.",
+      "3 fases, da mais fácil para a mais difícil: [reconhecer os bichos e as plantas, separar o lixo certo e escolher a atitude que protege o Pampa].",
+      "Retorno na hora a cada resposta: verde e um som alegre no acerto, vermelho e uma dica no erro.",
+      "No fim, estrelas pelo desempenho e um botão para jogar de novo.",
+      "Tudo em português do Brasil, sem anúncios, sem links para outros sites e sem pedir dados das crianças.",
+    ],
+    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Jogue uma vez até o fim antes de usar com a turma.",
   },
 
   // Ensino Fundamental, anos finais
@@ -1021,6 +1186,82 @@ const PROMPTS = [
     ],
     tip: "Refaça você mesmo as contas em que o Gemini apontou erro: ele também pode errar a conta de conferência.",
   },
+  // Calendário da escola, anos finais
+  {
+    title: "Festa junina: as contas da barraca",
+    stage: "finais", kind: "atividade",
+    data: "06", dataNome: "Festa junina",
+    area: "Matemática",
+    role: "Você é um(a) professor(a) experiente de Matemática dos anos finais do Ensino Fundamental, que conhece a BNCC e ensina com situações do dia a dia.",
+    task: "Crie uma atividade para imprimir sobre [as contas de uma barraca da festa junina da escola: preço, troco, lucro e porcentagem].",
+    context: [
+      "A turma é do [7º ano] do Ensino Fundamental, com estudantes de [12 e 13 anos], e o componente é Matemática.",
+      "A barraca vende comidas típicas, como [pipoca, pinhão, pé de moleque e cachorro-quente].",
+      "Os estudantes devem aprender: [calcular o custo, o preço de venda, o troco e o lucro, e usar porcentagem simples, como 10% e 25%].",
+      "Use valores de exemplo e deixe claro que são de exemplo.",
+      "Não ridicularize o povo do campo: nada de caipira desdentado ou que \"fala errado\".",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Use português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e uma tabela de preços da barraca, montada no texto.",
+      "5 problemas, do mais fácil para o mais difícil, terminando com um desafio: [quantos pacotes de pipoca é preciso vender para pagar o milho e o óleo].",
+      "Escreva a folha em texto normal, fora de bloco de código, sem letras de música de quadrilha.",
+      "No fim, separado, o gabarito com a conta passo a passo.",
+    ],
+    tip: "Refaça as contas do gabarito antes de imprimir. Se a escola fizer a festa de verdade, troque os preços de exemplo pelos da barraca da turma.",
+  },
+  {
+    title: "Semana da Pátria: quiz da Independência com mais gente na história",
+    stage: "finais", kind: "quiz",
+    data: "09-07", dataNome: "Semana da Pátria",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História dos anos finais do Ensino Fundamental, que conhece a BNCC e ensina a ler a história com olhar crítico.",
+    task: "Crie um quiz de 10 perguntas sobre [a Independência do Brasil e quem participou dela além de Dom Pedro].",
+    context: [
+      "A turma é do [8º ano] do Ensino Fundamental, com estudantes de [13 e 14 anos], e o componente é História.",
+      "Os estudantes devem aprender: [que a Independência foi um processo, com lutas em várias províncias, e que mulheres, pessoas escravizadas e indígenas também participaram, sem que todos ganhassem com ela].",
+      "Não invente nomes, datas nem frases de personagens históricos. Se não tiver certeza de um fato, deixe de fora ou marque [conferir a fonte].",
+      "Sem tom de propaganda: o quiz é para pensar a história.",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "10 perguntas de múltipla escolha, com 4 alternativas do mesmo tamanho, da mais fácil para a mais difícil.",
+      "Pelo menos 3 perguntas pedem para o estudante pensar, como \"quem continuou sem direitos depois de 1822?\".",
+      "Escreva o quiz em texto, fora de bloco de código e sem usar o teste interativo.",
+      "No fim, o gabarito com uma explicação curta de cada resposta.",
+    ],
+    tip: "Confira cada nome e cada data no livro didático da turma antes de aplicar: o Gemini às vezes troca personagens e anos.",
+  },
+  {
+    title: "Semana Farroupilha: a revolução contada por todos que lutaram",
+    stage: "finais", kind: "plano",
+    data: "09-20", dataNome: "Semana Farroupilha",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História dos anos finais do Ensino Fundamental, que conhece a BNCC e a história do Rio Grande do Sul.",
+    task: "Crie um plano de aula para a Semana Farroupilha sobre [a Revolução Farroupilha vista por quem lutou nela: estancieiros, peões, Lanceiros Negros e indígenas].",
+    context: [
+      "A turma é do [8º ano] do Ensino Fundamental, com [28] estudantes de [13 e 14 anos], e o componente é História.",
+      "Trate a revolução como história e cultura do RS, com olhar crítico e plural: sem romantizar a guerra e sem tratar os líderes como heróis sem defeito.",
+      "Inclua os Lanceiros Negros, homens escravizados a quem se prometeu a liberdade, e o episódio de Porongos, e mostre que a escravidão continuou depois da paz.",
+      "Inclua também o papel dos indígenas e das mulheres e os interesses econômicos, como o preço do charque.",
+      "Respeite as famílias que vivem a tradição gaúcha: o olhar crítico é sobre a história, não sobre a cultura de cada um.",
+      "Não invente datas, números de mortos, nomes nem frases de personagens. Onde citar um fato, marque [conferir a fonte] logo depois.",
+      "O tempo disponível é [duas aulas de 50 minutos].",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma tabela com objetivos, habilidades da BNCC, materiais e tempo total.",
+      "O passo a passo de cada aula com o tempo de cada parte: abertura, desenvolvimento e fechamento.",
+      "Uma atividade em grupos em que cada grupo olha a revolução de um ponto de vista e conta para a turma o que esse grupo ganhou e o que perdeu.",
+      "Uma pergunta para fechar: [por que a história dos Lanceiros Negros ficou tanto tempo esquecida?].",
+      "Escreva tudo em texto normal, fora de bloco de código.",
+    ],
+    tip: "Confira cada fato marcado num livro de História do RS ou no acervo de um museu antes da aula. O Gemini costuma errar datas e nomes de batalhas.",
+  },
+
   // Ensino Médio
   {
     title: "Simulado no estilo do Enem: 5 questões de Matemática",
@@ -1211,6 +1452,7 @@ const PROMPTS = [
   {
     title: "História: análise de fontes sobre a Revolução Farroupilha",
     stage: "medio", kind: "atividade",
+    data: "09-20", dataNome: "Semana Farroupilha",
     area: "História",
     role: "Você é um(a) professor(a) experiente de História do Ensino Médio, que ensina a ler fontes históricas.",
     task: "Crie uma atividade de análise de fontes sobre [a Revolução Farroupilha].",
@@ -1419,6 +1661,57 @@ const PROMPTS = [
     tip: "Refaça a conta do exemplo resolvido: o Gemini erra contas, principalmente a mediana quando a lista tem uma quantidade par de valores.",
   },
 
+  // Calendário da escola, Ensino Médio
+  {
+    title: "Dia do Professor: crônica de um professor que marca",
+    stage: "medio", kind: "historia",
+    data: "10-15", dataNome: "Dia do Professor",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa do Ensino Médio, que ensina a escrever crônicas.",
+    task: "Escreva uma crônica curta, para servir de modelo, sobre [um professor que marcou a vida de uma estudante numa escola pública do interior gaúcho].",
+    context: [
+      "A turma é da [1ª série] do Ensino Médio, com estudantes de [15 e 16 anos], e o componente é Língua Portuguesa.",
+      "Depois de ler o modelo, cada estudante vai escrever a sua crônica sobre um professor que marcou a sua vida, para o Dia do Professor.",
+      "Os personagens são inventados, com nomes brasileiros comuns. Nada de homenagem melosa: a crônica pode ter humor e uma cena do dia a dia da escola.",
+      "Não cite frases de escritores nem de educadores famosos.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Um título e de 5 a 7 parágrafos curtos, em primeira pessoa.",
+      "Escreva a crônica em texto normal, fora de bloco de código.",
+      "Depois, separado, 4 marcas do gênero crônica que aparecem no modelo, com o trecho de cada uma.",
+      "Um roteiro de escrita em 4 passos para o estudante, com uma pergunta para começar cada passo.",
+    ],
+    tip: "As crônicas da turma não precisam passar pelo Gemini: o modelo serve só para ler junto. Quem quiser pode entregar a sua ao professor homenageado.",
+  },
+  {
+    title: "Consciência Negra: do Grupo Palmares, de Porto Alegre, à nossa cidade",
+    stage: "medio", kind: "plano",
+    data: "11-20", dataNome: "Dia da Consciência Negra",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História do Ensino Médio, que conhece a história e a cultura afro-brasileira.",
+    task: "Crie um plano de aula para o Dia da Consciência Negra sobre [a origem da data e a presença negra na história do Rio Grande do Sul].",
+    context: [
+      "A turma é da [2ª série] do Ensino Médio, com [30] estudantes de [16 e 17 anos], e o componente é História.",
+      "A data lembra a morte de Zumbi dos Palmares e foi proposta nos anos 1970 pelo Grupo Palmares, de Porto Alegre, do qual fazia parte o poeta Oliveira Silveira.",
+      "Não escreva poemas nem frases como se fossem de Oliveira Silveira ou de outro autor. Deixe o espaço [poema escolhido pelo professor], que eu preencho com um texto verdadeiro.",
+      "Fale do RS com olhar crítico: a escravidão nas charqueadas, os Lanceiros Negros, os clubes sociais negros e a cultura negra de hoje, como [o Carnaval e as religiões de matriz africana].",
+      "Trate o racismo como um problema de hoje, sem expor nenhum estudante e sem pedir que alguém conte o que viveu.",
+      "Não invente números, datas nem nomes. Onde citar um fato, marque [conferir a fonte] logo depois.",
+      "O tempo disponível é [duas aulas de 50 minutos].",
+      "Relacione com a BNCC. Se não tiver certeza do código da habilidade, escreva só a descrição, sem inventar o código.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma tabela com objetivos, habilidades da BNCC, materiais e tempo total.",
+      "O passo a passo de cada aula com o tempo de cada parte: abertura, desenvolvimento e fechamento.",
+      "Uma pesquisa curta em grupos sobre a presença negra na nossa cidade, com as perguntas de cada grupo.",
+      "Como perceber se os estudantes aprenderam.",
+      "Escreva tudo em texto normal, fora de bloco de código.",
+    ],
+    tip: "Confira os fatos marcados em livros de autores negros gaúchos ou em sites de universidades. A Lei 10.639 pede a história e a cultura afro-brasileira o ano inteiro, não só em novembro.",
+  },
+
   // EJA, Educação de Jovens e Adultos: linguagem adulta, exemplos do trabalho e atividades curtas
   {
     title: "Alfabetização de adultos: palavras do trabalho e da cidade",
@@ -1605,6 +1898,80 @@ const PROMPTS = [
     ],
     tip: "Leia a versão nova pensando num estudante de 50 anos: se ainda soar como aula de criança, peça para deixar mais adulta.",
   },
+  // Calendário da escola, EJA
+  {
+    title: "Dia da Mulher: dupla jornada e trabalho de cuidado",
+    stage: "eja", kind: "atividade",
+    data: "03-08", dataNome: "Dia Internacional da Mulher",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa da EJA (Educação de Jovens e Adultos), que parte da vida dos estudantes para ler e escrever.",
+    task: "Crie uma atividade para imprimir para o Dia Internacional da Mulher, sobre [a dupla jornada: o trabalho fora e o cuidado com a casa e a família].",
+    context: [
+      "A turma é da EJA, nos anos finais do Ensino Fundamental, com jovens e adultos de [18 a 60 anos], e muitas estudantes são mães e trabalhadoras.",
+      "O dia não é de dar flores: é um dia de luta por direitos. Trate o tema com respeito, sem frases feitas e sem culpar ninguém da turma.",
+      "Os estudantes devem aprender: [ler um texto informativo curto, achar a ideia principal e dar a própria opinião com um argumento].",
+      "Não invente números, pesquisas nem leis. Onde um dado ajudar, deixe o espaço [dado de uma fonte oficial] para eu preencher.",
+      "Não cite frases de pessoas famosas.",
+      "Use linguagem adulta e respeitosa, nada infantilizado.",
+      "Não cite códigos de habilidades da BNCC.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Uma folha A4 com título, espaço para o nome e um texto informativo de até 15 linhas, em linguagem simples.",
+      "4 perguntas: 2 de compreensão do texto, 1 sobre o que mudou da geração das avós para hoje e 1 de opinião, com resposta de 3 a 5 linhas.",
+      "Ninguém precisa contar a própria vida: as perguntas falam de \"muitas mulheres\" e de \"uma família\", não de \"você\".",
+      "Escreva a folha em texto normal, fora de bloco de código.",
+      "No fim, separado, as respostas esperadas e uma dica para a conversa antes da leitura.",
+    ],
+    tip: "Preencha os espaços de dado com números do IBGE antes de imprimir. Se aparecer uma frase famosa entre aspas, apague: o Gemini às vezes inventa quem disse.",
+  },
+  {
+    title: "Dia do Trabalhador: quiz sobre os direitos de quem trabalha",
+    stage: "eja", kind: "quiz",
+    data: "05-01", dataNome: "Dia do Trabalhador",
+    area: "História",
+    role: "Você é um(a) professor(a) experiente de História da EJA (Educação de Jovens e Adultos), que parte da experiência de trabalho dos estudantes.",
+    task: "Crie um quiz de 8 perguntas sobre [os direitos de quem trabalha: carteira assinada, férias, 13º salário e FGTS].",
+    context: [
+      "A turma é da EJA, nos anos finais do Ensino Fundamental, com jovens e adultos de [18 a 60 anos], muitos trabalhadores com e sem carteira assinada.",
+      "Os estudantes devem aprender: [que os direitos do trabalho foram conquistados com luta e o que cada um deles garante].",
+      "Use situações do dia a dia de uma pessoa inventada, como um contracheque, uma demissão e as férias.",
+      "Não invente artigos de lei, valores nem datas. Onde citar uma lei ou um ano, marque [conferir a fonte] logo depois.",
+      "Trate com respeito quem trabalha sem carteira, por conta própria ou em casa: ninguém deve se sentir culpado.",
+      "Use linguagem adulta e respeitosa, nada infantilizado.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "8 perguntas de múltipla escolha, com 3 alternativas cada, da mais fácil para a mais difícil.",
+      "Alternativas do mesmo tamanho, para a resposta certa não ficar óbvia.",
+      "No fim, o gabarito com uma explicação curta de cada resposta.",
+      "Escreva o quiz em texto, fora de bloco de código e sem usar o teste interativo.",
+    ],
+    tip: "Confira as regras de cada direito no site do governo federal antes de aplicar: elas mudam com o tempo. Não peça para ninguém dizer quanto ganha.",
+  },
+  {
+    title: "Fim de ano: crônica de quem voltou a estudar",
+    stage: "eja", kind: "historia",
+    data: "12", dataNome: "Natal e fim de ano",
+    area: "Língua Portuguesa",
+    role: "Você é um(a) professor(a) experiente de Língua Portuguesa da EJA (Educação de Jovens e Adultos), que ensina a escrever a partir da vida dos estudantes.",
+    task: "Escreva uma crônica curta, para servir de modelo, sobre [o fim de ano de uma pessoa que voltou a estudar depois de muitos anos].",
+    context: [
+      "A turma é da EJA, [nos anos finais do Ensino Fundamental], com jovens e adultos de [18 a 65 anos].",
+      "A crônica fala das festas de fim de ano, do cansaço, do orgulho de ter chegado até dezembro e dos planos para o ano que vem.",
+      "Nem todos festejam o Natal: trate como festas de fim de ano, com respeito a todas as religiões e a quem não tem religião.",
+      "A personagem é inventada, adulta, com nome brasileiro comum. Nada de tom de cartão de Natal nem de frase pronta.",
+      "Não cite frases de pessoas famosas nem trechos de músicas.",
+      "Use linguagem adulta e respeitosa, nada infantilizado.",
+      "Responda em português do Brasil.",
+    ],
+    format: [
+      "Um título e de 5 a 7 parágrafos curtos, para ler junto com a turma.",
+      "Escreva a crônica em texto normal, fora de bloco de código.",
+      "No fim, 3 perguntas para a turma conversar e uma proposta de escrita: [uma carta para mim mesmo, para ler no começo do ano que vem].",
+    ],
+    tip: "A carta de cada estudante é dele: quem quiser guarda em casa, sem ler em voz alta.",
+  },
 ]
 
 // Describing the five stages: the name on the tags, the ages and the colour
@@ -1629,6 +1996,9 @@ const KINDS = {
   familias: { label: "Bilhete para as famílias", tint: "#ffe3c9" },
   enem: { label: "Preparação para o Enem", tint: "#ffe1b0" },
   encceja: { label: "Preparação para o Encceja", tint: "#ffe1b0", icon: "enem" },
+  // Tipos que o Construtor guarda em Meus prompts (ainda sem prompt pronto aqui)
+  rubrica: { label: "Rubrica e devolutiva", tint: "#d4f1ff", icon: "prancheta" },
+  sequencia: { label: "Sequência didática", tint: "#e6f4c8", icon: "sequencia" },
 }
 
 
@@ -1646,7 +2016,7 @@ const escape = text => text.replace(/[&<>"]/g, character => ({ "&": "&amp;", "<"
 const fold = text => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 // O Encceja usa o mesmo desenho do Enem (o icones.js não tem um próprio)
 const iconOf = kind => Icones.svg(KINDS[kind]?.icon || kind)
-const filters = { stage: "", materia: "", kind: "", meus: "", words: [] }
+const filters = { stage: "", materia: "", kind: "", meus: "", cal: "", words: [] }
 
 // A matéria vem do campo area. Os campos de experiência da Educação Infantil entram juntos,
 // e nomes iguais viram uma matéria só (o endereço usa o nome sem acento, em minúsculas, com hífen)
@@ -1655,6 +2025,13 @@ const materiaOf = prompt => prompt.stage === "infantil" ? "Educação Infantil" 
 const materias = new Map()
 PROMPTS.forEach(prompt => { const nome = materiaOf(prompt); if (!materias.has(slug(nome))) materias.set(slug(nome), nome) })
 const materiasEmOrdem = [...materias].sort((a, b) => a[1].localeCompare(b[1], "pt-BR"))
+// Calendário da escola: a data vira chave para pôr em ordem do ano (o mês sem dia fica no fim do mês) e texto para a etiqueta
+const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
+const partesDaData = data => data.split("-").map(Number)
+const chaveData = data => { const [mes, dia] = partesDaData(data); return mes * 100 + (dia || 99) }
+const dataLegivel = prompt => { const [mes, dia] = partesDaData(prompt.data); return dia ? `${dia === 1 ? "1º" : dia} de ${MESES[mes - 1]}` : MESES[mes - 1] }
+const quandoDe = prompt => prompt.dataTexto || dataLegivel(prompt)
+const maiuscula = texto => texto[0].toUpperCase() + texto.slice(1)
 // O valor que cada filtro olha em um prompt
 const valorDe = { stage: prompt => prompt.stage, materia: prompt => slug(materiaOf(prompt)), kind: prompt => prompt.kind }
 
@@ -1698,7 +2075,7 @@ function cardHTML(prompt, index) {
       <span class="kind-icon">${iconOf(prompt.kind)}</span>
       <div>
         <h3>${escape(prompt.title)}</h3>
-        <div class="tags"><span class="tag" style="--c: ${stage.light}">${stage.label}</span><span class="tag">${kind.label}</span></div>
+        <div class="tags"><span class="tag" style="--c: ${stage.light}">${stage.label}</span><span class="tag">${kind.label}</span>${prompt.data ? `<span class="tag data">${escape(maiuscula(quandoDe(prompt)))}</span><span class="tag vem">Vem aí</span>` : ""}</div>
       </div>
     </div>
     <div class="pcard-body">
@@ -1740,7 +2117,7 @@ const cards = [...document.querySelectorAll(".pcard")]
 const chips = [...document.querySelectorAll(".chip")]
 
 // Searching in everything a teacher could type: title, stage, kind, area and the prompt itself
-const haystacks = PROMPTS.map(prompt => fold([prompt.title, STAGES[prompt.stage].label, STAGES[prompt.stage].ages, KINDS[prompt.kind].label, materiaOf(prompt), prompt.area, toText(prompt)].join(" ")))
+const haystacks = PROMPTS.map(prompt => fold([prompt.title, STAGES[prompt.stage].label, STAGES[prompt.stage].ages, KINDS[prompt.kind].label, materiaOf(prompt), prompt.area, prompt.data ? `Calendário da escola ${prompt.dataNome} ${dataLegivel(prompt)} ${prompt.dataTexto || ""}` : "", toText(prompt)].join(" ")))
 
 const matches = (index, ignore) => {
   const prompt = PROMPTS[index]
@@ -1789,15 +2166,38 @@ const itemCasa = (item, ignore) =>
   && (ignore === "materia" || !filters.materia || valorItem.materia(item) === filters.materia)
   && (ignore === "kind" || !filters.kind || valorItem.kind(item) === filters.kind)
   && filters.words.every(word => fold(item.nome + " " + item.mensagens.join(" ")).includes(word))
-const visivelB = index => matches(index) && (!filters.meus || guardadoB(index))
-const itensVisiveis = () => filters.meus ? itensC().filter(item => itemCasa(item)) : []
-// Quantos prompts cada chip mostraria. O chip Meus prompts conta como se estivesse ligado
+// O Calendário só mostra os prompts com data: os guardados do Construtor não têm data e ficam de fora
+const visivelB = index => matches(index) && (!filters.meus || guardadoB(index)) && (!filters.cal || Boolean(PROMPTS[index].data))
+const itensVisiveis = () => filters.meus && !filters.cal ? itensC().filter(item => itemCasa(item)) : []
+// Quantos prompts cada chip mostraria. Os chips Meus prompts e Calendário contam como se estivessem ligados
 function totalDoChip(filter, value) {
-  const meus = filter === "meus" || Boolean(filters.meus)
-  const bate = valor => filter === "meus" || !value || valor === value
-  const dosPrompts = PROMPTS.filter((prompt, index) => matches(index, filter) && (filter === "meus" || bate(valorDe[filter](prompt))) && (!meus || guardadoB(index))).length
-  const dosItens = meus ? itensC().filter(item => itemCasa(item, filter) && (filter === "meus" || bate(valorItem[filter](item)))).length : 0
+  const liga = filter === "meus" || filter === "cal"
+  const meus = filter === "meus" || Boolean(filters.meus), cal = filter === "cal" || Boolean(filters.cal)
+  const bate = valor => liga || !value || valor === value
+  const dosPrompts = PROMPTS.filter((prompt, index) => matches(index, filter) && (liga || bate(valorDe[filter](prompt))) && (!meus || guardadoB(index)) && (!cal || Boolean(prompt.data))).length
+  const dosItens = meus && !cal ? itensC().filter(item => itemCasa(item, filter) && (liga || bate(valorItem[filter](item)))).length : 0
   return dosPrompts + dosItens
+}
+
+// No Calendário, os cartões seguem a ordem do ano; fora dele, voltam à ordem de sempre
+let emOrdemDoAno = false
+function ordenarCartoes() {
+  if (emOrdemDoAno === Boolean(filters.cal)) return
+  emOrdemDoAno = Boolean(filters.cal)
+  const ordem = emOrdemDoAno
+    ? cards.filter((_, index) => PROMPTS[index].data).sort((a, b) => chaveData(PROMPTS[cards.indexOf(a)].data) - chaveData(PROMPTS[cards.indexOf(b)].data))
+    : cards
+  ordem.forEach(card => $("library").appendChild(card))
+}
+// A próxima data entre os cartões que aparecem: os cartões do mês dela ganham destaque e o aviso diz qual é
+function marcarProxima() {
+  const hoje = new Date(), chaveHoje = (hoje.getMonth() + 1) * 100 + hoje.getDate()
+  const comData = filters.cal ? PROMPTS.map((_, index) => index).filter(index => PROMPTS[index].data && visivelB(index)).sort((a, b) => chaveData(PROMPTS[a].data) - chaveData(PROMPTS[b].data)) : []
+  const proxima = comData.find(index => chaveData(PROMPTS[index].data) >= chaveHoje) ?? comData[0]
+  const mes = proxima === undefined ? 0 : partesDaData(PROMPTS[proxima].data)[0]
+  cards.forEach((card, index) => card.classList.toggle("proxima", Boolean(mes) && !card.hidden && Boolean(PROMPTS[index].data) && partesDaData(PROMPTS[index].data)[0] === mes))
+  $("cal-proxima").hidden = proxima === undefined
+  if (proxima !== undefined) $("cal-texto").innerHTML = `Vem aí: <b>${escape(PROMPTS[proxima].dataNome)}</b>, ${escape(quandoDe(PROMPTS[proxima]).toLowerCase())}.`
 }
 
 let renomeando = "", apagando = "", apagarTimer
@@ -1859,6 +2259,7 @@ function restaurarCampos() {
 // Filtering the cards, updating the counts and showing the empty message when nothing is left
 function applyFilters(animate = true) {
   let shown = 0
+  ordenarCartoes()
   cards.forEach((card, index) => {
     const visible = visivelB(index)
     card.hidden = !visible
@@ -1874,15 +2275,16 @@ function applyFilters(animate = true) {
     chip.classList.toggle("zero", totalDoChip(filter, value) === 0)
     chip.setAttribute("aria-pressed", String(filters[filter] === value))
   })
-  $("count").textContent = `${shown} ${shown === 1 ? "prompt" : "prompts"}${filters.meus ? " em Meus prompts" : ""}`
+  marcarProxima()
+  $("count").textContent = `${shown} ${shown === 1 ? "prompt" : "prompts"}${filters.cal ? " do calendário" : ""}${filters.meus ? " em Meus prompts" : ""}`
   const semGuardados = filters.meus && !guardados.some(item => item.origem === "biblioteca" ? PROMPTS.some((_, i) => idDe(i) === item.id) : doConstrutor(item))
   $("empty-meus").hidden = !semGuardados
   $("empty").hidden = shown > 0 || semGuardados
-  $("clear").hidden = !filters.stage && !filters.materia && !filters.kind && !filters.words.length && !filters.meus
+  $("clear").hidden = !filters.stage && !filters.materia && !filters.kind && !filters.words.length && !filters.meus && !filters.cal
 }
 
 function clearFilters() {
-  Object.assign(filters, { stage: "", materia: "", kind: "", meus: "", words: [] })
+  Object.assign(filters, { stage: "", materia: "", kind: "", meus: "", cal: "", words: [] })
   $("search").value = ""
   applyFilters()
 }
@@ -1905,6 +2307,14 @@ $("search").addEventListener("input", () => {
   applyFilters()
 })
 $("clear").addEventListener("click", clearFilters)
+// Ir para lá: leva ao primeiro cartão do mês em destaque
+$("cal-ir").addEventListener("click", () => {
+  const alvo = cards.find(card => card.classList.contains("proxima"))
+  if (!alvo) return
+  alvo.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" })
+  alvo.setAttribute("tabindex", "-1")
+  alvo.focus({ preventScroll: true })
+})
 $("clear-empty").addEventListener("click", clearFilters)
 $("library").addEventListener("click", async event => {
   const button = event.target.closest("[data-copy]")
@@ -2013,8 +2423,8 @@ window.addEventListener("storage", event => {
 })
 // O site lembra os filtros: eles vão para o endereço, para mandar o link já filtrado, e ficam guardados no aparelho
 const pedidos = new URLSearchParams(location.search)
-const salvos = pedidos.has("etapa") || pedidos.has("materia") || pedidos.has("tipo") || pedidos.has("busca") || pedidos.has("meus")
-  ? { stage: pedidos.get("etapa") || "", materia: pedidos.get("materia") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "", meus: pedidos.get("meus") === "1" }
+const salvos = pedidos.has("etapa") || pedidos.has("materia") || pedidos.has("tipo") || pedidos.has("busca") || pedidos.has("meus") || pedidos.has("calendario")
+  ? { stage: pedidos.get("etapa") || "", materia: pedidos.get("materia") || "", kind: pedidos.get("tipo") || "", busca: pedidos.get("busca") || "", meus: pedidos.get("meus") === "1", cal: pedidos.get("calendario") === "1" }
   : Lembrar.ler("biblioteca", {})
 // A matéria aceita o nome do jeito que vier: "Língua Inglesa", "lingua-inglesa"...
 if (typeof salvos.materia === "string") salvos.materia = slug(salvos.materia)
@@ -2026,6 +2436,7 @@ if (typeof salvos.busca === "string" && salvos.busca) {
   filters.words = fold(salvos.busca).split(/\s+/).filter(Boolean)
 }
 if (salvos.meus === true) filters.meus = "1"
+if (salvos.cal === true) filters.cal = "1"
 const anotarFiltros = () => {
   const dados = { stage: filters.stage, materia: filters.materia, kind: filters.kind, busca: $("search").value.trim() }
   Lembrar.guardar("biblioteca", dados)
@@ -2035,6 +2446,7 @@ const anotarFiltros = () => {
   if (dados.kind) endereco.set("tipo", dados.kind)
   if (dados.busca) endereco.set("busca", dados.busca)
   if (filters.meus) endereco.set("meus", "1")
+  if (filters.cal) endereco.set("calendario", "1")
   history.replaceState(null, "", endereco.size ? "?" + endereco : location.pathname)
 }
 const filtrar = applyFilters
