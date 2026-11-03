@@ -130,6 +130,22 @@
       .telao .mesa { gap: 12px 24px; }
       .telao .cena { max-height: calc(100vh / var(--telao-escala) - 290px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      /* Ao montar a linha, os quatro fatos ficam numa fileira embaixo, e Dica e placar sobem para o lado da linha */
+      .telao main { width: calc(100% - 24px); }
+      .telao .mesa:has(.evento:nth-child(4)) { grid-template-areas: "fala fala" "missao cena" "acoes cena" "placar cena" "opcoes opcoes"; grid-template-rows: auto auto auto 1fr auto; }
+      .telao .mesa:has(.evento:nth-child(4)) .controles { display: contents; }
+      .telao .mesa:has(.evento:nth-child(4)) .missao { align-self: start; }
+      .telao .mesa:has(.evento:nth-child(4)) .acoes { grid-area: acoes; }
+      .telao .mesa:has(.evento:nth-child(4)) .placar { grid-area: placar; justify-self: center; }
+      .telao .opcoes:has(.evento:nth-child(4)) { grid-area: opcoes; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .telao .opcoes:has(.evento:nth-child(4)) .evento { grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: start; text-align: center; }
+      .telao .opcoes:has(.evento:nth-child(4)) .evento svg, .telao .opcoes:has(.evento:nth-child(4)) .evento .ordem { grid-row: auto; width: 40px; height: 40px; }
+      .telao .opcoes:has(.evento:nth-child(4)) .evento { padding: 6px 12px; }
+      .telao .mesa:has(.evento:nth-child(4)) .cena { max-height: calc(100vh / var(--telao-escala) - 390px); }
+      /* Nos séculos, a faixa do tempo fica mais larga, para os anos dela ficarem legíveis */
+      .telao .mesa:has(.opcoes--linha) { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); }
+      .telao .fala-bit__balao { font-size: 19px; }
+      .telao .missao__topo, .telao .nota, .telao .opcao.evento small { font-size: 17px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

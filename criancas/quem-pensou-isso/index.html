@@ -128,7 +128,22 @@
     /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas e as respostas ficam lado a lado */
     @media (min-width: 900px) {
       .telao .missao, .telao .opcoes { max-width: none; }
-      .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      .telao .opcoes { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
+      /* O Bit e a ideia lado a lado, as cartas embaixo, e o botão e o placar numa linha só: tudo cabe na altura */
+      .telao .mesa { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 8px 16px; }
+      .telao .missao__texto { font-size: 23px; }
+      .telao .mesa > :not(.fala-bit, .missao, .acoes, .placar) { grid-column: 1 / -1; }
+      .telao .fala-bit { margin: 0; gap: 10px; }
+      .telao .fala-bit__bit { width: 64px; }
+      .telao .fala-bit__balao { min-height: 0; font-size: 19px; }
+      .telao .missao { padding: 8px 16px 12px; }
+      .telao .missao__topo, .telao .nota, .telao .carta__epoca, .telao .carta__anos { font-size: 17px; }
+      .telao .missao__tema { font-size: 17px; }
+      .telao .carta { min-height: 0; padding: 8px 8px 10px; gap: 2px; }
+      .telao .carta__marca { width: 54px; height: 54px; }
+      .telao .carta__marca svg { width: 34px; height: 34px; }
+      .telao .acoes { justify-self: end; }
+      .telao .placar { justify-self: start; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

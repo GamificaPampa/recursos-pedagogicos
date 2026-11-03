@@ -145,10 +145,19 @@
     @media (min-width: 900px) {
       .telao .mesa { gap: 12px 24px; }
       .telao .quadro { gap: 8px; padding: 10px 12px; }
-      .telao .ser svg { width: 72px; height: 72px; }
-      .telao .punnett { grid-template-rows: 40px repeat(2, minmax(64px, 80px)); }
+      .telao .ser:not(.ser--grande) svg { width: 60px; height: 60px; }
+      .telao .ser--grande svg { width: 180px; }
+      .telao .punnett { grid-template-rows: 40px repeat(2, 68px); }
       .telao .opcoes { gap: 8px; }
       .telao .opcao { min-width: 72px; padding: 6px 12px; }
+      /* A pergunta fica mais baixa, os botões e o placar dividem uma linha e os rótulos pequenos crescem */
+      .telao .missao { padding: 10px 16px 12px; }
+      .telao .missao__pergunta { font-size: 24px; }
+      .telao .legenda { margin-top: 6px !important; padding: 4px 12px; }
+      .telao .missao__topo, .telao .legenda, .telao .ser figcaption, .telao .nota { font-size: 17px; }
+      .telao .controles { grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 12px 20px; }
+      .telao .controles .opcoes, .telao .controles .nota { grid-column: 1 / -1; }
+      .telao .controles .nota:empty { display: none; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

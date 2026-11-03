@@ -160,6 +160,56 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .opcao { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): tudo cabe na altura do projetor. Na abertura, os três motivos ficam lado a lado.
+       Na fase das pistas, a notícia fica à esquerda e o caderno à direita, com a fala do Bit e o caso em cima */
+    @media (min-width: 900px) {
+      .telao .intro { grid-template-columns: 1fr auto auto 1fr; align-items: center; gap: 10px 16px; max-width: none; padding: 0; }
+      .telao .intro img { grid-column: 2; width: 76px; }
+      .telao .intro h2 { grid-column: 3; }
+      .telao .intro h2 { font-size: 34px; }
+      .telao .intro > :not(img, h2) { grid-column: 1 / -1; }
+      .telao .intro ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .telao .intro li { padding: 10px 14px; }
+      .telao .intro p { max-width: 760px; }
+      .telao .mesa { gap: 12px 20px; }
+      .telao .missao { padding: 8px 14px 10px; }
+      .telao .missao__topo, .telao .aviso, .telao .caderno li.caderno__vazio, .telao .parte--site, .telao .parte--data, .telao .parte--autor, .telao .parte--fim { font-size: 17px; }
+      .telao .missao__texto { margin-top: 2px !important; font-size: 18px; }
+      .telao .pistas { margin-top: 6px !important; }
+      .telao .pistas span { width: 32px; height: 32px; }
+      .telao .fala-bit__balao { font-size: 18px; }
+      .telao .parte { padding: 4px 14px; }
+      .telao .parte--site { padding: 6px 14px; }
+      .telao .parte--data, .telao .parte--autor { min-height: 34px; }
+      .telao .parte--data { padding-top: 6px; }
+      .telao .parte--titulo { font-size: 21px; }
+      .telao .parte--texto { font-size: 17px; }
+      .telao .parte--fim { margin-bottom: 4px; }
+      .telao .aviso .btn { margin: 0 0 0 8px; }
+      /* Fase das pistas: o caderno sai da coluna da notícia e vai para o lado */
+      .telao .mesa:has(#caderno:not([hidden])) { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); grid-template-areas: "fala fala" "noticia missao" "noticia caderno" "noticia controles" "noticia aviso"; grid-template-rows: auto auto auto auto 1fr; align-items: start; gap: 10px 20px; }
+      /* Com duas pistas anotadas, a fala do Bit fica curta e sobe para o lado do caso, abrindo espaço para o caderno */
+      .telao .mesa:has(#caderno-lista li:nth-child(2)) { grid-template-areas: "fala missao" "noticia caderno" "aviso controles"; grid-template-rows: none; }
+      .telao .mesa:has(#caderno:not([hidden])) .noticia-area { display: contents; }
+      .telao .mesa:has(#caderno:not([hidden])) .noticia { grid-area: noticia; }
+      .telao .mesa:has(#caderno:not([hidden])) .caderno { grid-area: caderno; }
+      .telao .mesa:has(#caderno:not([hidden])) .aviso { grid-area: aviso; align-self: center; }
+      .telao .mesa:has(#caderno:not([hidden])) .missao { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 12px; text-align: left; }
+      .telao .mesa:has(#caderno:not([hidden])) .missao__texto { grid-column: 1 / -1; grid-row: 2; }
+      .telao .mesa:has(#caderno:not([hidden])) .pistas { margin: 0 !important; }
+      .telao .mesa:has(#caderno:not([hidden])) .fala-bit { margin: 0; align-self: center; }
+      .telao .mesa:has(#caderno:not([hidden])) .controles { grid-template-columns: auto auto; align-items: center; justify-content: center; gap: 12px 18px; }
+      .telao .caderno { padding: 8px 14px 10px; }
+      .telao .caderno h3 { margin-bottom: 4px; }
+      .telao .caderno ol { gap: 6px; }
+      .telao .caderno li { display: block; line-height: 1.3; }
+      .telao .caderno li svg { display: inline-block; width: 22px; height: 22px; margin-right: 6px; vertical-align: -5px; }
+      .telao .caderno li b { margin-right: 6px; }
+      .telao .opcoes:empty { display: none; }
+      .telao .fala-bit__balao { padding: 10px 16px; }
+      /* Fase de compartilhar, sem notícia: as respostas vão para a coluna da direita */
+      .telao .mesa:has(#noticia[hidden]) { grid-template-areas: "fala fala" "missao controles" "noticia controles"; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {

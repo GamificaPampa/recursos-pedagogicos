@@ -145,6 +145,20 @@
       .telao .mesa { gap: 12px 24px; }
       .telao #grafico { max-height: calc(100vh / var(--telao-escala) - 290px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      /* O gráfico ocupa a altura toda à direita, e a missão, os reguladores lado a lado, Dica e placar ficam à esquerda */
+      .telao main { width: calc(100% - 24px); }
+      .telao .mesa { grid-template-columns: minmax(0, 1fr) calc((100vh / var(--telao-escala) - 258px) * .96); }
+      .telao .grafico-area { gap: 4px; }
+      .telao #grafico { max-height: none; width: 100%; }
+      .telao .missao { align-self: start; padding: 8px 16px 10px; }
+      .telao .lei { margin: 2px 0 4px !important; font-size: 42px; }
+      .telao .controles { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 18px; }
+      .telao .opcoes, .telao .reguladores { flex: 1 1 100%; }
+      .telao .reguladores { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      .telao .regulador { grid-template-columns: minmax(0, 1fr) 48px 50px 48px; gap: 6px; padding: 6px 8px 6px 12px; }
+      .telao .passo { width: 48px; height: 48px; }
+      .telao .fala-bit__balao { font-size: 19px; }
+      .telao .missao__topo, .telao .nota, .telao .legenda-ab, .telao .regulador__nome small { font-size: 17px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

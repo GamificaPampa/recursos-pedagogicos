@@ -127,6 +127,18 @@
       .telao .mesa { gap: 12px 24px; }
       .telao #quadro { max-height: calc(100vh / var(--telao-escala) - 290px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      .telao .missao__topo, .telao .nota, .telao .pistas-titulo { font-size: 17px; }
+      .telao .pistas li { font-size: 17px; }
+      .telao .missao { padding: 8px 14px 10px; }
+      .telao .fala-bit__balao { font-size: 19px; padding: 10px 16px; }
+      /* Com pistas (fase 3), o caso, o quadro e as respostas ficam em três colunas */
+      .telao .mesa:has(#pistas:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr); grid-template-areas: "fala fala fala" "missao quadro controles"; align-items: start; }
+      .telao .mesa:has(#pistas:not([hidden])) .missao { align-self: start; }
+      .telao .mesa:has(#pistas:not([hidden])) .pergunta { font-size: 24px; }
+      .telao .mesa:has(#pistas:not([hidden])) .pistas { margin-top: 6px; }
+      .telao .mesa:has(#pistas:not([hidden])) .pistas-titulo { margin-top: 8px !important; }
+      .telao .mesa:has(#pistas:not([hidden])) .opcoes { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .telao .mesa:has(#pistas:not([hidden])) .opcao { font-size: 20px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

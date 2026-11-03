@@ -143,6 +143,13 @@
       .telao .mesa { gap: 12px 24px; }
       .telao #esquema { max-height: calc(100vh / var(--telao-escala) - 300px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); max-width: none; }
+      /* A fala do Bit vai para cima do circuito, e o desafio e as respostas ficam juntos à esquerda */
+      .telao .mesa { grid-template-areas: "missao fala" "missao circuito" "controles circuito"; grid-template-rows: auto auto 1fr; align-items: start; }
+      .telao .fala-bit { margin: 0; }
+      .telao .fala-bit__balao { font-size: 19px; padding: 10px 16px; }
+      .telao .missao { align-self: start; padding: 8px 14px 10px; }
+      .telao .missao__topo, .telao .legenda, .telao .nota, .telao #rot-sub { font-size: 17px; }
+      .telao .controles { gap: 10px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

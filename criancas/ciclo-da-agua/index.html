@@ -154,6 +154,21 @@
       #cena * { animation: none !important; }
       #cena[data-estado] .vapor path, #cena[data-estado] .chuva line, #cena[data-estado] .fluxo { opacity: 1; }
     }
+    /* Modo telão (tecla T): a fala do Bit fica em cima da cena, ao lado do desafio, e as letras pequenas crescem */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 24px; grid-template-areas: "missao fala" "controles cena"; grid-template-rows: auto 1fr; }
+      .telao .fala-bit { align-self: end; margin: 0; }
+      .telao .missao { padding: 12px 16px 14px; }
+      .telao .missao__topo { font-size: 17px; }
+      .telao .trilha { margin-top: 8px; }
+      .telao .trilha li { font-size: 16px; }
+      .telao .opcao small { font-size: 16px; }
+      .telao .controles { gap: 12px; }
+      /* A mesa ocupa a altura que sobra na tela, e a cena encolhe quando a fala do Bit é longa */
+      .telao .mesa { height: calc(100vh / var(--telao-escala) - 100px); }
+      .telao .cena-jogo { min-height: 0; grid-template-rows: minmax(0, 1fr) auto; place-items: stretch center; }
+      .telao #cena { height: 100%; min-height: 0; width: auto; max-width: 100%; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {

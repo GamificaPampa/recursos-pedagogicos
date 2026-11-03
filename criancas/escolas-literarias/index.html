@@ -128,9 +128,26 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
     }
-    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    /* Modo telão (tecla T): o jogo usa a largura do projetor e cabe na altura, sem rolar.
+       Nas fases 1 e 3 o Bit e o trecho ficam à esquerda e as respostas à direita; na fase 2 as colunas ocupam a largura toda */
     @media (min-width: 900px) {
-      .telao .mesa { max-width: none; }
+      .telao main { width: min(1060px, 100% - 16px); }
+      .telao .mesa { max-width: none; gap: 8px 16px; }
+      .telao .missao { padding: 8px 16px 12px; }
+      .telao .missao__topo, .telao .creditos, .telao .par h3 { font-size: 17px; }
+      .telao .item small { font-size: 16.5px; }
+      .telao .fala-bit__balao { min-height: 0; }
+      .telao .opcoes { gap: 10px; }
+      .telao .mesa:not(:has(.par)) { display: flow-root; }
+      .telao .mesa:not(:has(.par)) > :is(.fala-bit, .missao) { float: left; clear: left; width: calc(50% - 8px); margin: 0 0 10px; }
+      .telao .mesa:not(:has(.par)) > :not(.fala-bit, .missao) { margin: 0 0 10px calc(50% + 8px); }
+      .telao .mesa:not(:has(.par)) .opcoes { grid-template-columns: minmax(0, 1fr); }
+      /* Fase 2: o Bit e a missão lado a lado, os autores e a linha do tempo embaixo */
+      .telao .mesa:has(.par) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+      .telao .mesa:has(.par) > #area, .telao .mesa:has(.par) > .acoes, .telao .mesa:has(.par) > .placar { grid-column: 1 / -1; }
+      .telao .par h3 { margin-bottom: 4px; }
+      .telao .coluna { gap: 8px; }
+      .telao .item { min-height: 58px; padding: 6px 12px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

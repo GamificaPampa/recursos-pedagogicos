@@ -122,9 +122,23 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .item.erro, .fala-bit__bit img.nova, .fala-bit__balao.nova { animation: none !important; }
     }
-    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    /* Modo telão (tecla T): o jogo usa a largura do projetor e cabe na altura, sem rolar.
+       O Bit e a fonte ficam à esquerda; as respostas, os botões e o placar, à direita */
     @media (min-width: 900px) {
-      .telao .mesa { max-width: none; }
+      .telao main { width: min(1060px, 100% - 16px); }
+      .telao .mesa { display: flow-root; max-width: none; }
+      .telao .mesa > :is(.fala-bit, .missao) { float: left; clear: left; width: calc(50% - 8px); margin: 0 0 10px; }
+      .telao .mesa > :not(.fala-bit, .missao) { margin: 0 0 10px calc(50% + 8px); }
+      .telao .fala-bit__balao { min-height: 0; }
+      .telao .missao { padding: 8px 16px 12px; }
+      .telao .missao__topo, .telao .creditos { font-size: 17px; }
+      .telao .opcao small, .telao .item small { font-size: 16.5px; }
+      .telao .opcoes { gap: 10px; }
+      .telao .ordem { gap: 8px; }
+      .telao .item { min-height: 56px; padding: 6px 12px; }
+      /* Com cinco fatos ou mais, a lista vira duas colunas */
+      .telao .ordem:has(> :nth-child(5)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .telao .ordem:has(> :nth-child(5)) .item { gap: 8px; padding: 6px 8px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

@@ -123,8 +123,14 @@
     /* Modo telão (tecla T): o desenho cabe na altura do projetor e as respostas ficam lado a lado */
     @media (min-width: 900px) {
       .telao .mesa { gap: 12px 24px; }
-      .telao .grafico-caixa svg { max-height: calc(100vh / var(--telao-escala) - 330px); width: auto; max-width: 100%; margin-inline: auto; }
+      .telao .grafico-caixa svg { max-height: calc(100vh / var(--telao-escala) - 340px); width: auto; max-width: 100%; margin-inline: auto; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      /* O jogo usa a largura do projetor, e Dica e placar ficam lado a lado */
+      .telao main { width: calc(100% - 24px); }
+      .telao .controles { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 20px; }
+      .telao .opcoes { flex: 1 1 100%; }
+      .telao .missao__topo, .telao .fonte { font-size: 17px; }
+      .telao .fala-bit__balao { font-size: 19px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

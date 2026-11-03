@@ -166,6 +166,26 @@
       .telao .moleculas { width: 110px; }
       .telao .mais { margin-top: 44px; }
       .telao .seta { margin-top: 40px; }
+      /* A fala do Bit fica ao lado da missão, e a bancada ganha a altura que sobra */
+      .telao main { width: calc(100% - 24px); }
+      .telao .mesa .fala-bit { margin: 0; }
+      .telao .mesa .missao { padding: 8px 16px 10px; }
+      .telao .mesa .missao__titulo { font-size: 28px; line-height: 1.15; }
+      .telao .mesa:not(:has(.grande)) { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); grid-template-areas: "fala missao" "bancada bancada" "contagem controles"; }
+      .telao .mesa:has(.grande) { grid-template-areas: "fala missao" "bancada controles" "bancada contagem"; grid-template-rows: auto auto 1fr; }
+      .telao .grande .moleculas { max-height: calc(100vh / var(--telao-escala) - 360px); width: auto; }
+      .telao .fala-bit__balao { font-size: 19px; }
+      .telao .missao__topo, .telao .nota, .telao .legenda, .telao .contagem th { font-size: 17px; }
+      .telao .mesa:not(:has(.grande)) .bancada { padding: 4px 12px; }
+      .telao .subst { gap: 2px; }
+      .telao .contagem { padding: 8px 14px; }
+      .telao .contagem h2 { margin: 0; font-size: 19px; line-height: 1.1; }
+      .telao .contagem th { padding: 0 4px 2px; }
+      .telao .contagem td { padding: 2px 4px; }
+      .telao .contagem .atomo { height: 28px; }
+      .telao .acoes { gap: 8px; }
+      .telao .controles { gap: 10px; }
+      .telao .atomo { font-size: 16px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

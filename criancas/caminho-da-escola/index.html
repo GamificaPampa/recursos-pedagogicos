@@ -146,10 +146,26 @@
     @media (prefers-reduced-motion: reduce) {
       .robo, .confete, .comando { transition: none !important; animation: none !important; }
     }
-    /* Modo telão (tecla T): o mapa cabe na altura do projetor, junto com a legenda */
+    /* Modo telão (tecla T): o mapa cabe na altura do projetor, junto com a legenda. O caminho da fase 3 vai em
+       duas colunas, o placar fica ao lado de Próxima questão e os rótulos pequenos crescem */
     @media (min-width: 900px) {
       .telao .mesa { gap: 12px 24px; }
-      .telao #mapa { max-height: calc(100vh / var(--telao-escala) - 340px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .missao { padding: 10px 16px 12px; }
+      .telao .missao__topo, .telao .programa:empty::before { font-size: 17px; }
+      .telao .roteiro { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .telao .roteiro li { padding: 4px 8px; font-size: 17px; }
+      .telao .mesa:has(.roteiro:not([hidden])) { grid-template-columns: minmax(0, 1.25fr) minmax(0, .95fr); }
+      .telao .mesa:has(.roteiro:not([hidden])) #mapa { max-height: calc(100vh / var(--telao-escala) - 400px); }
+      .telao .comando { min-height: 68px; }
+      .telao #mapa { max-height: calc(100vh / var(--telao-escala) - 360px); width: auto; max-width: 100%; justify-self: center; }
+      .telao .legenda { gap: 6px; }
+      .telao .legenda li { gap: 4px; padding: 2px 10px 2px 4px; font-size: 16px; }
+      .telao .legenda svg { width: 26px; height: 26px; }
+      .telao .jogo { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+      .telao .jogo > .fases, .telao .jogo > .mesa { grid-column: 1 / -1; }
+      .telao .seguir-rodada { grid-column: 2; margin-top: 10px; }
+      .telao #placar { grid-column: 3; justify-self: start; margin: 10px 0 0 18px !important; }
+      .telao .jogo:has(#proxima[hidden]) #placar { grid-column: 1 / -1; justify-self: center; margin-left: 0 !important; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

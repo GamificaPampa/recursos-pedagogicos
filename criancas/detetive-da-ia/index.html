@@ -138,6 +138,27 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .opcao, .anima { transition: none !important; animation: none !important; }
     }
+    /* Modo telão (tecla T): tudo cabe na altura do projetor. Na fase da conversa, a fala do Bit sobe para a
+       coluna da esquerda e a conversa ocupa a direita inteira; com respostas, elas vão para a direita */
+    @media (min-width: 900px) {
+      .telao .mesa { gap: 12px 20px; }
+      .telao .missao { padding: 8px 14px 10px; }
+      .telao .missao__topo, .telao .missao__texto, .telao .nota, .telao .msg--ia b, .telao .objetivo small { font-size: 17px; }
+      .telao .missao__pergunta { margin: 2px 0 !important; font-size: 24px; }
+      .telao .fala-bit { margin: 0; }
+      .telao .fala-bit__balao { font-size: 19px; padding: 10px 16px; }
+      .telao .cena--chat { gap: 8px; padding: 12px 14px; }
+      .telao .msg { padding: 8px 12px; }
+      .telao .trecho { padding: 4px 8px; }
+      .telao .correcao { padding: 6px 10px; font-size: 17px; }
+      .telao .mesa:has(#opcoes:empty) { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); grid-template-areas: "fala cena" "missao cena" "controles cena"; grid-template-rows: auto auto 1fr; }
+      .telao .mesa:has(#opcoes:not(:empty)) { grid-template-areas: "fala fala" "missao controles" "cena controles"; grid-template-rows: auto auto 1fr; align-items: start; }
+      .telao .mesa:has(#opcoes:not(:empty)) .opcoes { max-width: none; }
+      .telao .mesa:has(#opcoes:not(:empty)) .cena { min-height: 0; }
+      .telao .mesa:has(#opcoes:not(:empty)) .missao { align-self: start; }
+      .telao .cartao-situacao svg { width: 76px; height: 76px; }
+      .telao .objetivo { padding: 10px 14px; }
+    }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
 p, li, blockquote {

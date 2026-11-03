@@ -145,9 +145,42 @@
     @media (prefers-reduced-motion: reduce) {
       .confete, .fala-bit__bit img, .fala-bit__balao { animation: none !important; }
     }
-    /* Modo telão (tecla T): o jogo usa a largura do projetor, para o texto ocupar menos linhas */
+    /* Modo telão (tecla T): o jogo usa a largura do projetor e cabe na altura, sem rolar.
+       Na fase 1 os parágrafos ocupam a largura toda, com as setas ao lado; nas outras, o texto fica à esquerda e as respostas à direita */
     @media (min-width: 900px) {
-      .telao .mesa { max-width: none; }
+      .telao main { width: min(1060px, 100% - 16px); }
+      .telao .mesa { max-width: none; gap: 8px 16px; }
+      .telao .missao { padding: 8px 16px 10px; }
+      .telao .missao__topo, .telao .legenda { font-size: 17px; }
+      .telao .missao__contexto { margin-top: 8px !important; }
+      .telao .fala-bit__balao { font-size: 19px; }
+      /* Fase 1: o Bit e os botões numa linha, a missão numa faixa e os quatro parágrafos embaixo */
+      .telao .mesa:has(> .ordem:not([hidden])) { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "fala acoes" "missao placar" "ordem ordem"; align-items: center; row-gap: 6px; }
+      .telao .mesa:has(> .ordem:not([hidden])) .fala-bit { grid-area: fala; margin: 0; }
+      .telao .mesa:has(> .ordem:not([hidden])) .missao { grid-area: missao; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; padding: 0 4px; background: none; border: 0; box-shadow: none; }
+      .telao .mesa:has(> .ordem:not([hidden])) .missao__texto { margin: 0 !important; font-size: 20px; }
+      .telao .mesa:has(> .ordem:not([hidden])) .acoes { grid-area: acoes; flex-direction: column; align-items: stretch; gap: 8px; }
+      .telao .mesa:has(> .ordem:not([hidden])) .placar { grid-area: placar; }
+      .telao .ordem { grid-area: ordem; gap: 6px; }
+      .telao .item { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0 12px; padding: 4px 10px; }
+      .telao .item p { grid-column: 2; grid-row: 1; font-size: 17px; line-height: 1.28; }
+      .telao .item .num { grid-column: 1; grid-row: 1; }
+      .telao .item .mover { grid-column: 3; grid-row: 1; }
+      .telao .item .papel { grid-column: 3; grid-row: 1; max-width: 190px; font-size: 17px; line-height: 1.2; text-align: right; }
+      .telao .item.acabou { grid-template-columns: auto minmax(0, 1fr) auto; }
+      /* As setas mostram só o desenho; o nome continua no aria-label */
+      .telao .mexe { gap: 0; min-width: 48px; padding: 0; font-size: 0; }
+      .telao .mexe svg { width: 24px; height: 24px; }
+      /* Fases 2 e 3: o Bit, a missão e a proposta à esquerda; as respostas e os botões à direita */
+      .telao .mesa:not(:has(> .ordem:not([hidden]))) { display: flow-root; }
+      .telao .mesa:not(:has(> .ordem:not([hidden]))) > :is(.fala-bit, .missao, .proposta) { float: left; clear: left; width: calc(50% - 8px); margin: 0 0 8px; }
+      .telao .mesa:not(:has(> .ordem:not([hidden]))) > :not(.fala-bit, .missao, .proposta) { margin: 0 0 10px calc(50% + 8px); }
+      /* Na fase 3 a proposta fica sob o Bit, e a missão vai para o lado das respostas */
+      .telao .mesa:has(> .proposta:not([hidden])) > .missao { float: none; clear: none; width: auto; margin: 0 0 10px calc(50% + 8px); }
+      .telao .proposta { line-height: 1.75; }
+      .telao .opcoes--papeis { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .telao .opcoes--papeis .opcao { padding: 8px 6px; }
+      .telao .trecho.feito i { font-size: 16.5px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

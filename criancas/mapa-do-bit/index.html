@@ -138,6 +138,28 @@
       .telao .mesa { gap: 12px 24px; }
       .telao #mapa { max-height: calc(100vh / var(--telao-escala) - 320px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      /* Menos altura: Dica e placar na mesma linha, missão mais baixa e fala do Bit um pouco menor */
+      .telao main { width: calc(100% - 24px); }
+      .telao .fala-bit__balao { font-size: 19px; }
+      .telao .missao { padding: 8px 16px 10px; }
+      .telao .grande { margin: 0 0 2px !important; font-size: 40px; }
+      .telao .legenda { margin-bottom: 4px !important; }
+      .telao .controles { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 18px; }
+      .telao .opcoes, .telao .toque { flex: 1 1 100%; }
+      .telao .toque { max-width: none; font-size: 17px; }
+      .telao .missao__topo, .telao .legenda, .telao .nota, .telao .pistas b { font-size: 17px; }
+      /* Biomas: as três pistas lado a lado, o mapa ao lado da missão, a nota, Dica e placar embaixo dela e os seis biomas numa fileira */
+      .telao .mesa:has(.opcoes--biomas) { grid-template-columns: minmax(0, 1fr) auto auto 240px; grid-template-areas: "fala fala fala fala" "missao missao missao mapa" "nota acoes placar mapa" "opcoes opcoes opcoes opcoes"; }
+      .telao .mesa:has(.opcoes--biomas) :is(.mapa-area, .controles) { display: contents; }
+      .telao .mesa:has(.opcoes--biomas) .missao { align-self: start; }
+      .telao .mesa:has(.opcoes--biomas) #mapa { grid-area: mapa; align-self: start; max-height: none; width: 100%; }
+      .telao .mesa:has(.opcoes--biomas) .nota { grid-area: nota; align-self: center; text-align: left; }
+      .telao .mesa:has(.opcoes--biomas) .acoes { grid-area: acoes; }
+      .telao .mesa:has(.opcoes--biomas) .placar { grid-area: placar; align-self: center; }
+      .telao .mesa:has(.opcoes--biomas) .opcoes { grid-area: opcoes; }
+      .telao .pistas { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 8px; margin-top: 4px; }
+      .telao .pistas li { padding: 4px 10px 5px; line-height: 1.25; }
+      .telao .opcoes--biomas { grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: none; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */

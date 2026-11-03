@@ -134,6 +134,14 @@
       .telao .mesa { gap: 12px 24px; }
       .telao .cena { max-height: calc(100vh / var(--telao-escala) - 270px); width: auto; max-width: 100%; justify-self: center; }
       .telao .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+      /* A fala do Bit vai para cima do desenho, e a pergunta e as respostas ficam juntas à esquerda */
+      .telao .mesa { grid-template-areas: "missao fala" "missao cena" "controles cena"; grid-template-rows: auto auto 1fr; align-items: start; }
+      .telao .fala-bit { margin: 0; }
+      .telao .fala-bit__balao { font-size: 19px; padding: 10px 16px; }
+      .telao .cena { max-height: calc(100vh / var(--telao-escala) - 330px); }
+      .telao .missao { align-self: start; padding: 8px 14px 10px; }
+      .telao .missao__topo, .telao .nota { font-size: 17px; }
+      .telao .controles { gap: 10px; }
     }
   </style>
 <style>/* tipografia automatica (viuvas, orfas e forcas) */
