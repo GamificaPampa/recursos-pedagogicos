@@ -224,6 +224,147 @@
     .answer { order: 7; margin-top: 22px }
     .vague svg { width: 58px; height: 58px }
   }
+  /* Modo em grupo, para o projetor: a sala vota levantando a mão e o formador toca na opção mais votada.
+     Tudo cresce com a tela (a medida-base vem da largura e da altura) e cabe em 1280 x 720 sem rolar */
+  .group-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px }
+  #start .btn.calm { --c: #fff }
+  html.grupo, html.grupo body { overflow: hidden }
+  html.grupo .bit-fala { display: none !important }
+  .grupo { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; gap: .5em; padding: .6em max(16px, 1.6em) .7em; overflow-x: hidden; overflow-y: auto; background: linear-gradient(var(--sky1, #4fadf2) -30%, var(--sky2) 70%); font-size: max(15px, min(1.55vw, 2.75vh)); line-height: 1.3 }
+  .grupo button { font-family: var(--font) }
+  .g-top { display: flex; align-items: center; gap: .6em; flex: none }
+  .g-brand { padding: .1em .8em; background: #fff; border: 3px solid var(--ink); border-radius: 999px; font-weight: 700; font-size: .9em; white-space: nowrap }
+  .g-dots { display: flex; gap: .4em; margin-left: auto }
+  .g-dots span { width: 1em; height: 1em; border: 3px solid var(--ink); border-radius: 50%; background: #fff }
+  .g-dots span.first { background: var(--mint) } .g-dots span.later { background: var(--yellow) } .g-dots span.now { background: var(--pink); transform: scale(1.25) }
+  .g-icon { display: grid; place-items: center; width: 2.2em; height: 2.2em; flex: none; padding: 0; background: #fff; border: 3px solid var(--ink); border-radius: 50%; box-shadow: 0 3px 0 var(--ink) }
+  .g-icon svg { width: 1.3em; height: 1.3em; pointer-events: none }
+  .g-exit { display: inline-flex; align-items: center; gap: .4em; padding: .2em .8em; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 3px 0 var(--ink); font-weight: 600; font-size: .9em }
+  kbd { display: inline-block; min-width: 1.6em; padding: 0 .35em; background: #fff; border: 2px solid var(--ink); border-bottom-width: 4px; border-radius: 7px; font: 700 .85em/1.4 var(--font); text-align: center }
+  .g-body { flex: 1; display: flex; flex-direction: column; gap: .6em; min-height: 0 }
+  .g-foot { display: flex; align-items: center; gap: .8em; flex: none; min-height: 2.6em }
+  .g-keys { margin: 0; color: var(--ink); font-size: .8em; font-weight: 500 }
+  .g-keys kbd { margin: 0 .1em }
+  .g-nav { display: flex; gap: .6em; margin-left: auto }
+  .g-nav .btn { --c: var(--mint); min-height: 0; padding: .3em 1.1em; font-size: 1em }
+  .g-nav .btn svg { width: 1.2em; height: 1.2em }
+  .g-nav .btn.back-step { --c: #fff }
+  .g-title { margin: 0; font-size: 1.7em; font-weight: 700; line-height: 1.1 }
+  .g-vague { display: flex; align-items: center; gap: .6em; flex: none }
+  .g-vague svg { width: 2.8em; height: 2.8em; flex: none }
+  .g-vague div { flex: 1; padding: .25em .8em; background: #fff; border: 4px solid var(--ink); border-radius: .8em }
+  .g-vague small { display: block; color: #c92a62; font-weight: 700; font-size: .7em; letter-spacing: .5px; text-transform: uppercase }
+  .g-vague b { font-size: 1.45em; font-weight: 700; line-height: 1.15 }
+  .g-parts { display: flex; flex-wrap: wrap; gap: .4em; flex: none }
+  .g-part { display: inline-flex; align-items: center; gap: .35em; padding: .1em .7em .1em .15em; background: #fff; border: 3px dashed var(--ink); border-radius: 999px; font-weight: 600; opacity: .7 }
+  .g-part i, .g-letter { display: grid; place-items: center; flex: none; background: #fff; border: 2px solid var(--ink); border-radius: 50%; font-style: normal; font-weight: 700 }
+  .g-part i { width: 1.4em; height: 1.4em; background: var(--c) }
+  .g-part svg { width: 1.1em; height: 1.1em }
+  .g-part.done { background: var(--light); border-style: solid; opacity: 1 }
+  .g-part.now { background: var(--c); border-style: solid; opacity: 1; font-size: 1.15em }
+  .g-ask { margin: 0; font-size: 1.2em; font-weight: 700 }
+  .g-ask span { font-weight: 500 }
+  .g-options { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8em; min-height: 0 }
+  .g-option { display: flex; flex-direction: column; gap: .4em; padding: .6em .7em; background: #fff; border: 4px solid var(--ink); border-top: .5em solid var(--c); border-radius: 1em; box-shadow: 0 6px 0 var(--ink); text-align: left; cursor: pointer; transition: transform .15s, opacity .2s }
+  .g-option:hover:not(.locked) { transform: translateY(-3px) }
+  .g-pick { display: flex; flex-direction: column; gap: .4em; width: 100%; padding: 0; background: none; border: 0; text-align: left }
+  .g-pick:disabled { cursor: default }
+  .g-pick:focus-visible { outline: 4px solid var(--pink); outline-offset: 4px; border-radius: .5em }
+  .g-option .g-head { display: flex; align-items: center; gap: .5em }
+  .g-option .g-letter { width: 1.8em; height: 1.8em; border-width: 4px; background: var(--light); font-size: 1.5em }
+  .g-option .g-text { flex: 1; margin: 0; font-size: 1.4em; font-weight: 600; line-height: 1.25 }
+  .g-why { margin: 0; padding: .35em .6em; border: 3px solid var(--ink); border-radius: .6em; font-size: 1.05em; font-weight: 500 }
+  .g-option.wrong { background: #ffeef3; box-shadow: none; transform: none; cursor: default }
+  .g-option.wrong .g-text { text-decoration: line-through; text-decoration-thickness: 3px; color: var(--soft) }
+  .g-option.wrong .g-why { background: #ffd6e3 }
+  .g-option.right { background: var(--task-light); animation: pop .35s cubic-bezier(.3, 1.6, .6, 1) }
+  .g-option.right .g-why { background: #fff }
+  .g-option.dim { opacity: .45; box-shadow: none; cursor: default }
+  .g-option .g-mark { width: 1.8em; height: 1.8em; flex: none }
+  .g-option.top-voted:not(.wrong):not(.dim) { outline: 5px solid var(--purple); outline-offset: 2px }
+  .g-hands { display: flex; align-items: center; gap: .35em; margin-top: auto; padding-top: .2em }
+  .g-hands button { display: grid; place-items: center; width: 1.9em; height: 1.9em; padding: 0; background: #fff; border: 3px solid var(--ink); border-radius: 50%; box-shadow: 0 3px 0 var(--ink); font-size: 1.4em; font-weight: 700; line-height: 1 }
+  .g-hands button:active { transform: translateY(3px); box-shadow: none }
+  .g-hands output { display: inline-flex; align-items: center; gap: .2em; min-width: 3.2em; font-size: 1.15em; font-weight: 700 }
+  .g-hands svg { width: 1.4em; height: 1.4em }
+  .g-hands small { color: var(--soft); font-size: .75em; font-weight: 500 }
+  .g-option.wrong .g-hands, .g-option.right .g-hands, .g-option.dim .g-hands { display: none }
+  .g-status { margin: 0; flex: none; font-weight: 600; font-size: 1em }
+  .g-status.good { color: #17694a } .g-status.bad { color: #a8164a }
+  /* Discussão depois de cada pedido */
+  .g-steps { display: flex; flex-wrap: wrap; gap: .4em; flex: none; margin: 0; padding: 0; list-style: none }
+  .g-steps button { padding: .1em .8em; background: #fff; border: 3px solid var(--ink); border-radius: 999px; font-size: .85em; font-weight: 600 }
+  .g-steps button[aria-current] { background: var(--yellow) }
+  .g-result { display: inline-flex; align-items: center; gap: .4em; align-self: flex-start; padding: .15em .9em .15em .3em; background: var(--yellow); border: 4px solid var(--ink); border-radius: 999px; font-size: 1.05em; font-weight: 700 }
+  .g-result.first { background: var(--mint) }
+  .g-result svg { width: 1.6em; height: 1.6em }
+  .g-prompt { display: grid; gap: .45em; margin: 0; padding: 0; list-style: none }
+  .g-prompt li { display: flex; align-items: flex-start; gap: .5em; padding: .4em .7em; background: #fff; border: 3px solid var(--ink); border-left: .6em solid var(--c); border-radius: .8em; font-size: 1.25em; font-weight: 600 }
+  .g-prompt li small { display: block; font-size: .65em; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--soft) }
+  .g-prompt li .g-letter, .g-fails .g-letter { width: 1.6em; height: 1.6em; background: var(--c); border-width: 3px }
+  .g-fails { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6em; min-height: 0 }
+  .g-fail { display: flex; flex-direction: column; gap: .35em; padding: .45em .7em; background: #fff; border: 3px solid var(--ink); border-top: .45em solid var(--c); border-radius: .9em; font-size: .94em }
+  .g-fail h3 { display: flex; align-items: center; gap: .4em; margin: 0; font-size: 1.05em }
+  .g-fail p { margin: 0 }
+  .g-fail p b { display: block; font-weight: 600 }
+  .g-fail p b::before { content: "\2715 "; color: #c92a62; font-weight: 700 }
+  .g-fail p span { color: #3b3560 }
+  .g-fail em { display: inline-block; margin-left: .3em; padding: 0 .5em; background: #ffd6e3; border: 2px solid var(--ink); border-radius: 999px; font-size: .8em; font-style: normal; font-weight: 700; vertical-align: .1em }
+  .g-trap { display: flex; align-items: flex-start; gap: .7em; padding: .6em .9em; background: #fff; border: 4px solid var(--ink); border-radius: 1em; box-shadow: 0 5px 0 rgba(47, 42, 74, .25) }
+  .g-trap > svg { width: 3.2em; height: 3.2em; flex: none }
+  .g-trap small { display: block; color: #c92a62; font-weight: 700; font-size: .75em; letter-spacing: .5px; text-transform: uppercase }
+  .g-trap p { margin: .15em 0 .5em; font-size: 1.4em; font-weight: 500 }
+  .g-trap .say { font-size: 1.5em }
+  .g-talk { display: flex; align-items: center; gap: .8em }
+  .g-talk img { width: 7em; height: 7em; flex: none }
+  .g-middle { gap: 1.2em }
+  .g-middle .g-trap { margin-top: auto }
+  .g-middle .g-talk { margin-bottom: auto }
+  .g-talk div { position: relative; flex: 1; padding: .5em 1em; background: var(--yellow); border: 4px solid var(--ink); border-radius: 1em }
+  .g-talk small { display: block; font-weight: 700; font-size: .75em; letter-spacing: .5px; text-transform: uppercase }
+  .g-talk b { font-size: 2em; line-height: 1.15 }
+  .g-talk p { margin: .2em 0 0; font-size: 1.2em; font-weight: 500 }
+  /* Abertura e placar */
+  .g-center { align-items: center; justify-content: center; text-align: center }
+  .g-intro { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: .4em 1em; max-width: 46em; text-align: left }
+  .g-intro img { width: 6.5em; height: 6.5em }
+  .g-intro ol { display: grid; gap: .3em; margin: 0; padding: 0; list-style: none; font-size: 1.05em; font-weight: 500 }
+  .g-intro ol li { display: flex; align-items: center; gap: .5em }
+  .g-intro ol b { display: grid; place-items: center; width: 1.6em; height: 1.6em; flex: none; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50% }
+  .g-stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6em; width: 100% ; max-width: 56em }
+  .g-stage { display: flex; flex-direction: column; align-items: center; gap: .2em; padding: .5em .4em; background: #fff; border: 4px solid var(--ink); border-radius: 1em; box-shadow: 0 5px 0 var(--ink) }
+  .g-stage .g-letter { width: 1.8em; height: 1.8em; border-width: 3px; background: var(--sky2); font-size: 1.3em }
+  .g-stage b { font-size: 1.05em; line-height: 1.15 }
+  .g-stage small { color: var(--soft); font-size: .8em }
+  .g-stage[aria-checked="true"] { background: var(--yellow) }
+  .g-stage[aria-checked="true"] .g-letter { background: var(--pink) }
+  .g-big { font-size: clamp(34px, 3.4em, 80px); line-height: 1; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  .g-big span { color: var(--yellow) }
+  .g-score { display: flex; align-items: center; gap: .5em; padding: .2em 1.1em .2em .4em; background: var(--yellow); border: 4px solid var(--ink); border-radius: 999px; box-shadow: 0 5px 0 var(--ink); font-size: 1.4em; font-weight: 700 }
+  .g-score img { width: 2.6em; height: 2.6em; margin: -.5em 0 }
+  .g-saves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45em; width: 100%; max-width: 60em; margin: 0; padding: 0; list-style: none; text-align: left }
+  .g-saves li { display: flex; gap: .5em; padding: .35em .7em; background: #fff; border: 3px solid var(--ink); border-radius: .8em; font-weight: 500; font-size: .9em }
+  .g-saves li > svg { width: 1.6em; height: 1.6em; flex: none }
+  .g-saves b { display: block; font-size: .85em; color: var(--soft) }
+  .g-saves li:last-child:nth-child(odd) { grid-column: 1 / -1 }
+  .g-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .6em }
+  .g-actions .btn { min-height: 0; padding: .3em 1.1em; font-size: 1em }
+  .g-actions .btn svg { width: 1.2em; height: 1.2em }
+  .g-actions .btn.go { --c: var(--mint) }
+  @media (max-width: 760px) {
+    .grupo { gap: 12px }
+    .g-brand { display: none }
+    .g-options, .g-fails, .g-saves { grid-template-columns: minmax(0, 1fr) }
+    .g-body, .g-options, .g-fails { flex: none; min-height: auto }
+    .g-foot { margin-top: auto; padding: 8px 0; background: var(--sky2) }
+    .g-foot:not(:has(.btn)) { display: none }
+    .g-stages { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+    .g-intro { grid-template-columns: minmax(0, 1fr) }
+    .g-intro img { grid-row: auto; justify-self: center; width: 90px; height: 90px }
+    .g-keys { display: none }
+    .g-foot { position: sticky; bottom: 0 }
+    .g-talk img { width: 70px; height: 70px }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important }
   }
@@ -288,8 +429,24 @@
     <label class="stage"><input type="radio" name="etapa" value="eja"><span><b>EJA</b><small>Jovens e adultos, da alfabetização ao Ensino Médio</small></span></label>
   </div>
   <p class="how">São 5 pedidos. Cada parte tem três blocos e só um é bom. Cuidado: o mais comprido nem sempre é o certo. Acerte de primeira para ganhar 3 estrelas.</p>
-  <button class="btn" type="button" id="begin">Começar<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></button>
+  <div class="group-row">
+    <button class="btn" type="button" id="begin">Começar<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></button>
+    <button class="btn calm" type="button" id="group-open"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="4" width="26" height="17" rx="2.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 21v4.5M10 29.5l6-4 6 4" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5 17.5 16 8l4.5 9.5M13.2 14h5.6" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Jogar em grupo (projetor)</button>
+  </div>
 </div>
+
+<!-- Modo em grupo: tela cheia para o projetor, com votação de mão. Nada é guardado além da etapa -->
+<section class="grupo" id="grupo" hidden tabindex="-1" aria-label="Jogo do Prompt em grupo">
+  <header class="g-top">
+    <span class="g-brand">Jogo do Prompt em grupo</span>
+    <span class="g-dots" id="g-dots" role="img"></span>
+    <button class="g-icon" type="button" id="g-full" aria-label="Tela cheia"><svg viewBox="0 0 32 32"><use href="#icone-tela-cheia"/></svg></button>
+    <button class="g-icon" type="button" id="g-mute" aria-label="Som"></button>
+    <button class="g-exit" type="button" id="g-exit">Sair <kbd>Esc</kbd></button>
+  </header>
+  <div class="g-body" id="g-body" aria-live="polite"></div>
+  <footer class="g-foot" id="g-foot"></footer>
+</section>
 
 <div class="overlay" id="win">
   <div id="stars" role="img"></div>
@@ -322,6 +479,7 @@
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="hand" viewBox="0 0 32 32"><path d="M9.5 18.5V9a2 2 0 0 1 4 0v6.5V6a2 2 0 0 1 4 0v9.5V7.5a2 2 0 0 1 4 0V16v-5a2 2 0 0 1 4 0v8.5c0 6-3.8 10-9 10-3.6 0-5.8-1.8-7.6-4.6L5.6 21.6a2 2 0 0 1 3.2-2.4z" fill="#ffd9b8" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
   <symbol id="bot" viewBox="0 0 100 100"><image href="/identidade-visual/mascote/bit.svg" width="100" height="100"/></symbol>
   <symbol id="teacher" viewBox="0 0 100 100">
     <path d="M18 98 C18 74 32 66 50 66 C68 66 82 74 82 98 Z" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="5" stroke-linejoin="round"/>
@@ -1063,6 +1221,281 @@ document.addEventListener("keydown", event => {
 // With the Bit saying every reason out loud for screen readers, the tip line stops repeating it
 addEventListener("DOMContentLoaded", () => { if (window.Bit) $("tip").removeAttribute("role") })
 loadRound(0)
+
+// Modo em grupo, para a Oficina presencial com o projetor. A sala vota levantando a mão, quem conduz toca na opção
+// mais votada (ou aperta a letra) e pode contar as mãos com + e -. Só números, sem nome de ninguém, e nada sai da página.
+// As rodadas, as peças e as armadilhas são as mesmas do jogo individual
+const HAND = '<svg viewBox="0 0 32 32" aria-hidden="true"><use href="#hand"/></svg>'
+const ICON = name => `<svg viewBox="0 0 32 32" aria-hidden="true"><use href="#icone-${name}"/></svg>`
+const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12 H19 M13 6 L19 12 L13 18" stroke="#2f2a4a" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+const WARN = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 L45 42 H3 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M24 18 V29" stroke="#2f2a4a" stroke-width="4.5" stroke-linecap="round"/><circle cx="24" cy="35.5" r="2.8" fill="#2f2a4a"/></svg>'
+const LETTERS = ["A", "B", "C", "D"]
+const BIT_POSE = pose => `<img src="/identidade-visual/mascote/bit-${pose}.svg" alt="">`
+const TALK_PAGES = ["Resposta certa", "Por que as outras falham", "Armadilha e conversa"]
+// The stage names come from the start screen, so they are written in one place only
+const STAGE_NAMES = [...document.querySelectorAll(".stage")].map(label => ({ id: label.querySelector("input").value, name: label.querySelector("b").textContent, note: label.querySelector("small").textContent }))
+const G = { on: false, screen: "intro", stage: "iniciais", round: 0, part: 0, options: [], crossed: [], solved: false, counts: [], misses: [], fallen: [], firstParts: 0, page: 0, status: "" }
+
+function groupFoot(keys, buttons = []) {
+  $("g-foot").innerHTML = `<p class="g-keys">${keys}</p><div class="g-nav">${buttons.map(button =>
+    `<button class="btn ${button.back ? "back-step" : ""}" type="button" data-go="${button.back ? "back" : "next"}">${button.back ? ICON("seta-esquerda") : ""}${button.label}${button.back ? "" : ARROW}</button>`).join("")}</div>`
+}
+function groupDots() {
+  const inGame = G.screen === "vote" || G.screen === "talk"
+  $("g-dots").innerHTML = inGame ? ROUNDS.map((_, index) => `<span class="${index === G.round ? "now" : index < G.round ? (G.misses[index] ? "later" : "first") : ""}"></span>`).join("") : ""
+  $("g-dots").setAttribute("aria-label", inGame ? `Pedido ${G.round + 1} de ${ROUNDS.length}` : "")
+}
+function groupBody(html, center = false) {
+  $("g-body").className = `g-body ${center === true ? "g-center" : center || ""}`
+  $("g-body").innerHTML = html
+  groupDots()
+  $("grupo").scrollTop = 0
+}
+
+function openGroup() {
+  G.on = true
+  G.stage = pickedStage() || stage
+  document.documentElement.classList.add("grupo")
+  $("grupo").hidden = false
+  drawGroupMute()
+  showIntro()
+  $("grupo").focus({ preventScroll: true })
+}
+// Leaving puts the individual game back on its start screen, with the stage the group played
+function closeGroup() {
+  G.on = false
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+  document.documentElement.classList.remove("grupo")
+  $("grupo").hidden = true
+  document.querySelector(`input[name="etapa"][value="${G.stage}"]`).checked = true
+  setStage(G.stage)
+  totalStars = 0
+  $("win").classList.remove("show")
+  $("final").classList.remove("show")
+  loadRound(0)
+  $("start").classList.add("show")
+  $("start").scrollTop = 0
+  $("group-open").focus({ preventScroll: true })
+}
+
+function showIntro() {
+  G.screen = "intro"
+  groupBody(`
+    <h1 class="g-big">Jogo do <span>Prompt</span></h1>
+    <div class="g-intro">${BIT_POSE("acenando")}<ol>
+      <li><b>1</b>Leiam juntos o pedido vago e a parte do prompt que falta.</li>
+      <li><b>2</b>A sala vota levantando a mão na A, na B ou na C.</li>
+      <li><b>3</b>Quem conduz toca na opção mais votada ou aperta a letra.</li></ol></div>
+    <p class="g-ask">Para quem a sala dá aula?</p>
+    <div class="g-stages" role="radiogroup" aria-label="Etapa">${STAGE_NAMES.map((item, index) =>
+      `<button class="g-stage" type="button" role="radio" aria-checked="${item.id === G.stage}" data-stage="${item.id}"><span class="g-letter">${LETTERS[index]}</span><b>${item.name}</b><small>${item.note}</small></button>`).join("")}</div>`, true)
+  groupFoot("<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> escolhem a etapa · <kbd>Espaço</kbd> começa · <kbd>Esc</kbd> sai", [{ label: "Começar" }])
+}
+function pickGroupStage(id) {
+  if (!STAGES[id]) return
+  G.stage = id
+  window.Lembrar?.guardar("jogo-do-prompt", { etapa: id })
+  document.querySelectorAll(".g-stage").forEach(button => button.setAttribute("aria-checked", button.dataset.stage === id))
+  beep([660])
+}
+
+function startGroup() {
+  setStage(G.stage)
+  G.misses = []
+  G.fallen = []
+  G.firstParts = 0
+  beep([523, 659, 784])
+  loadGroupRound(0)
+}
+function loadGroupRound(number) {
+  G.round = number
+  G.misses[number] = 0
+  G.fallen[number] = []
+  G.part = 0
+  startPart()
+}
+function startPart() {
+  const part = PARTS[G.part]
+  G.options = shuffle(ROUNDS[G.round][part.id].map(([text, why], index) => ({ text, why, good: index === 0 })))
+  G.crossed = G.options.map(() => false)
+  G.counts = G.options.map(() => 0)
+  G.solved = false
+  G.partMissed = false
+  G.status = ""
+  G.screen = "vote"
+  drawVote()
+}
+
+function drawVote() {
+  const data = ROUNDS[G.round], part = PARTS[G.part]
+  const top = Math.max(...G.counts)
+  const options = G.options.map((option, index) => {
+    const state = G.crossed[index] ? "wrong" : G.solved ? (option.good ? "right" : "dim") : ""
+    const shown = state === "wrong" || state === "right"
+    const mark = state === "wrong" ? ICON("errado") : state === "right" ? ICON("certo") : ""
+    return `<div class="g-option ${part.id} ${state} ${top > 0 && G.counts[index] === top ? "top-voted" : ""}" data-index="${index}">
+      <button class="g-pick" type="button" ${state ? "disabled" : ""} aria-label="Opção ${LETTERS[index]}: ${escape(option.text)}"><span class="g-head"><span class="g-letter">${LETTERS[index]}</span>${mark.replace("<svg ", '<svg class="g-mark" ')}</span><span class="g-text">${escape(option.text)}</span></button>
+      ${shown ? `<p class="g-why">${escape(option.why)}</p>` : ""}
+      <div class="g-hands"><button type="button" data-hand="-1" aria-label="Uma mão a menos na ${LETTERS[index]}">−</button><output>${HAND}${G.counts[index]}</output><button type="button" data-hand="1" aria-label="Uma mão a mais na ${LETTERS[index]}">+</button><small>mãos</small></div>
+    </div>`
+  }).join("")
+  const parts = PARTS.map((item, index) => {
+    const done = index < G.part || (index === G.part && G.solved)
+    return `<span class="g-part ${item.id} ${done ? "done" : index === G.part ? "now" : ""}"><i>${item.letter}</i>${item.name}${done ? ICON("certo") : ""}</span>`
+  }).join("")
+  groupBody(`
+    <div class="g-vague"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#teacher"/></svg><div><small>Pedido vago ${G.round + 1} de ${ROUNDS.length}</small><b>${escape(data.vague)}</b></div></div>
+    <div class="g-parts">${parts}</div>
+    <p class="g-ask">${part.name}: ${part.hint[0].toLowerCase() + part.hint.slice(1)}? <span>Levantem a mão na opção que vocês escolhem.</span></p>
+    <div class="g-options">${options}</div>
+    ${G.status ? `<p class="g-status ${G.solved ? "good" : "bad"}" role="status">${G.status}</p>` : ""}`)
+  const last = G.part === PARTS.length - 1
+  if (G.solved) groupFoot("<kbd>Espaço</kbd> ou <kbd>→</kbd> segue · <kbd>Esc</kbd> sai", [{ label: last ? "Ver a resposta certa" : "Próxima parte" }])
+  else groupFoot("<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> escolhem a mais votada · <kbd>Esc</kbd> sai")
+}
+
+function pickOption(index) {
+  if (G.screen !== "vote" || G.solved || G.crossed[index] || !G.options[index]) return
+  const option = G.options[index]
+  if (option.good) {
+    G.solved = true
+    if (!G.partMissed) G.firstParts++
+    G.status = G.partMissed ? "Agora sim! Leiam por que essa funciona." : "Acertaram de primeira! Leiam por que essa funciona."
+    beep([523, 784])
+  } else {
+    G.crossed[index] = true
+    G.partMissed = true
+    G.misses[G.round]++
+    G.fallen[G.round].push(option.text)
+    G.counts = G.options.map(() => 0)
+    G.status = "Essa não. Leiam o porquê e votem de novo entre as que sobraram."
+    beep([300, 200], { type: "sawtooth", volume: 0.12, spacing: 0.12 })
+  }
+  drawVote()
+}
+function countHand(index, change) {
+  if (G.screen !== "vote" || G.solved || G.crossed[index]) return
+  G.counts[index] = Math.max(0, Math.min(99, G.counts[index] + change))
+  drawVote()
+  document.querySelector(`.g-option[data-index="${index}"] [data-hand="${change}"]`)?.focus({ preventScroll: true })
+}
+
+// After the four parts: the right prompt, why the other blocks fail, and the Gemini trap with a question to talk about
+function showTalk(page) {
+  G.screen = "talk"
+  G.page = page
+  const data = ROUNDS[G.round], misses = G.misses[G.round]
+  const steps = `<div class="g-steps">${TALK_PAGES.map((name, index) => `<button type="button" data-page="${index}" ${index === page ? 'aria-current="step"' : ""}>${index + 1}. ${name}</button>`).join("")}</div>`
+  let html
+  if (page === 0) {
+    html = `<h2 class="g-title">Pedido ${G.round + 1}: "${escape(data.vague)}"</h2>
+      <span class="g-result ${misses ? "" : "first"}">${ICON(misses ? "repetir" : "estrela")}${misses ? `A sala chegou lá depois de ${misses} ${misses === 1 ? "voto errado" : "votos errados"}` : "A sala acertou tudo de primeira!"}</span>
+      <ol class="g-prompt">${PARTS.map(part => `<li class="${part.id}"><span class="g-letter">${part.letter}</span><div><small>${part.name}</small>${escape(data[part.id][0][0])}</div></li>`).join("")}</ol>`
+  } else if (page === 1) {
+    html = `<h2 class="g-title">Por que as outras falham</h2>
+      <div class="g-fails">${PARTS.map(part => `<div class="g-fail ${part.id}"><h3><span class="g-letter">${part.letter}</span>${part.name}</h3>
+        ${data[part.id].slice(1).map(([text, why]) => `<p><b>${escape(text)}${G.fallen[G.round].includes(text) ? "<em>a sala votou</em>" : ""}</b><span>${escape(why)}</span></p>`).join("")}</div>`).join("")}</div>`
+  } else {
+    html = `<div class="g-trap">${WARN}<div><small>Armadilha do Gemini</small><p>${escape(data.trap.text)}</p><span class="say">${escape(data.trap.say)}</span></div></div>
+      <div class="g-talk">${BIT_POSE("pensando")}<div><small>Para conversar</small><b>O que vocês mudariam no pedido?</b><p>Pensem na turma de vocês: que Contexto e que Formato vocês dariam ao Gemini?</p></div></div>`
+  }
+  groupBody(steps + html, page === 2 && "g-middle")
+  const last = G.round + 1 === ROUNDS.length
+  const next = page < 2 ? TALK_PAGES[page + 1] : last ? "Ver o placar da sala" : "Próximo pedido"
+  groupFoot("<kbd>←</kbd> <kbd>→</kbd> ou <kbd>Espaço</kbd> mudam a tela · <kbd>Esc</kbd> sai", page ? [{ label: "Voltar", back: true }, { label: next }] : [{ label: next }])
+}
+
+function showEnd() {
+  G.screen = "end"
+  const firsts = G.misses.filter(misses => misses === 0).length
+  groupBody(`
+    <h1 class="g-big">Placar da <span>sala</span></h1>
+    <div class="g-score">${BIT_POSE(firsts >= 3 ? "comemorando" : "feliz")}${firsts} de ${ROUNDS.length} pedidos certos de primeira</div>
+    <p class="g-ask"><span>${G.firstParts} das ${ROUNDS.length * PARTS.length} partes saíram certas no primeiro voto. Levem as frases que salvam para o Gemini:</span></p>
+    <ul class="g-saves" aria-label="As frases que evitam as armadilhas do Gemini">${ROUNDS.map((data, index) => `<li>${ICON(G.misses[index] ? "repetir" : "certo")}<div><b>${escape(data.vague)}</b>${escape(data.trap.say)}</div></li>`).join("")}</ul>
+    <div class="g-actions">
+      <button class="btn go" type="button" id="g-again">${ICON("repetir")}Jogar de novo</button>
+      <button class="btn" type="button" id="g-change">Trocar a etapa</button>
+      <button class="btn" type="button" id="g-leave">Sair do modo em grupo</button>
+    </div>`, true)
+  groupFoot("<kbd>Esc</kbd> sai do modo em grupo")
+  beep([523, 659, 784, 1047], { spacing: 0.14 })
+}
+
+function groupNext() {
+  if (G.screen === "intro") startGroup()
+  else if (G.screen === "vote" && G.solved) {
+    if (G.part + 1 < PARTS.length) {
+      G.part++
+      startPart()
+    } else showTalk(0)
+  } else if (G.screen === "talk") {
+    if (G.page < 2) showTalk(G.page + 1)
+    else if (G.round + 1 < ROUNDS.length) loadGroupRound(G.round + 1)
+    else showEnd()
+  }
+}
+function groupBack() {
+  if (G.screen === "talk" && G.page > 0) showTalk(G.page - 1)
+}
+
+const drawGroupMute = () => {
+  $("g-mute").innerHTML = muted ? SILENT : SOUND
+  $("g-mute").setAttribute("aria-label", muted ? "Ligar o som" : "Desligar o som")
+}
+$("group-open").addEventListener("click", openGroup)
+$("g-exit").addEventListener("click", closeGroup)
+$("g-mute").addEventListener("click", event => {
+  muted = !muted
+  drawMute()
+  drawGroupMute()
+  event.currentTarget.blur()
+})
+$("g-full").addEventListener("click", event => {
+  event.currentTarget.blur()
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+  else document.documentElement.requestFullscreen?.().catch(() => {})
+})
+$("g-foot").addEventListener("click", event => {
+  const button = event.target.closest("[data-go]")
+  if (button) button.dataset.go === "back" ? groupBack() : groupNext()
+})
+$("g-body").addEventListener("click", event => {
+  const target = event.target
+  const hand = target.closest("[data-hand]")
+  if (hand) return countHand(Number(hand.closest(".g-option").dataset.index), Number(hand.dataset.hand))
+  if (target.closest(".g-hands")) return
+  const option = target.closest(".g-option")
+  if (option) return pickOption(Number(option.dataset.index))
+  const stageButton = target.closest("[data-stage]")
+  if (stageButton) return pickGroupStage(stageButton.dataset.stage)
+  const page = target.closest("[data-page]")
+  if (page) return showTalk(Number(page.dataset.page))
+  if (target.closest("#g-again")) return startGroup()
+  if (target.closest("#g-change")) return showIntro()
+  if (target.closest("#g-leave")) return closeGroup()
+})
+// The keyboard of the group mode runs before the page's own Enter, so one key never does two things.
+// Arrows, space, Enter and the Page keys of a presentation clicker move on; letters choose; Esc leaves
+addEventListener("keydown", event => {
+  if (!G.on || event.ctrlKey || event.metaKey || event.altKey) return
+  const key = event.key, onButton = event.target.closest?.("button, a")
+  let handled = true
+  if (key === "Escape") closeGroup()
+  else if ((key === " " || key === "Enter") && onButton) handled = false
+  else if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(key)) groupNext()
+  else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(key)) groupBack()
+  else if (/^[a-d]$/i.test(key)) {
+    const index = LETTERS.indexOf(key.toUpperCase())
+    if (G.screen === "intro" && STAGE_NAMES[index]) pickGroupStage(STAGE_NAMES[index].id)
+    else if (G.screen === "vote") pickOption(index)
+  } else handled = false
+  if (handled) {
+    event.preventDefault()
+    event.stopImmediatePropagation()
+  }
+}, true)
+if (new URLSearchParams(location.search).has("grupo")) openGroup()
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
