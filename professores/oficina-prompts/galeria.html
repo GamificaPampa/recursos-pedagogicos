@@ -90,6 +90,11 @@
   .game .by .i { width: 16px; height: 16px; color: var(--ink) }
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px }
   .row .grow { flex: 1 }
+  /* Criados por você: os jogos publicados neste aparelho, guardados pelo Publicar meu jogo */
+  .game.meu .stage { height: 110px }
+  .row + .row { margin-top: 0; padding-top: 0 }
+  .btn.mandar { --c: var(--pink) }
+  .game.meu .row:last-child { flex-direction: column; align-items: stretch }
   .none { grid-column: 1 / -1; margin: 0; padding: 16px 20px; background: rgba(255, 255, 255, .7); border: 3px dashed var(--ink); border-radius: 20px; font-weight: 600 }
 
   /* The scenes inside the game cards */
@@ -216,6 +221,7 @@
     <p class="bubble">Aqui ficam os jogos que os professores criaram com o Gemini. Toque em Jogar para abrir um jogo.</p>
   </div>
   <nav class="nav">
+    <a href="#criados" id="nav-criados" style="--c: var(--purple)" hidden>Criados por você</a>
     <a href="#jogos" style="--c: var(--yellow)">Jogos dos professores</a>
     <a href="#enviar" style="--c: var(--mint)">Mande o seu jogo</a>
     <a href="#exemplos" style="--c: var(--pink)">Exemplos</a>
@@ -223,6 +229,12 @@
 </header>
 
 <main>
+<section class="sec" id="criados" hidden>
+  <h2 class="sec-title" style="--c: var(--purple)">Criados por você</h2>
+  <p class="sec-sub">Os jogos que você publicou neste aparelho, pelo <a href="/publicador/">Publicar meu jogo</a>. Só aparecem aqui, para você. Para entrar nos Jogos dos professores, mande para a equipe.</p>
+  <div class="games" id="criados-lista"></div>
+</section>
+
 <section class="sec" id="jogos">
   <h2 class="sec-title" style="--c: var(--yellow)">Jogos dos professores</h2>
   <p class="sec-sub" id="count"></p>
@@ -284,10 +296,10 @@
         <label for="f-jogo">Nome do jogo
           <input type="text" id="f-jogo" name="nome_do_jogo" maxlength="80" placeholder="Por exemplo: Caça às frações" autocomplete="off" required aria-describedby="e-jogo">
         </label>
-        <label for="f-link">Link do Canvas
+        <label for="f-link">Link do jogo
           <input type="url" id="f-link" name="link_do_canvas" inputmode="url" placeholder="https://gemini.google.com/share/..." autocomplete="off" required aria-describedby="d-link">
-          <span class="hint" id="d-link">É o link de Compartilhar do Gemini. Antes de enviar, cole numa janela anônima: se o jogo abrir sem pedir login, está certo.</span>
-          <span class="hint warn" id="a-link" hidden>Esse link não parece ser do Gemini. Confira se é o link de Compartilhar do Canvas.</span>
+          <span class="hint" id="d-link">É o link de Compartilhar do Gemini ou o link que o Publicar meu jogo deu. Antes de enviar, cole numa janela anônima: se o jogo abrir sem pedir login, está certo.</span>
+          <span class="hint warn" id="a-link" hidden>Esse link não parece ser do Gemini nem do Publicar meu jogo. Confira se é o link certo do jogo.</span>
         </label>
         <div class="pair">
           <label for="f-materia">Matéria
@@ -506,6 +518,35 @@ function gameCard(game) {
   </article>`
 }
 
+// Criados por você: o Publicar meu jogo guarda no navegador o nome, o link e a data de cada jogo publicado
+const CRIADOS = "gamificapampa-jogos-criados"
+function lerCriados() {
+  try {
+    const lista = JSON.parse(localStorage.getItem(CRIADOS) || "[]")
+    return Array.isArray(lista) ? lista.filter(jogo => jogo && jogo.nome && safeLink(jogo.link)) : []
+  } catch { return [] }
+}
+function dataBR(data) {
+  const [ano, mes, dia] = String(data || "").split("-")
+  return dia ? `${dia}/${mes}/${ano}` : ""
+}
+function renderCriados() {
+  const criados = lerCriados()
+  $("criados").hidden = $("nav-criados").hidden = !criados.length
+  $("criados-lista").innerHTML = criados.map((jogo, n) => {
+    const link = safeLink(jogo.link), cor = Object.keys(COLORS)[(n + 4) % 6], quando = dataBR(jogo.data)
+    return `<article class="game meu" style="${paint(cor)};--d:${(n % 3) * .08}s">
+    <div class="stage"><span aria-hidden="true">${SCENES.jogo}</span><span class="tag">Criado por você</span></div>
+    <div class="body">
+      <h3>${escape(jogo.nome)}</h3>
+      ${quando ? `<p class="meta"><span class="dot"></span>Publicado em ${quando}</p>` : ""}
+      <div class="row"><a class="btn grow" href="${escape(link)}" target="_blank" rel="noopener">${icon("play")}Jogar</a><button class="btn white small" type="button" data-copy="${escape(link)}">${icon("copy")}Copiar link</button></div>
+      <div class="row"><button class="btn small mandar grow" type="button" data-mandar="${n}">${icon("send")}Mandar para a Galeria</button><button class="btn white small" type="button" data-tirar="${n}">Tirar daqui</button></div>
+    </div>
+  </article>`
+  }).join("")
+}
+
 let filter = "todas"
 const FILTER_FROM = 4 // com menos jogos que isso, o filtro só atrapalha
 
@@ -547,6 +588,36 @@ $("filters").addEventListener("click", event => {
   if (!button) return
   filter = button.dataset.filter
   render()
+})
+$("criados-lista").addEventListener("click", event => {
+  const copiar = event.target.closest("[data-copy]")
+  if (copiar) return copy(copiar.dataset.copy, "Link copiado!")
+  const criados = lerCriados()
+  const mandar = event.target.closest("[data-mandar]")
+  if (mandar) {
+    const jogo = criados[Number(mandar.dataset.mandar)]
+    if (!jogo) return
+    if (!$("send-done").hidden) $("send-again").click()
+    $("f-jogo").value = jogo.nome
+    $("f-link").value = jogo.link
+    checkLinkHost()
+    $("enviar").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+    $("f-materia").focus({ preventScroll: true })
+    toast("Preenchemos o nome e o link. Complete o resto e envie.")
+    return
+  }
+  const tirar = event.target.closest("[data-tirar]")
+  if (tirar) {
+    if (tirar.dataset.certeza !== "1") {
+      tirar.dataset.certeza = "1"
+      tirar.textContent = "Tirar mesmo?"
+      return
+    }
+    criados.splice(Number(tirar.dataset.tirar), 1)
+    try { localStorage.setItem(CRIADOS, JSON.stringify(criados)) } catch {}
+    renderCriados()
+    toast("Tirado deste aparelho. O jogo continua no ar.")
+  }
 })
 $("games").addEventListener("click", event => {
   const button = event.target.closest("[data-copy]")
@@ -597,7 +668,7 @@ function mark(list) {
 
 // O aviso do link aparece enquanto a pessoa digita, mas não impede o envio: a equipe testa o link de qualquer jeito
 function checkLinkHost() {
-  $("a-link").hidden = !value("f-link") || /gemini\.google\.com|g\.co\/gemini/i.test(readLink())
+  $("a-link").hidden = !value("f-link") || /gemini\.google\.com|g\.co\/gemini|\.github\.io\//i.test(readLink())
 }
 
 form.addEventListener("input", () => {
@@ -652,6 +723,7 @@ $("send-again").addEventListener("click", () => {
 })
 
 render()
+renderCriados()
 </script>
 </body>
 </html>
