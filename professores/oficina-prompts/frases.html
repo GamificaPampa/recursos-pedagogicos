@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Frases que salvam · Oficina de Prompts</title>
-<meta name="description" content="As frases que evitam os erros mais comuns do Gemini: bloco de código, teste interativo, desenho com símbolos, códigos da BNCC, dados inventados e resposta em inglês. Copie e cole no fim do seu pedido.">
+<meta name="description" content="As frases que evitam os erros mais comuns do Gemini: bloco de código, teste interativo, desenho com símbolos, códigos da BNCC, dados inventados e resposta em inglês. Copie e cole no fim do seu pedido, ou mande depois da primeira resposta para pedir mais.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -42,6 +42,9 @@
   .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: auto }
   .btn svg { width: 22px; height: 22px }
   .copiado { font-weight: 700; color: #17694a }
+  .secao { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 40px 0 22px }
+  .secao h2 { margin: 0; font-size: clamp(28px, 6vw, 38px); line-height: 1.05; color: #fff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 4px 0 var(--ink) }
+  .secao p { flex: 1 1 320px; margin: 0; font-weight: 600 }
   .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
   footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
@@ -72,6 +75,13 @@
   </section>
 
   <div class="frases" id="frases"></div>
+
+  <section class="secao" data-bit-pose="feliz" data-bit-dica="A primeira resposta é um rascunho. Mande uma destas na mesma conversa para revisar, deixar mais difícil ou mais fácil.">
+    <h2>Peça mais</h2>
+    <p>A primeira resposta é um ponto de partida. Depois dela, mande uma destas mensagens na mesma conversa.</p>
+  </section>
+
+  <div class="frases" id="peca-mais"></div>
 
   <div class="mais">
     <a class="btn btn--conhecer" href="https://gamificapampa.github.io/maquina/">Máquina de prompts</a>
@@ -125,27 +135,56 @@ const FRASES = [
     diga: "Descreva só a necessidade, sem nome nem turma: por exemplo, um estudante de 15 anos com TDAH que se perde em textos longos.", quando: "adaptações e qualquer pedido que fale de um aluno" },
 ]
 
+// Mensagens para mandar na mesma conversa, depois da primeira resposta (o bloco Peça mais da Máquina de prompts)
+const PECA_MAIS = [
+  { titulo: "Revisar como especialista", icone: "revisar", cor: "#4fd6a6", luz: "#c9f5e3",
+    erro: "A primeira resposta pode ter conta errada, fato inventado, gabarito faltando ou a resposta certa sempre na mesma letra.",
+    diga: "Agora revise o material como um(a) coordenador(a) pedagógico(a) exigente. Confira o objetivo, os erros comuns, cada conta e cada fato, e se a resposta certa muda de letra entre as questões. Aponte os 3 pontos mais fracos e entregue a versão corrigida inteira, sem citar códigos da BNCC.", quando: "sempre, antes de levar o material para a turma" },
+  { titulo: "Mais desafio", icone: "foguete", cor: "#ff8a3d", luz: "#ffdcc4",
+    erro: "O material ficou fácil demais e só pede para lembrar.",
+    diga: "Faça uma versão mais desafiadora do mesmo material, com mais perguntas que peçam para explicar, comparar ou resolver um problema novo. Mantenha o mesmo formato.", quando: "turmas que já dominam o tema ou para quem termina antes" },
+  { titulo: "Para quem tem dificuldade", icone: "broto", cor: "#4da3ff", luz: "#cfe6ff",
+    erro: "Parte da turma ainda não acompanha o material como ele saiu.",
+    diga: "Faça uma versão para quem ainda tem dificuldade com o tema, com passos menores, um exemplo resolvido antes de cada parte e frases curtas. Mantenha o mesmo objetivo.", quando: "recuperação, reforço e quem precisa de mais apoio" },
+  { titulo: "Ligar ao lugar", icone: "casa", cor: "#ffd23f", luz: "#fff1a8",
+    erro: "Os exemplos falam de lugares e situações longe da turma.",
+    diga: "Troque os exemplos por situações de Alegrete e do Pampa gaúcho, sem inventar lugares nem dados.", quando: "problemas, histórias e textos com exemplos do dia a dia" },
+  { titulo: "Embaralhar as alternativas", icone: "repetir", cor: "#a08bff", luz: "#e2dbff",
+    erro: "A resposta certa cai quase sempre na mesma letra, e a turma percebe.",
+    diga: "Embaralhe as alternativas para que a resposta certa mude de letra entre as questões e atualize o gabarito.", quando: "quizzes, simulados e questões do Enem ou do Encceja" },
+  { titulo: "Perguntas abertas", icone: "balao", cor: "#ff5f8f", luz: "#ffd6e3",
+    erro: "Só tem múltipla escolha, e você quer ver a turma explicar com as próprias palavras.",
+    diga: "Agora crie 3 perguntas abertas sobre o mesmo objetivo, com o que esperar de uma boa resposta.", quando: "depois de um quiz ou de uma atividade, para avaliar o que a turma entendeu" },
+]
+
 const COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>'
 const escape = texto => texto.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])
 const icone = nome => window.Icones ? Icones.svg(nome) : ""
 
-document.getElementById("frases").innerHTML = FRASES.map((f, i) => `
+const montar = (id, lista, botao) => { document.getElementById(id).innerHTML = lista.map((f, i) => `
   <article class="frase" style="--c: ${f.cor}; --light: ${f.luz}">
     <h2>${icone(f.icone)}${escape(f.titulo)}</h2>
     <p class="erro">${escape(f.erro)}</p>
     <p class="diga">${escape(f.diga)}</p>
     <p class="quando"><b>Quando usar:</b> ${escape(f.quando)}</p>
-    <div class="linha"><button class="btn btn--jogar" type="button" data-i="${i}">${COPIAR}Copiar a frase</button><span class="copiado" role="status"></span></div>
-  </article>`).join("")
+    <div class="linha"><button class="btn btn--jogar" type="button" data-i="${i}">${COPIAR}${botao}</button><span class="copiado" role="status"></span></div>
+  </article>`).join("") }
+montar("frases", FRASES, "Copiar a frase")
+montar("peca-mais", PECA_MAIS, "Copiar a mensagem")
 
-const avisar = (lugar, ok) => {
-  lugar.textContent = ok ? "Copiado! Cole no fim do seu pedido." : ""
+const avisar = (lugar, ok, texto = "Copiado! Cole no fim do seu pedido.") => {
+  lugar.textContent = ok ? texto : ""
   setTimeout(() => { lugar.textContent = "" }, 4000)
 }
 document.getElementById("frases").addEventListener("click", async evento => {
   const botao = evento.target.closest("button[data-i]")
   if (!botao) return
   avisar(botao.parentElement.querySelector(".copiado"), await Copiar.texto(FRASES[botao.dataset.i].diga, { avisar: false }))
+})
+document.getElementById("peca-mais").addEventListener("click", async evento => {
+  const botao = evento.target.closest("button[data-i]")
+  if (!botao) return
+  avisar(botao.parentElement.querySelector(".copiado"), await Copiar.texto(PECA_MAIS[botao.dataset.i].diga, { avisar: false }), "Copiado! Mande na mesma conversa.")
 })
 // As frases gerais, que servem para quase todo pedido (sem a do Canvas, que é uma mensagem à parte)
 document.getElementById("todas").addEventListener("click", async () => {
