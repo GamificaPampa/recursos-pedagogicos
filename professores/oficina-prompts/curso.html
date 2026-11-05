@@ -514,7 +514,7 @@
   <section class="block" aria-labelledby="h-modulos">
     <h2 class="h2" id="h-modulos" style="--c: var(--mint)">Os módulos</h2>
     <div class="mods">
-      <a class="mod" href="#modulo-1" style="--c: var(--blue); --light: #cfe6ff"><span class="n" aria-hidden="true">1</span><b>Conversando com o Gemini</b><span>As 4 partes de um bom pedido, conversar para melhorar, as respostas estranhas e privacidade.</span><span class="tag" data-tag>A fazer</span></a>
+      <a class="mod" href="#modulo-1" style="--c: var(--blue); --light: #cfe6ff"><span class="n" aria-hidden="true">1</span><b>Conversando com o Gemini</b><span>As 4 partes de um bom pedido, as três chaves, conversar para melhorar, as respostas estranhas e privacidade.</span><span class="tag" data-tag>A fazer</span></a>
       <a class="mod" href="#modulo-2" style="--c: var(--pink); --light: #ffd6e3"><span class="n" aria-hidden="true">2</span><b>Conteúdo para a turma</b><span>Planos, histórias, quizzes e rubricas, três truques, BNCC sem inventar e inclusão.</span><span class="tag" data-tag>A fazer</span></a>
       <a class="mod" href="#modulo-3" style="--c: var(--mint); --light: #c9f5e3"><span class="n" aria-hidden="true">3</span><b>Jogos no Canvas</b><span>Duas mensagens, tipos de jogo com exemplos, consertar um problema por vez e compartilhar.</span><span class="tag" data-tag>A fazer</span></a>
       <a class="mod" href="#modulo-4" style="--c: var(--purple); --light: #e2dbff"><span class="n" aria-hidden="true">4</span><b>Gems e projeto final</b><span>O seu assistente com instruções fixas, um exemplo pronto e o roteiro do projeto final.</span><span class="tag" data-tag>A fazer</span></a>
@@ -550,7 +550,7 @@
   </header>
   <div class="goal">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
-    <p class="bubble"><b>Objetivo:</b> escrever um pedido claro com as 4 partes, melhorar a resposta conversando, consertar as respostas estranhas e proteger os dados <span data-sw="m1-goal">das crianças</span>.</p>
+    <p class="bubble"><b>Objetivo:</b> escrever um pedido claro com as 4 partes e as três chaves, melhorar a resposta conversando, consertar as respostas estranhas e proteger os dados <span data-sw="m1-goal">das crianças</span>.</p>
   </div>
   <div class="stage-bar"><span class="stage-bar-l" data-stage-label>Escolha a sua etapa para ver exemplos dela:</span><div class="stage-picks compact" data-stage-picker data-compact role="group" aria-label="Sua etapa"></div></div>
   <p class="stage-line" data-line="1" hidden></p>
@@ -584,6 +584,21 @@
         <div class="bad"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-no"/></svg>Vago</b><p class="quote" data-sw="ad-vago">Faça um jogo de matemática.</p><p class="small" style="color: var(--ink)">O Gemini precisa adivinhar a idade, o conteúdo e o formato.</p></div>
         <div class="good"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-yes"/></svg>Com as 4 partes</b><p class="quote" data-sw="ad-bom">Você é professor(a) de Matemática do 2º ano. Crie um jogo de somas até 20, para crianças de 7 anos que estão começando a ler, no celular. Use botões grandes, 3 fases e estrelas no final.</p></div>
       </div>
+    </article>
+    <article class="card wide">
+      <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-check"/></svg>As três chaves: objetivo, erro comum e conferir</h3>
+      <p>Com as 4 partes, a resposta fica certa para a turma. Com estas três frases, ela fica mais funda. Nos nossos testes no Gemini, a nota média das respostas subiu de 2,0 para 2,6, numa escala de 1 a 3.</p>
+      <div class="tricks">
+        <div class="trick" style="--t: #cfe6ff"><b>1. O objetivo no topo</b><p class="say">No topo, escreva numa frase o objetivo: o que a turma vai conseguir fazer depois.</p></div>
+        <div class="trick" style="--t: #ffd6e3"><b>2. Os erros comuns</b><p class="say">Considere os erros mais comuns dessa idade sobre o tema. Use nas alternativas erradas e nos avisos, com a explicação.</p></div>
+        <div class="trick" style="--t: #c9f5e3"><b>3. Conferir</b><p class="say">Antes de entregar, confira cada conta, cada fato e o gabarito.</p></div>
+      </div>
+      <p style="margin-top: 14px"><b>Antes e depois</b>, num quiz de frações do 4º ano:</p>
+      <div class="two">
+        <div class="bad"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-no"/></svg>Sem as chaves</b><p class="quote">Você é professor(a) de Matemática do 4º ano. Crie um quiz de 8 perguntas sobre frações, para crianças de 9 anos.</p><p class="small" style="color: var(--ink)">Saíram perguntas de definição, que só pedem para lembrar.</p></div>
+        <div class="good"><b><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-yes"/></svg>Com as três chaves</b><p class="quote">O mesmo pedido, com o objetivo no topo, os erros comuns da idade nas alternativas erradas e “antes de entregar, confira cada conta e o gabarito”.</p><p class="small" style="color: var(--ink)">Saíram 2 perguntas de lembrar, 4 de aplicar e 2 de explicar. Cada alternativa errada veio de um erro real, explicado no gabarito.</p></div>
+      </div>
+      <p class="note">Mesmo pedindo para conferir, revise você também: o Gemini ainda erra rimas, nomes e contas. Se ele recusar o pedido, toque em Refazer ou abra uma conversa nova. A <a href="https://gamificapampa.github.io/maquina/">Máquina de prompts</a> já põe as três chaves no pedido.</p>
     </article>
     <article class="card">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-wrench"/></svg>Converse para melhorar</h3>
@@ -1265,7 +1280,7 @@ const RULES = [
   ["fix", "Se eu disser que algo não funcionou, conserte só aquilo, sem mudar o resto."],
 ]
 
-// Final test: 10 questions, the index of the right option, the explanation and the module to review
+// Final test: 12 questions, the index of the right option, the explanation and the module to review
 const QUIZ = [
   { m: 1, q: "Como a IA generativa, como o Gemini, cria as respostas?",
     opts: ["Copia a resposta certa de um livro oficial.", "Prevê as palavras mais prováveis a partir do seu pedido.", "Pensa como uma pessoa e por isso nunca erra."], right: 1,
@@ -1276,9 +1291,9 @@ const QUIZ = [
   { m: 1, q: "A atividade veio boa, mas difícil demais para a turma. O que fazer?",
     opts: ["Pedir cinco mudanças diferentes de uma vez.", "Apagar a conversa e desistir.", "Continuar a conversa com uma mudança: “Deixe mais simples, para 7 anos.”"], right: 2,
     why: "Converse para melhorar, uma mudança de cada vez. Assim fica fácil ver o que melhorou." },
-  { m: 1, q: "O Gemini respondeu em inglês e pôs a atividade inteira num bloco de código. O que fazer?",
-    opts: ["Desistir e escrever tudo à mão.", "Pedir: “Responda em português do Brasil, em texto normal, fora de bloco de código.”", "Copiar o código e mandar para as crianças."], right: 1,
-    why: "São erros comuns do Gemini, e cada um tem uma frase que resolve. Dá até para pôr essas frases logo no primeiro pedido." },
+  { m: 1, q: "Seu quiz saiu só com perguntas de lembrar a definição. Qual acréscimo ao pedido ajuda mais?",
+    opts: ["Pedir mais perguntas: quanto mais, melhor.", "O objetivo no topo, os erros comuns da turma nas alternativas erradas e “antes de entregar, confira cada conta e o gabarito”.", "Escrever o pedido todo em letras maiúsculas."], right: 1,
+    why: "São as três chaves. O objetivo guia o material, os erros comuns viram alternativas erradas explicadas e a conferência pega contas e fatos errados. Mesmo assim, revise você também." },
   { m: 2, q: "Você quer exercícios no mesmo estilo dos que já usa com a turma. Qual truque ajuda mais?",
     opts: ["Dar um exemplo: colar um exercício seu e pedir “faça no mesmo estilo”.", "Escrever o pedido todo em letras maiúsculas.", "Pedir que ele invente um estilo novo."], right: 0,
     why: "Dar um exemplo é o jeito mais rápido de o Gemini entender o que você quer. Os outros truques são pedir perguntas antes e pedir níveis." },
