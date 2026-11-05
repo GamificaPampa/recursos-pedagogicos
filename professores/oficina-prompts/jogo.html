@@ -428,7 +428,7 @@
     <label class="stage"><input type="radio" name="etapa" value="medio"><span><b>Ensino Médio</b><small>Do 1º ao 3º ano</small></span></label>
     <label class="stage"><input type="radio" name="etapa" value="eja"><span><b>EJA</b><small>Jovens e adultos, da alfabetização ao Ensino Médio</small></span></label>
   </div>
-  <p class="how">São 5 pedidos. Cada parte tem três blocos e só um é bom. Cuidado: o mais comprido nem sempre é o certo. Acerte de primeira para ganhar 3 estrelas.</p>
+  <p class="how">São <span id="how-count">5</span> pedidos. Cada parte tem três blocos e só um é bom. Cuidado: o mais comprido nem sempre é o certo. Acerte de primeira para ganhar 3 estrelas.</p>
   <div class="group-row">
     <button class="btn" type="button" id="begin">Começar<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></button>
     <button class="btn calm" type="button" id="group-open"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="4" width="26" height="17" rx="2.5" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 21v4.5M10 29.5l6-4 6 4" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5 17.5 16 8l4.5 9.5M13.2 14h5.6" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Jogar em grupo (projetor)</button>
@@ -869,14 +869,70 @@ const ALL_ROUNDS = [
              ["Um currículo chique, em inglês, com foto e todos os documentos, para impressionar.", "Currículo de treino vai em português e sem documentos. E o Gemini às vezes responde em inglês: peça português do Brasil."]],
     trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem dado de estudante. Peça assim:", say: "Descreva a turma, sem nome de estudante. Responda em português do Brasil." },
   },
+  // As três chaves da spec das respostas mais profundas (equipe/notas/spec-profundidade-maquina.md):
+  // o objetivo na Tarefa, os erros comuns no Contexto e a conferência antes de entregar no Formato
+  {
+    id: "relogio",
+    vague: "Faça uma atividade sobre as horas.",
+    answer: { who: "Professor(a) de Matemática · 3º ano", title: "Que horas são? Horas exatas e meias horas", audience: "8 anos · relógio de ponteiros", shape: "sheet", note: "Objetivo no topo e gabarito no fim" },
+    role: [["Você é professor(a) experiente de Matemática do 3º ano.", "Matéria e ano certos: ele pensa no que essa turma já sabe."],
+           ["Você é um relojoeiro.", "Relojoeiro conserta relógio, não ensina a ler as horas. Diga a matéria e o ano."],
+           ["Você é professor(a) de Matemática de todos os anos, do 1º ano ao Ensino Médio, de qualquer escola.", "Todos os anos ao mesmo tempo não acertam nenhum. Diga o ano: 3º ano."]],
+    task: [["Crie uma atividade para imprimir sobre as horas, para a turma conseguir ler horas exatas e meias horas no relógio de ponteiros.", "Com o objetivo, cada exercício trabalha o que a turma precisa conseguir fazer no fim."],
+           ["Crie uma atividade sobre as horas.", "Sobre as horas, mas para a turma conseguir fazer o quê? Sem objetivo, vêm perguntas soltas de decorar."],
+           ["Crie uma atividade completa sobre as horas, os minutos, os segundos, os dias, os meses, o calendário e os fusos horários.", "Assunto demais e nenhum objetivo. Diga o que a turma deve conseguir fazer no fim."]],
+    context: [["Para crianças de 8 anos que leem as horas no celular, mas ainda não no relógio de ponteiros.", "Ele parte do que a turma já faz e vai até o que falta."],
+              ["Para crianças.", "Que idade? O que elas já sabem das horas?"],
+              ["Para crianças que adoram brincar e estão sempre perguntando quanto falta para o recreio.", "Gostar de recreio não diz o que a turma já sabe. Conte a idade e o que ela já lê."]],
+    format: [["Uma folha A4 com um exemplo resolvido, 5 exercícios do fácil ao difícil, cada relógio descrito entre parênteses e o gabarito.", "Pronta para imprimir, com o exemplo que mostra o caminho e os relógios descritos."],
+             ["Bastante exercício.", "Quantos? Em que ordem? Com gabarito?"],
+             ["Uma folha com um relógio desenhado com letras e símbolos em cada exercício.", "O Gemini desenha mal com letras e símbolos. Peça cada relógio descrito entre parênteses."]],
+    trap: { text: "Sem objetivo, o Gemini escolhe o mais fácil: perguntas de decorar, que não mostram se a turma aprendeu. Peça assim:", say: "No topo, escreva numa frase o objetivo: o que a turma vai conseguir fazer depois." },
+  },
+  {
+    id: "negativos",
+    vague: "Faça um quiz de números negativos.",
+    answer: { who: "Professor(a) de Matemática · 7º ano", title: "Quiz: qual número é maior?", audience: "12 anos · o erro do sinal", shape: "quiz", options: ["-5", "-2", "0"], right: 1, note: "Cada alternativa errada explicada" },
+    role: [["Você é professor(a) experiente de Matemática do 7º ano, que conhece os erros mais comuns da turma.", "Ele escreve como quem já viu esses erros na sala."],
+           ["Você é uma calculadora.", "Calculadora faz conta, não ensina. Diga a matéria e o ano."],
+           ["Você é um matemático premiado, que resolve de cabeça qualquer problema, do mais fácil ao mais difícil.", "Resolver de cabeça não é ensinar. Diga a matéria e o ano: Matemática do 7º ano."]],
+    task: [["Crie um quiz de 8 perguntas sobre comparar e somar números negativos.", "Quantidade e tema definidos, com o que a turma vai fazer: comparar e somar."],
+           ["Faça umas perguntas.", "Quantas? Sobre qual assunto?"],
+           ["Crie um quiz sobre todos os números: naturais, inteiros, racionais, irracionais e reais.", "Assunto demais para um quiz. Escolha um tema, como os números negativos."]],
+    context: [["Para estudantes de 12 anos que costumam achar que -5 é maior que -2, porque 5 é maior que 2.", "Com o erro da turma, as alternativas erradas vêm dele, e o gabarito explica por quê."],
+              ["Para o 7º ano.", "Onde a turma costuma errar? Sem isso, as alternativas erradas não pegam ninguém."],
+              ["Para estudantes que às vezes erram e às vezes acertam, dependendo do dia e da vontade.", "Errar às vezes não diz onde. Conte o erro que a turma repete, como achar -5 maior que -2."]],
+    format: [["Múltipla escolha com 3 alternativas, as erradas vindas desse erro, sem o teste interativo, e o gabarito explicando cada uma.", "Cada alternativa errada mostra um engano real, e o gabarito ensina a sair dele."],
+             ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
+             ["Com a reta numérica desenhada com traços e números ao lado de cada pergunta.", "O Gemini desenha mal com traços e números. Peça a reta descrita em palavras, entre parênteses."]],
+    trap: { text: "Sem os erros da turma, o Gemini cria alternativas erradas que ninguém escolheria, e o quiz não mostra quem ainda confunde. Peça assim:", say: "Considere os erros mais comuns dessa idade sobre o tema. As alternativas erradas vêm desses erros." },
+  },
+  {
+    id: "genetica",
+    vague: "Faça questões de genética.",
+    answer: { who: "Professor(a) de Biologia · Ensino Médio", title: "Enem: o cruzamento Aa × Aa", audience: "17 anos · estilo Enem", shape: "enem", note: "Gabarito conferido antes de entregar" },
+    role: [["Você é professor(a) experiente de Biologia do Ensino Médio e prepara estudantes para o Enem.", "Ele escreve como quem prepara a turma para a prova."],
+           ["Você é um geneticista.", "Geneticista pesquisa, não prepara para a prova. Diga a matéria e a etapa."],
+           ["Você é um cientista que sabe tudo de DNA, clonagem e genética de plantas, de bichos e de gente.", "Saber tudo não diz para quem ele escreve. Diga a matéria e a etapa: Biologia do Ensino Médio."]],
+    task: [["Crie 5 questões inéditas, no estilo do Enem, sobre a primeira lei de Mendel.", "Questões novas, com tema e quantidade definidos."],
+           ["Faça umas questões.", "Quantas? Sobre qual parte da genética?"],
+           ["Crie questões sobre toda a genética: Mendel, grupos sanguíneos, herança ligada ao sexo, mutações e biotecnologia.", "Assunto demais para 5 questões. Escolha um tema, como a primeira lei de Mendel."]],
+    context: [["Para estudantes de 17 anos que montam o quadro do cruzamento, mas erram a proporção de 3 para 1.", "Ele foca no erro da turma, e as alternativas erradas vêm dele."],
+              ["Para o Ensino Médio.", "Qual série? Onde a turma erra?"],
+              ["Para estudantes que vão fazer o Enem, o vestibular, concursos e qualquer outra prova.", "Todas as provas ao mesmo tempo não acertam nenhuma. Conte a idade e onde a turma erra."]],
+    format: [["Alternativas de A a E, cruzamentos escritos como texto (Aa × Aa), o gabarito explicado e, antes de entregar, cada conta conferida.", "Ele revisa o gabarito antes de mostrar, e você recebe menos conta errada."],
+             ["Como achar melhor.", "Sem formato, você gasta tempo arrumando depois."],
+             ["Alternativas de A a E, heredogramas desenhados com traços e bolinhas e as proporções em fórmulas de LaTeX.", "O Gemini desenha mal com traços, e o LaTeX aparece como código. Peça o heredograma em palavras, as contas como texto e a conferência no fim."]],
+    trap: { text: "No gabarito, o Gemini às vezes erra uma conta com toda a segurança. Pedir que ele confira antes de entregar diminui o erro, mas confira você também. Peça assim:", say: "Antes de entregar, confira cada conta e o gabarito, e corrija o que não estiver certo." },
+  },
 ]
 
-// The five rounds of each stage; the Educação Infantil and anos iniciais ones are the first Oficina rounds,
+// The rounds of each stage; the Educação Infantil and anos iniciais ones are the first Oficina rounds,
 // and the Ensino Médio ones never repeat the ones of the anos finais
 const STAGES = {
-  iniciais: { who: "das crianças", ids: ["jogo", "historia", "cantiga", "fracoes", "adaptar"] },
-  finais: { who: "dos estudantes", ids: ["quiz", "geografia", "independencia", "leitura", "pitagoras"] },
-  medio: { who: "dos estudantes", ids: ["simulado", "redacao", "mitose", "velocidade", "quimica"] },
+  iniciais: { who: "das crianças", ids: ["jogo", "historia", "cantiga", "fracoes", "adaptar", "relogio"] },
+  finais: { who: "dos estudantes", ids: ["quiz", "geografia", "independencia", "leitura", "pitagoras", "negativos"] },
+  medio: { who: "dos estudantes", ids: ["simulado", "redacao", "mitose", "velocidade", "quimica", "genetica"] },
   eja: { who: "dos estudantes", ids: ["eja-alfabetizacao", "eja-encceja", "eja-juros", "eja-saude", "eja-curriculo"] },
 }
 let ROUNDS = [], stage = "iniciais"
@@ -887,11 +943,14 @@ function setStage(id) {
 // The chosen stage stays on this device (lembrar.js keeps it in localStorage, never anything about students)
 const savedStage = () => window.Lembrar?.ler("jogo-do-prompt", {}).etapa
 const pickedStage = () => document.querySelector('input[name="etapa"]:checked')?.value
-document.querySelectorAll('input[name="etapa"]').forEach(input => input.addEventListener("change", () => window.Lembrar?.guardar("jogo-do-prompt", { etapa: input.value })))
+// A tela de início diz quantos pedidos a etapa escolhida tem
+const showCount = id => { const count = document.getElementById("how-count"); if (count) count.textContent = (STAGES[id] || STAGES.iniciais).ids.length }
+document.querySelectorAll('input[name="etapa"]').forEach(input => input.addEventListener("change", () => { window.Lembrar?.guardar("jogo-do-prompt", { etapa: input.value }); showCount(input.value) }))
 {
   const first = STAGES[savedStage()] ? savedStage() : "iniciais"
   document.querySelector(`input[name="etapa"][value="${first}"]`).checked = true
   setStage(first)
+  showCount(first)
 }
 
 const $ = id => document.getElementById(id)
@@ -988,12 +1047,13 @@ function drawAnswer(final = false) {
 const SHAPES = {
   game: () => `<div class="game-buttons"><span style="--c: var(--blue)">12</span><span style="--c: var(--mint)">15</span><span style="--c: var(--pink)">9</span></div><div class="stars-row">${STAR.repeat(3)}</div>`,
   story: () => `<div class="lines">${"<span></span>".repeat(6)}</div><div class="questions"><span>?</span><span>?</span><span>?</span></div>`,
-  sheet: () => `<div class="exercises">${[1, 2, 3, 4, 5].map(n => `<span>${n}</span>`).join("")}</div><span class="key">Gabarito no fim da folha</span>`,
-  quiz: () => `<div class="options"><span><b>A</b>Energia solar</span><span class="right"><b>B</b>Energia eólica</span><span><b>C</b>Carvão</span></div>`,
+  sheet: answer => `<div class="exercises">${[1, 2, 3, 4, 5].map(n => `<span>${n}</span>`).join("")}</div><span class="key">${answer.note || "Gabarito no fim da folha"}</span>`,
+  // O quiz mostra as alternativas do pedido, quando ele tem as suas, e a nota embaixo
+  quiz: answer => `<div class="options">${(answer.options || ["Energia solar", "Energia eólica", "Carvão"]).map((option, index) => `<span class="${index === (answer.right ?? 1) ? "right" : ""}"><b>${"ABC"[index]}</b>${escape(option)}</span>`).join("")}</div>${answer.note ? `<span class="key">${answer.note}</span>` : ""}`,
   text: () => `<ol class="numbered">${[1, 2, 3, 4].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><span class="key">O que mudou no texto</span>`,
   song: () => `<div class="lines">${"<span></span>".repeat(4)}</div><span class="key">Refrão e gestos entre parênteses</span>`,
   order: () => `<ol class="numbered">${[1, 2, 3, 4, 5].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><div class="stars-row">${STAR.repeat(3)}</div>`,
-  enem: () => `<div class="options enem">${["A", "B", "C", "D", "E"].map(letter => `<span class="${letter === "D" ? "right" : ""}"><b>${letter}</b><em></em></span>`).join("")}</div><span class="key">Gabarito com a conta passo a passo</span>`,
+  enem: answer => `<div class="options enem">${["A", "B", "C", "D", "E"].map(letter => `<span class="${letter === "D" ? "right" : ""}"><b>${letter}</b><em></em></span>`).join("")}</div><span class="key">${answer.note || "Gabarito com a conta passo a passo"}</span>`,
   essay: () => `<div class="theme"></div><div class="texts">${[1, 2, 3].map(n => `<span><b>${n}</b><i></i><i></i></span>`).join("")}</div><span class="key">Textos de apoio sem números</span>`,
   compare: () => `<div class="compare"><b>Mitose</b><b>Meiose</b>${"<span></span>".repeat(6)}</div><div class="questions">${"<span>?</span>".repeat(5)}</div><span class="key">Gabarito no fim</span>`,
   plan: answer => `<div class="times"><span>10 min</span><span>25 min</span><span>15 min</span></div><ol class="numbered">${[1, 2, 3].map(n => `<li><b>${n}</b><span></span></li>`).join("")}</ol><span class="key">${answer.note}</span>`,
