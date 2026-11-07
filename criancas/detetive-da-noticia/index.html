@@ -584,6 +584,7 @@ p, li, blockquote {
         $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
         return proxima()
       }
+      botao.disabled = true
       return errar(`Olhe de novo. ${n.explica}`, botao)
     }
     const s = SITUACOES[rodada]
@@ -593,6 +594,7 @@ p, li, blockquote {
       $("opcoes").querySelectorAll(".opcao").forEach(b => b.disabled = true)
       return proxima()
     }
+    botao.disabled = true
     errar(`Essa não é a melhor atitude. ${s.explica}`, botao)
   }
 
