@@ -719,8 +719,12 @@ p, li, blockquote {
     desenharCena()
   }
 
+  // Os botões novos aparecem no lugar dos antigos: o segundo toque de um toque duplo não vale como resposta
+  let etapaNovaEm = 0
+  const toqueDuplo = () => performance.now() - etapaNovaEm < 500
   function montarEtapa() {
     const r = atual(), t = tipo()
+    etapaNovaEm = performance.now()
     $("conferir").hidden = true
     if (t === "estados") {
       $("pergunta").textContent = "Qual é o nome desta mudança?"
@@ -739,6 +743,7 @@ p, li, blockquote {
       opcoes(Object.entries(SINAIS).map(([id, rotulo]) => ({ id, rotulo: `${rotulo}`, icone: '<i class="caixa" aria-hidden="true"></i>' })), { classe: "opcao--sinal", lado: "opcoes--grade" }).forEach(b => {
         b.setAttribute("aria-pressed", "false")
         b.onclick = () => {
+          if (toqueDuplo()) return
           const id = b.dataset.id
           if (marcados.has(id)) marcados.delete(id)
           else marcados.add(id)
@@ -782,7 +787,7 @@ p, li, blockquote {
 
   // Fase 2, parte 2: o método de separação
   function escolherMetodo(botao) {
-    if (travado || botao.disabled) return
+    if (travado || botao.disabled || toqueDuplo()) return
     const r = atual(), m = METODOS.find(x => x.id === botao.dataset.id)
     if (m.id === r.metodo) {
       botao.classList.add("certa")
