@@ -440,8 +440,8 @@ p, li, blockquote {
     erros++
     errosPedido++
     somErro()
-    const demais = k * b > a * n
-    let frase = `Você escolheu ${k}/${n}, e o pedido era ${a}/${b}. ${demais ? "Foi pizza demais: tire um pedaço." : "Faltou pizza: escolha mais um pedaço."}`
+    const demais = k * b > a * n, pedacos = Math.abs(a * n / b - k) === 1 ? "um pedaço" : "alguns pedaços"
+    let frase = `Você escolheu ${k}/${n}, e o pedido era ${a}/${b}. ${demais ? `Foi pizza demais: tire ${pedacos}.` : `Faltou pizza: escolha mais ${pedacos}.`}`
     if (errosPedido > 1) frase = n === b
       ? `O pedido é ${a}/${b}: a pizza tem ${b} pedaços iguais e o cliente quer ${a}.`
       : `Divida os ${n} pedaços em ${b} partes iguais: cada parte tem ${n / b} pedaços. O cliente quer ${a} ${a === 1 ? "parte" : "partes"}.`
