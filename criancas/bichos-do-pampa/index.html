@@ -537,7 +537,8 @@ p, li, blockquote {
       $("nota").textContent = "Cada bicho tocado ganha um número."
       desenharContagem(r)
       mostrarOpcoes(r.opcoes.map(n => `${n}<small>${"<i></i>".repeat(n)}</small>`), (botao, i) => {
-        if (r.opcoes[i] !== r.n) return errar(`Não são ${NUMEROS[r.opcoes[i]]}. Vamos contar de novo, tocando em um bicho de cada vez.`, botao)
+        const k = r.opcoes[i], numero = BICHOS[r.bicho][2] && k <= 2 ? ["", "uma", "duas"][k] : NUMEROS[k]
+        if (k !== r.n) return errar(`${k === 1 ? "Não é" : "Não são"} ${numero}. Vamos contar de novo, tocando em um bicho de cada vez.`, botao)
         contados = Array.from({ length: r.n }, (_, k) => k)
         desenharContagem(r)
         acertou(`Isso! São ${NUMEROS[r.n]} ${BICHOS[r.bicho][1]}. ${BICHOS[r.bicho][3]}`, botao)
