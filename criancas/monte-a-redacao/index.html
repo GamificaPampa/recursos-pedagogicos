@@ -613,7 +613,7 @@ p, li, blockquote {
     if (t === "marcar") return marcar(botao, opcao)
     if (opcao.certa) {
       botao.classList.add("certa")
-      if (t === "conectivo") { $("lacuna").textContent = opcao.t.toLowerCase(); $("lacuna").classList.add("cheia") }
+      if (t === "conectivo") { $("lacuna").textContent = opcao.t; $("lacuna").classList.add("cheia") }
       return acertou(r.acerto)
     }
     erros++
