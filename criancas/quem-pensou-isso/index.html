@@ -550,7 +550,7 @@ p, li, blockquote {
     const r = atual()
     dicas++
     if (tipo() === "ideia") {
-      if (dicas === 1) return window.Bit?.diz("pensando", `Pista: é um filósofo da ${F[r.certa].epoca}.`)
+      if (dicas === 1) return window.Bit?.diz("pensando", `Pista: viveu ${{ Antiguidade: "na Antiguidade", Modernidade: "na Modernidade", "Contemporâneo": "no período contemporâneo" }[F[r.certa].epoca]}.`)
       return window.Bit?.diz("pensando", tirarUma("cartas", b => b.dataset.id !== r.certa) ? "Tirei uma carta errada para você." : "Só sobraram cartas que podem ser. Releia a ideia com calma.")
     }
     if (tipo() === "linha") {
