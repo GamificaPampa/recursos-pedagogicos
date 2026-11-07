@@ -577,6 +577,7 @@
     var life = (gold ? 1300 : 2000) - 900 * progress();
     b.timer = later(function(){ escape(b); }, life);
     b.addEventListener('pointerdown', function(e){ e.preventDefault(); squash(b); });
+    b.addEventListener('click', function(){ squash(b); });
     bugsEl.appendChild(b);
   }
 
