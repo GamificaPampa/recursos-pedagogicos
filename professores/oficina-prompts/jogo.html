@@ -10,8 +10,13 @@
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
 <link rel="stylesheet" href="/identidade-visual/css/cores.css">
 <link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/carimbo.css">
 <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
 <style>
+  /* O Visto da professora cai na tela final */
+  #final h1 { position: relative; }
+  .final__visto { position: absolute; right: -40px; top: -38px; font-size: 26px; --giro: 12deg; -webkit-text-stroke: 0; text-shadow: none; }
+  @media (max-width: 520px) { .final__visto { right: -6px; top: -44px; font-size: 20px; } }
   :root { --risco: #cfcbe6;
 
     /* One colour per part of the prompt, the same as in the builder */
@@ -463,7 +468,7 @@
 </div>
 
 <div class="overlay" id="final">
-  <h1><span class="y">Mandou</span> <span class="p">bem!</span></h1>
+  <h1><span class="y">Mandou</span> <span class="p">bem!</span><span class="carimbo final__visto" id="final-visto" aria-hidden="true">Visto</span></h1>
   <div class="score" id="score"></div>
   <div class="hello">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
@@ -1166,6 +1171,11 @@ function nextRound() {
   beep([523, 659, 784, 1047], { spacing: 0.14 })
   confetti($("final"))
   $("final").classList.add("show")
+  // O Visto cai na tela final, uma vez a cada fim
+  const visto = $("final-visto")
+  visto.classList.remove("is-batendo")
+  void visto.offsetWidth
+  visto.classList.add("is-batendo")
   $("final").scrollTop = 0
   $("final").querySelector(".btn").focus({ preventScroll: true })
   bitSays("formatura", "Você zerou o Jogo do Prompt! Leve essas frases para os seus pedidos no ChatGPT.")
