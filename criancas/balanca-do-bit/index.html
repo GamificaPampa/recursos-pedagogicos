@@ -382,6 +382,7 @@ p, li, blockquote {
       somErro()
       return window.Bit?.diz("ops", `A balança ficou ainda mais torta! O prato da ${lado === "E" ? "esquerda" : "direita"} já estava mais leve. Use Desfazer e tire do outro prato.`)
     }
+    if (depois !== 0 && b === 0) return window.Bit?.diz("pensando", "A balança desequilibrou! Na esquerda só tem caixas x, sem peso de 1 para tirar. Use Desfazer para devolver o peso da direita.")
     if (depois !== 0) return window.Bit?.diz("pensando", "A balança desequilibrou! O que você tira de um prato precisa tirar do outro também.")
     window.Bit?.diz("feliz", `Equilibrou de novo: tirar 1 dos dois lados mantém a igualdade.`)
     conferir()
@@ -412,6 +413,7 @@ p, li, blockquote {
   $("dica").onclick = () => {
     if (ocupado) return
     const d = diferenca()
+    if (d > 0 && b === 0) return window.Bit?.diz("pensando", "Na esquerda só tem caixas x, sem peso de 1 para tirar. Use Desfazer para devolver o peso da direita.")
     if (d !== 0) return window.Bit?.diz("pensando", `O prato da ${d > 0 ? "esquerda" : "direita"} está mais pesado. Tire um peso de 1 dele para equilibrar.`)
     if (b > 0) return window.Bit?.diz("pensando", "Tire um peso de 1 do prato da esquerda e um do prato da direita. A balança continua equilibrada.")
     if (a > 1) return window.Bit?.diz("pensando", `Só tem caixas x na esquerda. Divida os dois lados por ${a} para ver quanto pesa uma caixa.`)
@@ -528,6 +530,10 @@ p, li, blockquote {
       if (ocupado) return window.Bit?.diz("pensando", `Esta equação já foi resolvida: x = ${xv}. Toque em Próxima questão.`, 9000)
       const d = diferenca(), pesos = lado => [...$("balanca").querySelectorAll(`.peso[data-lado="${lado}"]`)]
       const final = `No fim, x = ${xv}.`
+      if (d > 0 && b === 0) {
+        Jogo.modoProfessor.destacar($("desfazer"))
+        return window.Bit?.diz("pensando", `Na esquerda só tem caixas x, sem peso de 1 para tirar. Use Desfazer para devolver o peso da direita. ${final}`, 12000)
+      }
       if (d !== 0) {
         const lado = d > 0 ? "E" : "D"
         Jogo.modoProfessor.destacar(pesos(lado).slice(-1))
