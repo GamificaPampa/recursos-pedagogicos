@@ -491,6 +491,7 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
   function mostrarRodada() {
+    voo.rodada++
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
@@ -565,7 +566,8 @@ p, li, blockquote {
   })
 
   // Phase 2: the Bit runs on the line from left to right and picks the stars that are on it
-  const voo = { desde: 0, parado: 0 }
+  // rodada muda a cada rodada nova: um voo que ainda estava no ar para ali, sem marcar acerto nem erro
+  const voo = { desde: 0, parado: 0, rodada: 0 }
   function lancar() {
     const r = atual(), naReta = r.pontos.map(([x, y]) => Math.abs(a * x + b - y) < 1e-9)
     const t = trecho(a, b)
@@ -587,7 +589,9 @@ p, li, blockquote {
     const pegas = new Set()
     bit.style.display = ""
     voo.parado = 0
+    const meu = voo.rodada
     const passo = agora => {
+      if (meu !== voo.rodada) return
       // Com o professor pausando, o voo espera e o tempo parado não conta
       if (voo.desde) return requestAnimationFrame(passo)
       const p = Math.min(1, (agora - inicio - voo.parado) / duracao), x = t[0] + (t[1] - t[0]) * p
