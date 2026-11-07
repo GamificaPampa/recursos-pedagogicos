@@ -489,7 +489,10 @@ p, li, blockquote {
     errar(vizinha ? `O ${RODA[i][0]} é vizinho do ${nomeBase}: fica do lado, não na frente. Procure bem do outro lado.` : `Quase! A complementar fica bem na frente do ${nomeBase}, passando pelo meio do círculo.`)
   }
 
+  // Muda a cada rodada: a mistura que ainda está na paleta não mexe na rodada ou na fase seguinte
+  let geracao = 0
   function mostrarRodada() {
+    geracao++
     Jogo.ouvir.novaTela()
     const r = atual()
     if (tipo() === "misturar") {
@@ -506,13 +509,15 @@ p, li, blockquote {
         $("cena").innerHTML = paleta()
         if (escolhidas.length < 2) return
         ocupado = true
-        const mistura = misturar(...escolhidas)
+        const mistura = misturar(...escolhidas), minha = geracao
         setTimeout(() => {
+          if (minha !== geracao) return
           $("cena").innerHTML = paleta(mistura)
           if (mistura[0] === r.alvo) return acertou(`Isso! ${r.explica}`)
           errosAqui++
           errar(`${maiuscula(escolhidas[0])} com ${escolhidas[1]} dá ${mistura[0]}, não ${r.alvo}. ${errosAqui > 1 ? r.dica : "Tente outra dupla."}`)
           setTimeout(() => {
+            if (minha !== geracao) return
             escolhidas = []
             ocupado = false
             $("cena").innerHTML = paleta()
