@@ -263,6 +263,7 @@ p, li, blockquote {
 <script src="/identidade-visual/js/jogo.js"></script>
 <script>
   // Each fact: what happened, the year (negative is before Christ), how to read the year and its drawing
+  const ANO = new Date().getFullYear()
   const FATOS = {
     escrita: ["Invenção da escrita, na Mesopotâmia", -3500, "cerca de 3500 a.C.", "tabua"],
     piramides: ["Construção das grandes pirâmides do Egito", -2500, "cerca de 2500 a.C.", "piramide"],
@@ -277,7 +278,7 @@ p, li, blockquote {
     brasilia: ["Inauguração de Brasília", 1960, "1960", "congresso"],
     lua: ["Primeira pessoa a pisar na Lua", 1969, "1969", "lua"],
     constituicao: ["Constituição atual do Brasil", 1988, "1988", "lei"],
-    hoje: ["O ano em que estamos", 2026, "2026", "calendario"],
+    hoje: ["O ano em que estamos", ANO, String(ANO), "calendario"],
   }
   const FASES = [
     { nome: "O que veio primeiro?", tipo: "primeiro", rotulo: "pergunta",
@@ -431,7 +432,7 @@ p, li, blockquote {
     congresso: `<rect x="25" y="8" width="5" height="32" fill="#fff" stroke="${I}" stroke-width="2.5"/><rect x="31" y="8" width="5" height="32" fill="#fff" stroke="${I}" stroke-width="2.5"/><path d="M6 40q8-12 16 0zM38 40q8 12 16 0z" fill="#eef1f7" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><rect x="4" y="40" width="52" height="8" rx="2" fill="#cfd8e6" stroke="${I}" stroke-width="2.5"/>`,
     lua: `<circle cx="30" cy="32" r="22" fill="#eef1f7" stroke="${I}" stroke-width="3"/><circle cx="22" cy="26" r="4" fill="#cfd8e6"/><circle cx="36" cy="40" r="5" fill="#cfd8e6"/><path d="M38 24V8" stroke="${I}" stroke-width="2.5"/><path d="M38 8h12v8H38z" fill="#4da3ff" stroke="${I}" stroke-width="2"/>`,
     lei: `<path d="M14 6h26l8 8v40H14z" fill="#fff" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M20 20h20M20 28h20M20 36h14" stroke="#9aa3c2" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="46" r="7" fill="#ffd23f" stroke="${I}" stroke-width="2.5"/>`,
-    calendario: `<rect x="8" y="12" width="44" height="40" rx="6" fill="#fff" stroke="${I}" stroke-width="3"/><path d="M8 24h44" stroke="${I}" stroke-width="3"/><rect x="8" y="12" width="44" height="12" rx="6" fill="#ff5f8f" stroke="${I}" stroke-width="3"/><path d="M20 6v10M40 6v10" stroke="${I}" stroke-width="3.4" stroke-linecap="round"/><text x="30" y="45" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="${I}">2026</text>`,
+    calendario: `<rect x="8" y="12" width="44" height="40" rx="6" fill="#fff" stroke="${I}" stroke-width="3"/><path d="M8 24h44" stroke="${I}" stroke-width="3"/><rect x="8" y="12" width="44" height="12" rx="6" fill="#ff5f8f" stroke="${I}" stroke-width="3"/><path d="M20 6v10M40 6v10" stroke="${I}" stroke-width="3.4" stroke-linecap="round"/><text x="30" y="45" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="${I}">${ANO}</text>`,
   }
   const desenho = (id, tamanho = 56) => `<svg viewBox="0 0 60 60" width="${tamanho}" height="${tamanho}" aria-hidden="true">${DESENHOS[FATOS[id][3]]}</svg>`
   const romano = n => [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]].reduce((s, [v, l]) => { while (n >= v) { s += l; n -= v } return s }, "")
