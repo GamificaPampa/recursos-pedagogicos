@@ -493,8 +493,9 @@
   }
 
   function pickSeqChip(origIndex, chipEl){
-    if(seqChosen.length >= seqSteps.length) return;
+    if(seqChosen.length >= seqSteps.length || chipEl.disabled) return;
     chipEl.classList.add('used');
+    chipEl.disabled = true;
     seqChosen.push(origIndex);
     var slot = document.getElementById('slot-' + (seqChosen.length - 1));
     slot.classList.add('filled');
@@ -508,6 +509,7 @@
     var correct = seqChosen.every(function(v, i){ return v === i; });
     var fb = document.getElementById('seq-feedback');
     if(correct){
+      this.disabled = true;
       fb.textContent = seqAttemptedWrong ? 'Certo agora! +10 pts' : 'Perfeito na primeira! +20 pts';
       fb.className = 'feedback show ok';
       addScore(seqAttemptedWrong ? 10 : 20);
@@ -523,7 +525,7 @@
       fb.className = 'feedback show bad';
       vibrate([20,40,20]);
       // deixa consertar: limpa a escolha e devolve os passos
-      document.querySelectorAll('#seq-pool .chip').forEach(function(c){ c.classList.remove('used'); });
+      document.querySelectorAll('#seq-pool .chip').forEach(function(c){ c.classList.remove('used'); c.disabled = false; });
       seqChosen = [];
       document.querySelectorAll('.slot').forEach(function(s, i){
         s.classList.remove('filled');
