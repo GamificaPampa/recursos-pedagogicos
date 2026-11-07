@@ -401,6 +401,8 @@ p, li, blockquote {
   }
 
   let fase = 0, rodada = 0, erros = 0, errosAqui = 0, ocupado = false, programa = []
+  // Muda a cada rodada nova: o Bit que ainda estava andando para ali, sem marcar acerto nem erro
+  let geracao = 0
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
@@ -485,6 +487,7 @@ p, li, blockquote {
   }
 
   function mostrarRodada() {
+    geracao++
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("ir").hidden = false
@@ -558,11 +561,12 @@ p, li, blockquote {
     // Reading the path: Bit walks it, then we look at its right or left side
     const { passos } = andar(r.de, r.dir, r.cmds)
     const fimDoCaminho = passos[passos.length - 1]
-    const certo = doLado(fimDoCaminho.pos, fimDoCaminho.dir, r.lado)
+    const certo = doLado(fimDoCaminho.pos, fimDoCaminho.dir, r.lado), minha = geracao
     if (letra === certo) {
       ocupado = true
       g.classList.add("certo")
       await animar(passos)
+      if (minha !== geracao) return
       ocupado = false
       return acertar(`Isso! Eu parei e ${nomeCom(certo, "")} ficou à minha ${r.lado === "D" ? "direita" : "esquerda"}.`)
     }
@@ -573,6 +577,7 @@ p, li, blockquote {
     ocupado = true
     await animar(passos)
     await espera(1500)
+    if (minha !== geracao) return
     porRobo(r.de, r.dir)
     ocupado = false
   }
@@ -581,7 +586,8 @@ p, li, blockquote {
   let pausadoAula = false, aoContinuar = []
   const espera = ms => new Promise(pronto => setTimeout(() => pausadoAula ? aoContinuar.push(pronto) : pronto(), ms))
   async function animar(passos, comPrograma = false) {
-    for (let i = 1; i < passos.length; i++) {
+    const minha = geracao
+    for (let i = 1; i < passos.length && minha === geracao; i++) {
       porRobo(passos[i].pos, passos[i].dir)
       if (comPrograma) desenharPrograma(i - 1)
       somPasso()
@@ -606,8 +612,9 @@ p, li, blockquote {
     if (ocupado) return
     if (!programa.length) return window.Bit?.diz("pensando", "Toque nos comandos para montar o caminho e depois aperte Andar.")
     ocupado = true
-    const { passos, bateu } = andar(r.de, r.dir, programa)
+    const { passos, bateu } = andar(r.de, r.dir, programa), minha = geracao
     await animar(passos, true)
+    if (minha !== geracao) return
     const fim = passos[passos.length - 1]
     if (bateu) {
       $("robo").classList.remove("bateu")
@@ -624,6 +631,7 @@ p, li, blockquote {
       errar(`Parei, mas não estou ao lado ${nomeCom(r.para, "de")}. ${errosAqui > 0 ? "Conte os passos no mapa e use Apagar para trocar um comando." : "Use Apagar para trocar um comando e tente de novo."}`)
     }
     await espera(1300)
+    if (minha !== geracao) return
     porRobo(r.de, r.dir)
     desenharPrograma()
     ocupado = false
