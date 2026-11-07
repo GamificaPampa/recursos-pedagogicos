@@ -233,8 +233,8 @@ p, li, blockquote {
       </ul>
       <p class="seguranca">Segurança: o jogo só observa. Fogo, forno e panela quente são coisa de adulto. Nunca misture produtos de limpeza, porque algumas misturas soltam gases perigosos, e não prove leite ou comida estragada.</p>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes e confira os fatos de Ciências que ele escrever, porque ele pode errar.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes e confira os fatos de Ciências que ele escrever, porque ele pode errar.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Ciências] para estudantes do [6º e 7º ano]: uma cena de cozinha com o desenho do antes e do depois, e o estudante escolhe o nome da [mudança de estado] que aconteceu.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: dar nome às mudanças de estado, escolher o jeito certo de separar misturas, dizer se a transformação é física ou química], um botão de dica, uma explicação curta do conceito a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Desenhe os objetos com formas simples (SVG), sem usar letras e símbolos como desenho, e use só situações seguras, sem fogo nem produtos químicos. Não invente fatos científicos: se não tiver certeza, deixe de fora. Não use o teste interativo. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -931,7 +931,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
 
-  // Copiar as mensagens para o Gemini
+  // Copiar as mensagens para o ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

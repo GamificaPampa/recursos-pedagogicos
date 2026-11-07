@@ -315,8 +315,8 @@ p, li, blockquote {
         </div>
       </div>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Peça sempre notícias inventadas, sem pessoas reais nem política.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Peça sempre notícias inventadas, sem pessoas reais nem política.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo sobre [notícias falsas] para estudantes de [12 a 15 anos]: aparece uma notícia inventada, e o estudante toca nas pistas de que ela pode ser falsa, como o endereço do site, a data e o título exagerado.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: achar as pistas, decidir se a notícia parece confiável ou suspeita e escolher o que fazer antes de compartilhar], só notícias inventadas, sem pessoas reais nem política, botões grandes para o celular, uma explicação a cada resposta e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -675,7 +675,7 @@ p, li, blockquote {
     $("jogo").scrollIntoView({ block: "start" })
   }
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

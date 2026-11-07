@@ -11,6 +11,6 @@ Um jogo de letramento em IA: o estudante acha o erro nas respostas de uma inteli
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/detetive-da-ia/ |
 | Autoria      | Arthur Medeiros e Paulo Severo |
 
-As perguntas e as respostas da IA foram escritas para o jogo, com um erro de propósito em cada uma: um autor trocado, uma conta, uma distância, um livro inventado e um conselho perigoso. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. No projetor, a tecla P liga o modo professor. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
+As perguntas e as respostas da IA foram escritas para o jogo, com um erro de propósito em cada uma: um autor trocado, uma conta, uma distância, um livro inventado e um conselho perigoso. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. No projetor, a tecla P liga o modo professor. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
 
 Nada do que a criança faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado e as estrelas de cada fase.

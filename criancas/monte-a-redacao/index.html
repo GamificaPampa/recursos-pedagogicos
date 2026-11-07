@@ -265,8 +265,8 @@ p, li, blockquote {
         <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Redação] para estudantes do [3º ano do ensino médio]: aparecem quatro parágrafos de uma redação embaralhados, e o estudante usa botões de subir e descer para colocar [introdução, desenvolvimento 1, desenvolvimento 2 e conclusão] na ordem certa.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: pôr os parágrafos em ordem, achar a tese e escolher o conectivo certo, marcar agente, ação, meio, finalidade e detalhamento numa proposta de intervenção], um personagem que explica o erro e o acerto em frases curtas, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Use só textos de exemplo escritos por você, sem copiar redações reais e sem inventar dados de pesquisa. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -758,7 +758,7 @@ p, li, blockquote {
   mostrarEstrelas()
   BOTAO_SEGUIR.onclick = () => comecar(fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jogo do Prompt</title>
-<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o Gemini, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos. Rodadas da Educação Infantil ao Ensino Médio e da EJA.">
+<meta name="description" content="Um jogo para professores: transforme pedidos vagos em bons prompts para o ChatGPT, escolhendo o Papel, a Tarefa, o Contexto e o Formato certos. Rodadas da Educação Infantil ao Ensino Médio e da EJA.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -71,7 +71,7 @@
   @keyframes pop { from { transform: scale(.92) } }
   @keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
 
-  /* The answer Gemini would give, getting clearer with every good block */
+  /* The answer ChatGPT would give, getting clearer with every good block */
   .answer { position: relative }
   .meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px }
   .meter span { height: 14px; background: #eeecf7; border: 2px solid var(--ink); border-radius: 999px; transition: background .3s }
@@ -170,7 +170,7 @@
   .confetti { position: absolute; top: -20px; width: 14px; height: 22px; animation: fall linear forwards }
   @keyframes fall { to { transform: translateY(110vh) rotate(720deg) } }
 
-  /* The Gemini trap after every round: what the fast model gets wrong and the sentence that avoids it */
+  /* The AI trap after every round: what the AI often gets wrong and the sentence that avoids it */
   .trap { display: flex; align-items: flex-start; gap: 12px; max-width: 640px; padding: 12px 16px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 5px 0 rgba(47, 42, 74, .25); text-align: left }
   .trap svg { width: 46px; height: 46px; flex: none }
   .trap small { display: block; color: #c92a62; font-weight: 700; font-size: 14px; letter-spacing: .5px; text-transform: uppercase }
@@ -396,7 +396,7 @@
       <div class="slots" id="slots"></div>
     </div>
     <div class="panel answer">
-      <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 C34 22 42 30 60 32 C42 34 34 42 32 60 C30 42 22 34 4 32 C22 30 30 22 32 4 Z" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>Resposta do Gemini</h2>
+      <h2><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 C34 22 42 30 60 32 C42 34 34 42 32 60 C30 42 22 34 4 32 C22 30 30 22 32 4 Z" fill="#8c73ff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>Resposta do ChatGPT</h2>
       <div class="meter" id="meter"></div>
       <p class="missing" id="missing"></p>
       <div class="screen" id="screen"></div>
@@ -406,14 +406,14 @@
   <p class="tip" id="tip" role="status"></p>
   <h2 class="tray-title">Arraste ou toque nos blocos</h2>
   <div class="tray" id="tray"></div>
-  <div class="run-row"><button class="btn" id="run" type="button" hidden>Pedir ao Gemini<svg viewBox="0 0 24 24"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff"/></svg></button></div>
+  <div class="run-row"><button class="btn" id="run" type="button" hidden>Pedir ao ChatGPT<svg viewBox="0 0 24 24"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff"/></svg></button></div>
 </div>
 
 <div class="overlay show" id="start">
   <h1><span class="y">Jogo</span> do <span class="p">Prompt</span></h1>
   <div class="hello">
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
-    <p>Um pedido vago faz o Gemini adivinhar. Escolha os blocos certos e veja a resposta melhorar!</p>
+    <p>Um pedido vago faz o ChatGPT adivinhar. Escolha os blocos certos e veja a resposta melhorar!</p>
   </div>
   <ul class="legend">
     <li class="role"><i>P</i>Papel: quem ele é</li>
@@ -454,7 +454,7 @@
   <p id="win-text"></p>
   <div class="trap">
     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 L45 42 H3 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M24 18 V29" stroke="#2f2a4a" stroke-width="4.5" stroke-linecap="round"/><circle cx="24" cy="35.5" r="2.8" fill="#2f2a4a"/></svg>
-    <div><small>Armadilha do Gemini</small><p id="trap-text"></p><span class="say" id="trap-say"></span></div>
+    <div><small>Armadilha da IA</small><p id="trap-text"></p><span class="say" id="trap-say"></span></div>
   </div>
   <div class="actions">
     <button class="btn" type="button" id="next">Próximo pedido<svg viewBox="0 0 24 24"><path d="M5 12 H19 M13 6 L19 12 L13 18" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -469,7 +469,7 @@
     <svg viewBox="0 0 100 100" aria-hidden="true"><use href="#bot"/></svg>
     <p id="final-text"></p>
   </div>
-  <ul class="saves" id="saves" aria-label="As frases que evitam as armadilhas do Gemini"></ul>
+  <ul class="saves" id="saves" aria-label="As frases que evitam as armadilhas da IA"></ul>
   <div class="actions">
     <a class="btn" href="/maquina/">Abrir a Máquina<svg viewBox="0 0 24 24"><path d="M7 4 L20 12 L7 20 Z" fill="#fff"/></svg></a>
     <a class="btn calm" href="biblioteca.html">Ver a Biblioteca de prompts</a>
@@ -498,7 +498,7 @@
 <script>
 // The four parts of a prompt, in the order they are written
 const PARTS = [
-  { id: "role", letter: "P", name: "Papel", hint: "Quem o Gemini deve ser", missing: "quem ele é" },
+  { id: "role", letter: "P", name: "Papel", hint: "Quem o ChatGPT deve ser", missing: "quem ele é" },
   { id: "task", letter: "T", name: "Tarefa", hint: "O que ele deve fazer", missing: "o que fazer" },
   { id: "context", letter: "C", name: "Contexto", hint: "Para quem e com quais limites", missing: "para quem" },
   { id: "format", letter: "F", name: "Formato", hint: "Como o resultado deve sair", missing: "como deve sair" },
@@ -506,17 +506,17 @@ const PARTS = [
 
 // Every round: the vague request, how the answer looks when the prompt is complete,
 // three blocks for each part (the first is the good one, then a weak one and a long one that only looks complete),
-// each with the reason shown after it is picked, and the Gemini trap that the round teaches to avoid
+// each with the reason shown after it is picked, and the AI trap that the round teaches to avoid
 const ALL_ROUNDS = [
   {
     id: "jogo",
     vague: "Faça um jogo de matemática.",
     answer: { who: "Professor(a) de Matemática · 2º ano", title: "Jogo das somas até 20", audience: "7 anos · no celular", shape: "game" },
-    role: [["Você é professor(a) de Matemática do 2º ano.", "Agora o Gemini usa a linguagem e o conteúdo do 2º ano."],
+    role: [["Você é professor(a) de Matemática do 2º ano.", "Agora o ChatGPT usa a linguagem e o conteúdo do 2º ano."],
            ["Você é um gênio.", "Gênio de quê? Diga a matéria e o ano, para ele falar do jeito da turma."],
-           ["Você é a IA mais inteligente do mundo.", "Elogiar o Gemini não melhora a resposta. Diga a matéria e o ano."]],
+           ["Você é a IA mais inteligente do mundo.", "Elogiar o ChatGPT não melhora a resposta. Diga a matéria e o ano."]],
     task: [["Crie um jogo de somas até 20 para jogar no navegador.", "Verbo claro e conteúdo certo: ele sabe exatamente o que criar."],
-           ["Faça alguma coisa divertida.", "Sem verbo claro e sem conteúdo, o Gemini vai inventar qualquer coisa."],
+           ["Faça alguma coisa divertida.", "Sem verbo claro e sem conteúdo, o ChatGPT vai inventar qualquer coisa."],
            ["Crie o jogo mais divertido possível, que ensine toda a matemática do ano de um jeito inesquecível.", "Toda a matemática do ano não cabe num jogo. Escolha um conteúdo só, como somas até 20."]],
     context: [["Para crianças de 7 anos que estão começando a ler, no celular.", "Com a idade, a leitura e o aparelho, o jogo sai do tamanho certo."],
               ["Para alunos.", "Que idade? Eles já leem? Onde vão jogar? Sem isso, ele adivinha."],
@@ -524,7 +524,7 @@ const ALL_ROUNDS = [
     format: [["Botões grandes, 3 fases, som no acerto e estrelas no final.", "Você disse como quer: o resultado vem pronto para usar."],
              ["Do jeito que você achar melhor.", "Se você não diz como quer, recebe qualquer formato."],
              ["Com 10 fases, placar com o nome de cada aluno, as músicas que fazem sucesso e gráficos em 3D.", "Grande demais para o Canvas, e ainda pede nome de aluno e música famosa, que ele inventa."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
     id: "historia",
@@ -541,8 +541,8 @@ const ALL_ROUNDS = [
               ["Para crianças espertas que adoram histórias.", "Elogio não é contexto. Diga a idade e como a história vai ser lida."]],
     format: [["Até 6 parágrafos curtos, com as imagens descritas entre parênteses e 3 perguntas no fim.", "O tamanho cabe na roda, as imagens vêm descritas e as perguntas já vêm prontas."],
              ["Pode ser longa.", "Longa demais para a atenção de uma criança de 4 anos."],
-             ["Com desenhos feitos de letras e símbolos no meio do texto, para ficar bem ilustrada.", "O Gemini desenha mal com letras e símbolos. Peça as imagens descritas entre parênteses."]],
-    trap: { text: "Quando a história pede imagens, o Gemini desenha com letras e símbolos, e o desenho sai torto. Peça assim:", say: "Descreva as imagens entre parênteses." },
+             ["Com desenhos feitos de letras e símbolos no meio do texto, para ficar bem ilustrada.", "A IA desenha mal com letras e símbolos. Peça as imagens descritas entre parênteses."]],
+    trap: { text: "Quando a história pede imagens, a IA desenha com letras e símbolos, e o desenho sai torto. Peça assim:", say: "Descreva as imagens entre parênteses." },
   },
   {
     id: "fracoes",
@@ -550,7 +550,7 @@ const ALL_ROUNDS = [
     answer: { who: "Professor(a) de Matemática · 5º ano", title: "Frações do dia a dia", audience: "10 anos · 50 minutos", shape: "sheet" },
     role: [["Você é professor(a) de Matemática do 5º ano.", "Matéria e ano certos: ele pensa como quem planeja essa aula."],
            ["Você é uma inteligência artificial.", "Ele já sabe disso! Diga o papel que ele deve assumir."],
-           ["Você é professor(a) de Matemática do 5º ano e cita o código da BNCC de cada habilidade.", "O modelo rápido do Gemini costuma inventar códigos da BNCC. Peça sem os códigos."]],
+           ["Você é professor(a) de Matemática do 5º ano e cita o código da BNCC de cada habilidade.", "A IA costuma inventar códigos da BNCC. Peça sem os códigos."]],
     task: [["Crie uma atividade para imprimir sobre frações do dia a dia.", "Fica claro que é para imprimir e qual é o conteúdo."],
            ["Crie umas questões aí.", "Questões de quê? Para imprimir ou para a tela?"],
            ["Crie uma atividade para usar na tela, impressa e em casa.", "Na tela ou impressa? Cada uma pede um formato. Escolha uma."]],
@@ -560,7 +560,7 @@ const ALL_ROUNDS = [
     format: [["Uma folha A4 com 5 exercícios e o gabarito no fim, escrita fora de bloco de código.", "Pronto para imprimir, com gabarito, e o texto não vem preso num bloco de código."],
              ["Muitas questões.", "Quantas? Em que ordem? Com gabarito?"],
              ["A folha dentro de um bloco de código, para copiar com a formatação.", "No bloco de código a folha sai como texto de programa. Peça para escrever fora dele."]],
-    trap: { text: "O Gemini às vezes põe a folha inteira num bloco de código e inventa códigos da BNCC. Peça assim:", say: "Escreva fora de bloco de código e não cite códigos da BNCC." },
+    trap: { text: "A IA às vezes põe a folha inteira num bloco de código e inventa códigos da BNCC. Peça assim:", say: "Escreva fora de bloco de código e não cite códigos da BNCC." },
   },
   {
     id: "quiz",
@@ -577,8 +577,8 @@ const ALL_ROUNDS = [
               ["Para usar na escola, com estudantes, numa aula, em algum momento do ano, quando eu precisar.", "Muitas palavras e nenhuma informação. Diga o objetivo e a idade."]],
     format: [["Múltipla escolha com 3 alternativas, sem usar o teste interativo, e o gabarito explicado.", "Sai em texto, pronto para imprimir ou passar para o Google Forms."],
              ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
-             ["Como teste interativo, com cronômetro e pontuação.", "O teste interativo abre dentro do Gemini e não dá para imprimir nem levar ao Forms."]],
-    trap: { text: "No quiz, o Gemini às vezes abre um teste interativo, que não dá para imprimir nem passar para o Google Forms. Peça assim:", say: "Sem usar o teste interativo." },
+             ["Como teste interativo, com cronômetro e pontuação.", "Com cronômetro e pontuação, a IA cria um programa, e não uma folha: não dá para imprimir nem levar ao Forms."]],
+    trap: { text: "No quiz, a IA costuma caprichar na alternativa certa: ela sai mais longa que as erradas, e a turma acerta sem saber o conteúdo. Peça assim:", say: "Alternativas do mesmo tamanho, com a certa em posições diferentes." },
   },
   {
     id: "adaptar",
@@ -592,11 +592,11 @@ const ALL_ROUNDS = [
            ["Reescreva o texto do seu jeito, resumindo e cortando tudo o que for difícil.", "Cortar o difícil pode tirar o conteúdo da aula. Peça para manter o conteúdo."]],
     context: [["Para um aluno com TEA, de 8 anos, que lê frases curtas.", "Você descreveu a necessidade sem identificar a criança. Perfeito!"],
               ["Para um aluno.", "Qual é a necessidade dele? Diga a necessidade e a idade, sem o nome."],
-              ["Para o Joãozinho Silva, do 3º B, que tem autismo e mora com a avó.", "Nunca escreva o nome nem dados da criança no Gemini! Descreva a necessidade sem identificar ninguém."]],
+              ["Para o Joãozinho Silva, do 3º B, que tem autismo e mora com a avó.", "Nunca escreva o nome nem dados da criança no ChatGPT! Descreva a necessidade sem identificar ninguém."]],
     format: [["Em português do Brasil, com frases curtas, instruções numeradas e uma lista do que mudou.", "Você recebe o texto pronto, em português, e sabe o que foi alterado."],
              ["Deixe mais fácil.", "Mais fácil como? Diga o formato que ajuda esse aluno."],
-             ["Frases curtas e instruções numeradas, na língua que você achar melhor.", "O Gemini às vezes responde em inglês. Peça português do Brasil."]],
-    trap: { text: "O Gemini às vezes começa a resposta em inglês. E o que você escreve pode ficar guardado na conta, por isso nada de nomes. Peça assim:", say: "Responda em português do Brasil." },
+             ["Frases curtas e instruções numeradas, na língua que você achar melhor.", "A língua não pode ficar em aberto, e falta a lista do que mudou. Peça português do Brasil."]],
+    trap: { text: "O que você escreve fica guardado no histórico da conta, por isso nada de nome, turma ou laudo. Nesses pedidos, prefira o chat temporário, no alto da tela. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
   },
   {
     id: "cantiga",
@@ -607,14 +607,14 @@ const ALL_ROUNDS = [
            ["Você é um compositor premiado que conhece todas as músicas infantis do mundo.", "Conhecer todas as músicas não ajuda: ele pode copiar uma que já existe. Diga que ele é professor(a) de Educação Infantil."]],
     task: [["Crie uma letra inédita de 4 versos para ensinar os dias da semana.", "Letra nova, número de versos e tema: ele sabe o que criar."],
            ["Faça uma música legal.", "Legal como? Sobre o quê? Sem tema, a letra sai genérica."],
-           ["Escreva a letra completa da cantiga mais famosa dos dias da semana, com todos os versos.", "O Gemini não sabe letras de cantigas de cor: inventa e erra. Peça uma letra nova, com o tema e o número de versos."]],
+           ["Escreva a letra completa da cantiga mais famosa dos dias da semana, com todos os versos.", "A IA não sabe letras de cantigas de cor: inventa e erra. Peça uma letra nova, com o tema e o número de versos."]],
     context: [["Para crianças de 5 anos que cantam na roda, com palmas e um gesto para cada dia da semana.", "Com a idade e o jeito de cantar, os versos saem curtos e fáceis de repetir."],
               ["Para a turma.", "Que idade? Onde vão cantar? Sem isso, ele adivinha."],
               ["Para crianças que gostam de música, com bastante energia e que cantam o dia todo.", "Gostar de música não diz a idade nem como a cantiga vai ser usada. Conte a idade e o momento: a roda, com palmas."]],
     format: [["Versos curtos que rimam, um refrão que se repete e, entre parênteses, o gesto de cada verso.", "Você recebe a letra pronta para a roda, com o refrão e os gestos."],
              ["Do jeito que quiser.", "Sem dizer como, a música sai comprida e sem refrão."],
-             ["Com a cifra dos acordes, a partitura e o link do vídeo para ouvir.", "O Gemini não toca, não manda partitura e inventa links que não existem. Peça versos, refrão e gestos."]],
-    trap: { text: "Quando você pede uma música, o Gemini às vezes entrega a letra de outra música como se fosse nova, ou diz que a cantiga é antiga e conhecida. Peça assim:", say: "Crie uma letra inédita. Não copie músicas existentes." },
+             ["Com a cifra dos acordes, a partitura e o link do vídeo para ouvir.", "A IA não toca, não manda partitura e inventa links que não existem. Peça versos, refrão e gestos."]],
+    trap: { text: "Quando você pede uma música, a IA às vezes entrega a letra de outra música como se fosse nova, ou diz que a cantiga é antiga e conhecida. Peça assim:", say: "Crie uma letra inédita. Não copie músicas existentes." },
   },
   {
     id: "geografia",
@@ -631,8 +631,8 @@ const ALL_ROUNDS = [
               ["Para estudantes do Ensino Fundamental de escolas públicas de todas as regiões do Brasil.", "Todas as regiões ao mesmo tempo não cabem na aula. Diga a idade, o lugar e o tempo."]],
     format: [["Roteiro em 3 etapas, com o tempo de cada uma, uma pergunta para a turma e sem inventar números.", "Sai um roteiro que cabe na aula, e sem número inventado."],
              ["Como achar melhor.", "Sem formato, você perde tempo arrumando depois."],
-             ["Com gráficos de pizza da porcentagem de desmatamento de cada bioma, ano a ano.", "O Gemini inventa números, e porcentagem errada vira informação errada na sala. Peça o roteiro e cole só os dados em que você confia."]],
-    trap: { text: "Em Geografia, o Gemini coloca números de população, área e desmatamento, e inventa pesquisas para sustentar. Muitos saem errados. Peça assim:", say: "Não invente números nem pesquisas. Use só os dados que eu colar aqui." },
+             ["Com gráficos de pizza da porcentagem de desmatamento de cada bioma, ano a ano.", "A IA inventa números, e porcentagem errada vira informação errada na sala. Peça o roteiro e cole só os dados em que você confia."]],
+    trap: { text: "Em Geografia, a IA coloca números de população, área e desmatamento, e inventa pesquisas para sustentar. Muitos saem errados. Peça assim:", say: "Não invente números nem pesquisas. Use só os dados que eu colar aqui." },
   },
   {
     id: "independencia",
@@ -650,7 +650,7 @@ const ALL_ROUNDS = [
     format: [["Arrastar as cartas para a ordem certa, 3 fases, som no acerto e pontos no final, sem pedir o nome do estudante.", "Você disse como quer: o jogo sai pronto para usar."],
              ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato."],
              ["Com 15 fases, vídeos dos fatos, a voz de Dom Pedro I e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, que não cria vídeo nem voz, e o ranking pede nome de estudante."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
     id: "leitura",
@@ -661,14 +661,14 @@ const ALL_ROUNDS = [
            ["Você é um crítico literário e escritor premiado, que leu todos os livros importantes.", "Crítico escreve para especialistas. Diga a matéria e o ano."]],
     task: [["Crie 5 questões de interpretação sobre o texto que vou colar no fim.", "Número de questões e texto definidos: ele trabalha com o que você escolheu."],
            ["Faça perguntas de leitura.", "Sobre qual texto? Quantas?"],
-           ["Escolha um poema famoso e crie questões de interpretação, citando alguns versos dele.", "O Gemini inventa versos e diz que são de poetas famosos. Cole o texto que você quer trabalhar."]],
+           ["Escolha um poema famoso e crie questões de interpretação, citando alguns versos dele.", "A IA inventa versos e diz que são de poetas famosos. Cole o texto que você quer trabalhar."]],
     context: [["Para estudantes de 14 anos que leem bem, mas escrevem pouco, em uma aula de 50 minutos, com o texto impresso.", "Com o nível de leitura e o tempo, as questões cabem na aula."],
               ["Para a turma do 9º ano.", "Todo 9º ano é diferente. Conte o que a turma já faz bem e o tempo."],
               ["Para uma turma de 9º ano, de qualquer escola, com qualquer nível de leitura e em qualquer horário.", "Qualquer nível e qualquer horário não é contexto. Conte a idade, o que a turma já faz e o tempo."]],
     format: [["Uma folha para imprimir, com 5 questões, o gabarito no fim e só trechos que estejam no texto que colei.", "Pronto para imprimir, com gabarito e sem versos inventados."],
              ["Como preferir.", "Sem formato, você gasta tempo arrumando depois."],
              ["Folha em 3 colunas, com ilustrações, moldura decorada e 20 questões para a turma escolher.", "Vinte questões não cabem em 50 minutos. Peça uma folha simples com 5."]],
-    trap: { text: "O Gemini inventa trechos de poemas, músicas e frases de autores, e diz que são de verdade. Peça assim:", say: "Use só o texto que eu colar. Não cite músicas, versos nem autores que não estejam nele." },
+    trap: { text: "A IA inventa trechos de poemas, músicas e frases de autores, e diz que são de verdade. Peça assim:", say: "Use só o texto que eu colar. Não cite músicas, versos nem autores que não estejam nele." },
   },
   {
     id: "pitagoras",
@@ -685,8 +685,8 @@ const ALL_ROUNDS = [
               ["Para estudantes do 9º ano de uma escola com 600 estudantes, dois turnos, aulas às terças e quintas.", "Detalhe que não muda os problemas só confunde. Conte o que a turma já sabe e o tempo."]],
     format: [["Uma folha A4 com 5 problemas, a figura de cada um descrita entre parênteses e o gabarito com a conta.", "Pronta para imprimir, com as figuras descritas e a conta de cada resposta."],
              ["Algumas questões.", "Quantas? Com gabarito?"],
-             ["Folha com as figuras desenhadas com asteriscos e traços, uma ao lado de cada problema.", "O Gemini desenha mal com asteriscos e traços. Peça a figura descrita entre parênteses."]],
-    trap: { text: "Em Geometria, o Gemini tenta desenhar triângulos com letras e traços, e a figura sai torta. Peça assim:", say: "Descreva cada figura entre parênteses, sem desenhar com letras e símbolos." },
+             ["Folha com as figuras desenhadas com asteriscos e traços, uma ao lado de cada problema.", "A IA desenha mal com asteriscos e traços. Peça a figura descrita entre parênteses."]],
+    trap: { text: "Em Geometria, a IA tenta desenhar triângulos com letras e traços, e a figura sai torta. Peça assim:", say: "Descreva cada figura entre parênteses, sem desenhar com letras e símbolos." },
   },
   {
     id: "simulado",
@@ -694,7 +694,7 @@ const ALL_ROUNDS = [
     answer: { who: "Professor(a) de Matemática · Ensino Médio", title: "Simulado: porcentagem e juros", audience: "17 anos · estilo Enem", shape: "enem" },
     role: [["Você é professor(a) de Matemática do Ensino Médio e prepara estudantes para o Enem.", "Ele escreve como quem prepara a turma para o Enem."],
            ["Você é bom em provas.", "Bom em provas de quê? Diga a matéria e a etapa."],
-           ["Você é da banca do Enem e conhece as questões de todos os anos e das provas anteriores.", "O Gemini não tem acesso à banca nem às provas. Diga que ele é professor(a) de Matemática."]],
+           ["Você é da banca do Enem e conhece as questões de todos os anos e das provas anteriores.", "O ChatGPT não tem acesso à banca nem às provas. Diga que ele é professor(a) de Matemática."]],
     task: [["Crie 5 questões inéditas, no estilo do Enem, sobre porcentagem e juros.", "Questões novas, com tema e quantidade: ele não precisa lembrar de prova nenhuma."],
            ["Faça questões difíceis.", "Difíceis para quem? Sobre qual assunto?"],
            ["Copie 5 questões de Matemática de provas antigas do Enem, com o ano de cada uma.", "Ele não consulta as provas e inventa a questão e o ano. Peça questões inéditas, no estilo do Enem."]],
@@ -703,8 +703,8 @@ const ALL_ROUNDS = [
               ["Para estudantes que vão fazer o Enem, de qualquer escola, com qualquer nível de preparo e de qualquer ano.", "Qualquer nível e qualquer ano não é contexto. Conte a idade, o prazo e onde a turma erra."]],
     format: [["Alternativas de A a E, só uma correta, e gabarito com a conta passo a passo, sem dizer que são de um ano do Enem.", "Sai no formato da prova, com a conta explicada, e sem ano inventado."],
              ["Pode ser em qualquer formato.", "Sem formato, você gasta tempo arrumando depois."],
-             ["Uma prova completa de 45 questões, com cartão-resposta para imprimir.", "Quarenta e cinco questões é uma prova inteira, e o Gemini perde o fio. Peça poucas questões, de A a E, com gabarito."]],
-    trap: { text: "O Gemini às vezes diz que a questão é de uma prova do Enem e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de um ano do Enem." },
+             ["Uma prova completa de 45 questões, com cartão-resposta para imprimir.", "Quarenta e cinco questões é uma prova inteira, e a IA perde o fio. Peça poucas questões, de A a E, com gabarito."]],
+    trap: { text: "A IA às vezes diz que a questão é de uma prova do Enem e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de um ano do Enem." },
   },
   {
     id: "redacao",
@@ -712,17 +712,17 @@ const ALL_ROUNDS = [
     answer: { who: "Professor(a) de Redação · Ensino Médio", title: "Proposta: o tempo de tela dos jovens", audience: "17 anos · texto dissertativo-argumentativo", shape: "essay" },
     role: [["Você é professor(a) de Redação e prepara estudantes do Ensino Médio para o Enem.", "Ele escreve como quem prepara a turma para o texto dissertativo-argumentativo."],
            ["Você escreve bem.", "Escrever bem não é ensinar a escrever. Diga que ele é professor(a) de Redação."],
-           ["Você é o corretor oficial do Enem e dá a nota exata que o Inep daria a cada texto.", "O Gemini não é corretor oficial, e a nota dele não vale a do Inep. Diga que ele é professor(a) de Redação."]],
+           ["Você é o corretor oficial do Enem e dá a nota exata que o Inep daria a cada texto.", "O ChatGPT não é corretor oficial, e a nota dele não vale a do Inep. Diga que ele é professor(a) de Redação."]],
     task: [["Crie uma proposta de redação com um tema social atual e 3 textos de apoio.", "Um tema, com os textos de apoio no padrão da prova."],
            ["Dê um tema bom.", "Bom como? De que área? Sem isso, vem um tema genérico."],
-           ["Crie 10 propostas com todos os temas já cobrados no Enem desde 1998, com o ano de cada um.", "O Gemini não lembra o tema de cada ano e inventa. Peça uma proposta nova, com um tema só."]],
+           ["Crie 10 propostas com todos os temas já cobrados no Enem desde 1998, com o ano de cada um.", "A IA não lembra o tema de cada ano e inventa. Peça uma proposta nova, com um tema só."]],
     context: [["Para estudantes do 3º ano, de 17 anos, que treinam a proposta de intervenção, em uma aula de 100 minutos.", "Ele monta o tema para o ponto que a turma precisa treinar."],
               ["Para o Ensino Médio.", "Qual ano? O que a turma precisa treinar?"],
               ["Para estudantes que querem tirar nota mil, de qualquer escola e de qualquer nível.", "Nota mil não diz o nível da turma. Conte a idade, o que treinar e o tempo."]],
     format: [["O tema em uma frase e 3 textos de apoio curtos, sem números nem pesquisas, no modelo da proposta do Enem.", "Sai no modelo da prova, e os dados você escolhe, com fonte."],
              ["Como achar melhor.", "Sem formato, o texto sai solto e longo."],
-             ["Textos de apoio com estatísticas do IBGE e de pesquisas recentes, para dar mais credibilidade.", "O Gemini inventa o número e a fonte, e o estudante usa como verdade. Peça textos sem números e escolha os dados."]],
-    trap: { text: "Nos textos de apoio, o Gemini coloca números de institutos e pesquisas com tanta segurança que parecem verdadeiros, mas muitas vezes são inventados. Peça assim:", say: "Nos textos de apoio, não use números nem pesquisas. Os dados e as fontes eu busco." },
+             ["Textos de apoio com estatísticas do IBGE e de pesquisas recentes, para dar mais credibilidade.", "A IA inventa o número e a fonte, e o estudante usa como verdade. Peça textos sem números e escolha os dados."]],
+    trap: { text: "Nos textos de apoio, a IA coloca números de institutos e pesquisas com tanta segurança que parecem verdadeiros, mas muitas vezes são inventados. Peça assim:", say: "Nos textos de apoio, não use números nem pesquisas. Os dados e as fontes eu busco." },
   },
   {
     id: "mitose",
@@ -740,7 +740,7 @@ const ALL_ROUNDS = [
     format: [["Um quadro comparando mitose e meiose e 5 perguntas com gabarito, escrito fora de bloco de código.", "Você cola o quadro direto no documento, com as perguntas para a turma se testar."],
              ["Como achar melhor.", "Sem formato, a revisão sai solta."],
              ["Um quadro dentro de um bloco de código, para copiar sem perder as colunas.", "No bloco de código o quadro vira texto de programa. Peça o quadro fora do bloco de código."]],
-    trap: { text: "Quando você pede um quadro ou uma tabela, o Gemini às vezes põe tudo num bloco de código, e não dá para colar no documento. Peça assim:", say: "Escreva o quadro fora de bloco de código." },
+    trap: { text: "Quando você pede um quadro ou uma tabela, a IA às vezes põe tudo num bloco de código, e não dá para colar no documento. Peça assim:", say: "Escreva o quadro fora de bloco de código." },
   },
   {
     id: "velocidade",
@@ -758,7 +758,7 @@ const ALL_ROUNDS = [
     format: [["Passo a passo de cada aula com o tempo, 3 exercícios com gabarito e a conta mostrada em cada etapa.", "Você confere cada conta, e o plano cabe na aula."],
              ["Como quiser.", "Sem formato, o plano vem solto, sem tempo e sem exercícios."],
              ["Um plano de 20 páginas, com o passo a passo, os cálculos e o gabarito de tudo.", "Plano longo demais para ler e conferir. Peça por aula, com 3 exercícios e a conta em cada etapa."]],
-    trap: { text: "O Gemini erra contas, principalmente com unidades, e o gabarito sai errado com toda a segurança. Peça assim:", say: "Mostre a conta em cada etapa, com as unidades, e confira o resultado antes de responder." },
+    trap: { text: "A IA erra contas, principalmente com unidades, e o gabarito sai errado com toda a segurança. Peça assim:", say: "Mostre a conta em cada etapa, com as unidades, e confira o resultado antes de responder." },
   },
   {
     id: "quimica",
@@ -772,20 +772,20 @@ const ALL_ROUNDS = [
            ["Reescreva o texto do seu jeito, trocando os termos químicos por palavras do dia a dia.", "Trocar os termos tira o conteúdo da aula. Mantenha os termos e explique cada um."]],
     context: [["Para um estudante de 16 anos com dislexia, que lê melhor frases curtas e termos explicados, sem identificar ninguém.", "Você descreveu a necessidade sem identificar o estudante. Perfeito!"],
               ["Para um estudante.", "Qual é a necessidade? Diga a necessidade e a idade, sem o nome."],
-              ["Para a Marina Souza, do 2º B, que tem dislexia e vai mal em Química desde o ano passado.", "Nunca escreva o nome nem dados do estudante no Gemini! Descreva a necessidade sem identificar ninguém."]],
+              ["Para a Marina Souza, do 2º B, que tem dislexia e vai mal em Química desde o ano passado.", "Nunca escreva o nome nem dados do estudante no ChatGPT! Descreva a necessidade sem identificar ninguém."]],
     format: [["Em português do Brasil, com frases curtas, cada termo químico explicado em uma linha e uma lista do que mudou.", "Você recebe o texto pronto, com os termos explicados, e sabe o que foi alterado."],
              ["Deixe mais fácil.", "Mais fácil como? Diga o formato que ajuda esse estudante."],
-             ["Frases curtas e um glossário no fim, na língua que você achar melhor.", "O Gemini às vezes responde em inglês. Peça português do Brasil."]],
-    trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem turma do estudante. Peça assim:", say: "Descreva a necessidade, sem nome nem turma. Responda em português do Brasil." },
+             ["Frases curtas e um glossário no fim, na língua que você achar melhor.", "A língua não pode ficar em aberto, e falta a lista do que mudou. Peça português do Brasil."]],
+    trap: { text: "O que você escreve fica guardado no histórico da conta. Nunca coloque nome nem turma do estudante e, nesses pedidos, prefira o chat temporário, no alto da tela. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
   },
   // EJA: turmas de jovens e adultos, da alfabetização ao Ensino Médio. O bloco ruim comprido muitas vezes infantiliza
   {
     id: "eja-alfabetizacao",
     vague: "Faça uma atividade de alfabetização.",
     answer: { who: "Professor(a) da EJA · alfabetização", title: "Palavras do trabalho", audience: "adultos · 30 minutos", shape: "sheet" },
-    role: [["Você é professor(a) de alfabetização da EJA e cria atividades para adultos.", "Agora o Gemini escreve para adultos que estão aprendendo a ler, e não para crianças."],
+    role: [["Você é professor(a) de alfabetização da EJA e cria atividades para adultos.", "Agora o ChatGPT escreve para adultos que estão aprendendo a ler, e não para crianças."],
            ["Você é professor(a) do 1º ano.", "O 1º ano é turma de criança. Diga que é a EJA, para ele escrever para adultos."],
-           ["Você é professor(a) alfabetizador(a) com 30 anos de experiência, especialista em crianças de 6 e 7 anos.", "Experiência com crianças leva o Gemini a infantilizar. Diga que a turma é da EJA."]],
+           ["Você é professor(a) alfabetizador(a) com 30 anos de experiência, especialista em crianças de 6 e 7 anos.", "Experiência com crianças leva a IA a infantilizar. Diga que a turma é da EJA."]],
     task: [["Crie uma atividade para imprimir a partir da palavra TRABALHO, com sílabas e palavras novas.", "Uma palavra da vida da turma e um caminho claro: sílabas e palavras novas."],
            ["Faça uma atividade de letras.", "De quais letras? Para imprimir? Parta de uma palavra que a turma usa."],
            ["Crie uma atividade com o alfabeto inteiro, do A ao Z, com um bichinho desenhado para cada letra.", "Bichinho para cada letra é atividade de criança. Parta de uma palavra da vida da turma, como TRABALHO."]],
@@ -794,8 +794,8 @@ const ALL_ROUNDS = [
               ["Para adultos que não sabem nada e precisam começar do zero, como crianças.", "Adulto que não lê sabe muita coisa: reconhece preços, placas e rótulos. Valorize o que a turma já sabe."]],
     format: [["Folha A4 em letra de forma grande, com 4 exercícios curtos, imagens descritas entre parênteses e o gabarito.", "Pronta para imprimir, com a letra que a turma reconhece e sem desenho torto."],
              ["Bem bonitinha.", "Bonitinha como? E o diminutivo puxa o tom infantil. Diga a letra, quantos exercícios e o gabarito."],
-             ["Folha cheia de estrelinhas e carinhas felizes, desenhadas com letras e símbolos.", "Estrelinha e carinha infantilizam, e o Gemini desenha mal com letras e símbolos. Peça as imagens descritas entre parênteses."]],
-    trap: { text: "Quando lê \"alfabetização\", o Gemini costuma escrever como para crianças, com bichinhos e diminutivos, e ainda desenha com letras e símbolos. Peça assim:", say: "Linguagem adulta, sem nada infantil. Descreva as imagens entre parênteses." },
+             ["Folha cheia de estrelinhas e carinhas felizes, desenhadas com letras e símbolos.", "Estrelinha e carinha infantilizam, e a IA desenha mal com letras e símbolos. Peça as imagens descritas entre parênteses."]],
+    trap: { text: "Quando lê \"alfabetização\", a IA costuma escrever como para crianças, com bichinhos e diminutivos, e ainda desenha com letras e símbolos. Peça assim:", say: "Linguagem adulta, sem nada infantil. Descreva as imagens entre parênteses." },
   },
   {
     id: "eja-encceja",
@@ -803,7 +803,7 @@ const ALL_ROUNDS = [
     answer: { who: "Professor(a) de Matemática · EJA", title: "Encceja: porcentagem nas contas de casa", audience: "adultos · Ensino Fundamental", shape: "encceja" },
     role: [["Você é professor(a) de Matemática da EJA e prepara adultos para o Encceja.", "Matéria, etapa e prova certas: as questões saem no nível da turma."],
            ["Você é bom em provas.", "Bom em provas de quê? Diga a matéria, a etapa e a prova."],
-           ["Você é da banca do Encceja e conhece todas as provas do Inep desde a primeira edição.", "O Gemini não é da banca nem consulta as provas. Diga que ele é professor(a) de Matemática da EJA."]],
+           ["Você é da banca do Encceja e conhece todas as provas do Inep desde a primeira edição.", "O ChatGPT não é da banca nem consulta as provas. Diga que ele é professor(a) de Matemática da EJA."]],
     task: [["Crie 5 questões inéditas, no estilo do Encceja, sobre porcentagem nas contas de casa.", "Questões novas, com tema e quantidade: ele não precisa lembrar de prova nenhuma."],
            ["Faça umas questões.", "Quantas? Sobre o quê? Para qual prova?"],
            ["Copie 5 questões de provas antigas do Encceja, com o ano de cada uma.", "Ele não consulta as provas e inventa a questão e o ano. Peça questões inéditas, no estilo do Encceja."]],
@@ -812,8 +812,8 @@ const ALL_ROUNDS = [
               ["Para estudantes de qualquer idade, de qualquer escola, que vão fazer alguma prova um dia.", "Qualquer idade e alguma prova não é contexto. Conte a prova, a etapa e onde a turma erra."]],
     format: [["Alternativas de A a D, uma conta de casa em cada questão e o gabarito com a conta, sem dizer de que ano é.", "Sai no formato da prova, com a conta explicada, e sem ano inventado."],
              ["Qualquer formato.", "Sem formato, você gasta tempo arrumando depois."],
-             ["Uma prova completa do Encceja, com todas as áreas, a redação e o cartão-resposta, para aplicar numa noite só.", "Uma prova inteira é longa demais, e o Gemini perde o fio. Peça poucas questões, de A a D, com gabarito."]],
-    trap: { text: "O Gemini às vezes diz que a questão caiu numa prova do Encceja e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de uma prova do Encceja." },
+             ["Uma prova completa do Encceja, com todas as áreas, a redação e o cartão-resposta, para aplicar numa noite só.", "Uma prova inteira é longa demais, e a IA perde o fio. Peça poucas questões, de A a D, com gabarito."]],
+    trap: { text: "A IA às vezes diz que a questão caiu numa prova do Encceja e coloca o ano, mas a questão não existe e o ano é inventado. Peça assim:", say: "Questões inéditas. Não diga que são de uma prova do Encceja." },
   },
   {
     id: "eja-juros",
@@ -831,7 +831,7 @@ const ALL_ROUNDS = [
     format: [["Botões grandes, visual adulto, 3 fases, som no acerto e pontos no final, com preços de exemplo.", "Você disse como quer: o jogo sai adulto, com valores que não confundem ninguém."],
              ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato, até um jogo com cara de criança."],
              ["Com 12 fases, os preços reais das lojas da cidade e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, ele inventa os preços das lojas, e o ranking pede nome de estudante."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas costuma responder que não consegue criar o jogo. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
     id: "eja-saude",
@@ -839,7 +839,7 @@ const ALL_ROUNDS = [
     answer: { who: "Professor(a) de Ciências · EJA", title: "Quiz: pressão alta e o sal da comida", audience: "adultos · aula de 30 minutos", shape: "health" },
     role: [["Você é professor(a) de Ciências da EJA.", "Matéria e etapa certas: as perguntas saem no nível de adultos."],
            ["Você é médico.", "Médico dá diagnóstico, e a aula não é consulta. Diga que ele é professor(a) de Ciências da EJA."],
-           ["Você é um cardiologista famoso, que receita o melhor remédio para cada caso de pressão alta.", "Receitar remédio não é papel da aula, e o Gemini pode errar. Diga que ele é professor(a) de Ciências."]],
+           ["Você é um cardiologista famoso, que receita o melhor remédio para cada caso de pressão alta.", "Receitar remédio não é papel da aula, e a IA pode errar. Diga que ele é professor(a) de Ciências."]],
     task: [["Crie um quiz de 8 perguntas sobre a pressão alta e o sal da comida.", "Quantidade e tema definidos, perto da vida da turma."],
            ["Pergunte coisas de saúde.", "Quantas perguntas? Sobre qual assunto?"],
            ["Crie um quiz enorme sobre todas as doenças, remédios e exames.", "Assunto demais. Escolha um tema perto da turma, como a pressão alta."]],
@@ -848,8 +848,8 @@ const ALL_ROUNDS = [
               ["Para adultos que não entendem nada de saúde e precisam aprender tudo do zero.", "Adulto sabe muito de saúde, pela vida. Valorize o que a turma já sabe."]],
     format: [["Múltipla escolha com 3 alternativas, sem usar o teste interativo, e o gabarito explicado.", "Sai em texto, pronto para imprimir ou passar para o Google Forms."],
              ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
-             ["Como teste interativo, com os números das pesquisas mais recentes sobre a pressão alta no Brasil.", "O teste interativo não dá para imprimir, e o Gemini inventa números de pesquisa. Peça o quiz em texto."]],
-    trap: { text: "No quiz, o Gemini às vezes abre o teste interativo, que não dá para imprimir, e cita números de saúde que ninguém conferiu. Peça assim:", say: "Sem usar o teste interativo. Não invente números de saúde." },
+             ["Como teste interativo, com os números das pesquisas mais recentes sobre a pressão alta no Brasil.", "Teste interativo não sai numa folha para imprimir, e a IA inventa números de pesquisa. Peça o quiz em texto."]],
+    trap: { text: "Em saúde, a IA cita números de pesquisas que ninguém conferiu, com cara de verdade. Peça assim:", say: "Não invente números de saúde nem pesquisas." },
   },
   {
     id: "eja-curriculo",
@@ -860,14 +860,14 @@ const ALL_ROUNDS = [
            ["Você é um consultor de carreira que escreve currículos perfeitos para executivos de grandes empresas.", "Currículo de executivo não é a realidade da turma. Diga a matéria e a etapa."]],
     task: [["Planeje uma aula sobre o currículo, com um modelo inventado e uma escrita guiada.", "Tema e modelo inventado: ninguém precisa expor a própria vida."],
            ["Faça um currículo.", "De quem? A aula é para a turma aprender a fazer o seu."],
-           ["Escreva o currículo de cada estudante da turma, com os dados que eu mandar.", "Dado de estudante não vai para o Gemini. Peça um modelo inventado e uma escrita guiada."]],
+           ["Escreva o currículo de cada estudante da turma, com os dados que eu mandar.", "Dado de estudante não vai para o ChatGPT. Peça um modelo inventado e uma escrita guiada."]],
     context: [["Para adultos da EJA, no Ensino Médio, muitos procurando emprego e com experiência de trabalho informal.", "Você descreveu a turma sem identificar ninguém. Perfeito!"],
               ["Para um aluno.", "Qual turma? O que ela precisa? Descreva a turma, sem nome."],
-              ["Para o Seu Antônio Pereira, de 52 anos, da turma da noite, que trabalhou na obra.", "Nunca escreva o nome nem dados do estudante no Gemini! Descreva a turma sem identificar ninguém."]],
+              ["Para o Seu Antônio Pereira, de 52 anos, da turma da noite, que trabalhou na obra.", "Nunca escreva o nome nem dados do estudante no ChatGPT! Descreva a turma sem identificar ninguém."]],
     format: [["Em português do Brasil, com o tempo de cada parte, o modelo fora de bloco de código e 5 passos de escrita.", "Você recebe a aula pronta, em português, e o modelo dá para copiar."],
              ["Do jeito que achar melhor.", "Sem formato, a aula vem solta e sem tempo."],
-             ["Um currículo chique, em inglês, com foto e todos os documentos, para impressionar.", "Currículo de treino vai em português e sem documentos. E o Gemini às vezes responde em inglês: peça português do Brasil."]],
-    trap: { text: "O que você escreve pode ficar guardado na conta, e o Gemini às vezes responde em inglês. Nunca coloque nome nem dado de estudante. Peça assim:", say: "Descreva a turma, sem nome de estudante. Responda em português do Brasil." },
+             ["Um currículo chique, em inglês, com foto e todos os documentos, para impressionar.", "Currículo de treino vai em português, sem foto e sem documentos de ninguém. Peça um modelo inventado."]],
+    trap: { text: "O que você escreve fica guardado no histórico da conta. Nunca coloque nome nem dado de estudante: peça um modelo inventado. Peça assim:", say: "Descreva a turma, sem nome de estudante, e use um modelo inventado." },
   },
   // As três chaves da spec das respostas mais profundas (equipe/notas/spec-profundidade-maquina.md):
   // o objetivo na Tarefa, os erros comuns no Contexto e a conferência antes de entregar no Formato
@@ -886,8 +886,8 @@ const ALL_ROUNDS = [
               ["Para crianças que adoram brincar e estão sempre perguntando quanto falta para o recreio.", "Gostar de recreio não diz o que a turma já sabe. Conte a idade e o que ela já lê."]],
     format: [["Uma folha A4 com um exemplo resolvido, 5 exercícios do fácil ao difícil, cada relógio descrito entre parênteses e o gabarito.", "Pronta para imprimir, com o exemplo que mostra o caminho e os relógios descritos."],
              ["Bastante exercício.", "Quantos? Em que ordem? Com gabarito?"],
-             ["Uma folha com um relógio desenhado com letras e símbolos em cada exercício.", "O Gemini desenha mal com letras e símbolos. Peça cada relógio descrito entre parênteses."]],
-    trap: { text: "Sem objetivo, o Gemini escolhe o mais fácil: perguntas de decorar, que não mostram se a turma aprendeu. Peça assim:", say: "No topo, escreva numa frase o objetivo: o que a turma vai conseguir fazer depois." },
+             ["Uma folha com um relógio desenhado com letras e símbolos em cada exercício.", "A IA desenha mal com letras e símbolos. Peça cada relógio descrito entre parênteses."]],
+    trap: { text: "Sem objetivo, a IA escolhe o mais fácil: perguntas de decorar, que não mostram se a turma aprendeu. Peça assim:", say: "No topo, escreva numa frase o objetivo: o que a turma vai conseguir fazer depois." },
   },
   {
     id: "negativos",
@@ -904,8 +904,8 @@ const ALL_ROUNDS = [
               ["Para estudantes que às vezes erram e às vezes acertam, dependendo do dia e da vontade.", "Errar às vezes não diz onde. Conte o erro que a turma repete, como achar -5 maior que -2."]],
     format: [["Múltipla escolha com 3 alternativas, as erradas vindas desse erro, sem o teste interativo, e o gabarito explicando cada uma.", "Cada alternativa errada mostra um engano real, e o gabarito ensina a sair dele."],
              ["Qualquer formato serve.", "Sem formato, você vai gastar tempo arrumando depois."],
-             ["Com a reta numérica desenhada com traços e números ao lado de cada pergunta.", "O Gemini desenha mal com traços e números. Peça a reta descrita em palavras, entre parênteses."]],
-    trap: { text: "Sem os erros da turma, o Gemini cria alternativas erradas que ninguém escolheria, e o quiz não mostra quem ainda confunde. Peça assim:", say: "Considere os erros mais comuns dessa idade sobre o tema. As alternativas erradas vêm desses erros." },
+             ["Com a reta numérica desenhada com traços e números ao lado de cada pergunta.", "A IA desenha mal com traços e números. Peça a reta descrita em palavras, entre parênteses."]],
+    trap: { text: "Sem os erros da turma, a IA cria alternativas erradas que ninguém escolheria, e o quiz não mostra quem ainda confunde. Peça assim:", say: "Considere os erros mais comuns dessa idade sobre o tema. As alternativas erradas vêm desses erros." },
   },
   {
     id: "genetica",
@@ -922,8 +922,8 @@ const ALL_ROUNDS = [
               ["Para estudantes que vão fazer o Enem, o vestibular, concursos e qualquer outra prova.", "Todas as provas ao mesmo tempo não acertam nenhuma. Conte a idade e onde a turma erra."]],
     format: [["Alternativas de A a E, cruzamentos escritos como texto (Aa × Aa), o gabarito explicado e, antes de entregar, cada conta conferida.", "Ele revisa o gabarito antes de mostrar, e você recebe menos conta errada."],
              ["Como achar melhor.", "Sem formato, você gasta tempo arrumando depois."],
-             ["Alternativas de A a E, heredogramas desenhados com traços e bolinhas e as proporções em fórmulas de LaTeX.", "O Gemini desenha mal com traços, e o LaTeX aparece como código. Peça o heredograma em palavras, as contas como texto e a conferência no fim."]],
-    trap: { text: "No gabarito, o Gemini às vezes erra uma conta com toda a segurança. Pedir que ele confira antes de entregar diminui o erro, mas confira você também. Peça assim:", say: "Antes de entregar, confira cada conta e o gabarito, e corrija o que não estiver certo." },
+             ["Alternativas de A a E, heredogramas desenhados com traços e bolinhas e as proporções em fórmulas de LaTeX.", "A IA desenha mal com traços, e o LaTeX aparece como código. Peça o heredograma em palavras, as contas como texto e a conferência no fim."]],
+    trap: { text: "No gabarito, a IA às vezes erra uma conta com toda a segurança. Pedir que ela confira antes de entregar diminui o erro, mas confira você também. Peça assim:", say: "Antes de entregar, confira cada conta e o gabarito, e corrija o que não estiver certo." },
   },
 ]
 
@@ -1021,7 +1021,7 @@ function say(text, mood = "") {
   tip.classList.add("pop")
 }
 
-// Drawing the answer Gemini would give with only the parts filled so far
+// Drawing the answer ChatGPT would give with only the parts filled so far
 function drawAnswer(final = false) {
   const { answer } = ROUNDS[round]
   const has = id => Boolean(filled[id])
@@ -1029,8 +1029,8 @@ function drawAnswer(final = false) {
   const missing = PARTS.filter(part => !has(part.id)).map(part => part.missing)
   $("missing").className = `missing ${missing.length ? "" : "done"}`
   $("missing").innerHTML = missing.length
-    ? `O Gemini ainda vai adivinhar: <b>${missing.join(", ")}</b>.`
-    : final ? "<b>Resposta certa para a sua turma!</b>" : "<b>Pedido completo!</b> Agora é só pedir ao Gemini."
+    ? `O ChatGPT ainda vai adivinhar: <b>${missing.join(", ")}</b>.`
+    : final ? "<b>Resposta certa para a sua turma!</b>" : "<b>Pedido completo!</b> Agora é só pedir ao ChatGPT."
   const avatar = has("role")
     ? '<span class="avatar"><svg viewBox="0 0 100 100"><use href="#teacher"/></svg></span>'
     : '<span class="avatar unknown">?</span>'
@@ -1104,7 +1104,7 @@ function place(block) {
   }
 }
 
-// The finished prompt as one text, the same order the teacher would paste into Gemini
+// The finished prompt as one text, the same order the teacher would paste into ChatGPT
 const promptText = () => PARTS.map(part => filled[part.id]).join(" ")
 
 // Copiar do identidade-visual: só diz que copiou quando copiou e, se o navegador não deixar,
@@ -1139,7 +1139,7 @@ async function run() {
   $("win").classList.add("show")
   $("win").scrollTop = 0
   $("next").focus({ preventScroll: true })
-  bitSays("comemorando", "Pedido completo! Agora veja a armadilha do Gemini e a frase que livra dela.")
+  bitSays("comemorando", "Pedido completo! Agora veja a armadilha da IA e a frase que livra dela.")
 }
 
 function confetti(overlay) {
@@ -1159,16 +1159,16 @@ function confetti(overlay) {
 function nextRound() {
   $("win").classList.remove("show")
   if (round + 1 < ROUNDS.length) return loadRound(round + 1)
-  $("final-text").textContent = `Agora você sabe o segredo: Papel, Tarefa, Contexto e Formato, mais as frases que livram o Gemini das armadilhas. E nunca o nome ${STAGES[stage].who}!`
+  $("final-text").textContent = `Agora você sabe o segredo: Papel, Tarefa, Contexto e Formato, mais as frases que livram a IA das armadilhas. E nunca o nome ${STAGES[stage].who}!`
   $("score").innerHTML = `${totalStars} de ${ROUNDS.length * 3} estrelas`
-  // The sentences of the five traps, to take to Gemini
+  // The sentences of the five traps, to take to ChatGPT
   $("saves").innerHTML = ROUNDS.map(data => `<li><b>${escape(data.vague)}</b>${escape(data.trap.say)}</li>`).join("")
   beep([523, 659, 784, 1047], { spacing: 0.14 })
   confetti($("final"))
   $("final").classList.add("show")
   $("final").scrollTop = 0
   $("final").querySelector(".btn").focus({ preventScroll: true })
-  bitSays("formatura", "Você zerou o Jogo do Prompt! Leve essas frases para os seus pedidos no Gemini.")
+  bitSays("formatura", "Você zerou o Jogo do Prompt! Leve essas frases para os seus pedidos no ChatGPT.")
 }
 
 // Dragging a block with the mouse; on a phone the finger scrolls the page, and a tap, a click
@@ -1440,7 +1440,7 @@ function countHand(index, change) {
   document.querySelector(`.g-option[data-index="${index}"] [data-hand="${change}"]`)?.focus({ preventScroll: true })
 }
 
-// After the four parts: the right prompt, why the other blocks fail, and the Gemini trap with a question to talk about
+// After the four parts: the right prompt, why the other blocks fail, and the AI trap with a question to talk about
 function showTalk(page) {
   G.screen = "talk"
   G.page = page
@@ -1456,8 +1456,8 @@ function showTalk(page) {
       <div class="g-fails">${PARTS.map(part => `<div class="g-fail ${part.id}"><h3><span class="g-letter">${part.letter}</span>${part.name}</h3>
         ${data[part.id].slice(1).map(([text, why]) => `<p><b>${escape(text)}${G.fallen[G.round].includes(text) ? "<em>a sala votou</em>" : ""}</b><span>${escape(why)}</span></p>`).join("")}</div>`).join("")}</div>`
   } else {
-    html = `<div class="g-trap">${WARN}<div><small>Armadilha do Gemini</small><p>${escape(data.trap.text)}</p><span class="say">${escape(data.trap.say)}</span></div></div>
-      <div class="g-talk">${BIT_POSE("pensando")}<div><small>Para conversar</small><b>O que vocês mudariam no pedido?</b><p>Pensem na turma de vocês: que Contexto e que Formato vocês dariam ao Gemini?</p></div></div>`
+    html = `<div class="g-trap">${WARN}<div><small>Armadilha da IA</small><p>${escape(data.trap.text)}</p><span class="say">${escape(data.trap.say)}</span></div></div>
+      <div class="g-talk">${BIT_POSE("pensando")}<div><small>Para conversar</small><b>O que vocês mudariam no pedido?</b><p>Pensem na turma de vocês: que Contexto e que Formato vocês dariam ao ChatGPT?</p></div></div>`
   }
   groupBody(steps + html, page === 2 && "g-middle")
   const last = G.round + 1 === ROUNDS.length
@@ -1471,8 +1471,8 @@ function showEnd() {
   groupBody(`
     <h1 class="g-big">Placar da <span>sala</span></h1>
     <div class="g-score">${BIT_POSE(firsts >= 3 ? "comemorando" : "feliz")}${firsts} de ${ROUNDS.length} pedidos certos de primeira</div>
-    <p class="g-ask"><span>${G.firstParts} das ${ROUNDS.length * PARTS.length} partes saíram certas no primeiro voto. Levem as frases que salvam para o Gemini:</span></p>
-    <ul class="g-saves" aria-label="As frases que evitam as armadilhas do Gemini">${ROUNDS.map((data, index) => `<li>${ICON(G.misses[index] ? "repetir" : "certo")}<div><b>${escape(data.vague)}</b>${escape(data.trap.say)}</div></li>`).join("")}</ul>
+    <p class="g-ask"><span>${G.firstParts} das ${ROUNDS.length * PARTS.length} partes saíram certas no primeiro voto. Levem as frases que salvam para o ChatGPT:</span></p>
+    <ul class="g-saves" aria-label="As frases que evitam as armadilhas da IA">${ROUNDS.map((data, index) => `<li>${ICON(G.misses[index] ? "repetir" : "certo")}<div><b>${escape(data.vague)}</b>${escape(data.trap.say)}</div></li>`).join("")}</ul>
     <div class="g-actions">
       <button class="btn go" type="button" id="g-again">${ICON("repetir")}Jogar de novo</button>
       <button class="btn" type="button" id="g-change">Trocar a etapa</button>

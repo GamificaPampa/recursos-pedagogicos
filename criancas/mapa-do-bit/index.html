@@ -246,8 +246,8 @@ p, li, blockquote {
         <li>O botão Ouvir, o alto-falante no topo do jogo, lê a pergunta e a fala do Bit em voz alta, para quem ainda não lê bem. O botão ao lado liga o Ler sozinho, e a leitura funciona mesmo com o som desligado.</li>
       </ul>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Geografia, escala de mapas] para estudantes do [1º ano do ensino médio]: aparece um mapa esquemático com dois pontos, A e B, a distância entre eles em centímetros e a escala, e o estudante escolhe a distância real entre três respostas.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: calcular a distância real a partir da escala, achar um ponto pela latitude e pela longitude numa grade, ligar pistas de clima e vegetação aos biomas brasileiros], um botão de dica, o jogo explica a conta ou o motivo em cada acerto e em cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Avise na tela que os mapas são esquemáticos e que os números são de exemplo. Confira cada conta e cada fato. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -886,7 +886,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

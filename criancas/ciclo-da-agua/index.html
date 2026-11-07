@@ -284,8 +284,8 @@ p, li, blockquote {
         </div>
       </div>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo sobre [o ciclo da água] para crianças de [10 e 11 anos]: a criança coloca em ordem as etapas [evaporação, condensação, chuva e volta aos rios] e vê uma gotinha fazer o caminho.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: pôr as etapas em ordem, dizer o nome da etapa que aparece na cena e reconhecer o ciclo no dia a dia, como o espelho embaçado], botões grandes para o celular, um som curto no acerto, uma dica quando a criança errar e estrelas no fim de cada fase. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -567,7 +567,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

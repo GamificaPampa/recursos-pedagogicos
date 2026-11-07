@@ -267,8 +267,8 @@ p, li, blockquote {
         </div>
       </div>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [função afim] para estudantes do [1º ano do ensino médio]: um gráfico com duas estrelas marcadas, e o estudante ajusta o a e o b de y = ax + b com botões de mais e menos até a reta passar pelas duas estrelas.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: escolher a lei de uma reta pronta, ajustar a reta às estrelas, montar a função de uma situação do dia a dia como corrida de aplicativo ou bateria de celular], um botão de dica que mostra quanto a reta sobe quando o x anda 1, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -725,7 +725,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

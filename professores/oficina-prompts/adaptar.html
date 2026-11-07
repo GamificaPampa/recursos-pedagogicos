@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Adaptador de atividades · Oficina de Prompts</title>
-<meta name="description" content="Adapte uma atividade para incluir estudantes com TEA, TDAH, dislexia, deficiência visual, surdez, deficiência auditiva, deficiência intelectual ou altas habilidades, ou passe para leitura fácil para toda a turma: o antes e depois de cada caso e o pedido pronto para o Gemini, sem dados do estudante.">
+<meta name="description" content="Adapte uma atividade para incluir estudantes com TEA, TDAH, dislexia, deficiência visual, surdez, deficiência auditiva, deficiência intelectual ou altas habilidades, ou passe para leitura fácil para toda a turma: o antes e depois de cada caso e o pedido pronto para o ChatGPT, sem dados do estudante.">
 <meta name="theme-color" content="#5fbcff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
 <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
@@ -89,13 +89,13 @@
     <svg class="boia" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 26h16v-10a8 8 0 0 1 16 0v10h16v16h-10a8 8 0 0 0 0 16H32v-6a8 8 0 0 0-16 0v6H8z" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/></svg>
     <div>
       <h1><span class="y">Adaptador</span> de <span class="p">atividades</span></h1>
-      <p>A mesma atividade da turma, adaptada para que todo mundo participe. Escolha a necessidade, veja o antes e o depois e leve o pedido pronto para o Gemini.</p>
+      <p>A mesma atividade da turma, adaptada para que todo mundo participe. Escolha a necessidade, veja o antes e o depois e leve o pedido pronto para o ChatGPT.</p>
     </div>
   </header>
 
-  <section class="card regra" data-bit-pose="ops" data-bit-dica="Descreva a necessidade, nunca o estudante. Nome, laudo, CID e turma não vão para o Gemini.">
+  <section class="card regra" data-bit-pose="ops" data-bit-dica="Descreva a necessidade, nunca o estudante. Nome, laudo, CID e turma não vão para o ChatGPT.">
     <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="28" width="40" height="30" rx="6" fill="#ffd23f" stroke="#2f2a4a" stroke-width="4"/><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#2f2a4a" stroke-width="4"/><circle cx="32" cy="42" r="4" fill="#2f2a4a"/></svg>
-    <p><b>Descreva a necessidade, nunca o estudante.</b> Nome, foto, laudo, CID, diagnóstico de alguém e a turma não vão para o Gemini. Escreva só o que ajuda a adaptar, como “um estudante de 10 anos que lê frases curtas com apoio de imagem”.</p>
+    <p><b>Descreva a necessidade, nunca o estudante.</b> Nome, foto, laudo, CID, diagnóstico de alguém e a turma não vão para o ChatGPT. Escreva só o que ajuda a adaptar, como “um estudante de 10 anos que lê frases curtas com apoio de imagem”.</p>
   </section>
 
   <section class="card" id="escolha" data-bit-dica="Cada necessidade pede um jeito diferente de mudar a mesma atividade. A leitura fácil serve para a turma toda.">
@@ -104,7 +104,7 @@
     <ul class="chips" id="chips" role="group" aria-labelledby="grupo-inclusao"></ul>
     <p class="grupo" id="grupo-turma">Para toda a turma</p>
     <ul class="chips" id="chips-turma" role="group" aria-labelledby="grupo-turma"></ul>
-    <p class="aviso">A adaptação não substitui o AEE nem o plano individual do estudante. Leia e ajuste o que o Gemini devolver antes de usar.</p>
+    <p class="aviso">A adaptação não substitui o AEE nem o plano individual do estudante. Leia e ajuste o que o ChatGPT devolver antes de usar.</p>
   </section>
 
   <section class="card" data-bit-dica="Repare: o conteúdo e o objetivo continuam os mesmos da turma. Muda o caminho até eles.">
@@ -121,7 +121,7 @@
   </section>
 
   <section class="card" data-bit-pose="pensando" data-bit-dica="Preencha os campos e o pedido se monta sozinho. Depois, revise a resposta com o olhar de quem conhece a turma.">
-    <h2><span class="n">3</span>O pedido para o Gemini</h2>
+    <h2><span class="n">3</span>O pedido para o ChatGPT</h2>
     <div class="campos">
       <label for="componente">Componente<small>a matéria</small><input id="componente" placeholder="Ciências"></label>
       <label for="ano">Ano ou idade<small>da turma, sem o nome dela</small><input id="ano" placeholder="4º ano, 9 e 10 anos"></label>
@@ -130,7 +130,7 @@
     <p class="prompt" id="prompt" aria-live="polite"></p>
     <div class="linha">
       <button class="btn btn--jogar" type="button" id="copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o pedido</button>
-      <a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o Gemini</a>
+      <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o ChatGPT</a>
       <span class="copiado" id="copiado" role="status"></span>
     </div>
   </section>
@@ -139,7 +139,7 @@
     <h2><span class="n">4</span>Antes de usar</h2>
     <ul class="lembretes">
       <li>Confira se o conteúdo e o objetivo continuam os mesmos da turma: adaptar não é dar outra atividade.</li>
-      <li>Leia a lista do que mudou que o Gemini escreveu no fim e corte o que não serve para o seu estudante.</li>
+      <li>Leia a lista do que mudou que o ChatGPT escreveu no fim e corte o que não serve para o seu estudante.</li>
       <li>Converse com o professor do AEE e com a família: eles sabem o que funciona com aquele estudante.</li>
       <li>Ofereça a versão adaptada a quem precisar, sem expor ninguém na frente da turma.</li>
       <li>Imagens descritas entre parênteses viram figura de verdade: recorte, desenhe ou imprima.</li>
@@ -225,7 +225,7 @@ $("escolha").addEventListener("click", e => {
 for (const id of ["componente", "ano", "atividade"]) $(id).addEventListener("input", montar)
 $("copiar").addEventListener("click", async () => {
   const ok = await Copiar.texto($("prompt").textContent, { avisar: false })
-  $("copiado").textContent = ok ? "Copiado! Cole no Gemini." : ""
+  $("copiado").textContent = ok ? "Copiado! Cole no ChatGPT." : ""
   setTimeout(() => { $("copiado").textContent = "" }, 4000)
 })
 montar()

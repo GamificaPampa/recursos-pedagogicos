@@ -222,11 +222,11 @@ p, li, blockquote {
         <li>Abra o site <b>ibge.gov.br</b>, entre em <b>Cidades e Estados</b> e escolha a sua cidade.</li>
         <li>Pegue números de um tema: população por idade, trabalho e rendimento, ou população urbana e rural. Anote o ano e a fonte.</li>
         <li>Copie os números para uma tabela e confira se as partes somam o total (ou 100%).</li>
-        <li>Peça ao Gemini para montar as perguntas com esses números, como nas mensagens abaixo, e confira cada conta antes de usar com a turma.</li>
+        <li>Peça ao ChatGPT para montar as perguntas com esses números, como nas mensagens abaixo, e confira cada conta antes de usar com a turma.</li>
       </ol>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [Sociologia] para estudantes do [2º ano do ensino médio]: aparece um gráfico de barras com dados de exemplo de uma cidade imaginária, uma pergunta com três respostas, e o jogo explica por que a resposta está certa ou errada.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: ler gráficos de barras, setores e linhas com perguntas de maior valor, diferença e porcentagem; achar o que engana em um gráfico, como eixo cortado, amostra pequena e porcentagens que somam mais de 100; ligar o dado a um conceito como desigualdade social, mobilidade social, trabalho informal, êxodo rural ou envelhecimento da população], um botão de dica, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Avise na tela que os dados são de exemplo. Visual de jogo, mas sem parecer infantil. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -657,7 +657,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()

@@ -1,6 +1,6 @@
 # Caminho da Escola
 
-Um jogo de Geografia: a criança usa a legenda para achar os lugares no mapa do bairro, guia o Bit com "siga em frente", "vire à direita" e "vire à esquerda" e lê um caminho escrito para descobrir onde ele parou. É um dos jogos de exemplo por matéria, para a professora ver como pode ficar um jogo da sua disciplina antes de criar o dela com o Gemini.
+Um jogo de Geografia: a criança usa a legenda para achar os lugares no mapa do bairro, guia o Bit com "siga em frente", "vire à direita" e "vire à esquerda" e lê um caminho escrito para descobrir onde ele parou. É um dos jogos de exemplo por matéria, para a professora ver como pode ficar um jogo da sua disciplina antes de criar o dela com o ChatGPT.
 
 | Campo        | Valor                                                                                                         |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -11,6 +11,6 @@ Um jogo de Geografia: a criança usa a legenda para achar os lugares no mapa do 
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/caminho-da-escola/                              |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                                |
 
-Parte do prompt "Do caminho de casa ao mapa", da Biblioteca da Oficina de Prompts. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
+Parte do prompt "Do caminho de casa ao mapa", da Biblioteca da Oficina de Prompts. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
 
 Nada do que a criança faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

@@ -1,6 +1,6 @@
 # Balança do Bit
 
-Um jogo de Matemática: a criança resolve equações do 1º grau numa balança em equilíbrio, tirando pesos de 1 dos dois pratos e dividindo os dois lados até a caixa x ficar sozinha. É um dos jogos de exemplo por matéria, para a professora ver como pode ficar um jogo da sua disciplina antes de criar o dela com o Gemini.
+Um jogo de Matemática: a criança resolve equações do 1º grau numa balança em equilíbrio, tirando pesos de 1 dos dois pratos e dividindo os dois lados até a caixa x ficar sozinha. É um dos jogos de exemplo por matéria, para a professora ver como pode ficar um jogo da sua disciplina antes de criar o dela com o ChatGPT.
 
 | Campo        | Valor                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------- |
@@ -11,6 +11,6 @@ Um jogo de Matemática: a criança resolve equações do 1º grau numa balança 
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/balanca-do-bit/                           |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                          |
 
-Parte do prompt "Jogo da balança: equações do 1º grau", da Biblioteca da Oficina de Prompts. A balança inclina quando fica desequilibrada; deixar ela ainda mais torta conta como erro, e o botão Desfazer volta o último passo. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do Gemini.
+Parte do prompt "Jogo da balança: equações do 1º grau", da Biblioteca da Oficina de Prompts. A balança inclina quando fica desequilibrada; deixar ela ainda mais torta conta como erro, e o botão Desfazer volta o último passo. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

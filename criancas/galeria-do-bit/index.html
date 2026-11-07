@@ -234,8 +234,8 @@ p, li, blockquote {
         <li>Murais de Os Gêmeos, em São Paulo (arte urbana)</li>
       </ul>
 
-      <h3>Faça um jogo parecido com o Gemini</h3>
-      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do Gemini, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
+      <h3>Faça um jogo parecido com o ChatGPT</h3>
+      <p>Este jogo foi feito pela equipe do GamificaPampa. No Canvas do ChatGPT, dá para criar um parecido para a sua turma em duas mensagens: primeiro a ideia curta, depois os detalhes. Troque o que está entre colchetes.</p>
       <p class="mensagem" id="msg1"><b>Mensagem 1</b>Crie no Canvas um jogo de [elementos da linguagem visual] para estudantes do [7º ano]: o código desenha um quadro simples com [pontos, linhas ou formas] e o estudante escolhe qual elemento visual domina o quadro. Não use imagens de obras reais. É um jogo, não o teste interativo.</p>
       <p class="mensagem" id="msg2"><b>Mensagem 2</b>Agora melhore o jogo: [3 fases: elementos visuais, composição e equilíbrio, movimentos artísticos], 5 desafios por fase, um botão de dica, uma explicação do conceito a cada acerto e a cada erro, botões grandes para o celular, um som curto no acerto e estrelas no fim de cada fase. Cite só as obras e os autores que eu escrever aqui: [Abaporu, de Tarsila do Amaral; A Noite Estrelada, de Van Gogh]. Não invente datas, autores nem curiosidades. Tudo em português do Brasil.</p>
       <div class="linha">
@@ -859,7 +859,7 @@ p, li, blockquote {
   mostrarEstrelas()
   $("seguir").onclick = () => comecar(fase + 1)
 
-  // Copying the prompt messages for the Gemini
+  // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
       const caixa = $(botao.dataset.copiar), texto = caixa.textContent.replace(/^Mensagem \d/, "").trim()
