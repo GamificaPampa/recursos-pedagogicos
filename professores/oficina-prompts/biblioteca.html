@@ -257,7 +257,7 @@
     <li><span class="badge" style="--c: var(--pink)"><svg viewBox="0 0 36 36"><rect x="7" y="16" width="22" height="17" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg></span><span>Nunca escreva o nome ou dados dos alunos no Gemini. Fale da turma de um jeito geral.</span></li>
     <li><span class="badge" style="--c: var(--blue)"><svg viewBox="0 0 24 24"><path d="M19.5 12 A7.5 7.5 0 1 1 16.8 6.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M17.5 2.5 V6.8 H13.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Se o Gemini disser que não consegue ajudar, toque em <b>Refazer</b>, embaixo da resposta, ou abra uma conversa nova. Às vezes ele recusa um pedido normal.</span></li>
   </ul>
-  <p class="own">Quer montar o seu?<a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use o Construtor de prompts</a></p>
+  <p class="own">Quer montar o seu?<a class="btn build" href="/maquina/"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use a Máquina de prompts</a></p>
 </section>
 
 <section class="card filters" aria-label="Filtros">
@@ -287,20 +287,20 @@
 <div class="empty" id="empty-meus" hidden>
   <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" fill="#fff" stroke="#2f2a4a" stroke-width="2" stroke-linejoin="round"/></svg>
   <h2>Você ainda não guardou nenhum prompt</h2>
-  <p>Para guardar, toque em <b>Guardar</b>, a estrela de cada cartão da biblioteca. No Construtor, use <b>Guardar em Meus prompts</b>. Os guardados aparecem aqui.</p>
-  <a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use o Construtor de prompts</a>
+  <p>Para guardar, toque em <b>Guardar</b>, a estrela de cada cartão da biblioteca. Na Máquina de prompts, use <b>Guardar em Meus prompts</b>. Os guardados aparecem aqui.</p>
+  <a class="btn build" href="/maquina/"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use a Máquina de prompts</a>
 </div>
 
 <div class="empty" id="empty" hidden>
   <svg viewBox="0 0 90 90" aria-hidden="true"><circle cx="38" cy="38" r="26" fill="#fff1a8" stroke="#2f2a4a" stroke-width="5"/><path d="M57 57 L80 80" stroke="#2f2a4a" stroke-width="9" stroke-linecap="round"/><text x="38" y="50" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="34" font-weight="700" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="4" paint-order="stroke">?</text></svg>
   <h2>Nenhum prompt com esses filtros</h2>
-  <p>Tente outra palavra ou outra turma. Se não achar, monte o seu no <a href="construtor.html">Construtor de prompts</a>.</p>
+  <p>Tente outra palavra ou outra turma. Se não achar, monte o seu no <a href="/maquina/">Máquina de prompts</a>.</p>
   <button type="button" class="light-btn" id="clear-empty">Limpar filtros</button>
 </div>
 
 <div class="closing">
   <p>Não achou o que precisava?</p>
-  <a class="btn build" href="construtor.html"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Quer montar o seu? Use o Construtor de prompts</a>
+  <a class="btn build" href="/maquina/"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Quer montar o seu? Use a Máquina de prompts</a>
 </div>
 
 <section class="card mandar" id="mandar" aria-labelledby="mandar-titulo">
@@ -2215,7 +2215,7 @@ function itemHTML(item) {
       <span class="kind-icon">${iconOf(item.tipo)}</span>
       <div>
         <h3>${escape(item.nome)}</h3>
-        <div class="tags">${stage ? `<span class="tag" style="--c: ${stage.light}">${stage.label}</span>` : ""}<span class="tag">${kind.label}</span><span class="tag">Do Construtor</span></div>
+        <div class="tags">${stage ? `<span class="tag" style="--c: ${stage.light}">${stage.label}</span>` : ""}<span class="tag">${kind.label}</span><span class="tag">Da Máquina</span></div>
       </div>
     </div>
     <div class="pcard-body">
