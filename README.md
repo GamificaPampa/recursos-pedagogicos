@@ -4,7 +4,7 @@ Jogos e materiais que o GamificaPampa leva para as escolas públicas de Alegrete
 
 ## Para crianças
 
-Jogos de Engenharia de Software para crianças de 6 a 14 anos. Funcionam no celular, no tablet e no projetor.
+Jogos para a turma, da Educação Infantil ao Ensino Médio: os de Engenharia de Software, para crianças de 6 a 14 anos, e jogos de cada matéria. Funcionam no celular, no tablet e no projetor.
 
 | Jogo | Idade | Abrir no navegador | Código |
 | --- | --- | --- | --- |
