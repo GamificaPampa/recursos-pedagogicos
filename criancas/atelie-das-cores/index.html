@@ -354,7 +354,7 @@ p, li, blockquote {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
     $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
-      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+      if (!ocupado && !botao.disabled && !toqueDuplo()) aoEscolher(botao, Number(botao.dataset.i))
     })
   }
   function errar(frase, botao, riscar = true) {
@@ -477,7 +477,7 @@ p, li, blockquote {
   }
   const EXEMPLOS = { "0+3": "como um morango vermelho entre folhas verdes", "1+4": "como um pôr do sol laranja num céu azul", "2+5": "como uma flor amarela num vaso roxo" }
   function escolherFatia(i) {
-    if (ocupado) return
+    if (ocupado || toqueDuplo()) return
     const base = atual(), certa = (base + 3) % 6, [nomeBase] = RODA[base]
     if (i === certa) {
       $("cena").innerHTML = roda(base, certa)
@@ -491,8 +491,13 @@ p, li, blockquote {
 
   // Muda a cada rodada: a mistura que ainda está na paleta não mexe na rodada ou na fase seguinte
   let geracao = 0
+  // A rodada nova aparece no lugar do Próxima fase: o segundo toque de um toque duplo,
+  // logo depois que ela aparece, não escolhe tinta, resposta nem cor do círculo
+  let telaNovaEm = 0
+  const toqueDuplo = () => performance.now() - telaNovaEm < 500
   function mostrarRodada() {
     geracao++
+    telaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     const r = atual()
     if (tipo() === "misturar") {
