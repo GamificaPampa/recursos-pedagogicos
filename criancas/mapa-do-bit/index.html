@@ -677,8 +677,13 @@ p, li, blockquote {
     $("opcoes").innerHTML = opcoesDaRodada.map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.html}</button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
   }
+  // O desafio novo e a tela do fim aparecem onde estava o Próximo desafio: o segundo toque de um toque duplo,
+  // logo depois que a tela muda, não responde nem marca a grade nem reinicia o jogo
+  let telaNovaEm = 0
+  const toqueDuplo = () => performance.now() - telaNovaEm < 500
   function mostrarRodada() {
     Jogo.ouvir.novaTela()
+    telaNovaEm = performance.now()
     $("proxima").hidden = true
     $("dica").hidden = false
     const r = atual()
@@ -708,7 +713,7 @@ p, li, blockquote {
 
   // Escolher entre as respostas. O erro explica o que olhar
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const o = opcoesDaRodada[botao.dataset.i]
     if (o.ok) {
       botao.classList.add("certa")
@@ -727,7 +732,7 @@ p, li, blockquote {
 
   // Fase 2: marcar um ponto na grade
   function marcarPonto(lat, lon) {
-    if (ocupado || tentativas.some(([a, b]) => a === lat && b === lon)) return
+    if (ocupado || toqueDuplo() || tentativas.some(([a, b]) => a === lat && b === lon)) return
     const r = atual(), focoVolta = document.activeElement?.closest?.(".ponto")
     if (lat === r.lat && lon === r.lon) {
       revelar = true
@@ -815,7 +820,7 @@ p, li, blockquote {
   }
 
   // Stars by how many mistakes were made in the phase, and confetti
-  const fimExtra = Jogo.acoesDoFim(() => comecar(0))
+  const fimExtra = Jogo.acoesDoFim(() => toqueDuplo() || comecar(0))
   const FINS = [
     "Você calculou as distâncias. Do mapa para o chão, multiplica pela escala; do chão para o mapa, divide. E quanto menor o número depois dos dois pontos, mais detalhes.",
     "Você achou os pontos. A latitude conta a partir do Equador, para o norte ou para o sul; a longitude conta a partir de Greenwich, para o leste ou para o oeste.",
@@ -837,6 +842,7 @@ p, li, blockquote {
     $("seguir").querySelector("span").textContent = "Próxima fase"
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
+    telaNovaEm = performance.now()
     ;(ultima ? fimExtra.querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit.diz(ultima ? "formatura" : "comemorando", ultima ? "Escala, coordenadas e biomas: você já sabe ler um mapa! Que tal medir um mapa de papel na sua escola?" : "Fase completa! Vamos para a próxima?")
@@ -884,7 +890,7 @@ p, li, blockquote {
     })
   }
   mostrarEstrelas()
-  $("seguir").onclick = () => comecar(fase + 1)
+  $("seguir").onclick = () => toqueDuplo() || comecar(fase + 1)
 
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
