@@ -463,6 +463,10 @@ p, li, blockquote {
     const certa = f.tipo === "ordem" ? ORDEM[(r.inicio + passo) % 4] : r.etapa
     const qual = id => `${ETAPAS[id].art} ${ETAPAS[id].nome.toLowerCase()}`
     if (escolha !== certa) {
+      // Cada resposta errada conta um erro só: na ordem o botão volta a valer no passo seguinte, nas perguntas ele se apaga
+      if (botao.dataset.errouNoPasso === String(passo)) return
+      botao.dataset.errouNoPasso = passo
+      if (f.tipo !== "ordem") botao.disabled = true
       erros++
       errosAqui++
       somErro()
