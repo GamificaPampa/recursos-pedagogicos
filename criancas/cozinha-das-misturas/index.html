@@ -671,7 +671,7 @@ p, li, blockquote {
 
   /* ---------- O jogo ---------- */
   let fase = 0, rodada = 0, etapa = 0, erros = 0, travado = false, dicas = 0, depois = false
-  let marcados = new Set()
+  let marcados = new Set(), conferidaErrada = null
   const atual = () => FASES[fase].rodadas[rodada]
   const tipo = () => FASES[fase].tipo
   const lista = (itens, ultimo = "e") => itens.length < 2 ? itens.join("") : `${itens.slice(0, -1).join(", ")} ${ultimo} ${itens[itens.length - 1]}`
@@ -711,6 +711,7 @@ p, li, blockquote {
     dicas = 0
     depois = false
     marcados = new Set()
+    conferidaErrada = null
     const r = atual()
     desenharPlacar()
     $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].rodadas.length}`
@@ -825,7 +826,9 @@ p, li, blockquote {
       $("opcoes").querySelectorAll(".opcao").forEach(b => { b.disabled = true })
       return acertou(r.final)
     }
-    erros++
+    // Conferir de novo os mesmos sinais marcados não conta outro erro
+    if ([...marcados].sort().join() !== conferidaErrada) erros++
+    conferidaErrada = [...marcados].sort().join()
     somErro()
     const partes = []
     if (demais.length) partes.push(`O texto não conta ${demais.length === 1 ? "este sinal" : "estes sinais"}: ${lista(demais.map(s => minuscula(SINAIS[s])))}.`)
