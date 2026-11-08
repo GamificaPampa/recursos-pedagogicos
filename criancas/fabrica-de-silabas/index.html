@@ -445,12 +445,19 @@ p, li, blockquote {
   }
   $("dica").onclick = darDica
 
+  // Cada peça errada conta um erro só: montando a palavra ela volta a valer no passo seguinte, na sílaba que falta ela se apaga
+  const errouDeNovo = botao => {
+    if (botao.dataset.errouNoPasso === String(passo)) return true
+    botao.dataset.errouNoPasso = passo
+    return false
+  }
   function escolher(botao) {
     if (ocupado || botao.disabled) return
     const f = FASES[fase], p = atual(), peca = botao.textContent
     if (f.tipo === "montar") {
       const certa = p.silabas[passo]
       if (peca !== certa) {
+        if (errouDeNovo(botao)) return
         const frase = errosAqui === 0
           ? `${peca} não é a ${["primeira", "segunda", "terceira"][passo]} sílaba. Fale ${p.palavra.toLowerCase()} devagar, batendo uma palma para cada sílaba.`
           : `${p.silabas.join(" - ")}. A ${["primeira", "segunda", "terceira"][passo]} sílaba é ${certa}.`
@@ -468,6 +475,8 @@ p, li, blockquote {
     } else {
       const certa = p.silabas[p.falta]
       if (peca !== certa) {
+        if (errouDeNovo(botao)) return
+        botao.disabled = true
         const inventada = p.silabas.map((s, i) => i === p.falta ? peca : s).join("")
         const frase = errosAqui === 0
           ? `Com ${peca}, fica ${inventada}. Essa palavra não existe! Fale ${p.palavra.toLowerCase()} devagar.`
