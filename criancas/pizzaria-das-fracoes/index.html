@@ -291,7 +291,7 @@ p, li, blockquote {
     cala() {},
   }
   const pizza = $("pizza")
-  let fase = 0, pedido = 0, erros = 0, errosPedido = 0, ocupado = false
+  let fase = 0, pedido = 0, erros = 0, errosPedido = 0, entregueErrada = 0, ocupado = false
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
@@ -401,6 +401,7 @@ p, li, blockquote {
     $("nome").setAttribute("aria-label", `Pedido: ${a}/${b}, ${NOMES[`${a}/${b}`]}`)
     pizza.setAttribute("aria-label", `Pizza cortada em ${n} pedaços iguais`)
     errosPedido = 0
+    entregueErrada = 0
     desenharPizza(n)
     contar()
     $("placar").innerHTML = FASES[fase].pedidos.map((_, i) =>
@@ -437,8 +438,12 @@ p, li, blockquote {
       pizza.querySelectorAll(".pedaco.is-escolhido").forEach(pedaco => pedaco.classList.add("is-entregue"))
       return mostrarProxima()
     }
-    erros++
-    errosPedido++
+    // Cada quantidade errada conta um erro só: entregar de novo a mesma pizza (ou o toque duplo) não soma outro
+    if (k !== entregueErrada) {
+      erros++
+      errosPedido++
+    }
+    entregueErrada = k
     somErro()
     const demais = k * b > a * n, pedacos = Math.abs(a * n / b - k) === 1 ? "um pedaço" : "alguns pedaços"
     let frase = `Você escolheu ${k}/${n}, e o pedido era ${a}/${b}. ${demais ? `Foi pizza demais: tire ${pedacos}.` : `Faltou pizza: escolha mais ${pedacos}.`}`
