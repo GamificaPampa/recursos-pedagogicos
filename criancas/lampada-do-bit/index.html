@@ -734,8 +734,8 @@ p, li, blockquote {
         const certo = Math.abs(valor - alvo) < 1e-9
         Jogo.modoProfessor.destacar(certo ? $("acender") : valor < alvo ? $("mais") : $("menos"))
         return window.Bit?.diz("pensando", ehU
-          ? `Da lei U = R · I: U = ${num(r.R)} · ${num(r.pede)} = ${num(alvo)} V. ${certo ? "É o valor que está na pilha. Aperte Acender." : "Leve a tensão até esse valor."}`
-          : `Da lei U = R · I sai R = U ÷ I = ${num(r.U)} ÷ ${num(r.pede)} = ${num(alvo)} Ω. ${certo ? "É o valor que está no resistor. Aperte Acender." : "Leve a resistência até esse valor."}`, 14000)
+          ? `Da lei U = R · I: U = ${num(r.R)} · ${num(r.pede)} = ${num(alvo)} V. ${certo ? "É o valor que está na pilha. Aperte Ligar o circuito." : "Leve a tensão até esse valor."}`
+          : `Da lei U = R · I sai R = U ÷ I = ${num(r.U)} ÷ ${num(r.pede)} = ${num(alvo)} Ω. ${certo ? "É o valor que está no resistor. Aperte Ligar o circuito." : "Leve a resistência até esse valor."}`, 14000)
       }
       const i = r.opcoes.findIndex(([, res]) => res === true)
       Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${i}"]`))
