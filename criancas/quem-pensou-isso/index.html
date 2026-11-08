@@ -515,6 +515,9 @@ p, li, blockquote {
       const resumo = ordem.map(i => `${F[i].nome} (${F[i].epoca.toLowerCase()})`).join(", ")
       return acertou(`Linha do tempo certa! Do mais antigo para o mais recente: ${resumo}. Lembre que o a.C. conta ao contrário: quanto maior o número, mais antigo.`)
     }
+    // Cada carta errada conta um erro só por passo: tocar de novo na mesma carta (ou o toque duplo) não soma outro
+    if (botao.dataset.errouNoPasso === String(colocados.length)) return
+    botao.dataset.errouNoPasso = colocados.length
     erros++
     somErro()
     window.Bit?.diz("ops", `${F[id].nome} viveu de ${F[id].anos}, mas ainda sobrou alguém mais antigo no grupo. Procure o mais antigo entre as cartas que faltam.`)
