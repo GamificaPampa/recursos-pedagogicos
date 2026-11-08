@@ -471,6 +471,7 @@ p, li, blockquote {
       $("texto").textContent = "Isso! E qual pista do texto mostra essa escola?"
       $("area").innerHTML = `<div class="opcoes uma" id="opcoes" role="group" aria-label="Escolha a pista">${r.pistas.map((p, i) => botaoOpcao(i, p)).join("")}</div>`
       $("opcoes").querySelectorAll(".opcao").forEach(b => b.onclick = () => escolherPista(b))
+      pistasEm = performance.now()
       dicas = 0
       return fala("feliz", `É ${ESC[id].nome} mesmo. Agora diga por quê: qual pista do trecho aponta para isso?`)
     }
@@ -481,8 +482,10 @@ p, li, blockquote {
     const e = ESC[id]
     fala("ops", `${tipo() === "carac" ? "Essa característica não é do" : "Esse trecho não é do"} ${e.nome}. O ${e.nome} tem ${e.marca}. Procure outra pista.`)
   }
+  // As pistas aparecem no lugar das escolas: o segundo toque de um toque duplo não vale como resposta
+  let pistasEm = 0
   function escolherPista(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || performance.now() - pistasEm < 500) return
     const r = atual()
     if (r.pistas[botao.dataset.id] === r.pista) {
       botao.classList.add("certa")
@@ -494,7 +497,7 @@ p, li, blockquote {
     somErro()
     botao.disabled = true
     botao.classList.add("errada")
-    fala("ops", `Essa pista não aparece no trecho. Releia os versos e pense em ${ESC[r.esc].chave}.`)
+    fala("ops", `Essa pista não aparece no trecho. Releia os versos e procure ${ESC[r.esc].chave}.`)
   }
 
   // Fase 2: tocar num autor e numa escola
