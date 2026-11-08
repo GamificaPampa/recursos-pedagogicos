@@ -484,10 +484,16 @@ Jogo.som.aoMudar(ligado => {
 document.querySelector("#final p").after(Jogo.acoesDoFim(() => press("Enter")))
 
 
+// Tab anda pelos botões do topo e da tela final; Enter ou espaço logo depois aperta o botão escolhido pelo Tab
+let focoPeloTab = false
+addEventListener("pointerdown", () => { focoPeloTab = false })
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
   // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
   if (/^F\d{1,2}$/.test(event.key)) return
+  if (event.key === "Tab") return focoPeloTab = true
+  if ((event.key === "Enter" || event.key === " ") && focoPeloTab && document.activeElement?.matches("a, button")) return
+  focoPeloTab = false
   event.preventDefault()
   press(event.key)
 })
