@@ -540,6 +540,9 @@ p, li, blockquote {
       if (marcados === r.ids.length) return acertou(`Ordem certa: ${juntar(r.ids.map(i => EV[i].ano))}. ${e.fato}`)
       return fala("feliz", e.fato)
     }
+    // Cada fato errado conta um erro só por passo: tocar de novo no mesmo fato (ou o toque duplo) não soma outro
+    if (botao.dataset.errouNoPasso === String(marcados)) return
+    botao.dataset.errouNoPasso = marcados
     erros++
     somErro()
     botao.classList.remove("erro")
