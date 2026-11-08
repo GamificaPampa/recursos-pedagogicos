@@ -621,7 +621,11 @@ p, li, blockquote {
   }
 
   // Stars by how many mistakes were made in the phase, and confetti
+  // A tela do fim pode pôr o Próxima fase no lugar do Ver o resultado: o segundo toque de um toque duplo,
+  // logo depois que a tela aparece, não pula para a fase seguinte
+  let fimEm = 0
   function terminarFase() {
+    fimEm = performance.now()
     const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
     const ultima = fase === FASES.length - 1
     Jogo.progresso.guardar(fase + 1, estrelas)
@@ -679,7 +683,7 @@ p, li, blockquote {
     })
   }
   mostrarEstrelas()
-  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => performance.now() - fimEm < 500 || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
 
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
