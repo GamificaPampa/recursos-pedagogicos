@@ -533,6 +533,8 @@ p, li, blockquote {
     $("texto").textContent = r.texto || "Deixe cada átomo igual dos dois lados da seta."
     $("nota").textContent = tipo() === "dia" ? "Use os menores números inteiros possíveis." : "O coeficiente multiplica a molécula inteira."
     coefs = substancias().map(() => 1)
+    conferidaErrada = ""
+    bancadaNovaEm = performance.now()
     montarBancada()
     atualizar()
   }
@@ -556,11 +558,15 @@ p, li, blockquote {
     window.Bit?.diz("ops", `Olhe o número pequeno logo depois do ${r.el}: ele diz quantos átomos de ${r.el} há na molécula.`)
   }
 
+  // Cada combinação errada conta um erro só, e o Conferir da reação nova aparece no lugar do Próxima questão:
+  // o segundo toque de um toque duplo, logo depois que a bancada aparece, não confere nada
+  let conferidaErrada = "", bancadaNovaEm = 0
   $("conferir").onclick = () => {
-    if (ocupado) return
+    if (ocupado || performance.now() - bancadaNovaEm < 500) return
     const { esq, dir, diferentes } = balanco(), r = atual()
     if (diferentes.length) {
-      erros++
+      if (coefs.join() !== conferidaErrada) erros++
+      conferidaErrada = coefs.join()
       somErro()
       const el = diferentes[0]
       return window.Bit?.diz("ops", `Ainda não: o ${ELEMENTOS[el][0]} (${el}) tem ${esq[el]} nos reagentes e ${dir[el]} nos produtos. Numa reação, nenhum átomo some nem aparece.`)
