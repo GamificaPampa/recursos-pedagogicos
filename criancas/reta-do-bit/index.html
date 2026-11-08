@@ -526,6 +526,8 @@ p, li, blockquote {
       ? '<b class="a">a</b> é quanto o valor muda a cada 1 de x · <b class="b">b</b> é o valor no começo, quando x = 0'
       : '<b class="a">a</b> é quanto a reta sobe ou desce quando o x anda 1 · <b class="b">b</b> é onde ela corta o eixo y'
     revelar = false
+    tentadaErrada = ""
+    rodadaNovaEm = performance.now()
     desenhar()
   }
 
@@ -574,7 +576,7 @@ p, li, blockquote {
     const terminar = () => {
       ocupado = false
       if (naReta.every(Boolean)) return acertou(`Pegou as duas estrelas! A reta ${lei(a, b, "y", false)} passa por (${num(r.pontos[0][0])}, ${num(r.pontos[0][1])}) e (${num(r.pontos[1][0])}, ${num(r.pontos[1][1])}).`)
-      erros++
+      contarErro()
       somErro()
       const i = naReta.indexOf(false), [x, y] = r.pontos[i], yr = a * x + b
       const pegou = naReta.some(Boolean) ? "Pegou uma estrela, mas faltou a outra. " : ""
@@ -618,15 +620,22 @@ p, li, blockquote {
       desenharGrafico()
       return acertou(`f(x) = ${lei(a, b, "", false).slice(3)}. Para x = ${r.prever}: f(${r.prever}) = ${num(r.a)} · ${r.prever} ${r.b < 0 ? "−" : "+"} ${num(Math.abs(r.b))} = ${num(y)}. ${r.frase}`, 4200)
     }
-    erros++
+    contarErro()
     somErro()
     if (b !== r.b) return window.Bit?.diz("ops", `O b ainda não está certo. ${r.dicaB}`)
     if (Math.sign(a) !== Math.sign(r.a)) return window.Bit?.diz("ops", `O b está certo! Mas, quando o x cresce, o valor ${r.a > 0 ? "aumenta" : "diminui"}, então o a é ${r.a > 0 ? "positivo" : "negativo"}.`)
     window.Bit?.diz("ops", `O b está certo! Falta o a. ${r.dicaA}`)
   }
 
+  // Cada reta errada conta um erro só, e a rodada nova aparece com o botão no lugar do Próxima questão:
+  // o segundo toque de um toque duplo, logo depois que a rodada aparece, não lança nem confere nada
+  let tentadaErrada = "", rodadaNovaEm = 0
+  function contarErro() {
+    if (`${a} ${b}` !== tentadaErrada) erros++
+    tentadaErrada = `${a} ${b}`
+  }
   $("conferir").onclick = () => {
-    if (ocupado) return
+    if (ocupado || performance.now() - rodadaNovaEm < 500) return
     if (tipo() === "ajustar") lancar()
     else conferirFuncao()
   }
