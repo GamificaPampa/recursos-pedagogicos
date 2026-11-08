@@ -464,7 +464,11 @@ p, li, blockquote {
     $("nota-fonte").hidden = !(texto && exemplo)
   }
 
+  // Os botões novos aparecem no lugar do Próximo desafio e do Próxima fase: o segundo toque de um toque duplo não vale
+  let rodadaNovaEm = 0
+  const toqueDuplo = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
@@ -497,7 +501,7 @@ p, li, blockquote {
 
   // Fase 1: primária ou secundária
   function escolherTipo(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const r = atual()
     if (botao.dataset.id === r.resp) {
       botao.classList.add("certa")
@@ -512,7 +516,7 @@ p, li, blockquote {
 
   // Fase 2 e as perguntas da fase 3: escolher a resposta, e cada erro explica
   function escolherResposta(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const r = atual(), o = r.ops[botao.dataset.i]
     if (o.certa) {
       botao.classList.add("certa")
@@ -527,7 +531,7 @@ p, li, blockquote {
 
   // Fase 3: tocar nos fatos, do mais antigo ao mais novo
   function tocarFato(botao) {
-    if (ocupado || botao.classList.contains("feito")) return
+    if (ocupado || botao.classList.contains("feito") || toqueDuplo()) return
     const r = atual(), id = botao.dataset.id, e = EV[id]
     if (id === r.ids[marcados]) {
       marcados++
