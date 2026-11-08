@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tudo para imprimir · GamificaPampa</title>
+  <meta name="description" content="Tudo o que o GamificaPampa tem para imprimir num lugar só: roteiros, folhas de atividades, certificado, medalhas, mapas, a folha das famílias, o guia e o baralho, com o número de folhas de cada um.">
+  <meta property="og:title" content="Tudo para imprimir · GamificaPampa">
+  <meta property="og:description" content="Roteiros, atividades, certificado, medalhas, mapas e mais, com o número de folhas de cada um.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    p, ul, h2, h3 { margin: 0; }
+    :focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    main { display: grid; gap: 40px; width: min(1100px, 100% - 32px); margin: 16px auto 64px; }
+    .abertura { display: grid; justify-items: center; gap: 18px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 22px; max-width: 720px; text-align: left; }
+    .bit img { flex: none; width: clamp(80px, 12vw, 110px); height: auto; }
+    .bit .bubble { min-width: 0; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.35; }
+
+    /* Um grupo por momento de uso, com a cor na faixa do título */
+    .grupo { display: grid; gap: 18px; }
+    .grupo h2 { justify-self: start; padding: 6px 18px; background: var(--c); border: 4px solid var(--ink); border-radius: 999px; font-size: clamp(22px, 3vw, 30px); }
+    .papeis { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 18px; padding: 0; list-style: none; }
+    .papel { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; align-items: start; padding: 18px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; box-shadow: inset 0 10px 0 var(--c), 0 5px 0 var(--ink); padding-top: 24px; }
+    .pilha { width: 92px; height: 92px; }
+    .papel__corpo { display: grid; gap: 8px; }
+    .papel h3 { font-size: 20px; line-height: 1.2; }
+    .papel p { color: var(--soft); font-size: 16px; line-height: 1.35; }
+    /* Etiquetas sem sombra: a sombra dura fica só no que se clica */
+    .etiquetas { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; list-style: none; }
+    .etiquetas li { padding: 2px 10px; background: #f3f0ff; border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 600; }
+    .papel__acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+    @media (max-width: 420px) { .papel { grid-template-columns: 64px minmax(0, 1fr); } .pilha { width: 64px; height: 64px; } }
+
+    .dicas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; padding: 0; list-style: none; }
+    .dicas li { padding: 18px; background: var(--white); border: 4px solid var(--ink); border-radius: 20px; }
+    .dicas b { display: block; margin-bottom: 4px; font-size: 19px; }
+    .dicas p { color: var(--soft); font-size: 16px; }
+    .rodape { position: relative; padding: 24px; text-align: center; font-size: 15px; }
+  </style>
+  <script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body>
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 22%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 48%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 5%; top: 30%">&lt;/&gt;</span>
+    <span class="simbolo" style="right: 6%; top: 16%; --d: -2s">{ }</span>
+    <span class="simbolo" style="right: 8%; top: 58%; --d: -4s">01</span>
+    <span class="morros"></span>
+  </div>
+
+  <main>
+    <section class="abertura">
+      <p class="pill" style="--c: var(--orange)">PARA IMPRIMIR</p>
+      <h1 class="loud anima-letras"><span>Tudo</span> <span>para</span> <span class="yellow">imprimir</span></h1>
+      <div class="bit">
+        <img class="anima-flutuar" src="/identidade-visual/mascote/bit-acenando.svg" width="100" height="100" alt="Bit acenando">
+        <p class="bubble anima-balao" style="--d: .5s">Tudo o que vai para o papel está aqui, com o número de folhas de cada um. Imprima em A4, no tamanho real.</p>
+      </div>
+    </section>
+
+    <section class="grupo" style="--c: var(--yellow)">
+      <h2>Aula de Engenharia de Software</h2>
+      <ul class="papeis">
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">6</text></svg>
+        <div class="papel__corpo">
+          <h3>Roteiro da aula</h3>
+          <p>Os 50 minutos passo a passo, o que dizer em cada jogo e o que muda por idade.</p>
+          <ul class="etiquetas"><li>6 folhas A4</li><li>PDF de 645 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../aula-engenharia-de-software/roteiro.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../aula-engenharia-de-software/roteiro.html">Ver na tela</a></div>
+        </div>
+      </li>
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">3</text></svg>
+        <div class="papel__corpo">
+          <h3>Folha de atividades</h3>
+          <p>Robô até a estrela, ache o bug, caça-palavras, passos em ordem e invente um app.</p>
+          <ul class="etiquetas"><li>3 folhas A4</li><li>PDF de 440 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../aula-engenharia-de-software/atividades.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../aula-engenharia-de-software/atividades.html">Ver na tela</a></div>
+        </div>
+      </li>
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="35" width="64" height="46" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="26" y="45" width="48" height="4" rx="2" fill="#c3bde8"/><rect x="26" y="54" width="38" height="4" rx="2" fill="#c3bde8"/><rect x="26" y="63" width="48" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">1</text></svg>
+        <div class="papel__corpo">
+          <h3>Certificado de Programador(a) Mirim</h3>
+          <p>Escreva os nomes na tela e saia com um certificado por criança. O PDF tem a linha em branco.</p>
+          <ul class="etiquetas"><li>1 folha A4 deitada</li><li>PDF de 55 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--conhecer btn--small" href="../aula-engenharia-de-software/certificado.html"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Preencher os nomes</a><a class="btn btn--white btn--small" href="../aula-engenharia-de-software/certificado.pdf">PDF em branco</a></div>
+        </div>
+      </li>
+      </ul>
+    </section>
+    <section class="grupo" style="--c: var(--purple)">
+      <h2>Aula sobre IA</h2>
+      <ul class="papeis">
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">5</text></svg>
+        <div class="papel__corpo">
+          <h3>Roteiro da aula sobre IA</h3>
+          <p>Os 50 minutos para o 9º ano e o Ensino Médio, com o que muda por série.</p>
+          <ul class="etiquetas"><li>5 folhas A4</li><li>PDF de 415 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../aula-inteligencia-artificial/roteiro.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../aula-inteligencia-artificial/roteiro.html">Ver na tela</a></div>
+        </div>
+      </li>
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">3</text></svg>
+        <div class="papel__corpo">
+          <h3>Folha de atividades</h3>
+          <p>Complete como uma IA, pergunte bem, ache o erro, pode ou não pode e o combinado da turma.</p>
+          <ul class="etiquetas"><li>3 folhas A4</li><li>PDF de 359 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../aula-inteligencia-artificial/atividades.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../aula-inteligencia-artificial/atividades.html">Ver na tela</a></div>
+        </div>
+      </li>
+      </ul>
+    </section>
+    <section class="grupo" style="--c: var(--mint)">
+      <h2>Para a turma</h2>
+      <ul class="papeis">
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="#2f2a4a">12</text></svg>
+        <div class="papel__corpo">
+          <h3>Medalhas do Bit</h3>
+          <p>Doze por folha, coloridas ou em preto e branco. Escolha quantas de cada e imprima só o que precisa.</p>
+          <ul class="etiquetas"><li>12 por folha A4</li><li>Você escolhe quantas</li></ul>
+          <div class="papel__acoes"><a class="btn btn--conhecer btn--small" href="../medalhas/"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M15 15l5.5 5.5" stroke="#2f2a4a" stroke-width="3.4" stroke-linecap="round"/></svg>Montar as folhas</a></div>
+        </div>
+      </li>
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">8</text></svg>
+        <div class="papel__corpo">
+          <h3>Mapas da Dupla</h3>
+          <p>Os mapas do navegador do jogo Dupla, para quando as crianças não usam celular. Um mapa por fase.</p>
+          <ul class="etiquetas"><li>8 folhas A4</li><li>PDF de 542 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../../criancas/dupla/mapas.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../../criancas/dupla/mapas.html">Ver na tela</a></div>
+        </div>
+      </li>
+      </ul>
+    </section>
+    <section class="grupo" style="--c: var(--pink)">
+      <h2>Para as famílias</h2>
+      <ul class="papeis">
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">2</text></svg>
+        <div class="papel__corpo">
+          <h3>IA em casa</h3>
+          <p>Frente e verso para mandar para casa: o que a turma faz com IA, perguntas para conversar e os cuidados.</p>
+          <ul class="etiquetas"><li>1 folha A4, frente e verso</li><li>PDF de 293 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../ia-em-casa/ia-em-casa.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../ia-em-casa/">Ver na tela</a></div>
+        </div>
+      </li>
+      </ul>
+    </section>
+    <section class="grupo" style="--c: var(--blue)">
+      <h2>Para você</h2>
+      <ul class="papeis">
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">6</text></svg>
+        <div class="papel__corpo">
+          <h3>Guia do professor</h3>
+          <p>O método da Oficina de Prompts para consultar: as partes do prompt, BNCC, privacidade e o checklist.</p>
+          <ul class="etiquetas"><li>6 folhas A4</li><li>PDF de 642 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../oficina-prompts/guia.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../oficina-prompts/guia.html">Ver na tela</a></div>
+        </div>
+      </li>
+      <li class="papel">
+        <svg class="pilha" viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="14" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="33" y="20" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="27" y="26" width="46" height="64" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><rect x="35" y="36" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="45" width="20" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="54" width="30" height="4" rx="2" fill="#c3bde8"/><rect x="35" y="63" width="20" height="4" rx="2" fill="#c3bde8"/><circle cx="80" cy="82" r="15" fill="#ffd23f" stroke="#2f2a4a" stroke-width="3"/><text x="80" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="#2f2a4a">5</text></svg>
+        <div class="papel__corpo">
+          <h3>Baralho de prompts</h3>
+          <p>Cartas para recortar e montar pedidos para o ChatGPT na formação, mesmo sem internet.</p>
+          <ul class="etiquetas"><li>5 folhas A4</li><li>PDF de 334 KB</li></ul>
+          <div class="papel__acoes"><a class="btn btn--baixar btn--small" href="../oficina-prompts/baralho.pdf"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Abrir o PDF</a><a class="btn btn--white btn--small" href="../oficina-prompts/baralho.html">Ver na tela</a></div>
+        </div>
+      </li>
+      </ul>
+    </section>
+
+    <section class="grupo" style="--c: var(--orange)">
+      <h2>Na hora de imprimir</h2>
+      <ul class="dicas">
+        <li><b>Tamanho real</b><p>Na janela de impressão, escolha A4 e a escala 100% (ou Tamanho real). Ajustar à página encolhe as letras.</p></li>
+        <li><b>Preto e branco serve</b><p>As folhas foram pensadas para ler bem sem cor. Só as medalhas têm uma versão própria em preto e branco.</p></li>
+        <li><b>Sem internet na escola</b><p>Baixe os PDFs antes, em casa. O kit sem internet também traz as folhas da aula.</p></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+</body>
+</html>
