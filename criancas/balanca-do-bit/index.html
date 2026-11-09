@@ -354,8 +354,13 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // A equação nova aparece com o Dividir e os pratos no lugar do Próxima questão e do Próxima fase:
+  // o segundo toque de um toque duplo, logo depois que ela aparece, não divide nem tira peso
+  let telaNovaEm = 0
+  const toqueDuplo = () => performance.now() - telaNovaEm < 500
   function mostrarRodada() {
     Jogo.ouvir.novaTela()
+    telaNovaEm = performance.now()
     $("proxima").hidden = true
     $("desfazer").hidden = false
     $("dica").hidden = false
@@ -368,7 +373,7 @@ p, li, blockquote {
 
   // Taking a weight of 1 from one pan. Making the scale more unbalanced than it was is a mistake
   function tirar(lado) {
-    if (ocupado) return
+    if (ocupado || toqueDuplo()) return
     const antes = Math.abs(diferenca())
     if (lado === "E" ? b === 0 : c === 0) return window.Bit?.diz("pensando", "Esse prato não tem peso de 1 para tirar.")
     historico.push([a, b, c])
@@ -389,7 +394,7 @@ p, li, blockquote {
   }
 
   $("dividir").onclick = () => {
-    if (ocupado || a === 1) return
+    if (ocupado || a === 1 || toqueDuplo()) return
     if (diferenca() !== 0) return window.Bit?.diz("pensando", "Primeiro deixe a balança equilibrada de novo.")
     if (b > 0) {
       erros++
