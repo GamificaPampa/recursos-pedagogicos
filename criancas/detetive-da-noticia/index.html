@@ -494,7 +494,12 @@ p, li, blockquote {
     $("placar").innerHTML = Array.from({ length: FASES[fase].total }, (_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
 
+  // A notícia nova e a tela do fim aparecem onde estava o Próxima: o segundo toque de um toque duplo,
+  // logo depois que a tela muda, não responde, não pula a tela do fim e não abre o Por que isso importa
+  let telaNovaEm = 0
+  const toqueDuplo = () => performance.now() - telaNovaEm < 500
   function mostrarRodada() {
+    telaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     const f = FASES[fase]
     achadas = 0
@@ -553,7 +558,7 @@ p, li, blockquote {
 
   // Phase 1: a clue turns red and counts; a normal part turns green and counts as a mistake
   function investigar(botao) {
-    if (ocupado || botao.classList.contains("suspeita") || botao.classList.contains("normal")) return
+    if (ocupado || toqueDuplo() || botao.classList.contains("suspeita") || botao.classList.contains("normal")) return
     const parte = CASOS[rodada].partes[+botao.dataset.i]
     if (parte[2] === "s") {
       const [, , , nome, explica] = parte
@@ -574,7 +579,7 @@ p, li, blockquote {
 
   // Phases 2 and 3: one answer, and Bit explains why
   function responder(botao) {
-    if (ocupado) return
+    if (ocupado || toqueDuplo()) return
     const f = FASES[fase], v = +botao.dataset.v
     if (f.tipo === "julgar") {
       const n = NOTICIAS[rodada]
@@ -614,6 +619,7 @@ p, li, blockquote {
     $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
     $("placar").innerHTML = Array.from({ length: FASES[fase].total }, () => '<li class="feito"></li>').join("")
     $("fim").hidden = false
+    telaNovaEm = performance.now()
     $("seguir").focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? "Você é um detetive de notícias! Agora ensine isso para a sua família." : "Fase completa! Vamos para a próxima?")
@@ -657,7 +663,7 @@ p, li, blockquote {
     })
   }
   mostrarEstrelas()
-  $("seguir").onclick = () => comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => toqueDuplo() || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
   function mostrarIntro(aberta) {
     Jogo.ouvir.novaTela()
     $("intro").hidden = !aberta
@@ -672,6 +678,7 @@ p, li, blockquote {
     $("jogo").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
   }
   $("por-que").onclick = () => {
+    if (toqueDuplo()) return
     $("comecar").querySelector("span").textContent = "Voltar para a investigação"
     mostrarIntro(true)
     $("jogo").scrollIntoView({ block: "start" })
