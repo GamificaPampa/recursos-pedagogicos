@@ -513,6 +513,8 @@ p, li, blockquote {
     dicas = 0
     estado = ""
     revelar = false
+    ligadoErrado = null
+    desafioNovoEm = performance.now()
     desenharPlacar()
     $("topo").textContent = `${FASES[fase].nome} · desafio ${rodada + 1} de ${FASES[fase].rodadas.length}`
     $("opcoes").hidden = t === "lampada"
@@ -580,8 +582,11 @@ p, li, blockquote {
   })
 
   // Phase 1: turn the circuit on. Too little current is weak, a bit too much is too bright, much too much burns the lamp
+  // Cada valor errado conta um erro só, e o desafio novo aparece no lugar do Próximo desafio:
+  // o segundo toque de um toque duplo, logo depois que o desafio aparece, não liga o circuito
+  let ligadoErrado = null, desafioNovoEm = 0
   $("acender").onclick = () => {
-    if (ocupado) return
+    if (ocupado || performance.now() - desafioNovoEm < 500) return
     const r = atual(), ehU = r.ajusta === "U", U = ehU ? valor : r.U, R = ehU ? r.R : valor
     const I = corrente(U, R), unid = "A"
     const conta = `${num(U)} ÷ ${num(R)} = ${num(I)} ${unid}`
@@ -590,7 +595,8 @@ p, li, blockquote {
       desenharEsquema()
       return acertou(`Acendeu! I = U ÷ R = ${conta}. É exatamente a corrente que a lâmpada pede.`)
     }
-    erros++
+    if (valor !== ligadoErrado) erros++
+    ligadoErrado = valor
     if (I > r.pede * 1.5 - 1e-9) {
       estado = "queimada"
       desenharEsquema()
