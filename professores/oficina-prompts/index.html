@@ -363,7 +363,7 @@ try {
   const curso = JSON.parse(localStorage.getItem("gamificapampa-curso-prompts") || "null")
   const feitos = Array.isArray(curso?.modules) ? curso.modules.filter(Boolean).length : 0
   const botao = document.getElementById("curso-botao")
-  if (curso?.quizPassed) botao.textContent = "Ver o comprovante"
+  if (feitos === 4 && curso.quizPassed) botao.textContent = "Ver o comprovante"
   else if (feitos === 4) botao.textContent = "Fazer o teste final"
   else if (feitos > 0) botao.textContent = `Continuar: módulo ${curso.modules.indexOf(false) + 1}`
 } catch {}
