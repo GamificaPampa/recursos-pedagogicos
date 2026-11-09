@@ -476,14 +476,18 @@ p, li, blockquote {
     })
   }
   const EXEMPLOS = { "0+3": "como um morango vermelho entre folhas verdes", "1+4": "como um pôr do sol laranja num céu azul", "2+5": "como uma flor amarela num vaso roxo" }
+  // Cada cor errada do círculo conta um erro só: tocar nela de novo na mesma pergunta não soma outro
+  let fatiasErradas = new Set()
   function escolherFatia(i) {
     if (ocupado || toqueDuplo()) return
     const base = atual(), certa = (base + 3) % 6, [nomeBase] = RODA[base]
+    if (fatiasErradas.has(i)) return
     if (i === certa) {
       $("cena").innerHTML = roda(base, certa)
       const par = [base, certa].sort((p, q) => p - q).join("+")
       return acertou(`Isso! ${maiuscula(nomeBase)} e ${RODA[certa][0]} ficam frente a frente. Lado a lado, uma faz a outra brilhar mais, ${EXEMPLOS[par]}.`)
     }
+    fatiasErradas.add(i)
     if (i === base) return errar("Essa é a própria cor marcada. A complementar fica do outro lado do círculo.")
     const vizinha = Math.abs(i - base) === 1 || Math.abs(i - base) === 5
     errar(vizinha ? `O ${RODA[i][0]} é vizinho do ${nomeBase}: fica do lado, não na frente. Procure bem do outro lado.` : `Quase! A complementar fica bem na frente do ${nomeBase}, passando pelo meio do círculo.`)
@@ -550,6 +554,7 @@ p, li, blockquote {
       $("texto").textContent = "Toque na cor do círculo."
       $("nota").textContent = `O ${RODA[r][0]} está marcado com a borda escura.`
       $("cena").innerHTML = roda(r)
+      fatiasErradas = new Set()
       ligarRoda()
     }
   }
