@@ -279,6 +279,12 @@ function toggleFullscreen() {
 
 // Moving with the arrows and the keys a presentation clicker sends, and F for full screen
 document.addEventListener("keydown", event => {
+  // Com a tela preta, a tecla dos slides só volta a mostrar o slide em que a aula estava
+  if (!document.getElementById("preto").hidden && ["ArrowRight", "ArrowDown", "PageDown", " ", "Enter", "ArrowLeft", "ArrowUp", "PageUp", "Backspace", "Home", "End", "b", "B", "."].includes(event.key)) {
+    toggleBlack()
+    event.preventDefault()
+    return
+  }
   if (event.metaKey || event.ctrlKey || event.altKey) return
   // Enter e Espaço num botão ou link da tela são dele, não dos slides
   if ((event.key === "Enter" || event.key === " ") && event.target.closest("button, a")) return
