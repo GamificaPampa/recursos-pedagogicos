@@ -11,6 +11,6 @@ Um jogo de Matemática para o ensino médio: o estudante lê a lei de uma reta n
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/reta-do-bit/                                                |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                                            |
 
-Na fase 2, o Bit corre pela reta e pega as estrelas que estão nela; se faltar uma, ele diz em que altura a reta passou e onde a estrela estava. Na fase 3, as situações são uma corrida de aplicativo, a bateria do celular, um plano de internet, uma vela e uma caixa d'água, e cada acerto mostra no gráfico uma previsão feita com a função. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
+Na fase 2, o Bit corre pela reta e pega as estrelas que estão nela; se faltar uma, ele diz em que altura a reta passou e onde a estrela estava. Na fase 3, as situações são uma corrida de aplicativo, a bateria do celular, um plano de internet, uma vela e uma caixa d'água, e cada acerto mostra no gráfico uma previsão feita com a função. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

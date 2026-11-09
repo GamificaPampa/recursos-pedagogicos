@@ -11,6 +11,6 @@ Um jogo de Biologia para o ensino médio: o estudante relaciona genótipo e fen�
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/genetica-do-bit/                                         |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                                         |
 
-As características são a cor da semente da ervilha (amarela dominante), o gado mocho (sem chifre dominante) e a pelagem do Angus (preta dominante sobre a vermelha). O jogo evita de propósito exemplos de características de pessoas. No quadro de Punnett, cada toque troca o genótipo do quadrinho, e o acerto mostra o desenho de cada filhote e a proporção. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
+As características são a cor da semente da ervilha (amarela dominante), o gado mocho (sem chifre dominante) e a pelagem do Angus (preta dominante sobre a vermelha). O jogo evita de propósito exemplos de características de pessoas. No quadro de Punnett, cada toque troca o genótipo do quadrinho, e o acerto mostra o desenho de cada filhote e a proporção. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

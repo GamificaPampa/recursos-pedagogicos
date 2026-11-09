@@ -11,6 +11,6 @@ Um jogo de Ciências: a criança ajuda a Gotinha a dar a volta no ciclo da água
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/ciclo-da-agua/                                  |
 | Autoria      | Arthur Medeiros e Paulo Severo                                                                                |
 
-Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT, no método da Oficina de Prompts.
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT, no método da Oficina de Prompts.
 
 Nada do que a criança faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

@@ -11,6 +11,6 @@ Um jogo de Língua Inglesa: o estudante ouve uma palavra e toca no desenho, lê 
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/ingles-com-o-bit/ |
 | Autoria      | Arthur Medeiros e Paulo Severo |
 
-O jogo fala em inglês com a voz do próprio navegador; a leitura automática respeita o Sem som, e o botão Ouvir fala sempre. Sem voz no aparelho, a palavra aparece escrita. As explicações são em português. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
+O jogo fala em inglês com a voz do próprio navegador; a leitura automática respeita o Sem som, e o botão Ouvir fala sempre. Sem voz no aparelho, a palavra aparece escrita. As explicações são em português. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

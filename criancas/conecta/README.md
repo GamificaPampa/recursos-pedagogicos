@@ -13,4 +13,4 @@ A criança liga celulares, servidor e banco de dados com cabos e vê os dados co
 
 No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. Com o modo ligado, as teclas A, S, R e E passam a ser dele (a R do jogo, de apagar os cabos, fica no botão).
 
-Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT.

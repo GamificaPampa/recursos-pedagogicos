@@ -528,8 +528,8 @@ const ALL_ROUNDS = [
               ["Para crianças de todas as idades, em qualquer aparelho.", "Um jogo para todas as idades não acerta nenhuma. Escolha a turma."]],
     format: [["Botões grandes, 3 fases, som no acerto e estrelas no final.", "Você disse como quer: o resultado vem pronto para usar."],
              ["Do jeito que você achar melhor.", "Se você não diz como quer, recebe qualquer formato."],
-             ["Com 10 fases, placar com o nome de cada aluno, as músicas que fazem sucesso e gráficos em 3D.", "Grande demais para o Canvas, e ainda pede nome de aluno e música famosa, que ele inventa."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+             ["Com 10 fases, placar com o nome de cada aluno, as músicas que fazem sucesso e gráficos em 3D.", "Grande demais para um jogo só, e ainda pede nome de aluno e música famosa, que a IA inventa."]],
+    trap: { text: "Num pedido longo de uma vez, a IA pode deixar partes do jogo de fora, e o Gemini às vezes recusa o jogo. Em duas mensagens, funciona no ChatGPT e no Gemini:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
     id: "historia",
@@ -565,7 +565,7 @@ const ALL_ROUNDS = [
     format: [["Uma folha A4 com 5 exercícios e o gabarito no fim, escrita fora de bloco de código.", "Pronto para imprimir, com gabarito, e o texto não vem preso num bloco de código."],
              ["Muitas questões.", "Quantas? Em que ordem? Com gabarito?"],
              ["A folha dentro de um bloco de código, para copiar com a formatação.", "No bloco de código a folha sai como texto de programa. Peça para escrever fora dele."]],
-    trap: { text: "A IA às vezes põe a folha inteira num bloco de código e inventa códigos da BNCC. Peça assim:", say: "Escreva fora de bloco de código e não cite códigos da BNCC." },
+    trap: { text: "A IA às vezes enche a folha de emojis, põe tudo num bloco de código e inventa códigos da BNCC. Peça assim:", say: "Sem emojis, fora de bloco de código e sem códigos da BNCC." },
   },
   {
     id: "quiz",
@@ -601,7 +601,7 @@ const ALL_ROUNDS = [
     format: [["Em português do Brasil, com frases curtas, instruções numeradas e uma lista do que mudou.", "Você recebe o texto pronto, em português, e sabe o que foi alterado."],
              ["Deixe mais fácil.", "Mais fácil como? Diga o formato que ajuda esse aluno."],
              ["Frases curtas e instruções numeradas, na língua que você achar melhor.", "A língua não pode ficar em aberto, e falta a lista do que mudou. Peça português do Brasil."]],
-    trap: { text: "O que você escreve fica guardado no histórico da conta, por isso nada de nome, turma ou laudo. Nesses pedidos, prefira o chat temporário, no alto da tela. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
+    trap: { text: "O que você escreve fica guardado no histórico da conta, por isso nada de nome, turma ou laudo. Nesses pedidos, prefira o chat temporário, no alto da tela, à direita. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
   },
   {
     id: "cantiga",
@@ -654,8 +654,8 @@ const ALL_ROUNDS = [
               ["Para estudantes de qualquer idade, em computador, celular, tablet ou projetor, ao mesmo tempo.", "Um jogo para todas as idades e aparelhos não acerta nenhum. Escolha a turma."]],
     format: [["Arrastar as cartas para a ordem certa, 3 fases, som no acerto e pontos no final, sem pedir o nome do estudante.", "Você disse como quer: o jogo sai pronto para usar."],
              ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato."],
-             ["Com 15 fases, vídeos dos fatos, a voz de Dom Pedro I e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, que não cria vídeo nem voz, e o ranking pede nome de estudante."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+             ["Com 15 fases, vídeos dos fatos, a voz de Dom Pedro I e um ranking com o nome de cada estudante.", "Grande demais para um jogo só: a IA não cria vídeo nem a voz de ninguém, e o ranking pede nome de estudante."]],
+    trap: { text: "O ChatGPT entrega o jogo num bloco de código. Se o jogo vier em vários arquivos, fica difícil testar na Prévia e publicar. Peça assim:", say: "Faça tudo num único arquivo HTML, com o CSS e o JavaScript dentro." },
   },
   {
     id: "leitura",
@@ -745,7 +745,7 @@ const ALL_ROUNDS = [
     format: [["Um quadro comparando mitose e meiose e 5 perguntas com gabarito, escrito fora de bloco de código.", "Você cola o quadro direto no documento, com as perguntas para a turma se testar."],
              ["Como achar melhor.", "Sem formato, a revisão sai solta."],
              ["Um quadro dentro de um bloco de código, para copiar sem perder as colunas.", "No bloco de código o quadro vira texto de programa. Peça o quadro fora do bloco de código."]],
-    trap: { text: "Quando você pede um quadro ou uma tabela, a IA às vezes põe tudo num bloco de código, e não dá para colar no documento. Peça assim:", say: "Escreva o quadro fora de bloco de código." },
+    trap: { text: "Quando você pede um quadro ou uma tabela, a IA às vezes põe tudo num bloco de código ou monta um quadro interativo, às vezes em inglês, e não dá para colar no documento. Peça assim:", say: "Sem quadros interativos, só texto, fora de bloco de código." },
   },
   {
     id: "velocidade",
@@ -781,7 +781,7 @@ const ALL_ROUNDS = [
     format: [["Em português do Brasil, com frases curtas, cada termo químico explicado em uma linha e uma lista do que mudou.", "Você recebe o texto pronto, com os termos explicados, e sabe o que foi alterado."],
              ["Deixe mais fácil.", "Mais fácil como? Diga o formato que ajuda esse estudante."],
              ["Frases curtas e um glossário no fim, na língua que você achar melhor.", "A língua não pode ficar em aberto, e falta a lista do que mudou. Peça português do Brasil."]],
-    trap: { text: "O que você escreve fica guardado no histórico da conta. Nunca coloque nome nem turma do estudante e, nesses pedidos, prefira o chat temporário, no alto da tela. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
+    trap: { text: "O que você escreve fica guardado no histórico da conta. Nunca coloque nome nem turma do estudante e, nesses pedidos, prefira o chat temporário, no alto da tela, à direita. Peça assim:", say: "Descreva a necessidade, sem nome nem turma." },
   },
   // EJA: turmas de jovens e adultos, da alfabetização ao Ensino Médio. O bloco ruim comprido muitas vezes infantiliza
   {
@@ -835,8 +835,8 @@ const ALL_ROUNDS = [
               ["Para estudantes de todas as idades, das crianças aos idosos, em qualquer aparelho e a qualquer hora.", "Um jogo para todas as idades não acerta nenhuma. Diga que são adultos da EJA."]],
     format: [["Botões grandes, visual adulto, 3 fases, som no acerto e pontos no final, com preços de exemplo.", "Você disse como quer: o jogo sai adulto, com valores que não confundem ninguém."],
              ["Do jeito que achar melhor.", "Se você não diz como quer, recebe qualquer formato, até um jogo com cara de criança."],
-             ["Com 12 fases, os preços reais das lojas da cidade e um ranking com o nome de cada estudante.", "Grande demais para o Canvas, ele inventa os preços das lojas, e o ranking pede nome de estudante."]],
-    trap: { text: "Com o pedido inteiro numa mensagem só, o Canvas pode recusar o jogo ou deixar partes de fora. Mande em duas mensagens:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
+             ["Com 12 fases, os preços reais das lojas da cidade e um ranking com o nome de cada estudante.", "Grande demais para um jogo só, a IA inventa os preços das lojas, e o ranking pede nome de estudante."]],
+    trap: { text: "Num pedido longo de uma vez, a IA pode deixar partes do jogo de fora, e o Gemini às vezes recusa o jogo. Em duas mensagens, funciona no ChatGPT e no Gemini:", say: "1ª: a Tarefa, curta. 2ª: o Contexto e o Formato." },
   },
   {
     id: "eja-saude",

@@ -96,15 +96,15 @@
   </header>
 
   <section class="how">
-    <div class="card" data-bit-dica="O caminho no ChatGPT: na barra do lado, Novo projeto. Depois, dentro do projeto, Instruções.">
+    <div class="card" data-bit-dica="O caminho no ChatGPT: na barra do lado, o + ao lado de Projetos. Depois, dentro do projeto, ⋯ e Configurações do projeto.">
       <h2>Como criar o seu assistente</h2>
       <ol class="steps">
-        <li><span>No ChatGPT, na barra do lado, toque em <b>Novo projeto</b> e dê um nome, como <b>Assistente do 2º ano</b>.</span></li>
-        <li><span>Abra o projeto e toque em <b>Instruções</b>.</span></li>
-        <li><span>Copie as instruções de um assistente abaixo, cole e troque o que está entre [colchetes].</span></li>
-        <li><span>Salve e teste com um pedido numa conversa dentro do projeto. Ajuste se precisar.</span></li>
+        <li><span>No ChatGPT, na barra do lado, toque no <b>+</b> ao lado de <b>Projetos</b>. Dê um nome, como <b>Assistente do 2º ano</b>, e toque em <b>Criar projeto</b>.</span></li>
+        <li><span>Dentro do projeto, toque em <b>⋯</b> e em <b>Configurações do projeto</b>.</span></li>
+        <li><span>Copie as instruções de um assistente abaixo, cole em <b>Instruções</b> e troque o que está entre [colchetes].</span></li>
+        <li><span>Toque em <b>Salvar</b> e teste com um pedido numa conversa dentro do projeto. Ajuste se precisar.</span></li>
       </ol>
-      <p class="small">O nome dos botões pode mudar um pouco com as atualizações do ChatGPT, mas o caminho é parecido. No celular, a barra do lado abre no menu do canto de cima. Se não achar os Projetos, guarde as instruções num documento e cole no começo de cada conversa.</p>
+      <p class="small">No computador, o + de Projetos aparece ao passar o mouse. O botão Salvar só aparece depois de mexer no campo. No celular, a barra do lado abre no menu do canto de cima. Se não achar os Projetos, guarde as instruções num documento e cole no começo de cada conversa.</p>
     </div>
     <div class="care" data-bit-pose="ops" data-bit-dica="Nas instruções vão a etapa e o jeito da turma. Nome, foto ou dado de aluno nunca vai.">
       <h3><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="16" width="22" height="17" rx="4" fill="#ff5f8f" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg>Nas instruções, nunca</h3>
@@ -169,7 +169,8 @@ Regras gerais:
 - Em quiz, não use o teste interativo: escreva perguntas e gabarito no texto.
 - Em quiz e questões, misture perguntas de lembrar, de aplicar e de explicar. As alternativas erradas vêm de erros comuns, e a letra da resposta certa muda de uma questão para a outra.
 - Escreva frações e contas como texto, como 1/2 e 3 × 4, sem fórmulas em LaTeX.
-- Para jogo, lembre o professor de ligar o Canvas e mande primeiro a ideia curta; fases, som e estrelas vêm numa segunda mensagem.
+- Não use emojis no material nem quadros interativos: escreva tudo como texto.
+- Para jogo, entregue um único arquivo HTML, com o CSS e o JavaScript dentro, e lembre o professor de tocar em Prévia para jogar e de baixar o arquivo para publicar no publicador do GamificaPampa.
 - Use exemplos do dia a dia dos estudantes e do Rio Grande do Sul.`,
   },
   {
@@ -228,7 +229,7 @@ Toda atividade deve ter:
 Antes de responder, confira se cada exercício tem uma resposta certa e se o gabarito está correto. Pense que a impressão pode ser em preto e branco. Use português do Brasil e exemplos do dia a dia. Nunca use nomes ou dados das crianças.`,
   },
   {
-    name: "Criador de jogos no Canvas", tag: "Todas as etapas", color: ["#8c73ff", "#e2dbff"], icon: "game",
+    name: "Criador de jogos", tag: "Todas as etapas", color: ["#8c73ff", "#e2dbff"], icon: "game",
     for: "Cria jogos educativos que abrem no navegador do celular e do computador.",
     try: "Crie um jogo sobre [conteúdo] para crianças de [idade] anos.",
     text: `Você cria jogos educativos digitais para crianças de [idade] anos, para jogar [no celular de cada criança / no projetor com a turma toda].
@@ -241,6 +242,7 @@ Todo jogo deve:
 - Dar retorno na hora: verde e um som alegre no acerto, vermelho e uma dica no erro.
 - Terminar com estrelas pelo desempenho e um botão para jogar de novo.
 - Estar em português do Brasil, sem anúncios, sem links para outros sites e sem pedir dados das crianças.
+- Vir inteiro num só bloco de código, com o CSS e o JavaScript dentro, para eu tocar em Prévia e jogar, e baixar o arquivo para publicar.
 
 Na primeira resposta, faça uma versão simples do jogo; eu peço as melhorias depois. Se eu disser que algo não funcionou, conserte só aquilo, sem mudar o resto do jogo.`,
   },

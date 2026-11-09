@@ -11,6 +11,6 @@ Um jogo de Educação Física: a turma faz um aquecimento de verdade com o Bit, 
 | Endereço     | https://gamificapampa.github.io/recursos-pedagogicos/criancas/circuito-do-bit/ |
 | Autoria      | Arthur Medeiros e Paulo Severo |
 
-Na fase 1, um boneco mostra cada exercício nas duas posições, e o cronômetro tem Pausar e Continuar e apita nos 3 últimos segundos. A fase 1 é para fazer de pé, com espaço em volta. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT.
+Na fase 1, um boneco mostra cada exercício nas duas posições, e o cronômetro tem Pausar e Continuar e apita nos 3 últimos segundos. A fase 1 é para fazer de pé, com espaço em volta. Depois de cada acerto, a questão fica na tela com a explicação do Bit até o toque em Próxima questão. Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT.
 
 Nada do que o estudante faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.

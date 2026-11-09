@@ -119,17 +119,26 @@ const FRASES = [
     erro: "Ele sugere músicas, livros e vídeos com nomes inventados.",
     diga: "Não sugira músicas, livros ou vídeos que você não tenha certeza de que existem.", quando: "planos de aula e sequências didáticas" },
   { titulo: "Resposta em inglês", icone: "balao", cor: "#4da3ff", luz: "#cfe6ff",
-    erro: "Às vezes ele começa a resposta em inglês, sobretudo quando usa o Canvas.",
-    diga: "Responda sempre em português do Brasil.", quando: "qualquer pedido, principalmente jogos e páginas no Canvas" },
+    erro: "Às vezes ele começa a resposta em inglês, sobretudo no Gemini.",
+    diga: "Responda sempre em português do Brasil.", quando: "qualquer pedido, principalmente jogos" },
+  { titulo: "Emojis no material", icone: "festa", cor: "#ffd23f", luz: "#fff1a8",
+    erro: "O ChatGPT enche a folha de emojis, que saem estranhos na impressão.",
+    diga: "Sem emojis.", quando: "atividades, histórias e tudo o que vai ser impresso" },
+  { titulo: "Quadro interativo no meio", icone: "toque", cor: "#4fd6a6", luz: "#c9f5e3",
+    erro: "Às vezes o ChatGPT põe um quadro para clicar no meio da resposta, até em inglês, que não dá para imprimir nem copiar.",
+    diga: "Sem quadros interativos, só texto.", quando: "gabaritos, tabelas e quadros, como o de Punnett" },
+  { titulo: "Rimas que não rimam", icone: "nota", cor: "#ff5f8f", luz: "#ffd6e3",
+    erro: "Ele diz que duas palavras rimam quando não rimam, e o gabarito sai errado.",
+    diga: "Use só pares que rimam de verdade e confira cada rima antes de entregar.", quando: "atividades de rima, poemas e cantigas. Leia as rimas em voz alta antes de usar", especifica: true },
   { titulo: "Questão como se fosse do Enem", icone: "enem", cor: "#ffd23f", luz: "#fff1a8",
     erro: "Ele diz que a questão é de uma prova real do Enem e inventa o ano.",
     diga: "Crie questões no estilo do Enem, sem dizer que são de provas reais e sem inventar o ano de uma prova.", quando: "simulados e listas do Ensino Médio" },
   { titulo: "Contas erradas na resolução", icone: "revisar", cor: "#4fd6a6", luz: "#c9f5e3",
     erro: "Num gabarito comentado, ele erra uma conta no meio do caminho.",
     diga: "Confira cada conta antes de responder e mostre a resolução passo a passo.", quando: "Matemática, Física, Química e qualquer gabarito com cálculo" },
-  { titulo: "Canvas que recusa o jogo", icone: "jogo", cor: "#a08bff", luz: "#e2dbff",
-    erro: "Com o pedido inteiro numa mensagem só, o Canvas diz que não consegue criar o jogo.",
-    diga: "Crie uma página HTML interativa sobre [tema]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, em português do Brasil.", quando: "jogos: mande esta frase primeiro e, depois que a página aparecer, peça as fases, o som e as estrelas" },
+  { titulo: "Jogo pedido de uma vez", icone: "jogo", cor: "#a08bff", luz: "#e2dbff",
+    erro: "Com o pedido inteiro numa mensagem só, a IA pode deixar partes do jogo de fora, e o Gemini às vezes recusa o jogo.",
+    diga: "Crie uma página HTML interativa sobre [tema]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, em português do Brasil.", quando: "jogos: mande esta frase primeiro e, depois que o jogo aparecer, peça as fases, o som e as estrelas. No ChatGPT, toque em Prévia para jogar" },
   { titulo: "Dado de aluno no pedido", icone: "cadeado", cor: "#ff5f8f", luz: "#ffd6e3",
     erro: "Um nome ou a turma escritos no pedido ficam guardados na conta.",
     diga: "Descreva só a necessidade, sem nome nem turma: por exemplo, um estudante de 15 anos com TDAH que se perde em textos longos.", quando: "adaptações e qualquer pedido que fale de um aluno" },
@@ -186,9 +195,9 @@ document.getElementById("peca-mais").addEventListener("click", async evento => {
   if (!botao) return
   avisar(botao.parentElement.querySelector(".copiado"), await Copiar.texto(PECA_MAIS[botao.dataset.i].diga, { avisar: false }), "Copiado! Mande na mesma conversa.")
 })
-// As frases gerais, que servem para quase todo pedido (sem a do Canvas, que é uma mensagem à parte)
+// As frases gerais, que servem para quase todo pedido (sem a do jogo, que é uma mensagem à parte)
 document.getElementById("todas").addEventListener("click", async () => {
-  const gerais = FRASES.filter(f => f.icone !== "jogo").map(f => `- ${f.diga}`).join("\n")
+  const gerais = FRASES.filter(f => f.icone !== "jogo" && !f.especifica).map(f => `- ${f.diga}`).join("\n")
   avisar(document.getElementById("todas-ok"), await Copiar.texto(gerais, { avisar: false }))
 })
 </script>

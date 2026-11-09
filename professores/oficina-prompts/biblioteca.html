@@ -255,7 +255,7 @@
   <ul class="care">
     <li><span class="badge" style="--c: var(--yellow)"><svg viewBox="0 0 24 24"><path d="M4 20 L5 15.5 L15.5 5 A2.1 2.1 0 0 1 18.5 5 L19 5.5 A2.1 2.1 0 0 1 19 8.5 L8.5 19 Z M13.5 7 L17 10.5" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Prompts de partida:</b> troque o que está entre colchetes, ajuste para a sua turma e sempre revise a resposta do ChatGPT. As partes para trocar aparecem assim: <mark>[tema]</mark>.</span></li>
     <li><span class="badge" style="--c: var(--pink)"><svg viewBox="0 0 36 36"><rect x="7" y="16" width="22" height="17" rx="4" fill="#fff" stroke="#2f2a4a" stroke-width="3"/><path d="M11.5 16 V11 A6.5 6.5 0 0 1 24.5 11 V16" fill="none" stroke="#2f2a4a" stroke-width="3"/><circle cx="18" cy="24" r="2.6" fill="#2f2a4a"/></svg></span><span>Nunca escreva o nome ou dados dos alunos no ChatGPT. Fale da turma de um jeito geral.</span></li>
-    <li><span class="badge" style="--c: var(--blue)"><svg viewBox="0 0 24 24"><path d="M19.5 12 A7.5 7.5 0 1 1 16.8 6.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M17.5 2.5 V6.8 H13.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Se o ChatGPT disser que não consegue ajudar, toque em <b>Tentar de novo</b>, a seta que gira embaixo da resposta, ou abra uma conversa nova. Às vezes ele recusa um pedido normal.</span></li>
+    <li><span class="badge" style="--c: var(--blue)"><svg viewBox="0 0 24 24"><path d="M19.5 12 A7.5 7.5 0 1 1 16.8 6.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M17.5 2.5 V6.8 H13.2" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Se o ChatGPT disser que não consegue ajudar, toque em <b>⋯</b> e em <b>Gerar resposta novamente</b>, embaixo da resposta, ou abra uma conversa nova. Às vezes ele recusa um pedido normal.</span></li>
   </ul>
   <p class="own">Quer montar o seu?<a class="btn build" href="/maquina/"><svg viewBox="0 0 24 24"><path d="M7 4.5 L19.5 12 L7 19.5 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.5" stroke-linejoin="round"/></svg>Use a Máquina de prompts</a></p>
 </section>
@@ -476,7 +476,7 @@ const PROMPTS = [
       "No fim, a resposta certa de cada pergunta e uma explicação simples.",
       "Escreva tudo aqui na conversa, como texto normal, sem caixa de código.",
     ],
-    tip: "Depois, peça: \"Transforme esse quiz em um jogo no Canvas, com estrelas no final.\"",
+    tip: "Depois, peça: \"Transforme esse quiz em um jogo num único arquivo HTML, com estrelas no final.\" Toque em Prévia para jogar.",
   },
   {
     title: "Adaptar uma atividade para todos participarem",
@@ -875,7 +875,7 @@ const PROMPTS = [
       "No fim, estrelas pelo desempenho e um botão para jogar de novo.",
       "Tudo em português do Brasil, sem anúncios, sem links para outros sites e sem pedir dados das crianças.",
     ],
-    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Jogue uma vez até o fim antes de usar com a turma.",
+    tip: "Mande só a Tarefa primeiro. Quando o jogo aparecer, mande o Contexto e o Formato na mesma conversa e toque em Prévia para jogar. Jogue uma vez até o fim antes de usar com a turma.",
   },
 
   // Ensino Fundamental, anos finais
@@ -1161,7 +1161,7 @@ const PROMPTS = [
       "No fim, a pontuação e um botão para jogar de novo.",
       "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
-    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Confira os fatos e as datas antes de usar com a turma.",
+    tip: "Mande só a Tarefa primeiro. Quando o jogo aparecer, mande o Contexto e o Formato na mesma conversa e toque em Prévia para jogar. Confira os fatos e as datas antes de usar com a turma.",
   },
   {
     title: "Conferir uma lista de Matemática e o gabarito",
@@ -1471,7 +1471,7 @@ const PROMPTS = [
     tip: "Busque as fontes no acervo de um museu ou arquivo público e cole na atividade antes de imprimir.",
   },
   {
-    title: "Jogo de revisão no Canvas: tabela periódica",
+    title: "Jogo de revisão: tabela periódica", id: "jogo-de-revisao-no-canvas-tabela-periodica", // o id antigo mantém o que o professor já guardou
     stage: "medio", kind: "jogo",
     area: "Química",
     role: "Você é um(a) professor(a) experiente de Química do Ensino Médio, que sabe criar jogos de revisão.",
@@ -1486,7 +1486,7 @@ const PROMPTS = [
       "No fim, a pontuação e um botão para jogar de novo.",
       "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
-    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa.",
+    tip: "Mande só a Tarefa primeiro. Quando o jogo aparecer, mande o Contexto e o Formato na mesma conversa e toque em Prévia para jogar.",
   },
   {
     title: "Texto de Ciências adaptado para quem tem dificuldade de leitura",
@@ -1597,7 +1597,7 @@ const PROMPTS = [
     tip: "Confira as informações de saúde em uma fonte confiável, como o Ministério da Saúde, antes de usar com a turma.",
   },
   {
-    title: "Jogo de revisão no Canvas: phrasal verbs",
+    title: "Jogo de revisão: phrasal verbs", id: "jogo-de-revisao-no-canvas-phrasal-verbs", // o id antigo mantém o que o professor já guardou
     stage: "medio", kind: "jogo",
     area: "Língua Inglesa",
     role: "Você é um(a) professor(a) experiente de Língua Inglesa do Ensino Médio, que sabe criar jogos de revisão.",
@@ -1613,7 +1613,7 @@ const PROMPTS = [
       "No fim, a pontuação e um botão para jogar de novo.",
       "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
-    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Leia as frases em inglês antes de usar com a turma: às vezes o modelo cria uma que soa estranha.",
+    tip: "Mande só a Tarefa primeiro. Quando o jogo aparecer, mande o Contexto e o Formato na mesma conversa e toque em Prévia para jogar. Leia as frases em inglês antes de usar com a turma: às vezes o modelo cria uma que soa estranha.",
   },
   {
     title: "Revisar um texto em inglês escrito por estudantes",
@@ -1784,7 +1784,7 @@ const PROMPTS = [
       "No fim, a pontuação e um botão para jogar de novo.",
       "Sem anúncios, sem links para outros sites e sem pedir dados de quem joga.",
     ],
-    tip: "Ligue o Canvas e mande só a Tarefa primeiro. Quando a página aparecer, mande o Contexto e o Formato na mesma conversa. Jogue uma vez até o fim e confira as contas antes de usar com a turma.",
+    tip: "Mande só a Tarefa primeiro. Quando o jogo aparecer, mande o Contexto e o Formato na mesma conversa e toque em Prévia para jogar. Jogue uma vez até o fim e confira as contas antes de usar com a turma.",
   },
   {
     title: "Currículo, requerimento e carta: textos do dia a dia",
@@ -1986,7 +1986,7 @@ const STAGES = {
 // Naming each kind of material, with the colour on top of its cards
 const KINDS = {
   atividade: { label: "Atividade para imprimir", tint: "#fff1a8" },
-  jogo: { label: "Jogo interativo (Canvas)", tint: "#e2dbff" },
+  jogo: { label: "Jogo interativo", tint: "#e2dbff" },
   historia: { label: "História", tint: "#ffd6e3" },
   plano: { label: "Plano de aula", tint: "#cfe6ff" },
   quiz: { label: "Quiz ou avaliação", tint: "#ffdcc4" },
@@ -2004,8 +2004,8 @@ const KINDS = {
 
 // Giving every card a tip when its prompt has none of its own
 const TIPS = {
-  jogo: "Ligue o Canvas antes de enviar: toque no + da caixa de mensagem e escolha Canvas. Se o ChatGPT disser que não consegue, mande primeiro só a ideia do jogo, em uma frase, e o resto na mensagem seguinte.",
-  other: "Revise antes de usar com a turma: a IA pode errar fatos, trocar códigos da BNCC e inventar nomes de livros e músicas.",
+  jogo: "Mande primeiro só a ideia do jogo, em uma frase, e o resto na mensagem seguinte. O jogo vem num bloco de código: toque em Prévia para jogar e baixe o arquivo para publicar no publicador do GamificaPampa.",
+  other: "Revise antes de usar com a turma: a IA pode errar fatos, trocar códigos da BNCC e inventar nomes de livros e músicas. Se vierem emojis ou um quadro interativo, peça: sem emojis e sem quadros interativos, só texto.",
 }
 
 const ASK = "Antes de criar, me faça até 3 perguntas para entender melhor o que eu preciso. Só comece depois das minhas respostas."
@@ -2140,7 +2140,7 @@ const lerGuardados = () => {
 const gravarGuardados = lista => {
   try { localStorage.setItem(CHAVE, JSON.stringify(lista)); return true } catch { return false }
 }
-const idDe = index => "b-" + slug(PROMPTS[index].title)
+const idDe = index => "b-" + (PROMPTS[index].id || slug(PROMPTS[index].title))
 const doConstrutor = item => item.origem === "construtor" && typeof item.nome === "string" && Array.isArray(item.mensagens) && item.mensagens.every(texto => typeof texto === "string")
 const dataCurta = iso => { const data = new Date(iso); return isNaN(data) ? "" : data.toLocaleDateString("pt-BR") }
 // Dados de quem escreveu nos campos: avisa antes de guardar (as mesmas buscas do Construtor)

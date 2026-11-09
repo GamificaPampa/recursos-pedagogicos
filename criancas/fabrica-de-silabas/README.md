@@ -13,6 +13,6 @@ Um jogo de Língua Portuguesa para a alfabetização: a criança vê o desenho, 
 
 As palavras usam letra bastão maiúscula. O botão "Ouvir a palavra" usa a voz do próprio aparelho e some quando o navegador não tem voz. O botão "Dica" fala a palavra em sílabas no primeiro toque e faz pular a próxima sílaba no segundo; essa segunda dica conta nas estrelas como um erro.
 
-Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no Canvas do ChatGPT, no método da Oficina de Prompts.
+Embaixo do jogo, a parte "Para usar na aula" traz o que a turma aprende, como jogar com a turma e as duas mensagens para pedir um jogo parecido no ChatGPT, no método da Oficina de Prompts.
 
 Nada do que a criança faz sai do navegador. O jogo só guarda, no próprio aparelho, se o som está ligado.
