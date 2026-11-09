@@ -494,6 +494,7 @@ p, li, blockquote {
     $("apagar").hidden = false
     const f = FASES[fase], r = f.rodadas[rodada]
     errosAqui = 0
+    lugaresErrados = new Set()
     programa = []
     limparMarcas()
     desenharPlacar()
@@ -544,10 +545,13 @@ p, li, blockquote {
   }
 
   // Phases 1 and 3: the child taps a place on the map
+  // Cada lugar errado conta um erro só: tocar nele de novo na mesma pergunta não soma outro
+  let lugaresErrados = new Set()
   async function tocarLugar(g) {
     const f = FASES[fase], r = f.rodadas[rodada]
     if (ocupado || f.tipo === "guiar") return
     const l = +g.dataset.l, c = +g.dataset.c, letra = MAPA[l][c]
+    if (lugaresErrados.has(`${l},${c}`)) return
     if (f.tipo === "tocar") {
       if (l === r.alvo[0] && c === r.alvo[1]) {
         g.classList.add("certo")
@@ -555,6 +559,7 @@ p, li, blockquote {
       }
       g.classList.add("errado")
       setTimeout(() => g.classList.remove("errado"), 900)
+      lugaresErrados.add(`${l},${c}`)
       const certo = MAPA[r.alvo[0]][r.alvo[1]]
       return errar(errosAqui === 0 && r.dica ? `Aí fica ${nomeCom(letra, "")}. ${r.dica}` : `Aí fica ${nomeCom(letra, "")}. Procure o desenho ${nomeCom(certo, "de")} na legenda e depois o mesmo desenho no mapa.`)
     }
@@ -572,6 +577,7 @@ p, li, blockquote {
     }
     g.classList.add("errado")
     setTimeout(() => g.classList.remove("errado"), 900)
+    lugaresErrados.add(`${l},${c}`)
     if (errosAqui === 0) return errar(`Hum, não foi ${nomeCom(letra, "")}. Siga o caminho com o dedo no mapa, um passo de cada vez, e vire como eu viro.`)
     errar(`Olhe eu fazendo o caminho. No fim, veja o que fica à minha ${r.lado === "D" ? "direita" : "esquerda"}.`)
     ocupado = true
