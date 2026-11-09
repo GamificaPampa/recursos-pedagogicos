@@ -540,6 +540,9 @@ p, li, blockquote {
       mostrarOpcoes(r.map(id => cartao(id)), (botao, i) => {
         const id = r[i], proximo = ordem[colocados.length]
         if (id !== proximo) {
+          // Cada fato errado conta um erro só por passo: tocar de novo no mesmo fato (ou o toque duplo) não soma outro
+          if (botao.dataset.errouNoPasso === String(colocados.length)) return
+          botao.dataset.errouNoPasso = colocados.length
           const antes = FATOS[id][1] > FATOS[proximo][1]
           return errar(`Ainda não. ${antes ? "Tem um fato mais antigo que esse esperando." : "Esse ainda não."} ${FATOS[proximo][1] < 0 && FATOS[id][1] > 0 ? "Lembre: tudo o que é a.C. vem antes." : "Compare os anos com calma."}`, botao, false)
         }
