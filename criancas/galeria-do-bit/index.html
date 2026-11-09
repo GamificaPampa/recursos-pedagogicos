@@ -703,7 +703,11 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // O desafio novo aparece onde estava o Próximo desafio: o segundo toque de um toque duplo não vale como resposta
+  let rodadaNovaEm = 0
+  const toqueDuplo = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
@@ -724,7 +728,7 @@ p, li, blockquote {
 
   // Choosing an answer. A wrong choice explains the concept
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const r = atual(), op = r.opcoes[botao.dataset.i]
     if (op.ok) {
       botao.classList.add("certa")
@@ -742,7 +746,7 @@ p, li, blockquote {
 
   // Tapping a spot on the picture
   function tocarAlvo(i) {
-    if (ocupado || est.erradas.has(i)) return
+    if (ocupado || est.erradas.has(i) || toqueDuplo()) return
     const r = atual(), a = r.alvos[i]
     if (a.ok) {
       est.ok = true
