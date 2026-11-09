@@ -356,11 +356,15 @@ p, li, blockquote {
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
+  // A rodada nova pode pôr um fato no lugar do Próxima questão: o segundo toque de um toque duplo,
+  // logo depois que a rodada aparece, não responde nada
+  let rodadaNovaEm = 0
   function mostrarOpcoes(lista, aoEscolher, classe = "") {
+    rodadaNovaEm = performance.now()
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
     $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
-      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+      if (!ocupado && !botao.disabled && performance.now() - rodadaNovaEm >= 500) aoEscolher(botao, Number(botao.dataset.i))
     })
   }
   function errar(frase, botao, riscar = true) {
