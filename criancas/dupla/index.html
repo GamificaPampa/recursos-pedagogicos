@@ -882,6 +882,9 @@ function professorKey(event) {
   return key === "p" || (Jogo.modoProfessor.ligado && ["a", "s", "r", "e"].includes(key))
 }
 
+// Tab anda pelos botões do topo e da tela final; Enter ou espaço logo depois aperta o botão escolhido pelo Tab
+let focoPeloTab = false
+addEventListener("pointerdown", () => { focoPeloTab = false })
 document.addEventListener("keydown", event => {
   if (event.repeat || event.metaKey || event.ctrlKey) return
   // Os botões de "Para usar na aula" ficam com o teclado normal
@@ -889,6 +892,9 @@ document.addEventListener("keydown", event => {
   // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
   if (/^F\d{1,2}$/.test(event.key)) return
   if (professorKey(event)) return
+  if (event.key === "Tab") return focoPeloTab = true
+  if ((event.key === "Enter" || event.key === " ") && focoPeloTab && document.activeElement?.matches("a, button")) return
+  focoPeloTab = false
   event.preventDefault()
   press(event.key)
 })
