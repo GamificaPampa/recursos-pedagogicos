@@ -390,7 +390,7 @@ p, li, blockquote {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
     $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
-      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+      if (!ocupado && !botao.disabled && !toqueDuplo()) aoEscolher(botao, Number(botao.dataset.i))
     })
   }
   function errar(frase, botao, riscar = true) {
@@ -467,7 +467,7 @@ p, li, blockquote {
   }
   function ligarTrechos(r) {
     $("cena").querySelectorAll(".trecho").forEach(botao => botao.onclick = () => {
-      if (ocupado) return
+      if (ocupado || toqueDuplo()) return
       const i = Number(botao.dataset.i)
       if (i !== r.erro) {
         botao.classList.add("certo")
@@ -479,7 +479,11 @@ p, li, blockquote {
     })
   }
 
+  // A rodada nova aparece onde estavam o Próxima questão e o Próxima fase: o segundo toque de um toque duplo não vale
+  let rodadaNovaEm = 0
+  const toqueDuplo = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     const r = atual()
     if (tipo() === "erro") {
