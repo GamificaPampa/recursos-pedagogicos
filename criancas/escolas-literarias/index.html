@@ -425,7 +425,12 @@ p, li, blockquote {
     $("placar").innerHTML = rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
 
+  // O desafio novo aparece onde estavam o Próximo desafio, o Próxima fase e o Jogar de novo:
+  // o segundo toque de um toque duplo não escolhe escola nem marca autor
+  let rodadaNovaEm = 0
+  const toqueDuplo = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
@@ -461,7 +466,7 @@ p, li, blockquote {
 
   // Fases 1 e 3: escolher a escola. Na fase 3, depois vem a pista do texto
   function escolherEscola(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const r = atual(), id = botao.dataset.id
     if (id === r.esc) {
       botao.classList.add("certa")
@@ -502,7 +507,7 @@ p, li, blockquote {
 
   // Fase 2: tocar num autor e numa escola
   function tocarItem(botao) {
-    if (ocupado || botao.classList.contains("feito")) return
+    if (ocupado || botao.classList.contains("feito") || toqueDuplo()) return
     const lado = botao.dataset.lado
     somClique()
     $("area").querySelectorAll(`.item[data-lado="${lado}"]`).forEach(b => b.setAttribute("aria-pressed", "false"))
