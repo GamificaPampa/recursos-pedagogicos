@@ -518,12 +518,18 @@ p, li, blockquote {
     $("opcoes").classList.remove("opcoes--papeis")
   }
 
+  // O desafio novo aparece no lugar do Próximo desafio, e cada trecho novo da proposta usa os mesmos botões:
+  // o segundo toque de um toque duplo, logo depois que a tela muda, não confere nem responde nada
+  let telaNovaEm = 0, ordemErrada = ""
+  const toqueDuplo = () => performance.now() - telaNovaEm < 500
   function mostrarRodada() {
     Jogo.ouvir.novaTela()
     const r = atual(), t = tipoRodada()
     ocupado = false
     dicas = 0
     passo = 0
+    telaNovaEm = performance.now()
+    ordemErrada = ""
     $("proxima").hidden = true
     $("dica").hidden = false
     $("conferir").hidden = t !== "ordem"
@@ -598,7 +604,9 @@ p, li, blockquote {
       desenharOrdem([], true)
       return acertou(r.acerto)
     }
-    erros++
+    // Cada ordem errada conta um erro só: conferir de novo a mesma ordem não soma outro
+    if (ordem.join() !== ordemErrada) erros++
+    ordemErrada = ordem.join()
     somErro()
     desenharOrdem(marcas)
     const primeira = marcas.indexOf(false)
@@ -608,7 +616,7 @@ p, li, blockquote {
 
   // Phases 2 and 3: choosing the right option; each wrong one explains why
   function escolher(botao, opcao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueDuplo()) return
     const t = tipoRodada(), r = atual()
     if (t === "marcar") return marcar(botao, opcao)
     if (opcao.certa) {
@@ -641,6 +649,7 @@ p, li, blockquote {
     const r = atual(), [texto, papel] = r.trechos[passo]
     if (opcao.chave === papel) {
       passo++
+      telaNovaEm = performance.now()
       somCerto()
       desenharProposta()
       $("opcoes").querySelectorAll(".opcao").forEach(b => { b.disabled = false; b.classList.remove("errada") })
@@ -658,7 +667,7 @@ p, li, blockquote {
     window.Bit?.diz("ops", `Esse trecho ${PAPEIS[papel].pista}. Então não é ${PAPEIS[opcao.chave].nome.toLowerCase()}. Tente outra.`)
   }
 
-  $("conferir").onclick = () => { if (!ocupado && tipoRodada() === "ordem") conferirOrdem() }
+  $("conferir").onclick = () => { if (!ocupado && !toqueDuplo() && tipoRodada() === "ordem") conferirOrdem() }
 
   // The hint grows with each tap
   $("dica").onclick = () => {
