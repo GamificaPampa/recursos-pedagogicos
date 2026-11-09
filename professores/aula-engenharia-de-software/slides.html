@@ -296,8 +296,8 @@ function toggleFullscreen() {
 // Moving with the arrows and the keys a presentation clicker sends, and F for full screen
 document.addEventListener("keydown", event => {
   if (event.metaKey || event.ctrlKey || event.altKey) return
-  // Enter e Espaço num botão da tela são do botão, não dos slides
-  if ((event.key === "Enter" || event.key === " ") && event.target.closest("button")) return
+  // Enter e Espaço num botão ou link da tela são dele, não dos slides
+  if ((event.key === "Enter" || event.key === " ") && event.target.closest("button, a")) return
   if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(event.key)) show(current + 1)
   else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(event.key)) show(current - 1)
   else if (event.key === "Home") show(0)
