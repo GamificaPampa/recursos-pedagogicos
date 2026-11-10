@@ -625,7 +625,7 @@ const VIDEOS = {
     init: { view: "app", sent1: true, reply1: true, game: "q" }, start: [40, 62],
     steps: [
       { say: "No bloco do jogo, toque em baixar, a seta para baixo.", dur: 3.8, acts: [["move", .3, ".m1r .s-dl"], ["tap", 1.4, ".m1r .s-dl"], ["set", 1.55, { dl: true }]] },
-      { say: "Abra o publicador do GamificaPampa e entre com o GitHub.", dur: 4, acts: [["set", .4, { view: "pub" }], ["move", .8, ".pb-file", .9]] },
+      { say: "Abra o publicador do GamificaPampa e preencha seu nome, e-mail e escola. Não precisa de conta.", dur: 4.8, acts: [["set", .4, { view: "pub" }], ["move", .8, ".pb-file", .9]] },
       { say: "Escolha o arquivo do jogo que você baixou.", dur: 3.4, acts: [["move", .2, ".pb-file"], ["tap", 1.1, ".pb-file"], ["set", 1.3, { pfile: true }]] },
       { say: "Toque em <b>Publicar o jogo</b>.", dur: 3.6, key: 1.35, acts: [["move", .2, ".pb-go"], ["tap", 1.3, ".pb-go"], ["set", 1.45, { published: true }]] },
       { say: "O publicador dá o link e o QR code. Copie o link.", dur: 4, acts: [["move", .3, ".pb-copy"], ["tap", 1.5, ".pb-copy"], ["set", 1.65, { copied: true }]] },
