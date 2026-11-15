@@ -1,6 +1,6 @@
 # Recursos pedagógicos
 
-Jogos e materiais que o GamificaPampa leva para as escolas públicas de Alegrete/RS. Tudo é publicado pelo GitHub Pages em [gamificapampa.github.io/recursos-pedagogicos](https://gamificapampa.github.io/recursos-pedagogicos/), e o menu para projetar na sala está em [gamificapampa.github.io/turma](https://gamificapampa.github.io/turma/).
+Jogos e materiais que o GamificaPampa leva para as escolas de Alegrete/RS. Tudo é publicado pelo GitHub Pages em [gamificapampa.github.io/recursos-pedagogicos](https://gamificapampa.github.io/recursos-pedagogicos/), e o menu para projetar na sala está em [gamificapampa.github.io/turma](https://gamificapampa.github.io/turma/).
 
 ## Para crianças
 
