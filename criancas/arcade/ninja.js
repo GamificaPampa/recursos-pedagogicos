@@ -98,7 +98,7 @@
     if(stroke.hits >= 3 && api.running){
       var bonus = stroke.hits * 5;
       api.add(bonus, stroke.x, stroke.y - 40, 'COMBO x' + stroke.hits + '! +' + bonus);
-      api.banner('Combo x' + stroke.hits + '!');
+      api.banner('Sequência x' + stroke.hits + '!');
       A.sfx.gold();
     }
     if(stroke.hits > st.best) st.best = stroke.hits;

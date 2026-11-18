@@ -599,7 +599,12 @@ p, li, blockquote {
       $("fim-acoes").replaceChildren(Jogo.acoesDoFim(() => comecar(0)))
     } else {
       $("fim-acoes").innerHTML = '<button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>'
-      $("seguir").onclick = () => comecar(fase + 1)
+      // Toque duplo: o Próxima fase aparece onde estava o último botão, e o segundo toque, logo depois do primeiro,
+      // pulava a tela do fim sem a criança ver as estrelas. Esse segundo toque não conta
+      let toqueAnterior = 0, toqueAtual = 0
+      addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
+      const toqueDuplo = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
+      $("seguir").onclick = () => toqueDuplo() || comecar(fase + 1)
     }
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false

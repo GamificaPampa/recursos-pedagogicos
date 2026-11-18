@@ -659,8 +659,12 @@ p, li, blockquote {
     })
   }
   mostrarEstrelas()
-  $("seguir").onclick = () => comecar(fase + 1)
-
+  // Toque duplo: o Próxima fase aparece onde estava o último botão, e o segundo toque, logo depois do primeiro,
+  // pulava a tela do fim sem a criança ver as estrelas. Esse segundo toque não conta
+  let toqueAnterior = 0, toqueAtual = 0
+  addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
+  const toqueSeguido = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
+  $("seguir").onclick = () => toqueSeguido() || comecar(fase + 1)
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {

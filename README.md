@@ -13,8 +13,8 @@ Jogos para a turma, da Educação Infantil ao Ensino Médio: os de Engenharia de
 | Programação em Dupla | 7+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/dupla/) | [criancas/dupla](criancas/dupla) |
 | Conecta o Sistema | 8+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/conecta/) | [criancas/conecta](criancas/conecta) |
 | Arcade do Código, três jogos com placar | Todas | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/arcade/) | [criancas/arcade](criancas/arcade) |
-| Caça aos Bugs! | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/) | [criancas/caca-bugs](criancas/caca-bugs) |
-| Missão Dev, a primeira versão dos jogos | Não informada | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/) | [criancas/missao-dev](criancas/missao-dev) |
+| Caça aos Bugs! | 6+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/caca-bugs/) | [criancas/caca-bugs](criancas/caca-bugs) |
+| Missão Dev, a primeira versão dos jogos | 8+ | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/missao-dev/) | [criancas/missao-dev](criancas/missao-dev) |
 | Bichos do Pampa, exemplo para a Educação Infantil | 4 e 5 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/bichos-do-pampa/) | [criancas/bichos-do-pampa](criancas/bichos-do-pampa) |
 | Pizzaria das Frações, exemplo de Matemática | 9 e 10 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/pizzaria-das-fracoes/) | [criancas/pizzaria-das-fracoes](criancas/pizzaria-das-fracoes) |
 | Ciclo da Água, exemplo de Ciências | 10 e 11 anos | [jogar](https://gamificapampa.github.io/recursos-pedagogicos/criancas/ciclo-da-agua/) | [criancas/ciclo-da-agua](criancas/ciclo-da-agua) |

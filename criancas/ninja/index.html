@@ -697,7 +697,7 @@ function endSwipe() {
     labels.push({ text: `COMBO ×${strokeHits}! +${bonus}`, x: strokeEnd.x, y: strokeEnd.y - 40, life: 1.2, combo: true })
     log(`combo(${strokeHits})`)
     beep([880, 1175, 1568, 2093], { volume: 0.12, spacing: 0.06, length: 0.15 })
-    window.Bit?.diz("feliz", "Combo! Vários bugs de uma vez.", 2500)
+    window.Bit?.diz("feliz", "Sequência! Vários bugs de uma vez.", 2500)
   }
   bestCombo = Math.max(bestCombo, strokeHits)
   strokeHits = 0

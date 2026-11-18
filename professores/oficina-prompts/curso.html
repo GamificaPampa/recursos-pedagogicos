@@ -587,7 +587,7 @@
     </article>
     <article class="card wide">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-check"/></svg>As três chaves: objetivo, erro comum e conferir</h3>
-      <p>Com as 4 partes, a resposta fica certa para a turma. Com estas três frases, ela fica mais funda. Nos nossos testes, feitos no Gemini, a nota média das respostas subiu de 2,0 para 2,6, numa escala de 1 a 3.</p>
+      <p>Com as 4 partes, a resposta fica certa para a turma. Com estas três frases, ela fica mais funda. Nos nossos testes, a nota média das respostas subiu de 2,0 para 2,6 no Gemini, e a dos jogos subiu de 2,4 para 3,0 no ChatGPT, numa escala de 1 a 3.</p>
       <div class="tricks">
         <div class="trick" style="--t: #cfe6ff"><b>1. O objetivo no topo</b><p class="say">No topo, escreva numa frase o objetivo: o que a turma vai conseguir fazer depois.</p></div>
         <div class="trick" style="--t: #ffd6e3"><b>2. Os erros comuns</b><p class="say">Considere os erros mais comuns dessa idade sobre o tema. Use nas alternativas erradas e nos avisos, com a explicação.</p></div>
@@ -880,7 +880,7 @@
       <li>Baixe o arquivo, envie no <a href="/publicador/">publicador</a> e teste o link numa janela anônima.</li>
     </ol>
     <label for="t3" data-sw="t3-label">Pedido para o ChatGPT (dá para editar aqui)</label>
-    <textarea id="t3" rows="5" spellcheck="false" data-sw="t3">Você é professor(a) de [componente] do [ano] e cria jogos educativos. Crie um jogo sobre [conteúdo] para jogar no navegador, para crianças de [idade] anos, no celular, em 10 minutos. Um arquivo só, botões grandes, 3 fases do fácil ao difícil, som no acerto, estrelas no final e sem anúncios.</textarea>
+    <textarea id="t3" rows="5" spellcheck="false" data-sw="t3">Você é professor(a) de [componente] do [ano] e cria jogos educativos. Crie um jogo sobre [conteúdo] para jogar no navegador, para crianças de [idade] anos, no celular, em 10 minutos. Tudo num único arquivo HTML, com o código completo num bloco de código, sem criar arquivo, botões grandes, 3 fases do fácil ao difícil, som no acerto, estrelas no final e sem anúncios.</textarea>
     <div class="row"><button class="btn" type="button" data-copy="t3" style="--c: var(--mint)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg><span data-sw="t3-copy1">Copiar pedido</span></button><a class="btn calm" href="https://chatgpt.com/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-out"/></svg>Abrir o ChatGPT</a><span class="status" role="status"></span></div>
     <div id="t3b-box" hidden>
       <label for="t3b">Mensagem 2: os detalhes (envie depois que o jogo aparecer; dá para editar aqui)</label>
@@ -950,7 +950,7 @@
     </article>
     <article class="card wide">
       <h3><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-gem"/></svg>Exemplo de instruções</h3>
-      <p class="say" data-sw="gem-exemplo">Você é o assistente de um(a) professor(a) do 2º ano de uma escola pública do interior do Rio Grande do Sul. As crianças têm 7 e 8 anos e estão se alfabetizando. Sempre: responda em português do Brasil, com frases curtas; faça atividades com até 4 exercícios e o gabarito separado; prefira ideias que funcionem sem internet e com material barato. Se eu não disser o tema, pergunte antes de criar. Nunca invente códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.</p>
+      <p class="say" data-sw="gem-exemplo">Você é o assistente de um(a) professor(a) do 2º ano de uma escola do interior do Rio Grande do Sul. As crianças têm 7 e 8 anos e estão se alfabetizando. Sempre: responda em português do Brasil, com frases curtas; faça atividades com até 4 exercícios e o gabarito separado; prefira ideias que funcionem sem internet e com material barato. Se eu não disser o tema, pergunte antes de criar. Nunca invente códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.</p>
       <p class="small">Repare: tem a turma, o jeito de responder e as regras, e nenhum dado de criança.</p>
     </article>
     <article class="card">
@@ -1282,6 +1282,15 @@ const RULES = [
   ["fix", "Se eu disser que algo não funcionou, conserte só aquilo, sem mudar o resto."],
 ]
 
+// A ordem das alternativas muda a cada tentativa: a certa não fica sempre no mesmo lugar, como a Oficina ensina.
+// A lista natural (Papel, Tarefa, Contexto, Formato) fica na ordem de sempre
+const embaralharQuiz = () => QUIZ.map(item => {
+  const ordem = item.opts.map((_, index) => index)
+  if (item.opts.join(" ") === "Papel Tarefa Contexto Formato") return ordem
+  for (let i = ordem.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ordem[i], ordem[j]] = [ordem[j], ordem[i]] }
+  return ordem
+})
+const ordemDe = index => (quiz.ordens && quiz.ordens[index]) || QUIZ[index].opts.map((_, i) => i)
 // Final test: 12 questions, the index of the right option, the explanation and the module to review
 const QUIZ = [
   { m: 1, q: "Como a IA generativa, como o ChatGPT, cria as respostas?",
@@ -1931,11 +1940,12 @@ function renderQuiz() {
   }
   if (quiz.stage === "question") {
     const item = QUIZ[quiz.index]
+    const ordem = ordemDe(quiz.index)
     box.innerHTML = `
       <div class="qhead"><span class="count" style="margin: 0">Pergunta ${quiz.index + 1} de ${QUIZ.length}</span>
         <span class="qdots" aria-hidden="true">${QUIZ.map((_, index) => `<i class="${quiz.marks[index] === true ? "yes" : quiz.marks[index] === false ? "no" : index === quiz.index ? "now" : ""}"></i>`).join("")}</span></div>
       <h2 class="qtext" id="q-text" tabindex="-1">${escape(item.q)}</h2>
-      <div class="qopts" role="group" aria-labelledby="q-text">${item.opts.map((text, index) => `<button type="button" class="qopt" data-option="${index}"><b>${"ABCD"[index]}</b><span>${escape(text)}</span></button>`).join("")}</div>
+      <div class="qopts" role="group" aria-labelledby="q-text">${ordem.map((original, posicao) => `<button type="button" class="qopt" data-option="${original}"><b>${"ABCD"[posicao]}</b><span>${escape(item.opts[original])}</span></button>`).join("")}</div>
       <div id="q-explain" role="status"></div>
       <div class="row end" style="margin-top: 16px"><button type="button" class="btn" id="q-next" style="--c: var(--orange)" hidden>${quiz.index + 1 < QUIZ.length ? "Próxima pergunta" : "Ver o resultado"}${icon("i-next", 24)}</button></div>`
     return
@@ -1961,7 +1971,7 @@ function renderQuiz() {
 
 $("quiz").addEventListener("click", event => {
   if (event.target.closest("#q-start")) {
-    Object.assign(quiz, { stage: "question", index: 0, score: 0, answered: false, marks: [] })
+    Object.assign(quiz, { stage: "question", index: 0, score: 0, answered: false, marks: [], ordens: embaralharQuiz() })
     renderQuiz()
     $("q-text").focus({ preventScroll: true })
     $("quiz").scrollIntoView({ block: "start" })
@@ -1973,12 +1983,13 @@ $("quiz").addEventListener("click", event => {
     quiz.answered = true
     quiz.marks[quiz.index] = right
     if (right) quiz.score++
-    document.querySelectorAll(".qopt").forEach((button, index) => {
+    document.querySelectorAll(".qopt").forEach(button => {
+      const original = Number(button.dataset.option)
       button.setAttribute("aria-disabled", "true")
-      if (index === item.right) button.classList.add("right")
-      else if (index === chosen) button.classList.add("wrong")
+      if (original === item.right) button.classList.add("right")
+      else if (original === chosen) button.classList.add("wrong")
     })
-    $("q-explain").innerHTML = `<div class="explain ${right ? "good" : "bad"}"><strong>${right ? "Certo!" : `Não é essa. A resposta certa é a ${"ABCD"[item.right]}.`}</strong>${escape(item.why)}</div>`
+    $("q-explain").innerHTML = `<div class="explain ${right ? "good" : "bad"}"><strong>${right ? "Certo!" : `Não é essa. A resposta certa é a ${"ABCD"[ordemDe(quiz.index).indexOf(item.right)]}.`}</strong>${escape(item.why)}</div>`
     $("q-next").hidden = false
     $("q-next").focus({ preventScroll: true })
     const dots = document.querySelectorAll(".qdots i")
@@ -2208,24 +2219,24 @@ const STAGE_SWAPS = {
   "t3-label": everyStage("Mensagem 1: a ideia do jogo (dá para editar aqui)"),
   "t3-copy1": everyStage("Copiar mensagem 1"),
   t3: {
-    infantil: "Crie em HTML um jogo de [tema, por exemplo animais do pampa] para crianças de [4 e 5] anos que ainda não leem, para jogar no celular. A criança toca na figura que o jogo pede, e o jogo fala o pedido em voz alta.",
-    iniciais: "Crie em HTML um jogo de [conteúdo] para crianças de [7] anos que estão aprendendo a ler, para jogar no celular. Aparece uma pergunta curta e a criança toca na resposta certa entre 3 botões.",
-    finais: "Crie em HTML um jogo de [conteúdo, por exemplo equações do 1º grau] para estudantes de [12 e 13] anos, para jogar no celular. Aparece uma situação-problema, o estudante escolhe a resposta e o jogo mostra na hora se está certa.",
-    medio: "Crie em HTML um simulador de [conteúdo, por exemplo função afim] para estudantes de [16] anos, para usar no celular ou no computador. O estudante muda os valores e vê na hora o que acontece.",
+    infantil: "Crie em HTML um jogo de [tema, por exemplo animais do pampa] para crianças de [4 e 5] anos que ainda não leem, para jogar no celular. A criança toca na figura que o jogo pede, e o jogo fala o pedido em voz alta. Mostre o código completo num bloco de código HTML, sem criar arquivo.",
+    iniciais: "Crie em HTML um jogo de [conteúdo] para crianças de [7] anos que estão aprendendo a ler, para jogar no celular. Aparece uma pergunta curta e a criança toca na resposta certa entre 3 botões. Mostre o código completo num bloco de código HTML, sem criar arquivo.",
+    finais: "Crie em HTML um jogo de [conteúdo, por exemplo equações do 1º grau] para estudantes de [12 e 13] anos, para jogar no celular. Aparece uma situação-problema, o estudante escolhe a resposta e o jogo mostra na hora se está certa. Mostre o código completo num bloco de código HTML, sem criar arquivo.",
+    medio: "Crie em HTML um simulador de [conteúdo, por exemplo função afim] para estudantes de [16] anos, para usar no celular ou no computador. O estudante muda os valores e vê na hora o que acontece. Mostre o código completo num bloco de código HTML, sem criar arquivo.",
   },
   t3b: {
-    infantil: "Agora melhore o jogo: 3 fases com 2, 3 e 4 figuras, botões bem grandes, nada para ler, o erro vira uma dica e não um castigo, som suave no acerto, um botão para desligar o som e estrelas no fim de cada fase. Desenhe as figuras com formas simples e use textos em português do Brasil. Sem anúncios e sem pedir o nome da criança.",
-    iniciais: "Agora melhore o jogo: 3 fases do fácil ao difícil, frases curtas, botões grandes, o erro mostra uma dica e deixa tentar de novo, som no acerto com botão para desligar e estrelas no fim de cada fase. Textos em português do Brasil, sem inventar dados, sem anúncios e sem pedir o nome da criança.",
-    finais: "Agora melhore o jogo: 3 fases do fácil ao difícil, um botão de dica, estrelas no fim de cada fase, botões grandes para o celular e som no acerto com botão para desligar. Confira as contas e as respostas, use textos em português do Brasil, sem anúncios e sem pedir o nome do estudante.",
-    medio: "Agora melhore: 3 fases e, no fim de cada uma, uma questão no estilo do Enem com texto-base curto, 5 alternativas e a resolução comentada. Acrescente um botão de dica e botões grandes. Confira as contas, use textos em português do Brasil, não diga que a questão é de prova real, sem anúncios e sem pedir o nome do estudante.",
+    infantil: "Agora melhore o jogo: 3 fases com 2, 3 e 4 figuras, botões bem grandes, nada para ler, o erro vira uma dica e não um castigo, som suave no acerto, um botão para desligar o som e estrelas no fim de cada fase. Desenhe as figuras com formas simples e use textos em português do Brasil. Sem anúncios e sem pedir o nome da criança. Mostre o jogo inteiro de novo num bloco de código HTML, sem criar arquivo.",
+    iniciais: "Agora melhore o jogo: 3 fases do fácil ao difícil, frases curtas, botões grandes, o erro mostra uma dica e deixa tentar de novo, som no acerto com botão para desligar e estrelas no fim de cada fase. Textos em português do Brasil, sem inventar dados, sem anúncios e sem pedir o nome da criança. Mostre o jogo inteiro de novo num bloco de código HTML, sem criar arquivo.",
+    finais: "Agora melhore o jogo: 3 fases do fácil ao difícil, um botão de dica, estrelas no fim de cada fase, botões grandes para o celular e som no acerto com botão para desligar. Confira as contas e as respostas, use textos em português do Brasil, sem anúncios e sem pedir o nome do estudante. Mostre o jogo inteiro de novo num bloco de código HTML, sem criar arquivo.",
+    medio: "Agora melhore: 3 fases e, no fim de cada uma, uma questão no estilo do Enem com texto-base curto, 5 alternativas e a resolução comentada. Acrescente um botão de dica e botões grandes. Confira as contas, use textos em português do Brasil, não diga que a questão é de prova real, sem anúncios e sem pedir o nome do estudante. Mostre o jogo inteiro de novo num bloco de código HTML, sem criar arquivo.",
   },
 
   // Module 4: the Gem
   gemnome: { infantil: "Assistente da Educação Infantil", finais: "Assistente do 8º ano", medio: "Assistente do Ensino Médio" },
   "gem-exemplo": {
-    infantil: "Você é o assistente de um(a) professor(a) da Educação Infantil de uma escola pública do interior do Rio Grande do Sul. As crianças têm 4 e 5 anos e ainda não leem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, com frases curtas; proponha atividades de roda, brincadeira e movimento com material barato; se citar imagem, descreva a imagem entre parênteses. Se eu não disser o tema, pergunte antes de criar. Nunca invente músicas, livros nem códigos da BNCC.",
-    finais: "Você é o assistente de um(a) professor(a) do 8º ano de uma escola pública do interior do Rio Grande do Sul. Os estudantes têm 13 e 14 anos. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça atividades com até 5 exercícios, um deles ligado ao dia a dia dos estudantes, e o gabarito com a resolução separado. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados nem códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.",
-    medio: "Você é o assistente de um(a) professor(a) do Ensino Médio de uma escola pública do interior do Rio Grande do Sul. Os estudantes têm de 15 a 17 anos e se preparam para o Enem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça questões no estilo do Enem, com texto-base, 5 alternativas e o gabarito com a resolução, sem dizer que são de prova real. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados, citações nem códigos da BNCC: marque com [conferir a fonte] o que eu devo checar.",
+    infantil: "Você é o assistente de um(a) professor(a) da Educação Infantil de uma escola do interior do Rio Grande do Sul. As crianças têm 4 e 5 anos e ainda não leem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, com frases curtas; proponha atividades de roda, brincadeira e movimento com material barato; se citar imagem, descreva a imagem entre parênteses. Se eu não disser o tema, pergunte antes de criar. Nunca invente músicas, livros nem códigos da BNCC.",
+    finais: "Você é o assistente de um(a) professor(a) do 8º ano de uma escola do interior do Rio Grande do Sul. Os estudantes têm 13 e 14 anos. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça atividades com até 5 exercícios, um deles ligado ao dia a dia dos estudantes, e o gabarito com a resolução separado. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados nem códigos da BNCC: se não tiver certeza, escreva só a descrição da habilidade.",
+    medio: "Você é o assistente de um(a) professor(a) do Ensino Médio de uma escola do interior do Rio Grande do Sul. Os estudantes têm de 15 a 17 anos e se preparam para o Enem. Sempre: responda em português do Brasil, em texto normal e fora de bloco de código, sem usar o teste interativo; faça questões no estilo do Enem, com texto-base, 5 alternativas e o gabarito com a resolução, sem dizer que são de prova real. Se eu não disser o tema, pergunte antes de criar. Nunca invente dados, citações nem códigos da BNCC: marque com [conferir a fonte] o que eu devo checar.",
   },
   t4: {
     infantil: "Crie uma atividade para a roda de conversa sobre [tema], para a minha turma, sem precisar ler.",

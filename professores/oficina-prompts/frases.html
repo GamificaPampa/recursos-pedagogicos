@@ -70,7 +70,7 @@
   </header>
 
   <section class="card how" data-bit-pose="pensando" data-bit-dica="A Máquina de prompts já põe estas frases no prompt. Use esta página quando escrever o pedido do seu jeito.">
-    <p>A Máquina de prompts já coloca estas frases sozinha. Use esta página quando escrever o pedido do seu jeito ou quando o ChatGPT errar mesmo assim: copie a frase e mande na mesma conversa.</p>
+    <p>A Máquina de prompts já coloca quase todas estas frases sozinha. Use esta página quando escrever o pedido do seu jeito ou quando o ChatGPT errar mesmo assim: copie a frase e mande na mesma conversa.</p>
     <div class="todas"><button class="btn btn--conhecer" type="button" id="todas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar todas</button><span class="copiado" id="todas-ok" role="status"></span></div>
   </section>
 
@@ -129,25 +129,25 @@ const FRASES = [
     diga: "Sem quadros interativos, só texto.", quando: "gabaritos, tabelas e quadros, como o de Punnett" },
   { titulo: "Jogo que não sai", icone: "jogo", cor: "#4da3ff", luz: "#cfe6ff",
     erro: "Na conta gratuita, o ChatGPT às vezes tenta criar o jogo como arquivo para baixar e, quando acaba a cota de análise, diz que não conseguiu.",
-    diga: "Mostre o código completo num bloco de código HTML, sem criar arquivo.", quando: "jogos e páginas em HTML" },
+    diga: "Mostre o código completo num bloco de código HTML, sem criar arquivo.", quando: "jogos e páginas em HTML", especifica: true },
   { titulo: "A IA perdeu o jogo", icone: "jogo", cor: "#ff8a3d", luz: "#ffe0c7",
     erro: "Depois de muitos pedidos na mesma conversa, ele diz que não tem mais o código do jogo, ou conserta outra coisa e o erro fica.",
-    diga: "Este é o código do meu jogo. [O que está errado.] Corrija só isso e mostre o código completo num único bloco de código HTML, sem criar arquivo.", quando: "numa conversa nova, colando o código do jogo antes da frase" },
+    diga: "Este é o código do meu jogo. [O que está errado.] Corrija só isso e mostre o código completo num único bloco de código HTML, sem criar arquivo.", quando: "numa conversa nova, colando o código do jogo antes da frase", especifica: true },
   { titulo: "Rimas que não rimam", icone: "nota", cor: "#ff5f8f", luz: "#ffd6e3",
     erro: "Ele diz que duas palavras rimam quando não rimam, e o gabarito sai errado.",
     diga: "Use só pares que rimam de verdade e confira cada rima antes de entregar.", quando: "atividades de rima, poemas e cantigas. Leia as rimas em voz alta antes de usar", especifica: true },
   { titulo: "Questão como se fosse do Enem", icone: "enem", cor: "#ffd23f", luz: "#fff1a8",
     erro: "Ele diz que a questão é de uma prova real do Enem e inventa o ano.",
-    diga: "Crie questões no estilo do Enem, sem dizer que são de provas reais e sem inventar o ano de uma prova.", quando: "simulados e listas do Ensino Médio" },
+    diga: "Crie questões no estilo do Enem, sem dizer que são de provas reais e sem inventar o ano de uma prova.", quando: "simulados e listas do Ensino Médio", especifica: true },
   { titulo: "Contas erradas na resolução", icone: "revisar", cor: "#4fd6a6", luz: "#c9f5e3",
     erro: "Num gabarito comentado, ele erra uma conta no meio do caminho.",
-    diga: "Confira cada conta antes de responder e mostre a resolução passo a passo.", quando: "Matemática, Física, Química e qualquer gabarito com cálculo" },
+    diga: "Confira cada conta antes de responder e mostre a resolução passo a passo.", quando: "Matemática, Física, Química e qualquer gabarito com cálculo", especifica: true },
   { titulo: "Jogo pedido de uma vez", icone: "jogo", cor: "#a08bff", luz: "#e2dbff",
     erro: "Com o pedido inteiro numa mensagem só, a IA pode deixar partes do jogo de fora, e o Gemini às vezes recusa o jogo.",
-    diga: "Crie uma página HTML interativa sobre [tema]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, em português do Brasil.", quando: "jogos: mande esta frase primeiro e, depois que o jogo aparecer, peça as fases, o som e as estrelas. No ChatGPT, toque em Prévia para jogar" },
+    diga: "Crie uma página HTML interativa sobre [tema]: aparece uma pergunta e a pessoa toca na resposta certa. Botões grandes, cores alegres, em português do Brasil.", quando: "jogos: mande esta frase primeiro e, depois que o jogo aparecer, peça as fases, o som e as estrelas. No ChatGPT, toque em Prévia para jogar", especifica: true },
   { titulo: "Dado de aluno no pedido", icone: "cadeado", cor: "#ff5f8f", luz: "#ffd6e3",
     erro: "Um nome ou a turma escritos no pedido ficam guardados na conta.",
-    diga: "Descreva só a necessidade, sem nome nem turma: por exemplo, um estudante de 15 anos com TDAH que se perde em textos longos.", quando: "adaptações e qualquer pedido que fale de um aluno" },
+    diga: "Descreva só a necessidade, sem nome nem turma: por exemplo, um estudante de 15 anos com TDAH que se perde em textos longos.", quando: "adaptações e qualquer pedido que fale de um aluno", especifica: true },
 ]
 
 // Mensagens para mandar na mesma conversa, depois da primeira resposta (o bloco Peça mais da Máquina de prompts)

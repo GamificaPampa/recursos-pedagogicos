@@ -396,7 +396,7 @@
 //   {
 //     titulo: "Caça às frações",                              // o nome do jogo
 //     componente: "Matemática",                               // a matéria
-//     etapa: "iniciais",                                      // "infantil", "iniciais" ou "finais" (o filtro usa)
+//     etapa: "iniciais",                                      // "infantil", "iniciais", "finais", "medio" ou "eja" (o filtro usa)
 //     link: "https://usuario.github.io/caca-as-fracoes/",     // o link que o publicador deu
 //     ensina: "Frações: a criança toca nas pizzas que mostram a metade.",  // o que o jogo ensina, em uma frase
 //     autoria: "Professora de Matemática de Alegrete",        // "Professor(a) de [matéria] de [escola ou cidade]"
@@ -411,10 +411,10 @@ const COLORS = {
   blue: ["#4da3ff", "#cfe6ff"], pink: ["#ff5f8f", "#ffd6e3"], mint: ["#4fd6a6", "#c9f5e3"],
   orange: ["#ff8a3d", "#ffdcc4"], purple: ["#a08bff", "#e2dbff"], yellow: ["#ffd23f", "#fff1a8"],
 }
-const STAGES = { infantil: "Educação Infantil", iniciais: "Anos iniciais", finais: "Anos finais" }
-const FILTERS = [["todas", "Todas", "var(--yellow)"], ["infantil", "Educação Infantil", "var(--pink)"], ["iniciais", "Anos iniciais", "var(--blue)"], ["finais", "Anos finais", "var(--orange)"]]
+const STAGES = { infantil: "Educação Infantil", iniciais: "Anos iniciais", finais: "Anos finais", medio: "Ensino Médio", eja: "EJA" }
+const FILTERS = [["todas", "Todas", "var(--yellow)"], ["infantil", "Educação Infantil", "var(--pink)"], ["iniciais", "Anos iniciais", "var(--blue)"], ["finais", "Anos finais", "var(--orange)"], ["medio", "Ensino Médio", "var(--purple)"], ["eja", "EJA", "var(--mint)"]]
 
-const SUBJECTS = ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Vários componentes juntos",
+const SUBJECTS = ["Língua Portuguesa", "Matemática", "Ciências", "História", "Geografia", "Arte", "Educação Física", "Língua Inglesa", "Biologia", "Física", "Química", "Filosofia", "Sociologia", "Vários componentes juntos",
   "O eu, o outro e o nós", "Corpo, gestos e movimentos", "Traços, sons, cores e formas", "Escuta, fala, pensamento e imaginação", "Espaços, tempos, quantidades, relações e transformações"]
 
 const $ = id => document.getElementById(id)
