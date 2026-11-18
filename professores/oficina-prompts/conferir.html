@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conferir a resposta da IA · Oficina de Prompts</title>
+<meta name="description" content="Cole a resposta do ChatGPT e veja na hora o que costuma dar errado: contas erradas, gabarito sempre na mesma letra, código da BNCC inventado, emojis, inglês e código cortado. Sai com o pedido de conserto pronto. Nada é enviado: tudo acontece no seu aparelho.">
+<meta name="theme-color" content="#5fbcff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<link rel="stylesheet" href="/identidade-visual/css/carimbo.css">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { background: var(--sky2) }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.45 }
+  a { color: var(--ink); font-weight: 600 }
+  button, textarea { font: inherit; color: inherit }
+  button { cursor: pointer }
+  .page { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 14px 0 26px }
+  header .lente { width: clamp(80px, 20vw, 110px); flex: none; animation: boia 3s ease-in-out infinite }
+  @keyframes boia { 50% { transform: translateY(-8px) rotate(4deg) } }
+  h1 { margin: 0; font-size: clamp(40px, 9vw, 66px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  h1 .y { color: var(--yellow) } h1 .p { color: var(--pink) }
+  header p { max-width: 680px; margin: 10px 0 0; font-size: 19px; font-weight: 600 }
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 24px; line-height: 1.15 }
+  h2 .n { display: grid; place-items: center; width: 36px; height: 36px; flex: none; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 20px }
+
+  .card { margin-bottom: 24px; padding: 20px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .regra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; background: #fff1a8 }
+  .regra svg { width: 58px; height: 58px; flex: none }
+  .regra p { flex: 1 1 300px; margin: 0; font-weight: 600 }
+
+  label { display: grid; gap: 4px; font-weight: 700 }
+  label small { font-weight: 500; color: var(--soft) }
+  textarea { width: 100%; min-height: 190px; padding: 12px 14px; background: #fff; border: 3px solid var(--ink); border-radius: 16px; font-weight: 500; resize: vertical }
+  textarea:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .exemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px }
+  .exemplos span { font-weight: 700 }
+
+  .placar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 12px }
+  .estrelas { display: flex; gap: 4px }
+  .estrelas svg { width: 42px; height: 42px; transition: transform .3s var(--bounce, ease), opacity .3s }
+  .estrelas svg.apagada { opacity: .22; filter: grayscale(1); transform: scale(.85) }
+  .veredito { flex: 1 1 260px; margin: 0; font-size: 19px; font-weight: 700 }
+  .placar .carimbo { --giro: -8deg }
+  .placar .carimbo[hidden] { display: none }
+  .conferido { margin: 0; font-weight: 600; color: var(--soft) }
+
+  .cuidados { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none }
+  .cuidados li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; background: #f4f1ff; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600 }
+  .cuidados li.alerta { background: #ffd6e3 }
+  .cuidados li.ok { background: var(--light, #c9f5e3) }
+  .cuidados li svg { width: 30px; height: 30px; flex: none }
+  .cuidados li b { display: block }
+  .cuidados li span { font-weight: 500 }
+  .cuidados li q { font-weight: 700 }
+  .cuidados li code { padding: 0 4px; background: #fff; border-radius: 6px; font-family: inherit; font-weight: 700; overflow-wrap: anywhere }
+
+  .prompt { margin: 0 0 14px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 18px; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600 }
+  .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px }
+  .btn svg { width: 22px; height: 22px }
+  .copiado { font-weight: 700; color: #17694a }
+  .vazio { margin: 0; font-weight: 600; color: var(--soft) }
+  .nota { margin: 14px 0 0; font-size: 15px; font-weight: 600; color: var(--soft) }
+
+  .previa { display: block; width: 100%; height: min(70vh, 560px); margin-bottom: 14px; background: #fff; border: 3px solid var(--ink); border-radius: 16px }
+  [hidden] { display: none !important }
+
+  .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
+  footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
+  @media print { .page { max-width: none } .exemplos, .mais, .linha, .regra svg, #previa-card { display: none } .card { box-shadow: none; break-inside: avoid } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 8%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -30s"></span>
+  <span class="simbolo" style="left: 4%; top: 40%">1+1</span>
+  <span class="simbolo" style="right: 5%; top: 18%; --d: -3s">a b c</span>
+  <span class="morros" style="--altura: 13vh"></span>
+</div>
+
+<div class="page">
+  <header data-bit-pose="acenando" data-bit-dica="A IA erra com confiança. Cole aqui o que ela devolveu e eu procuro os erros que mais apareceram nos testes da Oficina.">
+    <svg class="lente" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="8" width="38" height="46" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M13 20h20M13 29h24M13 38h14" stroke="#8c73ff" stroke-width="4" stroke-linecap="round"/><path d="M30 44l7 7 16-18" fill="none" stroke="#2f2a4a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 44l7 7 16-18" fill="none" stroke="#4fd6a6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div>
+      <h1><span class="y">Conferir</span> a resposta <span class="p">da IA</span></h1>
+      <p>O Raio-X confere o pedido; aqui você confere o que voltou. Cole a resposta do ChatGPT e veja contas erradas, gabarito viciado, código da BNCC inventado e outros erros comuns. Você sai com o pedido de conserto pronto.</p>
+    </div>
+  </header>
+
+  <section class="card regra" data-bit-pose="ops" data-bit-dica="O quero-quero guarda os dados dos alunos. Aqui nada sai do seu aparelho.">
+    <span id="guarda" aria-hidden="true"></span>
+    <p><b>A resposta fica só no seu aparelho.</b> A conferência acontece aqui mesmo, sem enviar para ninguém e sem guardar. Ela acha os erros mais comuns, mas não lê como você: a última palavra é sempre a sua leitura.</p>
+  </section>
+
+  <section class="card" data-bit-pose="pensando" data-bit-dica="No ChatGPT, use o Copiar embaixo da resposta: assim vem tudo, do título ao gabarito.">
+    <h2><span class="n">1</span>Cole a resposta</h2>
+    <label for="texto">A resposta da IA<small>o material inteiro, do título ao gabarito, ou o código do jogo</small><textarea id="texto" placeholder="Cole aqui o que o ChatGPT ou o Gemini devolveu."></textarea></label>
+    <div class="exemplos">
+      <span id="rotulo-exemplos">Ou experimente:</span>
+      <button class="btn btn--small" type="button" data-exemplo="quiz" aria-describedby="rotulo-exemplos">Quiz com problemas</button>
+      <button class="btn btn--small" type="button" data-exemplo="folha" aria-describedby="rotulo-exemplos">Folha bem feita</button>
+      <button class="btn btn--small" type="button" data-exemplo="jogo" aria-describedby="rotulo-exemplos">Jogo cortado</button>
+    </div>
+  </section>
+
+  <section class="card" id="resultado" data-bit-dica="Cada aviso vem com o pedido de conserto. Os rosas são erro de verdade; os roxos pedem que você confira.">
+    <h2><span class="n">2</span>O que a conferência achou</h2>
+    <div class="placar">
+      <div class="estrelas" id="estrelas" role="img" aria-label="0 de 3 estrelas"></div>
+      <p class="veredito" id="veredito" role="status" aria-live="polite"></p>
+      <span class="carimbo" id="visto" hidden>Visto</span>
+    </div>
+    <p class="conferido" id="conferido"></p>
+    <ul class="cuidados" id="cuidados" aria-label="O que foi achado"></ul>
+  </section>
+
+  <section class="card" id="previa-card" hidden data-bit-pose="feliz" data-bit-dica="A prévia roda o código separada do site. Para imprimir, baixe o arquivo e abra no navegador.">
+    <h2><span class="n">+</span>Prévia do HTML</h2>
+    <iframe class="previa" id="previa" title="Prévia do material em HTML" sandbox="allow-scripts"></iframe>
+    <div class="linha">
+      <button class="btn btn--baixar" type="button" id="baixar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m-5-5 5 5 5-5M4 17v3h16v-3" fill="none" stroke="#2f2a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Baixar o arquivo</button>
+      <a class="btn" id="publicar" href="/publicador/" hidden>É um jogo? Publicar</a>
+    </div>
+  </section>
+
+  <section class="card" data-bit-pose="feliz" data-bit-dica="Mande o pedido na mesma conversa. Se a conversa já estiver longa, abra uma nova e cole o material junto.">
+    <h2><span class="n">3</span>O pedido de conserto</h2>
+    <p class="prompt" id="pedido"></p>
+    <div class="linha">
+      <button class="btn btn--jogar" type="button" id="copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o pedido</button>
+      <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir o ChatGPT</a>
+      <span class="copiado" id="copiado" role="status"></span>
+    </div>
+    <p class="nota">A conferência olha contas simples, gabarito, alternativas, BNCC, links, emojis, inglês e código. Ela não sabe se o conteúdo está certo para a sua turma: isso só você confere.</p>
+  </section>
+
+  <div class="mais">
+    <a class="btn btn--conhecer" href="raio-x.html">Raio-X do prompt</a>
+    <a class="btn" href="/maquina/">Máquina de prompts</a>
+    <a class="btn" href="frases.html">Frases que salvam</a>
+  </div>
+</div>
+
+<footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
+
+<script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/icones.js"></script>
+<script>
+// Everything runs here, on the device: the text is never sent nor stored
+const $ = id => document.getElementById(id)
+const semAcento = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+const escapar = s => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`)
+const numeroBr = n => n.toLocaleString("pt-BR", { maximumFractionDigits: 2 })
+
+const EXEMPLOS = {
+  quiz: `Quiz: Frações no dia a dia (5º ano) 🍕
+Habilidade da BNCC: EF05MA03
+
+1. Uma pizza foi cortada em 8 pedaços iguais e alguém comeu 2. Que fração da pizza foi comida?
+a) 1/2
+b) 2/8, que é o mesmo que 1/4 da pizza inteira
+c) 1/8
+d) 8/2
+
+2. Quanto é 25% de 80?
+a) 40
+b) 20, porque 25% é a quarta parte do total
+c) 25
+d) 8
+
+3. Uma caixa tem 3 fileiras com 4 ovos cada. Quantos ovos há na caixa?
+a) 7
+b) 12, porque são 3 fileiras de 4 ovos
+c) 34
+d) 10
+
+4. Qual fração é maior?
+a) 1/3
+b) 1/2, porque a pizza foi dividida em menos partes
+c) 1/5
+d) 1/8
+
+Explicação da questão 2: 25% de 80 = 25, ou seja, a quarta parte.
+Explicação da questão 3: 3 x 4 = 14 ovos.
+
+Vamos checar a questão 1: na verdade, a resposta certa é a b, porque 2/8 = 1/4.
+
+Gabarito
+1. b
+2. b
+3. b
+4. b`,
+  folha: `Folha de atividades: Multiplicação no mercado (4º ano)
+Objetivo: resolver problemas de multiplicação com dinheiro.
+
+1. Um pacote de figurinhas custa 3 reais. Quanto custam 5 pacotes?
+a) 8 reais
+b) 15 reais
+c) 12 reais
+d) 18 reais
+
+2. Uma caixa tem 6 lápis. Quantos lápis há em 4 caixas?
+a) 24 lápis
+b) 10 lápis
+c) 20 lápis
+d) 28 lápis
+
+3. Na feira, 1 kg de laranja custa 4 reais. Quanto custam 7 kg?
+a) 11 reais
+b) 21 reais
+c) 32 reais
+d) 28 reais
+
+4. Uma turma tem 5 grupos de 6 estudantes. Quantos estudantes há na turma?
+a) 30 estudantes
+b) 11 estudantes
+c) 36 estudantes
+d) 25 estudantes
+
+Gabarito
+1. b (5 x 3 = 15)
+2. a (4 x 6 = 24)
+3. d (7 x 4 = 28)
+4. a (5 x 6 = 30)`,
+  jogo: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Caça às Sílabas</title>
+<script src="https://cdn.exemplo.com/biblioteca-de-jogos.js"><\/script>
+<style>
+  body { font-family: sans-serif; background: #ffe680; text-align: center }
+  button { font-size: 28px; margin: 8px; padding: 12px 24px }
+</style>
+</head>
+<body>
+<h1>Caça às Sílabas</h1>
+<p id="pergunta">Qual sílaba começa a palavra BOLA?</p>
+<button onclick="responder('BO')">BO</button>
+<button onclick="responder('LA')">LA</button>
+<script>
+function responder(silaba) {
+  if (silaba === 'BO') { alert('Acertou!') } else { alert('Tente de novo') }
+}
+function proximaPergunta() {
+  const perguntas = [`
+}
+
+// Each check: "alerta" is a real error (pink), "aviso" asks the teacher to check (purple)
+function conferir(bruto) {
+  bruto = bruto.normalize("NFC")
+  const achados = []
+  const add = (nivel, icone, titulo, texto, pedido) => achados.push({ nivel, icone, titulo, texto, pedido })
+
+  // HTML: the code is checked as code, and the rest only on the visible text
+  const ehHtml = /<!doctype html|<html[\s>]/i.test(bruto)
+  let texto = bruto
+  if (ehHtml) {
+    if (!/<\/html>\s*(```)?\s*$/i.test(bruto)) add("alerta", "glitch", "O código veio cortado", "O fim do código (&lt;/html&gt;) não chegou. Cortado, o jogo ou a página para no meio.", "O código veio cortado no fim. Mostre o código completo de novo, do começo ao fim, num bloco de código HTML, sem criar arquivo.")
+    const fora = (bruto.match(/<script[^>]+src=["']?https?:[^"'\s>]+|<link[^>]+href=["']?https?:[^"'\s>]+|<img[^>]+src=["']?https?:[^"'\s>]+|@import\s+url\(["']?https?:[^"')]+/gi) || [])
+      .filter(m => !/fonts\.(googleapis|gstatic)\.com/.test(m))
+    if (fora.length) add("alerta", "computador", "Puxa coisa da internet", `O código depende de ${fora.length === 1 ? "um arquivo" : fora.length + " arquivos"} de fora. Sem internet, ou se o endereço não existir, nada aparece.`, "Coloque tudo dentro do próprio arquivo, sem nada puxado da internet: o CSS e o JavaScript no mesmo HTML, e desenhos feitos com CSS ou SVG.")
+    if (/\balert\s*\(/.test(bruto)) add("alerta", "toque", "Janelinhas de alerta", "O alert abre uma janela do navegador que trava o jogo e não funciona na prévia do publicador.", "Troque todos os alert por mensagens na própria tela do jogo, com um botão para continuar.")
+    if (/gabarito/i.test(bruto) && !/(break-before|page-break-before)\s*:\s*(page|always)/i.test(bruto)) add("aviso", "atividade", "Gabarito na mesma folha", "Na impressão, o gabarito pode sair grudado nas questões.", "Faça o gabarito começar numa folha nova na impressão, com break-before: page.")
+    const doc = new DOMParser().parseFromString(bruto, "text/html")
+    doc.querySelectorAll("script, style, noscript").forEach(e => e.remove())
+    texto = (doc.body ? doc.body.textContent : "").replace(/[ \t]+/g, " ")
+  }
+  const n = semAcento(texto)
+  const linhas = texto.split(/\r?\n/)
+
+  // Questions, alternatives and the answer key. The key starts at a line that begins with "Gabarito" or "Respostas"
+  const limpa = l => l.replace(/\*\*|__/g, "").replace(/^\s*[-•>#]+\s*/, "").trim()
+  const inicioGab = linhas.findIndex(l => /^\W*(gabarito|respostas( certas| corretas)?|chave de respostas)\b/.test(semAcento(limpa(l))))
+  const questoes = {}
+  const respostas = {}
+  let atual = null
+  linhas.forEach((cru, i) => {
+    const l = limpa(cru)
+    if (!l) return
+    if (inicioGab >= 0 && i >= inicioGab) {
+      const varias = [...l.matchAll(/(\d{1,2})\s*[-–).:]\s*\(?([a-e])\b\)?/gi)]
+      if (varias.length >= 2) { for (const m of varias) respostas[m[1]] = m[2].toLowerCase(); return }
+      const num = l.match(/^(?:quest[aã]o\s*)?(\d{1,2})\b/i)
+      if (!num) return
+      const resto = l.slice(num[0].length)
+      const letra = resto.match(/(?:^|[\s:(\-–.])(?:letra\s+)?([a-e])(?=\)|\.|,|;|\s*$|\s+[-–—(]|\s*:)/i)
+      if (letra) respostas[num[1]] = letra[1].toLowerCase()
+      return
+    }
+    const alt = l.match(/^\(?([a-eA-E])\s*[).\-–]\s+(.+)/)
+    if (alt && atual) {
+      const marcada = /\((correta|certa|resposta (certa|correta))\)|[✅✔✓]/i.test(cru) || (/^\s*[-•]?\s*\*\*/.test(cru) && /\*\*\s*$/.test(cru))
+      questoes[atual].alts[alt[1].toLowerCase()] = { texto: alt[2].replace(/\((correta|certa|resposta (certa|correta))\)|[✅✔✓]/gi, "").trim(), marcada }
+      return
+    }
+    const resp = semAcento(l).match(/^(?:resposta( certa| correta)?|alternativa (certa|correta))\s*:\s*(?:letra\s+)?\(?([a-e])\b/)
+    if (resp && atual) { respostas[atual] = resp[3]; return }
+    const q = l.match(/^(?:quest[aã]o\s*)?(\d{1,2})\s*[).:\-–]\s+\S/i)
+    if (q) { atual = q[1]; questoes[atual] = questoes[atual] || { alts: {} } }
+  })
+  const comAlts = Object.keys(questoes).filter(k => Object.keys(questoes[k].alts).length >= 2)
+  const letras = Object.values(respostas)
+
+  if (comAlts.length >= 2 && !letras.length) add("alerta", "quiz", "Alternativas sem gabarito", `Há ${comAlts.length} questões com alternativas e nenhuma resposta certa indicada.`, "Escreva o gabarito no fim, em texto, com o número da questão e a letra certa, sem usar o teste interativo.")
+
+  if (letras.length >= 4) {
+    const conta = {}
+    for (const l of letras) conta[l] = (conta[l] || 0) + 1
+    const [mais, vezes] = Object.entries(conta).sort((a, b) => b[1] - a[1])[0]
+    if (vezes / letras.length >= 0.6) add("alerta", "quiz", vezes === letras.length ? `A certa é sempre a letra ${mais.toUpperCase()}` : `A certa é quase sempre a letra ${mais.toUpperCase()}`, `Em ${vezes} de ${letras.length} questões a resposta é a ${mais.toUpperCase()}. A turma descobre o padrão e acerta sem pensar.`, `No gabarito, a resposta certa ficou ${vezes === letras.length ? "sempre" : "quase sempre"} na letra ${mais.toUpperCase()}. Embaralhe as alternativas para a certa cair em letras diferentes e refaça o gabarito.`)
+  }
+
+  // The right answer is the longest one: the class learns to pick the longest
+  let medidas = 0, maiores = 0
+  for (const k of comAlts) {
+    const certa = respostas[k], alts = questoes[k].alts
+    if (!certa || !alts[certa] || Object.keys(alts).length < 3) continue
+    medidas++
+    const tam = alts[certa].texto.length
+    if (Object.entries(alts).every(([l, a]) => l === certa || a.texto.length < tam)) maiores++
+  }
+  if (medidas >= 3 && maiores / medidas >= 0.75) add("alerta", "lupa", "A certa é sempre a mais comprida", `Em ${maiores} de ${medidas} questões, a alternativa certa é a mais longa, muitas vezes porque traz a explicação junto.`, "Deixe as alternativas de cada questão com tamanhos parecidos: a certa não pode ser sempre a mais longa nem trazer a explicação junto. Ponha as explicações só no gabarito.")
+
+  const marcadas = comAlts.filter(k => Object.values(questoes[k].alts).filter(a => a.marcada).length === 1)
+  if (marcadas.length) add("alerta", "certo", "A resposta aparece marcada", `Em ${marcadas.length === 1 ? "uma questão" : marcadas.length + " questões"}, a alternativa certa vem marcada ou em negrito no meio das questões.`, "Tire a marcação da resposta certa das questões e deixe as respostas só no gabarito, no fim.")
+
+  // Simple arithmetic: a op b = c, and "x% de y = z"
+  const NUM = "\\d+(?:[.,]\\d+)*"
+  const valor = s => /^\d{1,3}(\.\d{3})+(,\d+)?$/.test(s) ? Number(s.replace(/\./g, "").replace(",", ".")) : Number(s.replace(",", "."))
+  const casas = s => { const m = s.match(/[.,](\d+)$/); return m && !/^\d{1,3}(\.\d{3})+$/.test(s) ? m[1].length : 0 }
+  const confere = (calc, dado) => Math.abs(calc - valor(dado)) <= 0.5 * Math.pow(10, -casas(dado)) + 1e-9
+  const erradas = []
+  let contas = 0
+  for (const m of texto.matchAll(new RegExp(`(${NUM})[ \\t]*([+\\-−x×*·÷:])[ \\t]*(${NUM})[ \\t]*=[ \\t]*(${NUM})`, "g"))) {
+    const antes = texto.slice(Math.max(0, m.index - 3), m.index)
+    const depois = texto.slice(m.index + m[0].length, m.index + m[0].length + 3)
+    // Part of a longer expression, a fraction, a power or a date: skipped
+    if (/([+\-−×*·÷\/^]|\bx)[ \t]*$|[A-Za-z\d][.,]?$/.test(antes) || /^[ \t]*[\/+\-−x×*·÷^²³\d]/.test(depois) || /^[.,]\d/.test(depois)) continue
+    if (m[2] === ":" && /\d:\d/.test(m[0])) continue
+    const a = valor(m[1]), b = valor(m[3])
+    const op = m[2]
+    const calc = op === "+" ? a + b : /[-−]/.test(op) ? a - b : /[x×*·]/.test(op) ? a * b : b ? a / b : NaN
+    if (!isFinite(calc)) continue
+    contas++
+    if (!confere(calc, m[4])) erradas.push({ texto: m[0].trim(), certo: calc })
+  }
+  for (const m of texto.matchAll(new RegExp(`(${NUM})[ \\t]*%[ \\t]*de[ \\t]*(${NUM})[ \\t]*(?:=|é|são|dá)[ \\t]*(${NUM})`, "gi"))) {
+    const calc = valor(m[1]) * valor(m[2]) / 100
+    contas++
+    if (!confere(calc, m[3])) erradas.push({ texto: m[0].trim(), certo: calc })
+  }
+  if (erradas.length) add("alerta", "errado", erradas.length === 1 ? "Uma conta errada" : `${erradas.length} contas erradas`, `Confira: ${erradas.map(e => `<code>${escapar(e.texto)}</code> (dá ${numeroBr(e.certo)})`).join(", ")}.`, `Há ${erradas.length === 1 ? "uma conta errada" : "contas erradas"}: ${erradas.map(e => `${e.texto} (o certo é ${numeroBr(e.certo)})`).join("; ")}. Corrija no material e no gabarito, e confira as outras contas também.`)
+
+  if (/\\(frac|times|div|cdot|sqrt|text|left|right|dfrac)\b|\$\$|\\\(|\\\[/.test(texto)) add("alerta", "nota", "Fórmulas em código", "Apareceu LaTeX, como \\frac{1}{2}: na folha, a fração sai como código e não como fração.", "Escreva as contas e frações em texto simples, como 1/2 e 3 x 4, sem LaTeX.")
+
+  if (/(vamos (checar|conferir|verificar|revisar)|na verdade,? (a|o) (resposta|certa|certo|alternativa)|resposta correta real|deixe-me (corrigir|refazer|recalcular)|espera,|ops,|correcao:|recalculando)/.test(n)) add("alerta", "revisar", "A IA se corrigiu no meio do texto", "Ficou na resposta a conferência que a IA fez sozinha, como “na verdade, a resposta certa é…”. Na folha da turma, isso confunde.", "Refaça o material já corrigido, sem as suas conferências e correções no meio do texto.")
+
+  const caixas = (texto.match(/[─│┌┐└┘├┤┬┴┼═║╔╗╚╝█▓▒░▄▀]/g) || []).length
+  const arte = linhas.filter(l => /^[\s|\/\\_()o.'`^~=*-]{6,}$/.test(l) && /[\/\\]/.test(l)).length
+  if (caixas >= 6 || arte >= 3) add("alerta", "explosao", "Desenho feito com caracteres", "A IA tentou desenhar com letras e traços. Na folha, vira um amontoado de símbolos.", "Não desenhe com caracteres. Onde houver imagem, escreva entre parênteses o que desenhar, como (desenho de uma maçã).")
+
+  const palavras = n.match(/[a-z']+/g) || []
+  const INGLES = new Set(["the", "and", "with", "your", "you", "this", "that", "are", "is", "of", "for", "what", "which", "here", "let's", "answer", "answers", "question", "questions", "correct", "key", "students", "student", "will", "from", "have", "they", "their", "each", "should", "can", "click", "start", "score", "next", "play", "game"])
+  const emIngles = palavras.filter(p => INGLES.has(p)).length
+  if ((emIngles >= 6 && emIngles / palavras.length >= 0.04) || /^\W*(here is|here's|answer key|note:|instructions|let's)\b/m.test(n)) add("alerta", "livros", "Pedaços em inglês", "Parte da resposta saiu em inglês: títulos, instruções ou botões.", "Reescreva tudo em português do Brasil, inclusive os títulos, as instruções e os botões.")
+
+  const emojis = (texto.match(/\p{Extended_Pictographic}/gu) || []).filter(e => !/[©®™]/.test(e) && !(marcadas.length && /[✅✔]/.test(e))).length
+  if (emojis) add(ehHtml ? "aviso" : "alerta", "atividade", emojis === 1 ? "Um emoji" : `${emojis} emojis`, ehHtml ? "No jogo, emoji pode aparecer diferente em cada aparelho. Na folha impressa, sai estranho ou some." : "Na impressão, os emojis saem estranhos, em preto e branco, ou somem.", ehHtml ? "Troque os emojis por desenhos feitos com CSS ou SVG, que aparecem iguais em qualquer aparelho." : "Tire todos os emojis: o material é para imprimir.")
+
+  const bncc = [...new Set(texto.match(/\b(EF|EM|EI)\d{2}[A-Z]{2,3}\d{2,3}\b/g) || [])]
+  if (bncc.length) add("aviso", "plano", "Código da BNCC", `A IA costuma inventar códigos de habilidade. Confira ${bncc.map(c => `<code>${c}</code>`).join(", ")} em basenacionalcomum.mec.gov.br antes de usar.`, "Tire os códigos de habilidades da BNCC do material: eu confiro na base oficial e escrevo depois.")
+
+  const links = [...new Set(texto.match(/https?:\/\/[^\s)<>"'\]]+/g) || [])]
+  if (links.length) add("aviso", "chave", links.length === 1 ? "Um link" : `${links.length} links`, `A IA às vezes inventa endereços. Abra antes de passar para a turma: ${links.slice(0, 4).map(l => `<code>${escapar(l)}</code>`).join(", ")}${links.length > 4 ? "…" : ""}.`, "Tire os links que você não tem certeza de que existem e diga, no lugar, onde procurar o assunto.")
+
+  if (!ehHtml && Object.keys(questoes).length >= 3 && !/(objetivo|ao final|vai aprender|vao aprender|devem aprender|sera capaz|serao capazes)/.test(n)) add("aviso", "estrela", "Sem objetivo escrito", "A folha não diz o que a turma deve aprender. Com o objetivo no topo, fica mais fácil conferir se as questões servem.", "Escreva no começo, em uma frase, o que a turma deve aprender com este material.")
+
+  const palavrasTotal = texto.trim() ? texto.trim().split(/\s+/).length : 0
+  return { achados, ehHtml, contas, questoes: Object.keys(questoes).length, respostas: letras.length, palavras: palavrasTotal }
+}
+
+function pedidoDe(r) {
+  if (!r.achados.length) return ""
+  const itens = r.achados.map((a, i) => `${i + 1}. ${a.pedido}`).join("\n")
+  const fim = r.ehHtml ? "Depois, mostre o código completo de novo, num bloco de código HTML, sem criar arquivo." : "Depois, mande o material completo de novo, já corrigido, sem comentar as mudanças no meio do texto."
+  return `Revise o material que você me enviou e faça ${r.achados.length === 1 ? "esta correção" : "estas correções"}:\n${itens}\n${fim}`
+}
+
+const ESTRELA = Icones.svg("estrela")
+$("guarda").innerHTML = Icones.svg("quero-quero")
+let estrelasAntes = -1, falaDepois, htmlAtual = ""
+
+function mostrar() {
+  const bruto = $("texto").value
+  if (!bruto.trim()) {
+    $("estrelas").innerHTML = ESTRELA.repeat(3).replace(/<svg/g, '<svg class="apagada"')
+    $("estrelas").setAttribute("aria-label", "0 de 3 estrelas")
+    $("veredito").textContent = "Cole a resposta da IA ou toque num exemplo."
+    $("conferido").textContent = ""
+    $("visto").hidden = true
+    $("cuidados").innerHTML = ""
+    $("pedido").innerHTML = '<span class="vazio">O pedido de conserto aparece aqui.</span>'
+    $("copiar").disabled = true
+    $("previa-card").hidden = true
+    htmlAtual = ""
+    estrelasAntes = -1
+    return
+  }
+  const r = conferir(bruto)
+  const alertas = r.achados.filter(a => a.nivel === "alerta").length
+  const avisos = r.achados.length - alertas
+  const estrelas = alertas === 0 ? (avisos ? 2 : 3) : alertas <= 2 ? 1 : 0
+  $("estrelas").innerHTML = [0, 1, 2].map(i => i < estrelas ? ESTRELA : ESTRELA.replace("<svg", '<svg class="apagada"')).join("")
+  $("estrelas").setAttribute("aria-label", `${estrelas} de 3 estrelas`)
+  const veredito = r.palavras < 20 && !r.ehHtml ? "Parece só um pedaço. Cole a resposta inteira, do título ao gabarito."
+    : estrelas === 3 ? "Nada dos erros comuns. Agora é a sua leitura."
+    : estrelas === 2 ? "Sem erro à vista, mas há o que conferir."
+    : estrelas === 1 ? "Há o que consertar antes de usar com a turma."
+    : "Muita coisa para consertar. Mande o pedido abaixo."
+  $("veredito").textContent = veredito
+  $("visto").hidden = estrelas < 3 || r.palavras < 20
+  const partes = []
+  if (r.contas) partes.push(`${r.contas} ${r.contas === 1 ? "conta" : "contas"}`)
+  if (r.questoes) partes.push(`${r.questoes} ${r.questoes === 1 ? "questão" : "questões"}`)
+  if (r.respostas) partes.push(`${r.respostas} ${r.respostas === 1 ? "resposta" : "respostas"} do gabarito`)
+  if (r.ehHtml) partes.push("o código HTML")
+  $("conferido").textContent = partes.length ? `Conferi ${partes.join(", ").replace(/, ([^,]*)$/, " e $1")}.` : ""
+  $("cuidados").innerHTML = r.achados.map(a => `<li class="${a.nivel === "alerta" ? "alerta" : ""}">${Icones.svg(a.icone)}<div><b>${a.titulo}</b><span>${a.texto} Peça: <q>${escapar(a.pedido)}</q></span></div></li>`).join("")
+    || `<li class="ok">${Icones.svg("certo")}<div><b>Nenhum erro comum</b><span>Leia com calma mesmo assim: a conferência não sabe se o conteúdo serve para a sua turma.</span></div></li>`
+  const pedido = pedidoDe(r)
+  if (pedido) $("pedido").textContent = pedido
+  else $("pedido").innerHTML = '<span class="vazio">Sem pedido de conserto: nada dos erros comuns.</span>'
+  $("copiar").disabled = !pedido
+  // HTML preview, isolated from the site (sandbox without allow-same-origin)
+  $("previa-card").hidden = !r.ehHtml
+  if (r.ehHtml && bruto !== htmlAtual) {
+    htmlAtual = bruto
+    $("previa").srcdoc = bruto
+    $("publicar").hidden = !/<script/i.test(bruto)
+  }
+  if (estrelas !== estrelasAntes && window.Bit && Bit.diz) {
+    clearTimeout(falaDepois)
+    const pose = estrelas === 3 ? "comemorando" : estrelas === 0 ? "ops" : estrelas === 1 ? "pensando" : "feliz"
+    falaDepois = setTimeout(() => Bit.diz(pose, veredito), 700)
+  }
+  estrelasAntes = estrelas
+}
+
+let espera
+$("texto").addEventListener("input", () => { clearTimeout(espera); espera = setTimeout(mostrar, 250) })
+document.querySelectorAll("[data-exemplo]").forEach(b => b.addEventListener("click", () => {
+  $("texto").value = EXEMPLOS[b.dataset.exemplo]
+  mostrar()
+  $("resultado").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" })
+}))
+$("copiar").addEventListener("click", async () => {
+  const ok = await Copiar.texto($("pedido").textContent, { avisar: false })
+  $("copiado").textContent = ok ? "Copiado! Cole na conversa com a IA." : ""
+  setTimeout(() => { $("copiado").textContent = "" }, 4000)
+})
+$("baixar").addEventListener("click", () => {
+  const titulo = (htmlAtual.match(/<title>([^<]*)<\/title>/i) || [])[1] || "material"
+  const nome = semAcento(titulo).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "material"
+  const url = URL.createObjectURL(new Blob([htmlAtual], { type: "text/html;charset=utf-8" }))
+  const a = Object.assign(document.createElement("a"), { href: url, download: nome + ".html" })
+  document.body.append(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+})
+mostrar()
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+</body>
+</html>
