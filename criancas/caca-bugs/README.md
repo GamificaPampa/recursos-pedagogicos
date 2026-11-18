@@ -4,7 +4,7 @@ Em 30 segundos, a criança toca nos insetos que aparecem na tela do celular para
 
 | Campo        | Valor                                                                                                                    |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Público      | Sem idade definida |
+| Público      | A partir de 6 anos |
 | Projeto      | Curso de Engenharia de Software da UNIPAMPA, Campus Alegrete                                                             |
 | O que ensina | Testes e depuração: quem cria software passa muito tempo testando para achar os bugs antes de quem usa o app             |
 | Como usar    | Celular. Na sala, projete o [estande.html](estande.html), que mostra o QR code para a turma entrar e o placar ao vivo |

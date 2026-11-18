@@ -4,7 +4,7 @@ Cinco desafios rápidos para sentir como é pensar como quem cria software: mont
 
 | Campo        | Valor                                                                                                                        |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| Público      | Sem idade definida: foi a primeira versão dos jogos                                                      |
+| Público      | A partir de 8 anos                                                                                       |
 | Projeto      | Curso de Engenharia de Software da UNIPAMPA, Campus Alegrete                                                                 |
 | O que ensina | Algoritmo, depuração e laços de repetição                                                                                    |
 | Como usar    | Celular, em cerca de 2 minutos. Na sala, projete o [estande.html](estande.html), que mostra o QR code para a turma entrar |
