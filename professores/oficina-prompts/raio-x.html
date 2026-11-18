@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raio-X do prompt · Oficina de Prompts</title>
+<meta name="description" content="Cole um prompt e veja na hora se ele tem Papel, Tarefa, Contexto e Formato, se tem dado de estudante e o que falta pedir. Sai com o prompt melhorado para o ChatGPT. Nada é enviado: tudo acontece no seu aparelho.">
+<meta name="theme-color" content="#5fbcff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<link rel="stylesheet" href="/identidade-visual/css/carimbo.css">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { background: var(--sky2) }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.45 }
+  a { color: var(--ink); font-weight: 600 }
+  button, textarea { font: inherit; color: inherit }
+  button { cursor: pointer }
+  .page { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 14px 0 26px }
+  header .lente { width: clamp(80px, 20vw, 110px); flex: none; animation: boia 3s ease-in-out infinite }
+  @keyframes boia { 50% { transform: translateY(-8px) rotate(-4deg) } }
+  h1 { margin: 0; font-size: clamp(40px, 9vw, 66px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  h1 .y { color: var(--yellow) } h1 .p { color: var(--pink) }
+  header p { max-width: 680px; margin: 10px 0 0; font-size: 19px; font-weight: 600 }
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 24px; line-height: 1.15 }
+  h2 .n { display: grid; place-items: center; width: 36px; height: 36px; flex: none; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 20px }
+
+  .card { margin-bottom: 24px; padding: 20px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .regra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; background: #fff1a8 }
+  .regra svg { width: 58px; height: 58px; flex: none }
+  .regra p { flex: 1 1 300px; margin: 0; font-weight: 600 }
+
+  label { display: grid; gap: 4px; font-weight: 700 }
+  label small { font-weight: 500; color: var(--soft) }
+  textarea { width: 100%; min-height: 150px; padding: 12px 14px; background: #fff; border: 3px solid var(--ink); border-radius: 16px; font-weight: 500; resize: vertical }
+  textarea:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .exemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px }
+  .exemplos span { font-weight: 700 }
+  .local { margin: 12px 0 0; font-size: 15px; font-weight: 600; color: var(--soft) }
+
+  /* The verdict: stars, the stamp and what Bit thinks */
+  .placar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 16px }
+  .estrelas { display: flex; gap: 4px }
+  .estrelas svg { width: 42px; height: 42px; transition: transform .3s var(--bounce, ease), opacity .3s }
+  .estrelas svg.apagada { opacity: .22; filter: grayscale(1); transform: scale(.85) }
+  .veredito { flex: 1 1 260px; margin: 0; font-size: 19px; font-weight: 700 }
+  .placar .carimbo { --giro: -8deg }
+  .placar .carimbo[hidden] { display: none }
+
+  /* The four pieces, with what was found or the line that is missing */
+  .pecas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 14px }
+  .peca { padding: 12px 14px 14px; background: #f4f2f8; border: 3px solid var(--ink); border-radius: 18px }
+  .peca.ok { background: var(--light) }
+  .peca strong { display: flex; align-items: center; gap: 8px; font-size: 20px }
+  .peca strong i { display: grid; place-items: center; width: 32px; height: 32px; flex: none; background: var(--c); color: #fff; border: 3px solid var(--ink); border-radius: 9px; font-style: normal; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill }
+  .peca strong em { margin-left: auto; padding: 0 10px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-style: normal }
+  .peca p { margin: 8px 0 0; font-size: 16px; font-weight: 500 }
+  .peca mark { padding: 0 4px; background: #fff; border-radius: 6px; font-weight: 700; color: var(--ink) }
+
+  .cuidados { display: grid; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none }
+  .cuidados li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; background: #f4f1ff; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600 }
+  .cuidados li.alerta { background: #ffd6e3 }
+  .cuidados li svg { width: 30px; height: 30px; flex: none }
+  .cuidados li b { display: block }
+  .cuidados li span { font-weight: 500 }
+  .cuidados li q { font-weight: 700 }
+
+  .prompt { margin: 0 0 14px; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 18px; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600 }
+  .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px }
+  .btn svg { width: 22px; height: 22px }
+  .copiado { font-weight: 700; color: #17694a }
+  .vazio { margin: 0; font-weight: 600; color: var(--soft) }
+  .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
+  footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
+  @media print { .page { max-width: none } .exemplos, .mais, .linha, .regra svg { display: none } .card { box-shadow: none; break-inside: avoid } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 8%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -30s"></span>
+  <span class="simbolo" style="left: 4%; top: 40%">P T</span>
+  <span class="simbolo" style="right: 5%; top: 18%; --d: -3s">C F</span>
+  <span class="morros" style="--altura: 13vh"></span>
+</div>
+
+<div class="page">
+  <header data-bit-pose="acenando" data-bit-dica="Cole um prompt seu, de um colega ou da internet. Eu mostro o que tem e o que falta, antes de você gastar uma conversa com a IA.">
+    <svg class="lente" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="8" width="38" height="46" rx="6" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M13 20h20M13 29h24M13 38h14" stroke="#8c73ff" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="36" r="13" fill="#cdeeff" fill-opacity=".85" stroke="#2f2a4a" stroke-width="4"/><path d="M47 45l11 11" stroke="#2f2a4a" stroke-width="7" stroke-linecap="round"/></svg>
+    <div>
+      <h1><span class="y">Raio-X</span> do <span class="p">prompt</span></h1>
+      <p>Cole um prompt e veja na hora se ele tem Papel, Tarefa, Contexto e Formato, o que falta pedir e o que pode dar errado. Você sai com o prompt melhorado, pronto para o ChatGPT.</p>
+    </div>
+  </header>
+
+  <section class="card regra" data-bit-pose="ops" data-bit-dica="O quero-quero guarda os dados dos alunos: nome, laudo e turma não entram no prompt.">
+    <span id="guarda" aria-hidden="true"></span>
+    <p><b>O prompt fica só no seu aparelho.</b> O Raio-X lê o texto aqui mesmo, sem enviar para ninguém e sem guardar. Mesmo assim, nada de nome, laudo ou outro dado de estudante: se aparecer, o quero-quero avisa.</p>
+  </section>
+
+  <section class="card" data-bit-pose="pensando" data-bit-dica="Experimente os exemplos para ver o Raio-X funcionando. Depois cole o seu.">
+    <h2><span class="n">1</span>Cole o prompt</h2>
+    <label for="texto">O prompt<small>o que você mandaria para o ChatGPT ou o Gemini</small><textarea id="texto" placeholder="Faça uma atividade sobre frações."></textarea></label>
+    <div class="exemplos">
+      <span id="rotulo-exemplos">Ou experimente:</span>
+      <button class="btn btn--small" type="button" data-exemplo="curto" aria-describedby="rotulo-exemplos">Prompt de uma linha</button>
+      <button class="btn btn--small" type="button" data-exemplo="jogo" aria-describedby="rotulo-exemplos">Pedido de jogo</button>
+      <button class="btn btn--small" type="button" data-exemplo="dado" aria-describedby="rotulo-exemplos">Com dado de estudante</button>
+      <button class="btn btn--small" type="button" data-exemplo="completo" aria-describedby="rotulo-exemplos">Prompt completo</button>
+    </div>
+  </section>
+
+  <section class="card" id="resultado" data-bit-dica="Cada peça que falta é uma coisa que a IA vai adivinhar. Quanto menos ela adivinha, mais o material serve para a sua turma.">
+    <h2><span class="n">2</span>O que o Raio-X viu</h2>
+    <div class="placar">
+      <div class="estrelas" id="estrelas" role="img" aria-label="0 de 3 estrelas"></div>
+      <p class="veredito" id="veredito" role="status" aria-live="polite"></p>
+      <span class="carimbo" id="visto" hidden>Visto</span>
+    </div>
+    <div class="pecas" id="pecas"></div>
+    <ul class="cuidados" id="cuidados" aria-label="Cuidados"></ul>
+  </section>
+
+  <section class="card" data-bit-pose="feliz" data-bit-dica="Troque o que está entre colchetes pelo que vale para a sua turma e apague o que não precisar.">
+    <h2><span class="n">3</span>O prompt melhorado</h2>
+    <p class="prompt" id="melhor"></p>
+    <div class="linha">
+      <button class="btn btn--jogar" type="button" id="copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o prompt</button>
+      <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir o ChatGPT</a>
+      <span class="copiado" id="copiado" role="status"></span>
+    </div>
+  </section>
+
+  <div class="mais">
+    <a class="btn btn--conhecer" href="/maquina/">Máquina de prompts</a>
+    <a class="btn" href="frases.html">Frases que salvam</a>
+    <a class="btn" href="guia.html">Guia do professor</a>
+  </div>
+</div>
+
+<footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
+
+<script src="/identidade-visual/js/copiar.js"></script>
+<script src="/identidade-visual/js/icones.js"></script>
+<script>
+// Everything runs here, on the device: the text is never sent nor stored
+const $ = id => document.getElementById(id)
+const semAcento = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+const escapar = s => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`)
+
+const EXEMPLOS = {
+  curto: "Faça uma atividade sobre frações.",
+  jogo: "Crie um jogo de perguntas sobre os animais do Pampa para o 3º ano, com 3 fases e estrelas no final.",
+  dado: "Crie uma atividade de leitura para o aluno Fulano, do 4º ano, que tem dislexia e não gosta de ler.",
+  completo: "Você é professor(a) de Educação Infantil. Escreva uma história curta sobre um quero-quero que perde o ninho, para crianças de 4 anos que ainda não leem. Vou ler em voz alta na roda. Até 6 parágrafos curtos e 3 perguntas para conversar no fim. Sem emojis. Responda sempre em português do Brasil."
+}
+
+// The four pieces of the method. Each test runs on the text without accents; "falta" is the line the improved prompt gets
+const PECAS = [
+  { id: "papel", letra: "P", nome: "Papel", c: "#4da3ff", light: "#cfe6ff",
+    teste: /\b(voce e|voce sera|voce atua|aja como|atue como|seja (um|uma)|faca o papel|assuma o papel|no papel de)\b[^.!?\n]*/,
+    dica: "Quem a IA deve ser. Sem papel, ela responde como qualquer um.",
+    falta: "Você é professor(a) de [matéria] do [ano]." },
+  { id: "tarefa", letra: "T", nome: "Tarefa", c: "#4fd6a6", light: "#c9f5e3",
+    teste: /\b(crie|criar|elabore|elaborar|faca|fazer|monte|montar|escreva|escrever|prepare|preparar|gere|gerar|produza|sugira|liste|adapte|adaptar|revise|corrija|explique|resuma|planeje|invente|desenvolva|organize|transforme|proponha|construa|redija|formule|reescreva|traduza|quero|preciso|gostaria|me ajude)\b[^.!?\n]*/,
+    dica: "O que ela deve fazer, com um verbo: crie, escreva, adapte, revise.",
+    falta: "Crie [o que você quer] sobre [o tema]." },
+  { id: "contexto", letra: "C", nome: "Contexto", c: "#ffd23f", light: "#fff1a8",
+    teste: /(\b\d{1,2} ?(º|°|o|a|ª)? ?ano\b|\banos (iniciais|finais)|ensino (fundamental|medio)|educacao infantil|\beja\b|pre-?escola|creche|maternal|\b\d{1,2} (a|e) \d{1,2} anos|\b\d{1,2} anos\b|\bserie\b|\benem\b)[^.!?\n]*/,
+    dica: "Para quem é: o ano ou a idade da turma, e o que ela já sabe.",
+    falta: "A turma é do [ano ou idade] e já sabe [o que já estudaram]." },
+  { id: "formato", letra: "F", nome: "Formato", c: "#ff8a3d", light: "#ffdcc4",
+    teste: /(\btabela|\blista\b|\btopicos|\bparagrafos?\b|bloco de codigo|\bhtml\b|\bslides?\b|gabarito|\b\d+ (questoes|perguntas|exercicios|itens|paragrafos|linhas|palavras|fases|cartas|slides|atividades|alternativas|niveis|rodadas|estrofes|versos|frases|dicas|passos|etapas|aulas|cenas|personagens|minutos)|\bate \d+|no maximo|uma folha|uma pagina|multipla escolha|verdadeiro ou falso|passo a passo|com (imagens|figuras|desenhos)|botoes grandes|estrelas no final)[^.!?\n]*/,
+    dica: "Como o resultado deve sair: quantas questões, lista ou tabela, com gabarito, para imprimir.",
+    falta: "Entregue em [lista, tabela ou folha para imprimir], com [quantos] [itens]." },
+]
+// What tends to go wrong with the AI, from the tests of the workshop (the same sentences as Frases que salvam)
+const CUIDADOS = [
+  { id: "jogo", icone: "jogo", quando: n => /\b(jogo|game|joguinho)\b/.test(n) && !/bloco de codigo/.test(n) && !/(imprimir|tabuleiro|recortar)/.test(n),
+    titulo: "Pedido de jogo", texto: "No ChatGPT gratuito, o jogo como arquivo gasta a cota do dia e pode não chegar.", frase: "Mostre o código completo num bloco de código HTML, sem criar arquivo." },
+  { id: "imprimir", icone: "atividade", quando: n => /(imprimir|impress|\bfolha\b|xerox|\bprova\b)/.test(n) && !/emoji/.test(n),
+    titulo: "Vai imprimir", texto: "A IA enche a folha de emojis, que saem estranhos na impressão.", frase: "Sem emojis." },
+  { id: "gabarito", icone: "quiz", quando: n => /(questoes|perguntas(?! para (conversar|discutir|a roda))|exercicios|\bprova\b|\bquiz\b|avaliacao|simulado|multipla escolha)/.test(n) && !/(gabarito|respostas? (certa|correta))/.test(n) && !/\bjogo\b/.test(n),
+    titulo: "Perguntas sem gabarito", texto: "Sem pedir, o gabarito pode não vir, ou vir num teste interativo que não dá para imprimir.", frase: "Escreva as perguntas e o gabarito em texto, sem usar o teste interativo." },
+  { id: "bncc", icone: "plano", quando: n => /bncc/.test(n) && !/(nao|sem) (cite|citar|invente|inventar)[^.]*bncc/.test(n),
+    titulo: "BNCC", texto: "A IA costuma inventar códigos de habilidade. Se precisar do código, procure em basenacionalcomum.mec.gov.br.", frase: "Não cite códigos de habilidades da BNCC." },
+  { id: "portugues", icone: "livros", quando: n => n.split(/\s+/).length >= 8 && !/portugues/.test(n),
+    titulo: "Idioma", texto: "Às vezes a resposta, ou um pedaço dela, sai em inglês.", frase: "Responda sempre em português do Brasil." },
+]
+// A name right after aluno, estudante, criança... (capitalized, so TEA or TDAH do not count), CID codes and CPF numbers
+const DADO = /\b(alun[oa]s?|estudantes?|crian[çc]as?|menin[oa]s?|meu filho|minha filha)[ \t]+(chamad[oa][ \t]+|de nome[ \t]+)?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]{2,})/g
+const NAO_NOME = new Set(["Educação", "Ensino", "Infantil", "Fundamental", "Médio", "Especial", "Libras", "Matemática", "Português", "Ciências", "História", "Geografia", "Artes", "Inglês", "Física", "Química", "Biologia", "Filosofia", "Sociologia",
+  "Surdo", "Surda", "Surdos", "Surdas", "Cego", "Cega", "Cegos", "Cegas", "Autista", "Autistas", "Indígena", "Indígenas", "Quilombola", "Quilombolas", "Que", "Com", "Sem", "Para", "Dos", "Das"])
+const OUTROS_DADOS = [/\bCID[\s:-]*[A-Z]\d{2}(\.\d)?/gi, /\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/g]
+
+function analisar(texto) {
+  // Positions in n match the original text (NFC in, accents out, same length). The quero-quero is a bird,
+  // not "quero" (I want), so it is blanked out with the same length
+  texto = texto.normalize("NFC")
+  const n = semAcento(texto).replace(/quero-quero/g, m => "_".repeat(m.length))
+  const palavras = texto.trim() ? texto.trim().split(/\s+/).length : 0
+  const pecas = PECAS.map(p => {
+    const achou = n.match(p.teste)
+    if (!achou) return { ...p, ok: false }
+    // Shows the excerpt from the original text, with accents, at the same position
+    const trecho = texto.slice(achou.index, achou.index + Math.min(achou[0].length, 70)).trim()
+    return { ...p, ok: true, trecho: trecho + (achou[0].length > 70 ? "…" : "") }
+  })
+  // Each piece of student data and what replaces it in the improved prompt: the name goes, "aluno" stays
+  const dados = []
+  for (const m of texto.matchAll(DADO)) if (!NAO_NOME.has(m[3])) dados.push({ texto: m[0], troca: m[1] })
+  for (const r of OUTROS_DADOS) for (const m of texto.matchAll(r)) dados.push({ texto: m[0], troca: "[sem dado do estudante]" })
+  const cuidados = CUIDADOS.filter(c => c.quando(n))
+  const pedidos = (n.match(/\b(crie|elabore|faca|monte|escreva|prepare|gere|produza|sugira|liste|adapte|revise|corrija|explique|resuma|planeje|invente|desenvolva|organize|transforme|proponha|construa|redija|reescreva|traduza)\b/g) || []).length
+  const certas = pecas.filter(p => p.ok).length
+  const estrelas = dados.length ? 0 : [0, 0, 1, 2, 3][certas]
+  // "Sou professora do 2º ano" tells who the teacher is, not who the AI should be
+  const souProfessor = /\bsou (professor|professora)\b/.test(n)
+  return { palavras, pecas, dados, cuidados, pedidos, certas, estrelas, souProfessor }
+}
+
+function melhorar(texto, r) {
+  let base = texto.trim()
+  // The student's data comes out of the improved prompt; the original stays in the box for the teacher to fix
+  for (const d of r.dados) base = base.split(d.texto).join(d.troca)
+  const linhas = []
+  const papel = r.pecas.find(p => p.id === "papel")
+  for (const p of r.pecas) if (!p.ok && p.id !== "papel") linhas.push(p.falta)
+  for (const c of r.cuidados) linhas.push(c.frase)
+  return (papel.ok ? "" : papel.falta + "\n") + base + (linhas.length ? "\n\n" + linhas.join("\n") : "")
+}
+
+const ESTRELA = Icones.svg("estrela")
+$("guarda").innerHTML = Icones.svg("quero-quero")
+let estrelasAntes = -1, falaDepois
+function mostrar() {
+  const texto = $("texto").value
+  if (!texto.trim()) {
+    $("estrelas").innerHTML = ESTRELA.repeat(3).replace(/<svg/g, '<svg class="apagada"')
+    $("estrelas").setAttribute("aria-label", "0 de 3 estrelas")
+    $("veredito").textContent = "Cole um prompt ou toque num exemplo."
+    $("visto").hidden = true
+    $("pecas").innerHTML = PECAS.map(p => `<div class="peca" style="--c: ${p.c}; --light: ${p.light}"><strong><i>${p.letra}</i>${p.nome}</strong><p>${p.dica}</p></div>`).join("")
+    $("cuidados").innerHTML = ""
+    $("melhor").innerHTML = '<span class="vazio">O prompt melhorado aparece aqui.</span>'
+    $("copiar").disabled = true
+    estrelasAntes = -1
+    return
+  }
+  const r = analisar(texto)
+  $("estrelas").innerHTML = [0, 1, 2].map(i => i < r.estrelas ? ESTRELA : ESTRELA.replace("<svg", '<svg class="apagada"')).join("")
+  $("estrelas").setAttribute("aria-label", `${r.estrelas} de 3 estrelas`)
+  const veredito = r.dados.length ? "Antes de tudo, tire o dado do estudante."
+    : r.certas === 4 ? "Prompt completo: a IA tem tudo o que precisa."
+    : r.certas === 3 ? "Quase lá: falta uma peça."
+    : r.certas === 2 ? "Metade do caminho: a IA ainda vai adivinhar bastante."
+    : "A IA vai adivinhar quase tudo. Comece pelas peças que faltam."
+  $("veredito").textContent = veredito
+  $("visto").hidden = r.estrelas < 3
+  const dicaDe = p => p.id === "papel" && r.souProfessor ? "Você contou quem você é. Diga também quem a IA deve ser." : p.dica
+  $("pecas").innerHTML = r.pecas.map(p => `<div class="peca${p.ok ? " ok" : ""}" style="--c: ${p.c}; --light: ${p.light}"><strong><i>${p.letra}</i>${p.nome}<em>${p.ok ? "tem" : "falta"}</em></strong><p>${p.ok ? `Achei: <mark>${escapar(p.trecho)}</mark>` : `${dicaDe(p)} Exemplo: <mark>${escapar(p.falta)}</mark>`}</p></div>`).join("")
+  const itens = []
+  if (r.dados.length) itens.push(`<li class="alerta">${Icones.svg("quero-quero")}<div><b>Dado de estudante</b><span>Tire do prompt: ${r.dados.map(d => `<q>${escapar(d.texto)}</q>`).join(", ")}. Descreva a necessidade, como “um estudante de 9 anos que lê frases curtas”. No prompt melhorado, ele já saiu.</span></div></li>`)
+  if (r.palavras < 12) itens.push(`<li>${Icones.svg("relogio")}<div><b>Curto demais</b><span>Com ${r.palavras} ${r.palavras === 1 ? "palavra" : "palavras"}, a IA preenche o resto do jeito dela. Conte para quem é e como quer receber.</span></div></li>`)
+  if (r.pedidos >= 4) itens.push(`<li>${Icones.svg("sequencia")}<div><b>Muitos pedidos de uma vez</b><span>Com ${r.pedidos} pedidos no mesmo prompt, a IA costuma esquecer algum. Peça uma coisa por vez e mande o resto depois.</span></div></li>`)
+  for (const c of r.cuidados) itens.push(`<li>${Icones.svg(c.icone)}<div><b>${c.titulo}</b><span>${c.texto} Peça: <q>${c.frase}</q></span></div></li>`)
+  $("cuidados").innerHTML = itens.join("")
+  $("melhor").textContent = melhorar(texto, r)
+  $("copiar").disabled = false
+  // Bit comments only when the stars change, after the teacher stops typing
+  if (r.estrelas !== estrelasAntes && window.Bit && Bit.diz) {
+    clearTimeout(falaDepois)
+    const pose = r.dados.length ? "ops" : r.estrelas === 3 ? "comemorando" : r.estrelas === 0 ? "pensando" : "feliz"
+    falaDepois = setTimeout(() => Bit.diz(pose, veredito), 700)
+  }
+  estrelasAntes = r.estrelas
+}
+
+$("texto").addEventListener("input", mostrar)
+document.querySelectorAll("[data-exemplo]").forEach(b => b.addEventListener("click", () => {
+  $("texto").value = EXEMPLOS[b.dataset.exemplo]
+  mostrar()
+  $("resultado").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" })
+}))
+$("copiar").addEventListener("click", async () => {
+  const ok = await Copiar.texto($("melhor").textContent, { avisar: false })
+  $("copiado").textContent = ok ? "Copiado! Cole no ChatGPT." : ""
+  setTimeout(() => { $("copiado").textContent = "" }, 4000)
+})
+mostrar()
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+</body>
+</html>
