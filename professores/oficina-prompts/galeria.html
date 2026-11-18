@@ -298,7 +298,7 @@
           <input type="text" id="f-jogo" name="nome_do_jogo" maxlength="80" placeholder="Por exemplo: Caça às frações" autocomplete="off" required aria-describedby="e-jogo">
         </label>
         <label for="f-link">Link do jogo
-          <input type="url" id="f-link" name="link_do_canvas" inputmode="url" placeholder="https://..." autocomplete="off" required aria-describedby="d-link">
+          <input type="url" id="f-link" name="link_do_jogo" inputmode="url" placeholder="https://..." autocomplete="off" required aria-describedby="d-link">
           <span class="hint" id="d-link">É o link que o publicador (Publicar meu jogo) deu. Quem usa o Gemini pode mandar o link de compartilhar do Canvas do Gemini. Antes de enviar, cole numa janela anônima: se o jogo abrir sem pedir login, está certo.</span>
           <span class="hint warn" id="a-link" hidden>Esse link não parece ser do publicador nem do Gemini. Um link de conversa do ChatGPT mostra a conversa, não o jogo: baixe o jogo e envie no publicador.</span>
         </label>
@@ -397,7 +397,7 @@
 //     titulo: "Caça às frações",                              // o nome do jogo
 //     componente: "Matemática",                               // a matéria
 //     etapa: "iniciais",                                      // "infantil", "iniciais", "finais", "medio" ou "eja" (o filtro usa)
-//     link: "https://usuario.github.io/caca-as-fracoes/",     // o link que o publicador deu
+//     link: "https://gamificapampa.github.io/jogos/caca-as-fracoes/",     // o link que o publicador deu
 //     ensina: "Frações: a criança toca nas pizzas que mostram a metade.",  // o que o jogo ensina, em uma frase
 //     autoria: "Professora de Matemática de Alegrete",        // "Professor(a) de [matéria] de [escola ou cidade]"
 //     cor: "orange",                                          // "blue", "pink", "mint", "orange", "purple" ou "yellow"
@@ -697,7 +697,7 @@ async function sendForm(event) {
   label.textContent = "Enviando..."
   try {
     const data = new FormData(form)
-    data.set("link_do_canvas", readLink())
+    data.set("link_do_jogo", readLink())
     const answer = await fetch(form.action, { method: "POST", body: data, headers: { Accept: "application/json" } })
     if (!answer.ok) {
       say("O serviço de envio recusou a mensagem e a equipe não recebeu. Os dados continuam aqui: tente de novo em alguns minutos. Se o erro continuar, fale com a coordenação da oficina.")

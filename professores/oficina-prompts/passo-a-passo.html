@@ -428,7 +428,7 @@
   </header>
 
   <nav class="tabs" aria-label="Escolha o vídeo">
-    <a class="tab" href="#canvas" data-id="canvas" style="--light: #c9f5e3">
+    <a class="tab" href="#pedir-o-jogo" data-id="pedir-o-jogo" style="--light: #c9f5e3">
       <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="44" rx="8" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M28 10 V54" stroke="#2f2a4a" stroke-width="3.5"/><rect x="9" y="18" width="14" height="7" rx="3.5" fill="#cfe6ff" stroke="#2f2a4a" stroke-width="2.5"/><rect x="9" y="31" width="14" height="7" rx="3.5" fill="#e2dbff" stroke="#2f2a4a" stroke-width="2.5"/><rect x="33" y="16" width="22" height="32" rx="4" fill="#4fd6a6" stroke="#2f2a4a" stroke-width="3"/><path d="M44 22 L46.5 27.5 L52 28 L48 32 L49 38 L44 35 L39 38 L40 32 L36 28 L41.5 27.5 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>
       <span><b>Pedir o jogo</b><small>Vídeo 1</small></span>
     </a>
@@ -607,7 +607,7 @@ ${HANDS}`,
 // The three videos. Each step has a caption, a length in seconds and what happens in it:
 // move the finger to a button, tap it, change the screen, or type a text little by little
 const VIDEOS = {
-  canvas: {
+  "pedir-o-jogo": {
     n: 1, title: "Pedir um jogo e jogar na Prévia", color: "#4fd6a6", light: "#c9f5e3", scene: "app",
     init: { view: "app", game: "q" }, start: [82, 58],
     steps: [
@@ -651,7 +651,13 @@ const VIDEOS = {
     ],
   },
 }
-const ORDER = ["canvas", "compartilhar", "gem"]
+const ORDER = ["pedir-o-jogo", "compartilhar", "gem"]
+// O vídeo 1 se chamava #canvas, mas a conta gratuita do ChatGPT não tem Canvas: os links antigos (dos jogos) abrem o
+// vídeo 1 e o endereço passa a #pedir-o-jogo
+const pedido = () => {
+  if (location.hash === "#canvas") history.replaceState(null, "", location.pathname + location.search + "#pedir-o-jogo")
+  return location.hash.slice(1)
+}
 const FRASE = "Quando eu <b>[o que fiz]</b>, acontece <b>[o que aconteceu]</b>, mas deveria <b>[o que esperava]</b>. Conserte só isso."
 const PARTS = [["P", "Papel", "#4da3ff"], ["T", "Tarefa", "#4fd6a6"], ["C", "Contexto", "#ffd23f"], ["F", "Formato", "#ff8a3d"]]
 const strip = html => html.replace(/<[^>]+>/g, "")
@@ -899,10 +905,10 @@ function setMode() {
   $("live-box").hidden = still
   $("frames").hidden = !still
   $("list-box").hidden = still
-  select(VIDEOS[location.hash.slice(1)] ? location.hash.slice(1) : video?.id ?? "canvas")
+  select(VIDEOS[pedido()] ? pedido() : video?.id ?? "pedir-o-jogo")
 }
 calm.addEventListener?.("change", setMode)
-addEventListener("hashchange", () => select(VIDEOS[location.hash.slice(1)] ? location.hash.slice(1) : "canvas"))
+addEventListener("hashchange", () => select(VIDEOS[pedido()] ? pedido() : "pedir-o-jogo"))
 if (!CSS.supports("width", "1cqw")) {
   const fit = new ResizeObserver(entries => entries.forEach(entry => { const scene = entry.target.querySelector(".scene"); if (scene) scene.style.fontSize = entry.contentRect.width / 60 + "px" }))
   new MutationObserver(() => document.querySelectorAll(".stage").forEach(stage => fit.observe(stage))).observe(document.body, { childList: true, subtree: true })
@@ -910,7 +916,7 @@ if (!CSS.supports("width", "1cqw")) {
 }
 setMode()
 
-// A step can be opened from the address, for example passo-a-passo.html?passo=3#canvas
+// A step can be opened from the address, for example passo-a-passo.html?passo=3#pedir-o-jogo
 if (params.has("passo") && !still) {
   const index = Math.max(0, Math.min(video.steps.length - 1, Number(params.get("passo")) - 1 || 0))
   const step = video.steps[index]
@@ -924,13 +930,13 @@ document.fonts?.ready.then(() => still ? paintStill() : draw())
 // Bit's tip for the player follows the chosen video, and changes on screen when the teacher switches videos
 (() => {
   const tips = {
-    canvas: "O jogo vem num bloco de código: toque em Prévia para jogar. Se o ChatGPT recusar, toque em ⋯ e em Gerar resposta novamente, embaixo da resposta.",
+    "pedir-o-jogo": "O jogo vem num bloco de código: toque em Prévia para jogar. Se o ChatGPT recusar, toque em ⋯ e em Gerar resposta novamente, embaixo da resposta.",
     compartilhar: "O publicador fica em gamificapampa.github.io/publicador. Antes de mandar para a turma, abra o link numa janela anônima: se abrir lá, abre no celular das crianças.",
     gem: "Quer um assistente pronto? O Bit faz perguntas e monta o prompt com você. As instruções estão na página Assistentes do Bit.",
   }
   const player = document.getElementById("player")
   const update = (say) => {
-    const tip = tips[location.hash.slice(1)] || tips.canvas
+    const tip = tips[location.hash.slice(1)] || tips["pedir-o-jogo"]
     player.dataset.bitDica = tip
     if (say) window.Bit?.diz("pensando", tip, 9000)
   }
