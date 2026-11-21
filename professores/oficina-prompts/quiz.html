@@ -51,6 +51,7 @@
   .lidas { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: q }
   .lidas > li { padding: 10px 14px; background: #f4f2f8; border: 3px solid var(--ink); border-radius: 16px }
   .lidas > li.falta { background: #ffd6e3 }
+  .lidas > li.cuidado { background: #fff1a8 }
   .lidas .fase { margin: 6px 0 0; padding: 2px 12px; display: inline-block; background: var(--yellow); border: 3px solid var(--ink); border-radius: 999px; font-weight: 700; font-size: 15px }
   .lidas b.q { display: block }
   .lidas ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none }
@@ -204,11 +205,42 @@ const R = {
   marca: /\s*(\(x\)|\[x\]|\*|✓|✔|✅|\((?:certa|correta)\)|←\s*certa)\s*/i,
 }
 const comparavel = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()
+// The Copiar button of the ChatGPT joins each question in one line (test of 20/11):
+// "1. Pergunta? a) X b) Y c) Z Resposta: b Por quê: ...". The answer, the explanation and the options go back
+// to their own lines. Options only split when they come in order (a, b, c...), so "a)" in a sentence stays
+const ROTULO = "(?:Resposta(?:\\s+(?:certa|correta))?|Alternativa\\s+(?:certa|correta)|Gabarito|Por\\s*qu[eê]|Explica[cç][aã]o|Justificativa)\\s*:"
+const ANTES_DO_ROTULO = new RegExp("\\s+(?=" + ROTULO + ")"), COMECA_NO_ROTULO = new RegExp("^" + ROTULO)
+function separar(linha) {
+  return linha.split(ANTES_DO_ROTULO).flatMap(parte => {
+    if (COMECA_NO_ROTULO.test(parte)) return [parte]
+    const cortes = []
+    let esperada = "a"
+    for (const m of parte.matchAll(/(?:^|\s)[(\[]?([a-eA-E])[)\]]\s/g)) {
+      if (m[1].toLowerCase() !== esperada) continue
+      cortes.push(m.index + m[0].length - m[0].trimStart().length)
+      esperada = String.fromCharCode(esperada.charCodeAt(0) + 1)
+    }
+    if (cortes.length < 2) return [parte]
+    if (cortes[0] > 0) cortes.unshift(0)
+    return cortes.map((c, i) => parte.slice(c, cortes[i + 1]).trim())
+  })
+}
+// What an option is worth as a number ("1/2", "6/12", "0,5", "3/8 de xícara"), to find two right answers
+// and an explanation whose sum ends in another option
+const NUMERO = /(-?\d[\d.,]*)\s*(?:\/\s*(\d[\d.,]*))?/
+const numero = s => (s = s.replace(/[.,]+$/, ""), Number(/,/.test(s) || /^\d{1,3}(\.\d{3})+$/.test(s) ? s.replace(/\./g, "").replace(",", ".") : s))
+const fracao = m => { const v = numero(m[1]) / (m[2] ? numero(m[2]) : 1); return Number.isFinite(v) ? +v.toFixed(9) : null }
+function valor(t) {
+  const m = t.trim().match(new RegExp("^" + NUMERO.source + "(?:\\s+(.*))?$"))
+  const v = m && fracao(m)
+  return v === null || !m ? null : { v, chave: `${v} ${comparavel(m[3] || "")}` }
+}
 function lerQuiz(texto) {
   const fases = [], semFase = { nome: "", perguntas: [] }
   let faseAtual = semFase, atual = null, noGabarito = false, gabarito = ""
   const linhas = texto.replace(/\r/g, "").split("\n")
     .map(l => l.replace(/\*\*|__/g, "").replace(/^\s*(#+|>)\s*/, "").replace(/^\s*[-•]\s+(?=\(?[a-eA-E]\s*[).\]])/, "").trim())
+    .flatMap(separar)
   for (const linha of linhas) {
     if (!linha) continue
     if (noGabarito) { gabarito += " " + linha; continue }
@@ -258,8 +290,25 @@ function lerQuiz(texto) {
     if (q.letra) q.opcoes.forEach(o => { o.certa = o.letra === q.letra })
     const certas = q.opcoes.filter(o => o.certa)
     if (certas.length > 1) q.opcoes.forEach(o => { o.certa = o === certas[0] })
+    const textos = q.opcoes.map(o => comparavel(o.t))
+    const repetida = q.opcoes.find((o, i) => textos.indexOf(textos[i]) !== i)
     q.problema = q.opcoes.length < 2 ? "Achei menos de 2 alternativas."
       : !q.opcoes.some(o => o.certa) ? "Não achei a resposta certa. Escreva Resposta: e a letra embaixo das alternativas."
+      : repetida ? `Duas alternativas são iguais (${repetida.t}). Troque uma delas.`
+      : ""
+    // Two options with the same value, like 1/2 and 6/12: both may be right (test of 20/11). It can be on
+    // purpose ("simplifique 6/12"), so the question stays in the game and the teacher decides
+    const valores = q.opcoes.map(o => valor(o.t)), chaves = valores.map(v => v && v.chave)
+    const dupla = chaves.findIndex((c, i) => c !== null && chaves.indexOf(c) !== i)
+    const [o1, o2] = dupla < 0 ? [] : [q.opcoes[chaves.indexOf(chaves[dupla])], q.opcoes[dupla]]
+    // The explanation does the sum right and the letter points to another option (test of 20/11:
+    // "6 - 4,25 = 1,75 kg" with Resposta: a, 2,25 kg). Only the last "= number" counts
+    const conta = [...q.porque.matchAll(new RegExp("=\\s*" + NUMERO.source, "g"))].pop()
+    const resultado = conta && fracao(conta), certa = q.opcoes.findIndex(o => o.certa)
+    const chega = resultado === null || !conta ? [] : q.opcoes.filter((o, i) => valores[i] && valores[i].v === resultado)
+    q.aviso = q.problema ? ""
+      : o1 ? `${o1.letra}) ${o1.t} e ${o2.letra}) ${o2.t} valem o mesmo` + (o1.certa || o2.certa ? ": as duas podem estar certas. Troque uma delas." : ", e quem percebe isso descarta as duas. Troque uma delas.")
+      : chega.length === 1 && !chega[0].certa && valores[certa]?.v !== resultado ? `A conta do Por quê dá ${chega[0].t}, que é a ${chega[0].letra}), mas a resposta marcada é a ${q.opcoes[certa].letra}). Confira qual está certa.`
       : ""
   }
   return { fases: [semFase, ...fases].filter(f => f.perguntas.length), todas }
@@ -467,16 +516,16 @@ function atualizar() {
     $("contagem").textContent = "Cole as perguntas para ver o que o site entendeu."
     $("lidas").innerHTML = ""
   } else {
-    const ruins = lido.todas.length - boas.length
-    $("contagem").textContent = `${boas.length} ${boas.length === 1 ? "pergunta pronta" : "perguntas prontas"}` + (ruins ? `, ${ruins} para arrumar` : "")
+    const ruins = lido.todas.length - boas.length, avisos = boas.filter(q => q.aviso).length
+    $("contagem").textContent = `${boas.length} ${boas.length === 1 ? "pergunta pronta" : "perguntas prontas"}` + (ruins ? `, ${ruins} para arrumar` : "") + (avisos ? `, ${avisos} para conferir` : "")
     let faseAntes = null
     $("lidas").innerHTML = lido.fases.flatMap(f => f.perguntas.map(q => {
       const fase = f.nome && f !== faseAntes ? `<span class="fase">${escapar(f.nome)}</span>` : ""
       faseAntes = f
-      return `<li class="${q.problema ? "falta" : ""}">${fase}<b class="q">${q.numero}. ${escapar(q.texto)}</b><ul>${q.opcoes.map(o => `<li class="${o.certa ? "certa" : ""}">${o.letra}) ${escapar(o.t)}</li>`).join("")}</ul>${q.porque ? `<p class="porque">Por quê: ${escapar(q.porque)}</p>` : ""}${q.problema ? `<p class="problema">${q.problema}</p>` : ""}</li>`
+      return `<li class="${q.problema ? "falta" : q.aviso ? "cuidado" : ""}">${fase}<b class="q">${q.numero}. ${escapar(q.texto)}</b><ul>${q.opcoes.map(o => `<li class="${o.certa ? "certa" : ""}">${o.letra}) ${escapar(o.t)}</li>`).join("")}</ul>${q.porque ? `<p class="porque">Por quê: ${escapar(q.porque)}</p>` : ""}${q.problema || q.aviso ? `<p class="problema">${escapar(q.problema || q.aviso)}</p>` : ""}</li>`
     })).join("")
   }
-  $("pronto").hidden = !(boas.length >= 2 && boas.length === lido.todas.length)
+  $("pronto").hidden = !(boas.length >= 2 && boas.length === lido.todas.length && !boas.some(q => q.aviso))
   $("dica-conferir").hidden = !boas.length
   const temJogo = boas.length >= 2
   for (const id of ["moldura", "acoes", "passos"]) $(id).hidden = !temJogo
