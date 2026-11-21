@@ -109,7 +109,7 @@
 
   <section class="card" id="colar" data-bit-pose="pensando" data-bit-dica="Experimente os exemplos para ver o Raio-X funcionando. Depois cole o seu.">
     <h2><span class="n">1</span>Cole o prompt</h2>
-    <p class="veio" id="veio" hidden>Este prompt veio da Biblioteca. O que você mudar aqui não muda o que ficou lá. <a href="biblioteca.html" id="voltar">Voltar para a Biblioteca</a></p>
+    <p class="veio" id="veio" hidden><span id="veio-texto"></span> <a href="biblioteca.html" id="voltar"></a></p>
     <label for="texto">O prompt<small>o que você mandaria para o ChatGPT ou o Gemini</small><textarea id="texto" placeholder="Faça uma atividade sobre frações."></textarea></label>
     <div class="exemplos">
       <span id="rotulo-exemplos">Ou experimente:</span>
@@ -224,7 +224,10 @@ function analisar(texto) {
   for (const m of texto.matchAll(DADO)) if (!NAO_NOME.has(m[3])) dados.push({ texto: m[0], troca: m[1] })
   for (const r of OUTROS_DADOS) for (const m of texto.matchAll(r)) dados.push({ texto: m[0], troca: "[sem dado do estudante]" })
   const cuidados = CUIDADOS.filter(c => c.quando(n))
-  const pedidos = (n.match(/\b(crie|elabore|faca|monte|escreva|prepare|gere|produza|sugira|liste|adapte|revise|corrija|explique|resuma|planeje|invente|desenvolva|organize|transforme|proponha|construa|redija|reescreva|traduza)\b/g) || []).length
+  // A request is a verb that asks for a new thing: "crie uma atividade", "elabore um plano". "Escreva numa frase o
+  // objetivo" or "adapte para esta turma" only detail the same material, and "não gere arquivo" is a limit
+  const semLimites = n.replace(/\b(nao|nem) \w+/g, " ")
+  const pedidos = (semLimites.match(/\b(crie|elabore|faca|monte|escreva|prepare|gere|produza|sugira|liste|adapte|revise|corrija|explique|resuma|planeje|invente|desenvolva|organize|transforme|proponha|construa|redija|reescreva|traduza) (um|uma|uns|umas|dois|duas|tres|\d+)\b/g) || []).length
   const certas = pecas.filter(p => p.ok).length
   const estrelas = dados.length ? 0 : [0, 0, 1, 2, 3][certas]
   // "Sou professora do 2º ano" tells who the teacher is, not who the AI should be
@@ -284,7 +287,7 @@ function mostrar() {
     itens.push(`<li>${Icones.svg("adaptar")}<div><b>Partes para trocar</b><span>Troque antes de mandar: ${mostra}. Se ficar entre colchetes, a IA inventa no lugar da sua turma.</span></div></li>`)
   }
   if (r.palavras < 12) itens.push(`<li>${Icones.svg("relogio")}<div><b>Curto demais</b><span>Com ${r.palavras} ${r.palavras === 1 ? "palavra" : "palavras"}, a IA preenche o resto do jeito dela. Conte para quem é e como quer receber.</span></div></li>`)
-  if (r.pedidos >= 4) itens.push(`<li>${Icones.svg("sequencia")}<div><b>Muitos pedidos de uma vez</b><span>Com ${r.pedidos} pedidos no mesmo prompt, a IA costuma esquecer algum. Peça uma coisa por vez e mande o resto depois.</span></div></li>`)
+  if (r.pedidos >= 3) itens.push(`<li>${Icones.svg("sequencia")}<div><b>Muitos pedidos de uma vez</b><span>Com ${r.pedidos} pedidos no mesmo prompt, a IA costuma esquecer algum. Peça uma coisa por vez e mande o resto depois.</span></div></li>`)
   for (const c of r.cuidados) itens.push(`<li>${Icones.svg(c.icone)}<div><b>${c.titulo}</b><span>${c.texto} Peça: <q>${c.frase}</q></span></div></li>`)
   $("cuidados").innerHTML = itens.join("")
   $("melhor").textContent = melhorar(texto, r)
@@ -310,23 +313,36 @@ $("copiar").addEventListener("click", async () => {
   setTimeout(() => { $("copiado").textContent = "" }, 4000)
 })
 
-// The Biblioteca's "Fazer o Raio-X" brings the prompt in sessionStorage, never in the address (it would stay in
-// the history and go out in the Referer). It is read once and deleted at once, so it does not stay in the tab
+// The "Fazer o Raio-X" of the Biblioteca and of the Máquina brings the prompt in sessionStorage, never in the address
+// (it would stay in the history and go out in the Referer). It is read once and deleted at once, so it does not stay in the tab
 const TRAZIDO = "gp-raio-x:prompt"
+const ORIGENS = {
+  biblioteca: { texto: "Este prompt veio da Biblioteca. O que você mudar aqui não muda o que ficou lá.", voltar: "Voltar para a Biblioteca", href: "biblioteca.html", caminho: "/biblioteca.html" },
+  maquina: { texto: "Este prompt veio da Máquina de prompts. O que você mudar aqui não muda a Máquina.", voltar: "Voltar para a Máquina", href: "/maquina/", caminho: "/maquina/" },
+}
+let origem = null
 function trazerPrompt() {
   let dado = null
   try { dado = JSON.parse(sessionStorage.getItem(TRAZIDO)) } catch {}
   try { sessionStorage.removeItem(TRAZIDO) } catch {}
   if (!dado || typeof dado.texto !== "string" || !dado.texto.trim()) return false
-  $("texto").value = dado.texto.slice(0, 20000)
-  $("veio").hidden = dado.origem !== "biblioteca"
+  // The Máquina sends the material pasted at the end of the prompt too, which can be long
+  $("texto").value = dado.texto.slice(0, 100000)
+  origem = Object.prototype.hasOwnProperty.call(ORIGENS, dado.origem) ? ORIGENS[dado.origem] : null
+  if (origem) {
+    $("veio-texto").textContent = origem.texto
+    $("voltar").textContent = origem.voltar
+    $("voltar").href = origem.href
+  }
+  $("veio").hidden = !origem
   return true
 }
-// Going back with the browser keeps the filters and what was typed in the cards of the Biblioteca
+// Going back with the browser keeps what was chosen and written there: the filters and the fields of the
+// Biblioteca, the material pasted in the Máquina
 $("voltar").addEventListener("click", event => {
   try {
     const antes = new URL(document.referrer)
-    if (antes.origin === location.origin && antes.pathname.endsWith("/biblioteca.html") && history.length > 1) { event.preventDefault(); history.back() }
+    if (origem && antes.origin === location.origin && antes.pathname.replace(/index\.html$/, "").endsWith(origem.caminho) && history.length > 1) { event.preventDefault(); history.back() }
   } catch {}
 })
 const trouxe = trazerPrompt()
