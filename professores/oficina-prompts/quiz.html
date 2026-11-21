@@ -299,7 +299,9 @@ function htmlDoJogo(nome, objetivo, fases) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapar(nome)}</title>
 <style>
-/* Feito no Quiz na hora, da Oficina de Prompts do GamificaPampa */
+/* Feito no Quiz na hora, da Oficina de Prompts do GamificaPampa. A Fredoka vem do site quando há internet;
+   sem internet, o jogo funciona igual, com a letra do aparelho */
+@font-face { font-family: "Fredoka"; src: url("https://gamificapampa.github.io/identidade-visual/fontes/fredoka/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
 :root { --fundo: #4fadf2; --fundo-2: #bfe5ff; --texto: #2f2a4a; --destaque: #ffd23f; --botao: #4fd6a6; --borda: #2f2a4a;
   --certo: #c9f5e3; --certo-texto: #14532d; --errado: #ffd6e0; --errado-texto: #7a1530;
   --fonte: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif; --raio: 18px; --linha: 4px solid var(--borda); --sombra: 0 6px 0 var(--borda); }
