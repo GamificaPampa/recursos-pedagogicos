@@ -168,9 +168,11 @@ const escapar = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`)
 // 1. The request for the AI: the format at the end is what lets the reader below understand the answer
 function montarPedido() {
   const materia = $("materia").value.trim() || "[matéria]", ano = $("ano").value.trim() || "[ano]"
+  // "do 3º ano", "da 2ª série", e o resto ("EJA", "8 anos") vira "de uma turma de ...", para o português sair certo
+  const daTurma = /^\d+\s*º?\s*ano(?!s)/i.test(ano) || ano === "[ano]" ? `do ${ano}` : /^\d+\s*ª?\s*s[ée]rie/i.test(ano) ? `da ${ano}` : `de uma turma de ${ano}`
   const tema = $("tema").value.trim() || "[tema]"
   const n = Math.max(3, Math.min(20, parseInt($("quantas").value, 10) || 8))
-  $("pedido").textContent = `Você é professor(a) de ${materia} do ${ano}. Crie ${n} perguntas de múltipla escolha sobre ${tema}, da mais fácil à mais difícil, com 3 alternativas cada e só uma certa. As alternativas erradas devem vir de erros comuns de quem está aprendendo, e a certa não pode ser sempre a mais comprida. Confira cada resposta antes de escrever e varie a letra da certa.
+  $("pedido").textContent = `Você é professor(a) de ${materia} ${daTurma}. Crie ${n} perguntas de múltipla escolha sobre ${tema}, da mais fácil à mais difícil, com 3 alternativas cada e só uma certa. As alternativas erradas devem vir de erros comuns de quem está aprendendo, e a certa não pode ser sempre a mais comprida. Confira cada resposta antes de escrever e varie a letra da certa.
 
 Escreva em texto normal, fora de bloco de código, sem emojis e sem usar o teste interativo, exatamente neste formato, uma pergunta depois da outra:
 
