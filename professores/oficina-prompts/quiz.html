@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz na hora · Oficina de Prompts</title>
+<meta name="description" content="Peça as perguntas ao ChatGPT, cole aqui e o jogo de quiz fica pronto na hora, no estilo do GamificaPampa: fases, estrelas, explicação no erro e Treinar os erros. Teste, baixe e publique para a turma, sem a IA escrever código.">
+<meta name="theme-color" content="#5fbcff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='16' fill='%234da3ff' stroke='%231d2a44' stroke-width='6'/><circle cx='36' cy='48' r='9' fill='%23fff'/><circle cx='64' cy='48' r='9' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cores.css">
+<link rel="stylesheet" href="/identidade-visual/css/botoes.css">
+<link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+<link rel="stylesheet" href="/identidade-visual/css/carimbo.css">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+  html { background: var(--sky2) }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.45 }
+  a { color: var(--ink); font-weight: 600 }
+  button, input, textarea { font: inherit; color: inherit }
+  button { cursor: pointer }
+  .page { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 14px 0 26px }
+  header .icone-topo { width: clamp(80px, 20vw, 110px); flex: none; animation: boia 3s ease-in-out infinite }
+  @keyframes boia { 50% { transform: translateY(-8px) rotate(-4deg) } }
+  h1 { margin: 0; font-size: clamp(40px, 9vw, 66px); font-weight: 700; line-height: 1.02; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink) }
+  h1 .y { color: var(--yellow) } h1 .p { color: var(--pink) }
+  header p { max-width: 700px; margin: 10px 0 0; font-size: 19px; font-weight: 600 }
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 24px; line-height: 1.15 }
+  h2 .n { display: grid; place-items: center; width: 36px; height: 36px; flex: none; background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; font-size: 20px }
+  .card { margin-bottom: 24px; padding: 20px 22px; background: #fff; border: 4px solid var(--ink); border-radius: 26px; box-shadow: 0 7px 0 rgba(47, 42, 74, .25) }
+  .card > p { margin: 0 0 12px; font-weight: 500 }
+
+  .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; margin-bottom: 12px }
+  label { display: grid; gap: 4px; font-weight: 700 }
+  label small { font-weight: 500; color: var(--soft) }
+  input, textarea { width: 100%; padding: 10px 12px; background: #fff; border: 3px solid var(--ink); border-radius: 14px; font-weight: 500 }
+  textarea { min-height: 220px; resize: vertical; font-size: 16px }
+  input:focus-visible, textarea:focus-visible { outline: 4px solid var(--pink); outline-offset: 2px }
+  .prompt { margin: 14px 0; padding: 14px 16px; background: #f4f1ff; border: 3px dashed var(--ink); border-radius: 18px; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600 }
+  .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px }
+  .linha + label, label + .linha { margin-top: 14px }
+  .btn svg { width: 22px; height: 22px }
+  .aviso { margin: 14px 0 0; padding: 10px 14px; background: #fff1a8; border: 3px solid var(--ink); border-radius: 14px; font-weight: 600 }
+  .ok-texto { font-weight: 700; color: #17694a }
+
+  /* What the page understood: one line per question, the right answer marked */
+  .resumo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 12px; font-weight: 700; font-size: 19px }
+  .resumo .carimbo[hidden] { display: none }
+  .lidas { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: q }
+  .lidas > li { padding: 10px 14px; background: #f4f2f8; border: 3px solid var(--ink); border-radius: 16px }
+  .lidas > li.falta { background: #ffd6e3 }
+  .lidas .fase { margin: 6px 0 0; padding: 2px 12px; display: inline-block; background: var(--yellow); border: 3px solid var(--ink); border-radius: 999px; font-weight: 700; font-size: 15px }
+  .lidas b.q { display: block }
+  .lidas ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none }
+  .lidas ul li { padding: 2px 10px; background: #fff; border: 2px solid var(--ink); border-radius: 10px; font-size: 15px; font-weight: 500 }
+  .lidas ul li.certa { background: #c9f5e3; font-weight: 700 }
+  .lidas ul li.certa::before { content: "certa: "; font-weight: 700 }
+  .lidas .porque { margin: 6px 0 0; font-size: 15px; color: var(--soft) }
+  .lidas .problema { margin: 6px 0 0; font-weight: 700 }
+  .vazio { margin: 0; font-weight: 600; color: var(--soft) }
+
+  .moldura { position: relative; margin: 14px 0; border: 4px solid var(--ink); border-radius: 20px; overflow: hidden; background: #4fadf2 }
+  .moldura iframe { display: block; width: 100%; height: min(70vh, 620px); border: 0; background: #4fadf2 }
+  .moldura:fullscreen iframe { height: 100vh }
+  .passos { margin: 14px 0 0; padding-left: 22px; font-weight: 500 }
+  .passos li { margin-bottom: 6px }
+  .mais { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px }
+  footer { padding: 30px 16px 10px; text-align: center; font-weight: 600 }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+</style>
+<script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body class="ceu">
+<div class="cenario cenario--fixo" aria-hidden="true">
+  <span class="nuvem" style="top: 8%; --w: 170px; --t: 70s; --d: -12s"></span>
+  <span class="nuvem" style="top: 26%; --w: 120px; --t: 55s; --d: -30s"></span>
+  <span class="simbolo" style="left: 4%; top: 40%">a b c</span>
+  <span class="simbolo" style="right: 5%; top: 18%; --d: -3s">?</span>
+  <span class="morros" style="--altura: 13vh"></span>
+</div>
+
+<div class="page">
+  <header data-bit-pose="acenando" data-bit-dica="A IA é ótima em perguntas e ruim em código comprido. Aqui ela só escreve as perguntas, e o jogo sai pronto do site.">
+    <svg class="icone-topo" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="8" width="52" height="40" rx="9" fill="#fff" stroke="#2f2a4a" stroke-width="4"/><path d="M26 22a6 6 0 1 1 8 5.6c-1.4.6-2 1.6-2 3V32" fill="none" stroke="#8c73ff" stroke-width="4.5" stroke-linecap="round"/><circle cx="32" cy="39" r="2.6" fill="#8c73ff"/><path d="M20 48l-6 10 14-10" fill="#fff" stroke="#2f2a4a" stroke-width="4" stroke-linejoin="round"/><path d="M50 4l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2" stroke-linejoin="round"/></svg>
+    <div>
+      <h1><span class="y">Quiz</span> na <span class="p">hora</span></h1>
+      <p>Peça as perguntas ao ChatGPT, cole aqui e o jogo fica pronto na hora: fases, estrelas, explicação no erro e Treinar os erros. Sem a IA escrever código, nada trava nem sai cortado.</p>
+    </div>
+  </header>
+
+  <section class="card" data-bit-pose="pensando" data-bit-dica="Preencha os campos e copie o pedido. O formato no fim do pedido é o que deixa o site ler as perguntas sozinho.">
+    <h2><span class="n">1</span>Peça as perguntas</h2>
+    <div class="campos">
+      <label for="materia">Matéria<input id="materia" placeholder="Ciências"></label>
+      <label for="ano">Ano ou idade<small>da turma, sem o nome dela</small><input id="ano" placeholder="3º ano"></label>
+      <label for="tema">Tema<input id="tema" placeholder="os animais do Pampa"></label>
+      <label for="quantas">Quantas perguntas<input id="quantas" type="number" min="3" max="20" value="8"></label>
+    </div>
+    <p class="prompt" id="pedido" aria-live="polite"></p>
+    <div class="linha">
+      <button class="btn btn--jogar" type="button" id="copiar-pedido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar o pedido</button>
+      <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir o ChatGPT</a>
+      <span class="ok-texto" id="copiado-pedido" role="status"></span>
+    </div>
+  </section>
+
+  <section class="card" data-bit-dica="Cole a resposta inteira. Eu ignoro o que não for pergunta, alternativa, resposta ou explicação.">
+    <h2><span class="n">2</span>Cole as perguntas</h2>
+    <p>Cole o que o ChatGPT devolveu, ou escreva você mesmo no mesmo formato. Vale marcar a certa com <b>Resposta: b</b>, com um <b>*</b> no fim da alternativa ou com um <b>Gabarito</b> no fim. Para separar em fases, escreva <b>Fase: nome</b> antes das perguntas.</p>
+    <div class="campos">
+      <label for="nome">Nome do jogo<input id="nome" placeholder="Bichos do Pampa"></label>
+      <label for="objetivo">O que a turma aprende<small>aparece na tela de início</small><input id="objetivo" placeholder="reconhecer os animais do Pampa e onde vivem"></label>
+    </div>
+    <label for="texto">As perguntas<textarea id="texto" spellcheck="false" placeholder="1. Qual destes animais é uma ave do Pampa?
+a) Quero-quero
+b) Tatu
+c) Graxaim
+Resposta: a
+Por quê: o quero-quero é a ave que grita quando alguém chega perto do ninho."></textarea></label>
+    <div class="linha">
+      <button class="btn btn--small" type="button" id="exemplo">Ver um exemplo</button>
+      <button class="btn btn--small" type="button" id="limpar">Limpar</button>
+    </div>
+    <p class="aviso">O texto não fica guardado nesta página. Quando o jogo estiver bom, baixe ou publique para não perder. Pergunta não leva nome de estudante.</p>
+  </section>
+
+  <section class="card" id="conferencia" data-bit-dica="Confira se a certa de cada pergunta é a certa mesmo. A IA erra conta e data às vezes.">
+    <h2><span class="n">3</span>Confira o que o site entendeu</h2>
+    <div class="resumo"><span id="contagem" role="status" aria-live="polite"></span><span class="carimbo carimbo--roxo" id="pronto" hidden>Pronto para a turma</span></div>
+    <ol class="lidas" id="lidas"></ol>
+    <p class="aviso" id="dica-conferir" hidden>Antes de jogar com a turma, leia cada resposta certa. Se quiser uma segunda opinião, cole a resposta da IA no <a href="conferir.html">Conferir a resposta da IA</a>.</p>
+  </section>
+
+  <section class="card" id="jogar-card" data-bit-pose="feliz" data-bit-dica="Jogue uma vez antes da aula. No projetor, use a tela cheia.">
+    <h2><span class="n">4</span>Jogue e leve para a turma</h2>
+    <p id="sem-jogo" class="vazio">O jogo aparece aqui quando houver pelo menos 2 perguntas com a resposta certa.</p>
+    <div class="moldura" id="moldura" hidden>
+      <iframe id="previa" title="Prévia do quiz" sandbox="allow-scripts"></iframe>
+    </div>
+    <div class="linha" id="acoes" hidden>
+      <button class="btn btn--jogar" type="button" id="tela-cheia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="#2f2a4a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Jogar em tela cheia</button>
+      <button class="btn btn--baixar" type="button" id="baixar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m-5-5 5 5 5-5" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="#2f2a4a" stroke-width="3" stroke-linecap="round"/></svg>Baixar o jogo</button>
+      <a class="btn btn--compartilhar" href="/publicador/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12l10-6M7 12l10 6" stroke="#2f2a4a" stroke-width="2.6"/><circle cx="6" cy="12" r="3.4" fill="#fff" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="18" cy="5.5" r="3.4" fill="#fff" stroke="#2f2a4a" stroke-width="2.5"/><circle cx="18" cy="18.5" r="3.4" fill="#fff" stroke="#2f2a4a" stroke-width="2.5"/></svg>Publicar para a turma</a>
+    </div>
+    <ol class="passos" id="passos" hidden>
+      <li>Toque em <b>Baixar o jogo</b>: vem um arquivo <b>.html</b> que abre em qualquer navegador, até sem internet.</li>
+      <li>No <b>Publicar para a turma</b>, envie esse arquivo e receba o link e o QR para os estudantes jogarem no celular.</li>
+    </ol>
+  </section>
+
+  <div class="mais">
+    <a class="btn btn--conhecer" href="raio-x.html">Raio-X do prompt</a>
+    <a class="btn" href="conferir.html">Conferir a resposta da IA</a>
+    <a class="btn" href="/maquina/">Máquina de prompts</a>
+  </div>
+</div>
+
+<footer>Oficina de Prompts para Professores · UNIPAMPA, Campus Alegrete</footer>
+
+<script src="/identidade-visual/js/copiar.js"></script>
+<script>
+const $ = id => document.getElementById(id)
+const escapar = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`)
+
+// 1. The request for the AI: the format at the end is what lets the reader below understand the answer
+function montarPedido() {
+  const materia = $("materia").value.trim() || "[matéria]", ano = $("ano").value.trim() || "[ano]"
+  const tema = $("tema").value.trim() || "[tema]"
+  const n = Math.max(3, Math.min(20, parseInt($("quantas").value, 10) || 8))
+  $("pedido").textContent = `Você é professor(a) de ${materia} do ${ano}. Crie ${n} perguntas de múltipla escolha sobre ${tema}, da mais fácil à mais difícil, com 3 alternativas cada e só uma certa. As alternativas erradas devem vir de erros comuns de quem está aprendendo, e a certa não pode ser sempre a mais comprida. Confira cada resposta antes de escrever e varie a letra da certa.
+
+Escreva em texto normal, fora de bloco de código, sem emojis e sem usar o teste interativo, exatamente neste formato, uma pergunta depois da outra:
+
+1. [pergunta]
+a) [alternativa]
+b) [alternativa]
+c) [alternativa]
+Resposta: [letra]
+Por quê: [uma frase curta que explica a resposta certa]
+
+Responda sempre em português do Brasil.`
+}
+for (const id of ["materia", "ano", "tema", "quantas"]) $(id).addEventListener("input", montarPedido)
+$("copiar-pedido").addEventListener("click", async () => {
+  const ok = await Copiar.texto($("pedido").textContent, { avisar: false })
+  $("copiado-pedido").textContent = ok ? "Copiado! Cole no ChatGPT." : ""
+  setTimeout(() => { $("copiado-pedido").textContent = "" }, 4000)
+})
+montarPedido()
+
+// 2. The reader: understands the usual ways the AI (or a person) writes a quiz
+const R = {
+  // "Fase: nome", "Fase 2 - nome" or just "Fase 2"; a word like "Parte" at the start of a sentence does not count
+  fase: /^(?:fase|rodada|parte|n[ií]vel|etapa)\s*\d*\s*[:\-–]\s*(.*)$|^(?:fase|rodada|n[ií]vel)\s+(\d+)$/i,
+  // Only "Gabarito" alone, or followed by numbered pairs, opens the answer key at the end
+  gabarito: /^gabarito\s*[:\-–]?\s*((?:\d.*)?)$/i,
+  pergunta: /^(?:quest[aã]o|pergunta)?\s*(\d{1,2})\s*[.)\-–:º°]\s*(.+)$/i,
+  opcao: /^[(\[]?([a-eA-E])\s*[).\]\-–:]\s*(.+)$/,
+  resposta: /^(?:resposta(?:\s+(?:certa|correta))?|alternativa\s+(?:certa|correta)|gabarito|correta|certa)\s*[:\-–]?\s*(?:letra\s*)?[(\[]?([a-eA-E])\b[)\]]?.*$/i,
+  respostaTexto: /^(?:resposta(?:\s+(?:certa|correta))?|correta|certa)\s*[:\-–]\s*(.+)$/i,
+  porque: /^(?:por\s*qu[eê]|explica[cç][aã]o|justificativa|coment[aá]rio)\s*[:\-–]\s*(.+)$/i,
+  marca: /\s*(\(x\)|\[x\]|\*|✓|✔|✅|\((?:certa|correta)\)|←\s*certa)\s*/i,
+}
+const comparavel = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()
+function lerQuiz(texto) {
+  const fases = [], semFase = { nome: "", perguntas: [] }
+  let faseAtual = semFase, atual = null, noGabarito = false, gabarito = ""
+  const linhas = texto.replace(/\r/g, "").split("\n")
+    .map(l => l.replace(/\*\*|__/g, "").replace(/^\s*(#+|>)\s*/, "").replace(/^\s*[-•]\s+(?=\(?[a-eA-E]\s*[).\]])/, "").trim())
+  for (const linha of linhas) {
+    if (!linha) continue
+    if (noGabarito) { gabarito += " " + linha; continue }
+    let m
+    if ((m = linha.match(R.gabarito))) { noGabarito = true; gabarito += " " + m[1]; continue }
+    if ((m = linha.match(R.fase)) && !linha.match(R.pergunta)) {
+      faseAtual = { nome: (m[1] || "").trim() || `Fase ${m[2] || fases.length + 1}`, perguntas: [] }
+      fases.push(faseAtual); atual = null; continue
+    }
+    if ((m = linha.match(R.resposta)) && atual) { atual.letra = m[1].toLowerCase(); continue }
+    // "Resposta: Quero-quero", without the letter: the option with the same text is the right one
+    if ((m = linha.match(R.respostaTexto)) && atual && atual.opcoes.length) {
+      const alvo = comparavel(m[1].replace(/^[(\[]?[a-e][)\].]\s*/i, ""))
+      // Same text, or a single option the answer starts with ("8 patas" for the option "8")
+      const comeca = atual.opcoes.filter(o => alvo.startsWith(comparavel(o.t) + " "))
+      const opcao = atual.opcoes.find(o => comparavel(o.t) === alvo) || (comeca.length === 1 ? comeca[0] : null)
+      if (opcao) atual.letra = opcao.letra
+      continue
+    }
+    if ((m = linha.match(R.porque)) && atual) { atual.porque = m[1].trim(); continue }
+    if ((m = linha.match(R.opcao)) && atual) {
+      // Options written on one line ("a) 4  b) 2  c) 6") are split apart
+      const partes = (m[1] + ") " + m[2]).split(/\s+(?=[b-eB-E]\)\s)/)
+      for (const parte of partes) {
+        const p = parte.match(R.opcao)
+        if (!p) continue
+        let t = p[2], certa = false
+        if (R.marca.test(t)) { certa = true; t = t.replace(R.marca, " ").trim() }
+        atual.opcoes.push({ letra: p[1].toLowerCase(), t, certa })
+      }
+      continue
+    }
+    if ((m = linha.match(R.pergunta))) {
+      atual = { numero: Number(m[1]), texto: m[2].trim(), opcoes: [], letra: "", porque: "" }
+      faseAtual.perguntas.push(atual); continue
+    }
+    // Anything else continues the question text, while it has no options yet
+    if (atual && !atual.opcoes.length) atual.texto += " " + linha
+  }
+  const todas = [semFase, ...fases].flatMap(f => f.perguntas)
+  // A final answer key such as "1-b, 2-a, 3) c" fills in what is missing
+  for (const [, num, letra] of gabarito.matchAll(/(\d{1,2})\s*[.)\-–:=]?\s*[(\[]?([a-eA-E])\b/g)) {
+    const q = todas.find(q => q.numero === Number(num))
+    if (q && !q.letra && !q.opcoes.some(o => o.certa)) q.letra = letra.toLowerCase()
+  }
+  for (const q of todas) {
+    if (q.letra) q.opcoes.forEach(o => { o.certa = o.letra === q.letra })
+    const certas = q.opcoes.filter(o => o.certa)
+    if (certas.length > 1) q.opcoes.forEach(o => { o.certa = o === certas[0] })
+    q.problema = q.opcoes.length < 2 ? "Achei menos de 2 alternativas."
+      : !q.opcoes.some(o => o.certa) ? "Não achei a resposta certa. Escreva Resposta: e a letra embaixo das alternativas."
+      : ""
+  }
+  return { fases: [semFase, ...fases].filter(f => f.perguntas.length), todas }
+}
+
+// 3. The game: one self-contained file, in the GamificaPampa style, with no font or script from outside
+const NOMES_FASES = [[], ["Perguntas"], ["Aquecimento", "Desafio"], ["Aquecimento", "Desafio", "Grande final"]]
+function dadosDoJogo(lido) {
+  const boas = lido.todas.filter(q => !q.problema)
+  let fases = lido.fases.map(f => ({ nome: f.nome, perguntas: f.perguntas.filter(q => !q.problema) })).filter(f => f.perguntas.length)
+  // Without phases written by the teacher, up to 4 questions per phase
+  if (fases.length === 1 && !fases[0].nome) {
+    const n = Math.ceil(boas.length / 4), nomes = NOMES_FASES[n] || []
+    fases = Array.from({ length: n }, (_, i) => ({ nome: nomes[i] || `Parte ${i + 1}`, perguntas: boas.slice(i * 4, i * 4 + 4) }))
+  }
+  return fases.map(f => ({ nome: f.nome || "Perguntas", perguntas: f.perguntas.map(q => {
+    const certa = q.opcoes.find(o => o.certa)
+    // Stored mixed too, so the file never has the right answer always in the same place. The mix comes from
+    // the text itself: the same questions give the same file, and the preview only reloads when something changes
+    const mistura = o => [...q.texto + o.t].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)
+    const opcoes = q.opcoes.map(o => ({ t: o.t, certa: o.certa || undefined,
+      porque: o.certa ? (q.porque || "Isso mesmo!") : `A certa é: ${certa.t}.${q.porque ? " " + q.porque : ""}` }))
+      .sort((a, b) => mistura(a) - mistura(b))
+    return { texto: q.texto, opcoes }
+  }) }))
+}
+
+const BIT = `<svg class="bit" viewBox="0 0 100 100" aria-hidden="true"><line x1="50" y1="8" x2="50" y2="22" stroke="#2f2a4a" stroke-width="4"/><circle cx="50" cy="8" r="6" fill="#ff4d4d" stroke="#2f2a4a" stroke-width="2"/><rect x="18" y="22" width="64" height="48" rx="14" fill="#4da3ff" stroke="#2f2a4a" stroke-width="4"/><circle cx="38" cy="44" r="9" fill="#fff"/><circle cx="62" cy="44" r="9" fill="#fff"/><circle cx="40" cy="45" r="4" fill="#2f2a4a"/><circle cx="64" cy="45" r="4" fill="#2f2a4a"/><circle cx="27" cy="57" r="4" fill="#ff8fb0"/><circle cx="73" cy="57" r="4" fill="#ff8fb0"/><path d="M40 60 q10 7 20 0" stroke="#2f2a4a" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="72" width="40" height="20" rx="6" fill="#8cc4ff" stroke="#2f2a4a" stroke-width="4"/></svg>`
+
+function htmlDoJogo(nome, objetivo, fases) {
+  const total = fases.reduce((s, f) => s + f.perguntas.length, 0)
+  const dados = JSON.stringify(fases).replace(/</g, "\\u003c")
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapar(nome)}</title>
+<style>
+/* Feito no Quiz na hora, da Oficina de Prompts do GamificaPampa */
+:root { --fundo: #4fadf2; --fundo-2: #bfe5ff; --texto: #2f2a4a; --destaque: #ffd23f; --botao: #4fd6a6; --borda: #2f2a4a;
+  --certo: #c9f5e3; --certo-texto: #14532d; --errado: #ffd6e0; --errado-texto: #7a1530;
+  --fonte: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif; --raio: 18px; --linha: 4px solid var(--borda); --sombra: 0 6px 0 var(--borda); }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: linear-gradient(var(--fundo), var(--fundo-2)) fixed; color: var(--texto); font: 600 20px/1.4 var(--fonte); }
+main { width: min(760px, 100% - 32px); margin: 24px auto; }
+button { min-height: 52px; padding: 8px 22px; background: var(--botao); color: var(--texto); border: var(--linha); border-radius: var(--raio); box-shadow: var(--sombra); font: 700 20px var(--fonte); cursor: pointer; }
+button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--borda); }
+button:focus-visible { outline: 4px solid var(--destaque); outline-offset: 3px; }
+button.secundario { background: #fff; }
+.cartao { display: grid; gap: 16px; padding: 22px; background: #fff; border: var(--linha); border-radius: var(--raio); box-shadow: var(--sombra); }
+.cartao[hidden] { display: none; }
+h1 { margin: 0; font-size: clamp(32px, 6vw, 48px); line-height: 1.1; }
+p { margin: 0; }
+.topo { display: flex; align-items: center; gap: 14px; }
+.bit { width: 72px; height: 72px; flex: none; }
+.fala { padding: 10px 16px; border: var(--linha); border-radius: 20px; background: #fff; font-size: 18px; }
+.progresso { display: flex; justify-content: space-between; gap: 10px; font-size: 18px; }
+.barra { height: 14px; background: #eee; border: 3px solid var(--borda); border-radius: 999px; overflow: hidden; }
+.barra i { display: block; height: 100%; width: 0; background: var(--destaque); transition: width .4s; }
+.pergunta { font-size: clamp(22px, 4vw, 30px); line-height: 1.3; }
+.opcoes { display: grid; gap: 12px; }
+.opcoes button { width: 100%; text-align: left; background: #fff; }
+.opcoes button:disabled { cursor: default; }
+.certo { background: var(--certo) !important; color: var(--certo-texto); }
+.errado { background: var(--errado) !important; color: var(--errado-texto); }
+.retorno { min-height: 64px; padding: 12px 16px; border-radius: var(--raio); }
+.retorno:empty { visibility: hidden; }
+.estrelas { font-size: 48px; letter-spacing: 8px; color: #e6b400; }
+.acoes { display: flex; flex-wrap: wrap; gap: 12px; }
+.assinatura { margin-top: 14px; text-align: center; font-size: 14px; opacity: .8; }
+@media (prefers-reduced-motion: no-preference) { .certo, .errado { animation: pulo .3s ease; } }
+@keyframes pulo { 50% { transform: scale(1.03); } }
+</style>
+</head>
+<body>
+<main>
+  <section class="cartao" id="inicio">
+    <div class="topo">${BIT}<p class="fala">Oi! Eu sou o Bit. Vamos jogar?</p></div>
+    <h1>${escapar(nome)}</h1>
+    <p><b>Objetivo:</b> ${escapar(objetivo || "acertar as perguntas e aprender com as explicações")}.</p>
+    <p>São ${total} perguntas em ${fases.length} ${fases.length === 1 ? "fase" : "fases"}. Toque na resposta certa. Se errar, o jogo explica, e no fim dá para treinar os erros.</p>
+    <div class="acoes"><button id="jogar">Jogar</button></div>
+  </section>
+  <section class="cartao" id="jogo" hidden>
+    <div class="progresso"><span id="fase"></span><span id="conta"></span></div>
+    <div class="barra" aria-hidden="true"><i id="barra"></i></div>
+    <p class="pergunta" id="pergunta"></p>
+    <div class="opcoes" id="opcoes"></div>
+    <p class="retorno" id="retorno" role="status" aria-live="polite"></p>
+    <div class="acoes"><button id="proxima" hidden>Próxima</button></div>
+  </section>
+  <section class="cartao" id="fim" hidden>
+    <div class="topo">${BIT}<p class="fala" id="fala-fim"></p></div>
+    <h1>Fim de jogo!</h1>
+    <p class="estrelas" id="estrelas"></p>
+    <p id="resumo"></p>
+    <div class="acoes"><button id="treinar" hidden>Treinar os erros</button><button class="secundario" id="denovo">Jogar de novo</button></div>
+  </section>
+  <p class="assinatura">Feito no Quiz na hora, da Oficina de Prompts do GamificaPampa</p>
+</main>
+<script>
+const FASES = ${dados};
+const $ = (id) => document.getElementById(id);
+let lista = [], posicao = 0, acertos = 0, erradas = [], audio;
+const som = (certo) => {
+  try {
+    audio = audio || new AudioContext();
+    const osc = audio.createOscillator(), vol = audio.createGain();
+    osc.frequency.value = certo ? 660 : 220;
+    vol.gain.setValueAtTime(0.15, audio.currentTime);
+    vol.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.3);
+    osc.connect(vol).connect(audio.destination);
+    osc.start(); osc.stop(audio.currentTime + 0.3);
+  } catch (e) { /* sem som, o jogo continua */ }
+};
+const mostrar = (id) => { for (const tela of ['inicio', 'jogo', 'fim']) $(tela).hidden = tela !== id; };
+const embaralhar = (l) => { const c = [...l]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c; };
+const comecar = (perguntas) => { lista = perguntas; posicao = 0; acertos = 0; erradas = []; mostrar('jogo'); desenhar(); };
+const desenhar = () => {
+  const p = lista[posicao];
+  $('fase').textContent = p.fase;
+  $('conta').textContent = 'Pergunta ' + (posicao + 1) + ' de ' + lista.length;
+  $('barra').style.width = (posicao / lista.length * 100) + '%';
+  $('pergunta').textContent = p.texto;
+  $('retorno').textContent = ''; $('retorno').className = 'retorno';
+  $('proxima').hidden = true;
+  $('opcoes').replaceChildren(...embaralhar(p.opcoes).map((op) => {
+    const b = document.createElement('button');
+    b.textContent = op.t;
+    b.addEventListener('click', () => responder(p, op, b));
+    return b;
+  }));
+  $('opcoes').querySelector('button').focus();
+};
+const responder = (p, op, botao) => {
+  if (op.certa) acertos += 1; else erradas.push(p);
+  for (const b of $('opcoes').querySelectorAll('button')) b.disabled = true;
+  botao.classList.add(op.certa ? 'certo' : 'errado');
+  if (!op.certa) for (const b of $('opcoes').querySelectorAll('button')) if (p.opcoes.find((o) => o.t === b.textContent && o.certa)) b.classList.add('certo');
+  $('retorno').className = 'retorno ' + (op.certa ? 'certo' : 'errado');
+  $('retorno').textContent = (op.certa ? '✓ Certo! ' : '✗ Ainda não. ') + op.porque;
+  som(op.certa);
+  $('proxima').textContent = posicao + 1 < lista.length ? 'Próxima' : 'Ver o resultado';
+  $('proxima').hidden = false; $('proxima').focus();
+};
+const terminar = () => {
+  const n = acertos === lista.length ? 3 : acertos >= lista.length / 2 ? 2 : 1;
+  $('estrelas').textContent = '★'.repeat(n) + '☆'.repeat(3 - n);
+  $('estrelas').setAttribute('aria-label', n + ' de 3 estrelas');
+  $('resumo').textContent = 'Você acertou ' + acertos + ' de ' + lista.length + '.';
+  $('fala-fim').textContent = n === 3 ? 'Acertou tudo! Você é fera.' : 'Muito bem! Errar faz parte de aprender.';
+  $('treinar').hidden = !erradas.length;
+  mostrar('fim');
+  (erradas.length ? $('treinar') : $('denovo')).focus();
+};
+$('proxima').addEventListener('click', () => { posicao += 1; if (posicao >= lista.length) terminar(); else desenhar(); });
+const todas = () => FASES.flatMap((f, i) => f.perguntas.map((p) => ({ ...p, fase: 'Fase ' + (i + 1) + ' de ' + FASES.length + ': ' + f.nome })));
+$('jogar').addEventListener('click', () => comecar(todas()));
+$('treinar').addEventListener('click', () => comecar(erradas.map((p) => ({ ...p, fase: 'Treinar os erros' }))));
+$('denovo').addEventListener('click', () => { mostrar('inicio'); $('jogar').focus(); });
+<\/script>
+</body>
+</html>
+`
+}
+
+const EXEMPLO = `Fase: Quem é quem
+1. Qual destes animais é uma ave do Pampa?
+a) Tatu
+b) Quero-quero
+c) Graxaim
+Resposta: b
+Por quê: o quero-quero é a ave que grita quando alguém chega perto do ninho.
+
+2. O graxaim é parecido com qual animal?
+a) Com uma raposa
+b) Com um gato
+c) Com um coelho
+Resposta: a
+Por quê: o graxaim é um canídeo, da mesma família das raposas e dos cachorros.
+
+Fase: Onde vivem
+3. O que cobre a maior parte do Pampa?
+a) Floresta fechada
+b) Areia, como no deserto
+c) Campos de capim
+Resposta: c
+Por quê: o Pampa é um bioma de campos, com capim baixo e poucas árvores.
+
+4. O umbu é...
+a) uma árvore que dá sombra no campo
+b) um peixe do rio Uruguai
+c) um tipo de capim
+Resposta: a
+Por quê: o umbu é a árvore grande e isolada que dá sombra no meio do campo.`
+
+let ultimoHtml = "", ultimoNome = ""
+function atualizar() {
+  const lido = lerQuiz($("texto").value)
+  const boas = lido.todas.filter(q => !q.problema)
+  if (!lido.todas.length) {
+    $("contagem").textContent = "Cole as perguntas para ver o que o site entendeu."
+    $("lidas").innerHTML = ""
+  } else {
+    const ruins = lido.todas.length - boas.length
+    $("contagem").textContent = `${boas.length} ${boas.length === 1 ? "pergunta pronta" : "perguntas prontas"}` + (ruins ? `, ${ruins} para arrumar` : "")
+    let faseAntes = null
+    $("lidas").innerHTML = lido.fases.flatMap(f => f.perguntas.map(q => {
+      const fase = f.nome && f !== faseAntes ? `<span class="fase">${escapar(f.nome)}</span>` : ""
+      faseAntes = f
+      return `<li class="${q.problema ? "falta" : ""}">${fase}<b class="q">${q.numero}. ${escapar(q.texto)}</b><ul>${q.opcoes.map(o => `<li class="${o.certa ? "certa" : ""}">${o.letra}) ${escapar(o.t)}</li>`).join("")}</ul>${q.porque ? `<p class="porque">Por quê: ${escapar(q.porque)}</p>` : ""}${q.problema ? `<p class="problema">${q.problema}</p>` : ""}</li>`
+    })).join("")
+  }
+  $("pronto").hidden = !(boas.length >= 2 && boas.length === lido.todas.length)
+  $("dica-conferir").hidden = !boas.length
+  const temJogo = boas.length >= 2
+  for (const id of ["moldura", "acoes", "passos"]) $(id).hidden = !temJogo
+  $("sem-jogo").hidden = temJogo
+  if (!temJogo) { ultimoHtml = ""; $("previa").removeAttribute("srcdoc"); return }
+  ultimoNome = $("nome").value.trim() || "Quiz da turma"
+  const html = htmlDoJogo(ultimoNome, $("objetivo").value.trim().replace(/\.$/, ""), dadosDoJogo(lido))
+  // The preview reloads only when the game changes, so a pause in typing does not restart it for nothing
+  if (html !== ultimoHtml) $("previa").srcdoc = html
+  ultimoHtml = html
+}
+let espera
+for (const id of ["texto", "nome", "objetivo"]) $(id).addEventListener("input", () => { clearTimeout(espera); espera = setTimeout(atualizar, 500) })
+$("exemplo").addEventListener("click", () => {
+  $("texto").value = EXEMPLO
+  if (!$("nome").value) $("nome").value = "Bichos do Pampa"
+  if (!$("objetivo").value) $("objetivo").value = "reconhecer bichos e plantas do Pampa"
+  atualizar()
+  $("conferencia").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" })
+})
+$("limpar").addEventListener("click", () => { $("texto").value = ""; atualizar(); $("texto").focus() })
+$("tela-cheia").addEventListener("click", () => {
+  const m = $("moldura")
+  if (m.requestFullscreen) m.requestFullscreen().catch(() => m.scrollIntoView())
+  else m.scrollIntoView()
+})
+$("baixar").addEventListener("click", () => {
+  if (!ultimoHtml) return
+  const nomeArquivo = ultimoNome.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "quiz"
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([ultimoHtml], { type: "text/html" })), download: nomeArquivo + ".html" })
+  document.body.append(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000)
+})
+atualizar()
+</script>
+<script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
+</body>
+</html>
