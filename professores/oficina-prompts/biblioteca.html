@@ -2053,6 +2053,15 @@ function toText(prompt) {
 const marked = text => escape(text).replace(/\[[^\]]*\]/g, part => `<mark>${part}</mark>`).replace(/\n/g, "<br>")
 const list = lines => `<ul>${lines.map(line => `<li${line.startsWith("MATERIAL") ? ' class="paste"' : ""}>${marked(line)}</li>`).join("")}</ul>`
 
+// Fazer o Raio-X: o prompt vai pelo sessionStorage, numa chave só para isso, e nunca pelo endereço,
+// que fica no histórico e sai no Referer. O Raio-X lê e apaga a chave assim que abre
+const LUPA = Icones.svg("lupa")
+function abrirRaioX(texto, botao) {
+  try { sessionStorage.setItem("gp-raio-x:prompt", JSON.stringify({ texto, origem: "biblioteca" })) }
+  catch { return avisarNoCartao(botao, "Este navegador não deixou levar o prompt. Copie e cole no Raio-X.") }
+  location.href = "raio-x.html"
+}
+
 // Drawing one card: the coloured top, the four parts like the builder, the buttons and the tip
 // As partes entre colchetes viram campos: o que a pessoa escreve entra no lugar delas na hora de copiar
 const lacunas = prompt => [...new Set(toText(prompt).match(/\[[^\]]+\]/g) || [])]
@@ -2096,6 +2105,7 @@ function cardHTML(prompt, index) {
       <div class="actions">
         <button class="btn copy" type="button" data-copy="${index}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V19.5 A1.5 1.5 0 0 1 19 21 H9 A1.5 1.5 0 0 1 7.5 19.5 V9.5 A1.5 1.5 0 0 1 9 8 Z M16 8 V4.5 A1.5 1.5 0 0 0 14.5 3 H5 A1.5 1.5 0 0 0 3.5 4.5 V14.5 A1.5 1.5 0 0 0 5 16 H7.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg>Copiar prompt</button>
         <button class="btn save" type="button" data-save="${index}" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.8 7.9 8.6 1.2-6.3 6 1.6 8.6L16 23.1l-7.7 4.1 1.6-8.6-6.3-6 8.6-1.2z" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Guardar</span></button>
+        <button class="btn open" type="button" data-raiox="${index}">${LUPA}Fazer o Raio-X</button>
         <a class="btn open" href="${CHATGPT}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C12.8 8.5 15.5 11.2 22 12 C15.5 12.8 12.8 15.5 12 22 C11.2 15.5 8.5 12.8 2 12 C8.5 11.2 11.2 8.5 12 2 Z" fill="#fff" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/></svg>Abrir o ChatGPT</a>
         <span class="copied" role="status"></span>
       </div>
@@ -2226,6 +2236,7 @@ function itemHTML(item) {
       ${nome}
       <details class="ver-prompt"><summary>Ver o prompt inteiro</summary><pre>${escape(item.mensagens.join("\n\n-----\n\n"))}</pre></details>
       ${renomeando === item.id ? "" : `<div class="actions">${copiar}
+        <button class="btn open" type="button" data-acao="raiox">${LUPA}Fazer o Raio-X</button>
         <button class="btn btn--falar" type="button" data-acao="mandar">${AVIAO}Mandar este prompt</button>
         <button class="btn open" type="button" data-acao="renomear">Renomear</button>
         <button class="btn open" type="button" data-acao="apagar"${apagando === item.id ? ' style="--c: var(--pink)"' : ""}>${apagando === item.id ? "Apagar mesmo?" : "Apagar"}</button>
@@ -2359,6 +2370,11 @@ $("library").addEventListener("click", event => {
   const botao = event.target.closest("[data-save]")
   if (botao) guardarCartao(Number(botao.dataset.save), botao)
 })
+// O Raio-X recebe o prompt com o que a pessoa já escreveu nos campos; o que ficou em branco segue entre colchetes
+$("library").addEventListener("click", event => {
+  const botao = event.target.closest("[data-raiox]")
+  if (botao) abrirRaioX(textoPreenchido(Number(botao.dataset.raiox)), botao)
+})
 // Quem muda um campo de um prompt guardado muda também o que ficou guardado
 $("library").addEventListener("change", event => {
   const campo = event.target.closest("input[data-prompt]")
@@ -2379,6 +2395,9 @@ $("meus-itens").addEventListener("click", async event => {
   if (acao === "copiar") {
     const ok = await copyText(item.mensagens[Number(botao.dataset.i)] ?? item.mensagens[0])
     avisarNoCartao(botao, ok ? "Copiado! Agora cole no ChatGPT." : "")
+  } else if (acao === "raiox") {
+    // As duas mensagens do jogo vão juntas: o Raio-X olha o pedido inteiro
+    abrirRaioX(item.mensagens.join("\n\n"), botao)
   } else if (acao === "mandar") {
     mandarGuardado(item)
   } else if (acao === "renomear") {

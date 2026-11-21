@@ -42,6 +42,8 @@
   .exemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px }
   .exemplos span { font-weight: 700 }
   .local { margin: 12px 0 0; font-size: 15px; font-weight: 600; color: var(--soft) }
+  .veio { margin: 0 0 10px; padding: 8px 12px; background: #c9f5e3; border: 3px dashed var(--ink); border-radius: 14px; font-weight: 600 }
+  .veio[hidden] { display: none }
 
   /* The verdict: stars, the stamp and what Bit thinks */
   .placar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 16px }
@@ -105,8 +107,9 @@
     <p><b>O prompt fica só no seu aparelho.</b> O Raio-X lê o texto aqui mesmo, sem enviar para ninguém e sem guardar. Mesmo assim, nada de nome, laudo ou outro dado de estudante: se aparecer, o quero-quero avisa.</p>
   </section>
 
-  <section class="card" data-bit-pose="pensando" data-bit-dica="Experimente os exemplos para ver o Raio-X funcionando. Depois cole o seu.">
+  <section class="card" id="colar" data-bit-pose="pensando" data-bit-dica="Experimente os exemplos para ver o Raio-X funcionando. Depois cole o seu.">
     <h2><span class="n">1</span>Cole o prompt</h2>
+    <p class="veio" id="veio" hidden>Este prompt veio da Biblioteca. O que você mudar aqui não muda o que ficou lá. <a href="biblioteca.html" id="voltar">Voltar para a Biblioteca</a></p>
     <label for="texto">O prompt<small>o que você mandaria para o ChatGPT ou o Gemini</small><textarea id="texto" placeholder="Faça uma atividade sobre frações."></textarea></label>
     <div class="exemplos">
       <span id="rotulo-exemplos">Ou experimente:</span>
@@ -184,11 +187,13 @@ const PECAS = [
 ]
 // What tends to go wrong with the AI, from the tests of the workshop (the same sentences as Frases que salvam)
 const CUIDADOS = [
-  { id: "jogo", icone: "jogo", quando: n => /\b(jogo|game|joguinho)\b/.test(n) && !/bloco de codigo/.test(n) && !/(imprimir|tabuleiro|recortar)/.test(n),
+  { id: "jogo", icone: "jogo", quando: n => /\b(jogo|game|joguinho)\b/.test(n) && !/bloco de codigo/.test(n) && !/(imprimir|tabuleiro|recortar|quadra|patio)/.test(n),
     titulo: "Pedido de jogo", texto: "No ChatGPT gratuito, o jogo como arquivo gasta a cota do dia e pode não chegar.", frase: "Mostre o código completo num bloco de código HTML, sem criar arquivo." },
   { id: "imprimir", icone: "atividade", quando: n => /(imprimir|impress|\bfolha\b|xerox|\bprova\b)/.test(n) && !/emoji/.test(n),
     titulo: "Vai imprimir", texto: "A IA enche a folha de emojis, que saem estranhos na impressão.", frase: "Sem emojis." },
-  { id: "gabarito", icone: "quiz", quando: n => /(questoes|perguntas(?! para (conversar|discutir|a roda))|exercicios|\bprova\b|\bquiz\b|avaliacao|simulado|multipla escolha)/.test(n) && !/(gabarito|respostas? (certa|correta))/.test(n) && !/\bjogo\b/.test(n),
+  // Questions for a talk, for the groups or that the AI asks the teacher ("me faça até 3 perguntas para entender"),
+  // rubrics and essays need no answer key
+  { id: "gabarito", icone: "quiz", quando: n => /(questoes|perguntas(?! para (conversar|discutir|a roda|a turma|os grupos|fechar|entender))|exercicios|\bprova\b|\bquiz\b|avaliacao|simulado|multipla escolha)/.test(n) && !/(gabarito|respostas? (certa|correta)|com as? respostas?)/.test(n) && !/(\bjogo\b|rubrica|redacao)/.test(n),
     titulo: "Perguntas sem gabarito", texto: "Sem pedir, o gabarito pode não vir, ou vir num teste interativo que não dá para imprimir.", frase: "Escreva as perguntas e o gabarito em texto, sem usar o teste interativo." },
   { id: "bncc", icone: "plano", quando: n => /bncc/.test(n) && !/(nao|sem) (cite|citar|invente|inventar)[^.]*bncc/.test(n),
     titulo: "BNCC", texto: "A IA costuma inventar códigos de habilidade. Se precisar do código, procure em basenacionalcomum.mec.gov.br.", frase: "Não cite códigos de habilidades da BNCC." },
@@ -224,7 +229,10 @@ function analisar(texto) {
   const estrelas = dados.length ? 0 : [0, 0, 1, 2, 3][certas]
   // "Sou professora do 2º ano" tells who the teacher is, not who the AI should be
   const souProfessor = /\bsou (professor|professora)\b/.test(n)
-  return { palavras, pecas, dados, cuidados, pedidos, certas, estrelas, souProfessor }
+  // Parts still between brackets, as in the starter prompts of the Biblioteca. "[conferir]" is an instruction
+  // to the AI (Frases que salvam), and [texto](link) is a link: neither is a part to fill in
+  const lacunas = [...new Set((texto.match(/\[[^\[\]\n]{1,200}\](?!\()/g) || []).filter(l => semAcento(l) !== "[conferir]"))]
+  return { palavras, pecas, dados, cuidados, pedidos, certas, estrelas, souProfessor, lacunas }
 }
 
 function melhorar(texto, r) {
@@ -259,16 +267,22 @@ function mostrar() {
   $("estrelas").innerHTML = [0, 1, 2].map(i => i < r.estrelas ? ESTRELA : ESTRELA.replace("<svg", '<svg class="apagada"')).join("")
   $("estrelas").setAttribute("aria-label", `${r.estrelas} de 3 estrelas`)
   const veredito = r.dados.length ? "Antes de tudo, tire o dado do estudante."
+    : r.certas === 4 && r.lacunas.length ? "As quatro peças estão aí. Falta trocar o que está entre colchetes."
     : r.certas === 4 ? "Prompt completo: a IA tem tudo o que precisa."
     : r.certas === 3 ? "Quase lá: falta uma peça."
     : r.certas === 2 ? "Metade do caminho: a IA ainda vai adivinhar bastante."
     : "A IA vai adivinhar quase tudo. Comece pelas peças que faltam."
   $("veredito").textContent = veredito
-  $("visto").hidden = r.estrelas < 3
+  // The stamp means ready to send: not while a part between brackets is left to fill in
+  $("visto").hidden = r.estrelas < 3 || r.lacunas.length > 0
   const dicaDe = p => p.id === "papel" && r.souProfessor ? "Você contou quem você é. Diga também quem a IA deve ser." : p.dica
   $("pecas").innerHTML = r.pecas.map(p => `<div class="peca${p.ok ? " ok" : ""}" style="--c: ${p.c}; --light: ${p.light}"><strong><i>${p.letra}</i>${p.nome}<em>${p.ok ? "tem" : "falta"}</em></strong><p>${p.ok ? `Achei: <mark>${escapar(p.trecho)}</mark>` : `${dicaDe(p)} Exemplo: <mark>${escapar(p.falta)}</mark>`}</p></div>`).join("")
   const itens = []
   if (r.dados.length) itens.push(`<li class="alerta">${Icones.svg("quero-quero")}<div><b>Dado de estudante</b><span>Tire do prompt: ${r.dados.map(d => `<q>${escapar(d.texto)}</q>`).join(", ")}. Descreva a necessidade, como “um estudante de 9 anos que lê frases curtas”. No prompt melhorado, ele já saiu.</span></div></li>`)
+  if (r.lacunas.length) {
+    const mostra = r.lacunas.slice(0, 6).map(l => `<q>${escapar(l)}</q>`).join(", ") + (r.lacunas.length > 6 ? ` e mais ${r.lacunas.length - 6}` : "")
+    itens.push(`<li>${Icones.svg("adaptar")}<div><b>Partes para trocar</b><span>Troque antes de mandar: ${mostra}. Se ficar entre colchetes, a IA inventa no lugar da sua turma.</span></div></li>`)
+  }
   if (r.palavras < 12) itens.push(`<li>${Icones.svg("relogio")}<div><b>Curto demais</b><span>Com ${r.palavras} ${r.palavras === 1 ? "palavra" : "palavras"}, a IA preenche o resto do jeito dela. Conte para quem é e como quer receber.</span></div></li>`)
   if (r.pedidos >= 4) itens.push(`<li>${Icones.svg("sequencia")}<div><b>Muitos pedidos de uma vez</b><span>Com ${r.pedidos} pedidos no mesmo prompt, a IA costuma esquecer algum. Peça uma coisa por vez e mande o resto depois.</span></div></li>`)
   for (const c of r.cuidados) itens.push(`<li>${Icones.svg(c.icone)}<div><b>${c.titulo}</b><span>${c.texto} Peça: <q>${c.frase}</q></span></div></li>`)
@@ -295,7 +309,35 @@ $("copiar").addEventListener("click", async () => {
   $("copiado").textContent = ok ? "Copiado! Cole no ChatGPT." : ""
   setTimeout(() => { $("copiado").textContent = "" }, 4000)
 })
+
+// The Biblioteca's "Fazer o Raio-X" brings the prompt in sessionStorage, never in the address (it would stay in
+// the history and go out in the Referer). It is read once and deleted at once, so it does not stay in the tab
+const TRAZIDO = "gp-raio-x:prompt"
+function trazerPrompt() {
+  let dado = null
+  try { dado = JSON.parse(sessionStorage.getItem(TRAZIDO)) } catch {}
+  try { sessionStorage.removeItem(TRAZIDO) } catch {}
+  if (!dado || typeof dado.texto !== "string" || !dado.texto.trim()) return false
+  $("texto").value = dado.texto.slice(0, 20000)
+  $("veio").hidden = dado.origem !== "biblioteca"
+  return true
+}
+// Going back with the browser keeps the filters and what was typed in the cards of the Biblioteca
+$("voltar").addEventListener("click", event => {
+  try {
+    const antes = new URL(document.referrer)
+    if (antes.origin === location.origin && antes.pathname.endsWith("/biblioteca.html") && history.length > 1) { event.preventDefault(); history.back() }
+  } catch {}
+})
+const trouxe = trazerPrompt()
 mostrar()
+// The Bit and the top bar only load after this script: once they are on the page, the prompt card goes to
+// the top, with the verdict right below, and the Bit says it
+if (trouxe) addEventListener("DOMContentLoaded", () => {
+  $("colar").scrollIntoView({ block: "start" })
+  estrelasAntes = -1
+  mostrar()
+}, { once: true })
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="baixo-direita" defer></script>
 </body>
