@@ -639,6 +639,12 @@ p, li, blockquote {
   let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
   let est = { ok: false, ajuda: false, erradas: new Set() }
   const atual = () => FASES[fase].rodadas[rodada]
+  // As opções mudam de lugar a cada partida, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
@@ -720,7 +726,7 @@ p, li, blockquote {
     $("pistas").hidden = $("pistas-titulo").hidden = !r.pistas
     $("pistas").innerHTML = (r.pistas ?? []).map(p => `<li>${p}</li>`).join("")
     $("opcoes").hidden = !r.opcoes
-    $("opcoes").innerHTML = (r.opcoes ?? []).map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.t}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar((r.opcoes ?? []).map((o, i) => `<button class="opcao" type="button" data-i="${i}">${o.t}</button>`)).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
     $("nota").textContent = r.nota ?? (r.alvos ? "Toque no quadro. No teclado, use Tab e Enter." : fase === 0 ? "Quadros desenhados pelo Bit." : "")
     desenharQuadro()
@@ -884,6 +890,24 @@ p, li, blockquote {
   })
 
   desenharSom()
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou siga em frente.", 9000)
+      if (ocupado) return window.Bit?.diz("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.", 9000)
+      const r = atual(), dica = r.dica[r.dica.length - 1]
+      if (r.opcoes) {
+        const i = r.opcoes.findIndex(o => o.ok)
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${i}"]`))
+        return window.Bit?.diz("pensando", `A resposta é ${r.opcoes[i].t}. ${dica}`, 12000)
+      }
+      const i = r.alvos.findIndex(a => a.ok)
+      Jogo.modoProfessor.destacar($("quadro").querySelector(`.alvo[data-i="${i}"]`))
+      window.Bit?.diz("pensando", `A resposta é ${r.alvos[i].rotulo.replace(/^./, c => c.toLowerCase())}. ${dica}`, 12000)
+    },
+  })
+
   addEventListener("load", () => comecar(0))
 </script>
 </body>

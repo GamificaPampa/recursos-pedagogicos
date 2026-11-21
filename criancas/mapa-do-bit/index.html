@@ -909,6 +909,27 @@ p, li, blockquote {
   })
 
   desenharSom()
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit.diz("pensando", "A fase terminou. Escolha outra fase ou siga em frente.")
+      if (ocupado) return window.Bit.diz("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.")
+      const r = atual()
+      if (r.modo === "marcar") {
+        Jogo.modoProfessor.destacar($("mapa").querySelector(`.ponto[data-lat="${r.lat}"][data-lon="${r.lon}"]`))
+        return window.Bit.diz("pensando", `O ponto certo está marcado na grade. ${r.acerto}`)
+      }
+      const i = opcoesDaRodada.findIndex(o => o.ok)
+      Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${i}"]`))
+      if (tipo() === "biomas") {
+        const b = BIOMAS[r.id]
+        return window.Bit.diz("pensando", `É ${b.art.toLowerCase()} ${b.nome}. ${b.acerto.replace(/^[^!]*! /, "")}`)
+      }
+      window.Bit.diz("pensando", `A resposta é ${opcoesDaRodada[i].html}. ${r.acerto}`)
+    },
+  })
+
   addEventListener("load", () => comecar(0))
 </script>
 </body>

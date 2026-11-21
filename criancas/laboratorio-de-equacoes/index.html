@@ -261,6 +261,7 @@ p, li, blockquote {
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
         <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes" hidden></div>
       </div>
     </section>
 
@@ -637,10 +638,11 @@ p, li, blockquote {
     $("fim-texto").textContent = ultima
       ? `Você balanceou as reações${comoFoi}. Da azia à fotossíntese, toda reação segue a mesma regra: os átomos só mudam de lugar.`
       : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
-    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("seguir").hidden = ultima
+    $("fim-acoes").hidden = !ultima
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
-    $("seguir").focus()
+    ;(ultima ? $("fim-acoes").querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? "Você é químico de verdade! Na reação, nada se cria e nada se perde." : "Fase completa! Vamos para a próxima?")
     if (estrelas === 3) confete()
@@ -683,7 +685,8 @@ p, li, blockquote {
     })
   }
   mostrarEstrelas()
-  $("seguir").onclick = () => performance.now() - fimEm < 500 || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => performance.now() - fimEm < 500 || comecar(fase + 1)
+  $("fim-acoes").append(Jogo.acoesDoFim(() => performance.now() - fimEm < 500 || comecar(0)))
 
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {

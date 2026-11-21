@@ -210,6 +210,7 @@ p, li, blockquote {
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
         <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes" hidden></div>
       </div>
     </section>
 
@@ -351,10 +352,17 @@ p, li, blockquote {
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const opcaoNumero = i => $("opcoes").querySelector(`.opcao[data-i="${i}"]`)
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
   function mostrarOpcoes(lista, aoEscolher, classe = "") {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
-    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar(lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`)).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
       if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
     })
@@ -476,7 +484,7 @@ p, li, blockquote {
         $("cena").innerHTML = `<p class="grande">${palavra}</p><p class="traducao">${palavra} = ${PALAVRAS[palavra]}</p>`
         acertou(`Isso! ${palavra.toUpperCase()} quer dizer ${PALAVRAS[palavra]}.`, botao)
       }, "opcoes--desenhos")
-      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("desenho"); b.setAttribute("aria-label", opcoes[i]) })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.classList.add("desenho"); b.setAttribute("aria-label", opcoes[b.dataset.i]) })
     } else if (tipo() === "frase") {
       $("pergunta").textContent = "Leia e toque no desenho certo"
       $("texto").textContent = "Olhe o número e a cor."
@@ -493,7 +501,7 @@ p, li, blockquote {
         $("cena").innerHTML = `${ALTO_FALANTE}<p class="grande">${r.frase}</p><p class="traducao">${r.pt}</p>`
         acertou(`Isso! "${r.frase}" quer dizer ${r.pt}. Em inglês, a cor vem antes da coisa: ${corc} ${r.obj}${nc > 1 ? "s" : ""}.`, botao)
       })
-      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("grupo"); b.setAttribute("aria-label", `${r.opcoes[i][0]} ${r.opcoes[i][1]}`) })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.classList.add("grupo"); b.setAttribute("aria-label", r.opcoes[b.dataset.i].join(" ")) })
     } else {
       $("pergunta").textContent = "Responda ao Bit"
       $("texto").textContent = "Escolha a melhor resposta em inglês."
@@ -532,10 +540,11 @@ p, li, blockquote {
     const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
     const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
     $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
-    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("seguir").hidden = ultima
+    $("fim-acoes").hidden = !ultima
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
-    $("seguir").focus()
+    ;(ultima ? $("fim-acoes").querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
     if (estrelas === 3) confete()
@@ -583,7 +592,8 @@ p, li, blockquote {
   let toqueAnterior = 0, toqueAtual = 0
   addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
   const toqueDuplo = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
-  $("seguir").onclick = () => toqueDuplo() || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => toqueDuplo() || comecar(fase + 1)
+  $("fim-acoes").append(Jogo.acoesDoFim(() => toqueDuplo() || comecar(0)))
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
@@ -606,18 +616,18 @@ p, li, blockquote {
     resposta() {
       if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
       if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
-      const r = atual(), botoes = [...$("opcoes").querySelectorAll(".opcao")]
+      const r = atual()
       if (tipo() === "ouvir") {
         const [palavra, opcoes] = r
-        Jogo.modoProfessor.destacar(botoes[opcoes.indexOf(palavra)])
+        Jogo.modoProfessor.destacar(opcaoNumero(opcoes.indexOf(palavra)))
         return window.Bit?.diz("pensando", `A palavra é ${palavra}, que quer dizer ${PALAVRAS[palavra]}.`, 12000)
       }
       if (tipo() === "frase") {
         const i = r.opcoes.findIndex(([n, cor]) => n === r.certo[0] && cor === r.certo[1])
-        Jogo.modoProfessor.destacar(botoes[i])
+        Jogo.modoProfessor.destacar(opcaoNumero(i))
         return window.Bit?.diz("pensando", `"${r.frase}" quer dizer ${r.pt}. ${NUMEROS[r.certo[0]]} é ${r.certo[0]} e ${r.certo[1]} é ${CORES[r.certo[1]][0]}.`, 12000)
       }
-      Jogo.modoProfessor.destacar(botoes[r.certa])
+      Jogo.modoProfessor.destacar(opcaoNumero(r.certa))
       window.Bit?.diz("pensando", r.explica, 12000)
     },
     // A voz em inglês para quando o professor pausa

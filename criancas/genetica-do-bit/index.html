@@ -226,6 +226,7 @@ p, li, blockquote {
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
         <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes" hidden></div>
       </div>
     </section>
 
@@ -618,10 +619,11 @@ p, li, blockquote {
     $("fim-texto").textContent = ultima
       ? `Você previu os filhotes${comoFoi}. É assim que um criador escolhe o touro para ter bezerros sem chifre, usando a lei que Mendel descobriu com ervilhas.`
       : `Você terminou a fase${comoFoi}. Próxima fase: ${FASES[fase + 1].nome}.`
-    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("seguir").hidden = ultima
+    $("fim-acoes").hidden = !ultima
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
-    $("seguir").focus()
+    ;(ultima ? $("fim-acoes").querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? "Você domina a primeira lei de Mendel! Cada filhote recebe uma letra de cada um." : "Fase completa! Vamos para a próxima?")
     if (estrelas === 3) confete()
@@ -669,7 +671,8 @@ p, li, blockquote {
   let toqueAnterior = 0, toqueAtual = 0
   addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
   const toqueDuplo = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
-  $("seguir").onclick = () => toqueDuplo() || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => toqueDuplo() || comecar(fase + 1)
+  $("fim-acoes").append(Jogo.acoesDoFim(() => toqueDuplo() || comecar(0)))
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {

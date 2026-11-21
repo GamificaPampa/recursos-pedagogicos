@@ -679,6 +679,27 @@ p, li, blockquote {
   })
 
   desenharSom()
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return fala("pensando", "A fase terminou. Escolha outra fase ou siga em frente.")
+      if (ocupado) return fala("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.")
+      const r = atual()
+      if (r.kind === "binaria") {
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-id="${r.resp}"]`))
+        return fala("pensando", r.certa)
+      }
+      if (r.kind === "escolha") {
+        Jogo.modoProfessor.destacar($("opcoes").querySelector(`.opcao[data-i="${r.ops.findIndex(o => o.certa)}"]`))
+        return fala("pensando", r.explica)
+      }
+      const prox = EV[r.ids[marcados]]
+      Jogo.modoProfessor.destacar($("ordem").querySelector(`.item[data-id="${r.ids[marcados]}"]`))
+      fala("pensando", `O próximo fato é de ${prox.ano}. ${prox.fato}`)
+    },
+  })
+
   addEventListener("load", () => comecar(0))
 </script>
 </body>

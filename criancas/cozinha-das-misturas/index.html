@@ -216,6 +216,7 @@ p, li, blockquote {
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
         <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes" hidden></div>
       </div>
     </section>
 
@@ -891,10 +892,11 @@ p, li, blockquote {
     $("fim-titulo").textContent = ultima ? "Cientista da cozinha!" : `Fase ${fase + 1} completa!`
     const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
     $("fim-texto").textContent = `Você terminou a fase${comoFoi}. ${FASES[fase].fim}${ultima ? "" : ` Próxima fase: ${FASES[fase + 1].nome}.`}`
-    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("seguir").hidden = ultima
+    $("fim-acoes").hidden = !ultima
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
-    $("seguir").focus()
+    ;(ultima ? $("fim-acoes").querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? "Você domina a matéria e suas transformações! Agora é olhar para a cozinha de casa com olhos de cientista." : "Fase completa! Vamos para a próxima?")
     if (estrelas === 3) confete()
@@ -942,7 +944,8 @@ p, li, blockquote {
   let toqueAnterior = 0, toqueAtual = 0
   addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
   const toqueSeguido = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
-  $("seguir").onclick = () => toqueSeguido() || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => toqueSeguido() || comecar(fase + 1)
+  $("fim-acoes").append(Jogo.acoesDoFim(() => toqueSeguido() || comecar(0)))
   // Copiar as mensagens para o ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
@@ -960,6 +963,39 @@ p, li, blockquote {
   })
 
   desenharSom()
+  // Modo professor (tecla P ou ?professor): escolher a fase, mostrar a resposta e pausar
+  Jogo.modoProfessor({
+    irParaFase: n => comecar(n - 1),
+    resposta() {
+      if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou siga em frente.")
+      if (travado) return window.Bit?.diz("pensando", "Este desafio já foi respondido. Toque em Próximo desafio.")
+      const r = atual(), t = tipo()
+      const botao = id => $("opcoes").querySelector(`.opcao[data-id="${id}"]`)
+      if (t === "estados") {
+        Jogo.modoProfessor.destacar(botao(r.certa))
+        return window.Bit?.diz("pensando", r.expl)
+      }
+      if (t === "misturas" && etapa === 0) {
+        Jogo.modoProfessor.destacar(botao(r.tipo))
+        return window.Bit?.diz("pensando", r.tipo === "hetero"
+          ? `É heterogênea: dá para ver mais de uma parte, ${r.partes}.`
+          : "É homogênea: a mistura tem um aspecto só, e o sal dissolvido não aparece.")
+      }
+      if (t === "misturas") {
+        Jogo.modoProfessor.destacar(botao(r.metodo))
+        return window.Bit?.diz("pensando", r.expl2)
+      }
+      if (etapa === 0) {
+        Jogo.modoProfessor.destacar(botao(r.tipo))
+        return window.Bit?.diz("pensando", r.tipo === "quimica"
+          ? `É transformação química: apareceu algo novo, ${r.novo}.`
+          : `É transformação física: ${r.continua}.`)
+      }
+      Jogo.modoProfessor.destacar(r.sinais.map(botao))
+      window.Bit?.diz("pensando", `O texto conta ${r.sinais.length === 1 ? "este sinal" : "estes sinais"}: ${lista(r.sinais.map(s => minuscula(SINAIS[s])))}. Marque e toque em Conferir.`)
+    },
+  })
+
   addEventListener("load", () => comecar(0))
 </script>
 </body>

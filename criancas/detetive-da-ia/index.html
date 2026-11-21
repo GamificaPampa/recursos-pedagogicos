@@ -227,6 +227,7 @@ p, li, blockquote {
         <h2 class="loud" id="fim-titulo">Fase completa!</h2>
         <p id="fim-texto"></p>
         <button class="btn btn--jogar btn--big" type="button" id="seguir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="#fff" stroke="#2f2a4a" stroke-width="3" stroke-linejoin="round"/></svg><span>Próxima fase</span></button>
+        <div id="fim-acoes" hidden></div>
       </div>
     </section>
 
@@ -385,10 +386,17 @@ p, li, blockquote {
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const opcaoNumero = i => $("opcoes").querySelector(`.opcao[data-i="${i}"]`)
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
   function mostrarOpcoes(lista, aoEscolher, classe = "") {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
-    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar(lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`)).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
       if (!ocupado && !botao.disabled && !toqueDuplo()) aoEscolher(botao, Number(botao.dataset.i))
     })
@@ -430,7 +438,6 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
   function mostrar() {
-    if (typeof pararRodada === "function") pararRodada()
     $("proxima").hidden = true
     $("dica").hidden = false
     $("acao").hidden = true
@@ -524,7 +531,6 @@ p, li, blockquote {
 
   // Stars by how many mistakes were made in the phase, and confetti
   function terminarFase() {
-    if (typeof pararRodada === "function") pararRodada()
     const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
     const ultima = fase === FASES.length - 1
     Jogo.progresso.guardar(fase + 1, estrelas)
@@ -535,10 +541,11 @@ p, li, blockquote {
     const comoFoi = erros ? ` com ${erros} ${erros === 1 ? "erro" : "erros"}` : " sem errar"
     const feito = FASES[fase].fim || `Você terminou a fase${comoFoi}.`
     $("fim-texto").textContent = ultima ? `${feito} ${FIM.texto}` : `${feito} Próxima fase: ${FASES[fase + 1].nome}${/[?!]$/.test(FASES[fase + 1].nome) ? "" : "."}`
-    $("seguir").querySelector("span").textContent = ultima ? "Jogar de novo" : "Próxima fase"
+    $("seguir").hidden = ultima
+    $("fim-acoes").hidden = !ultima
     $("placar").innerHTML = FASES[fase].rodadas.map(() => '<li class="feito"></li>').join("")
     $("fim").hidden = false
-    $("seguir").focus()
+    ;(ultima ? $("fim-acoes").querySelector("button") : $("seguir")).focus()
     somFesta()
     window.Bit?.diz("comemorando", ultima ? FIM.fala : "Fase completa! Vamos para a próxima?")
     if (estrelas === 3) confete()
@@ -586,7 +593,8 @@ p, li, blockquote {
   let toqueAnterior = 0, toqueAtual = 0
   addEventListener("pointerdown", () => { toqueAnterior = toqueAtual; toqueAtual = performance.now() }, true)
   const toqueSeguido = () => performance.now() - toqueAtual < 600 && toqueAtual - toqueAnterior < 450
-  $("seguir").onclick = () => toqueSeguido() || comecar(fase === FASES.length - 1 ? 0 : fase + 1)
+  $("seguir").onclick = () => toqueSeguido() || comecar(fase + 1)
+  $("fim-acoes").append(Jogo.acoesDoFim(() => toqueSeguido() || comecar(0)))
   // Copying the prompt messages for the ChatGPT
   document.querySelectorAll("[data-copiar]").forEach(botao => {
     botao.onclick = async () => {
@@ -614,8 +622,7 @@ p, li, blockquote {
         Jogo.modoProfessor.destacar($("cena").querySelector(`.trecho[data-i="${r.erro}"]`))
         return window.Bit?.diz("pensando", `${r.certo} ${r.conferir}`)
       }
-      const botoes = [...$("opcoes").querySelectorAll(".opcao")]
-      Jogo.modoProfessor.destacar(botoes[r.certa])
+      Jogo.modoProfessor.destacar(opcaoNumero(r.certa))
       window.Bit?.diz("pensando", r.explica)
     },
   })

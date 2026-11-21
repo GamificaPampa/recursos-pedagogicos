@@ -56,13 +56,16 @@
   .hills::after { right: -25%; width: 95%; height: 120%; background: var(--hill2) }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important } }
 
-  header, #dots { display: flex; gap: 14px; align-items: center }
+  header, #fases { display: flex; gap: 14px; align-items: center }
+  header { flex-wrap: wrap; justify-content: center }
   .dot { width: 26px; height: 26px; border-radius: 50%; border: 4px solid var(--ink); background: #fff; transition: transform .2s }
   .dot.done { background: var(--yellow) }
   /* A fase feita tem um visto, além da cor, e a fase atual é maior: a cor não é a única pista */
   .dot { position: relative }
   .dot.done::after { content: ""; position: absolute; left: 50%; top: 45%; width: 28%; height: 50%; border: solid var(--ink); border-width: 0 3px 3px 0; transform: translate(-50%, -50%) rotate(45deg) }
   .dot.now { background: var(--pink); transform: scale(1.25) }
+  /* O kit deixa os botões de fase mais baixos no telão; aqui as fases são só pontos */
+  html.telao #fases .dot.fase { min-height: 0 }
   #mute { display: grid; place-items: center; width: 52px; height: 52px; margin-left: 24px; padding: 0; background: #fff; border: 3px solid var(--ink); border-radius: 50%; box-shadow: 0 4px 0 var(--ink); cursor: pointer }
   #mute svg { width: 28px; height: 28px; pointer-events: none }
   #board {
@@ -194,15 +197,15 @@
     #queue { gap: 3px }
     #queue li { width: 8.6vw; border-width: 3px }
     html, body { overflow: auto }
-    header, #dots { gap: 8px }
+    header, #fases { gap: 8px }
     #mute { margin-left: 0 }
   }
 </style>
 </head>
-<body>
+<body data-telao="sem-zoom">
 <div class="sky" aria-hidden="true"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="hills"></div></div>
 
-<header><span id="dots"></span><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
+<header><span id="fases" role="list" aria-label="Fases"></span><button id="mute" tabindex="-1" aria-label="Som"><svg viewBox="0 0 24 24"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="#ffd23f" stroke="#2f2a4a" stroke-width="2.2" stroke-linejoin="round"/><path d="M16.5 9 Q18.5 12 16.5 15 M19 6.5 Q23 12 19 17.5" stroke="#2f2a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button></header>
 <main><div id="board"></div><ol id="code"></ol></main>
 <ol id="queue"></ol>
 <nav>
@@ -346,6 +349,7 @@ function loadLevel(number) {
   resize()
   document.querySelectorAll("#win, #final").forEach(overlay => overlay.classList.remove("show"))
   draw()
+  Jogo.ouvir.novaTela()
 
   // Bit, in the corner, says hello on the first level and asks for a plan on the next ones
   setTimeout(() => window.Bit?.diz(level === 0 ? "acenando" : "pensando", level === 0
@@ -355,8 +359,14 @@ function loadLevel(number) {
 
 // Redrawing the level dots, the command queue and its code version, marking the current and the wrong step
 function draw(current = -1) {
-  document.getElementById("dots").innerHTML = LEVELS.map((_, index) =>
-    `<span class="dot ${index < level ? "done" : ""} ${index === level ? "now" : ""}"></span>`).join(" ")
+  // Os pontos mudam no lugar, sem desenhar de novo: a barra do modo professor acompanha o aria-pressed deles
+  const dots = document.getElementById("fases")
+  if (!dots.children.length) dots.innerHTML = LEVELS.map(() => '<span class="dot fase" role="listitem"></span>').join(" ")
+  ;[...dots.children].forEach((dot, index) => {
+    dot.className = `dot fase ${index < level ? "done" : ""} ${index === level ? "now" : ""}`
+    dot.setAttribute("aria-pressed", String(index === level))
+    dot.setAttribute("aria-label", `Fase ${index + 1}${index < level ? ", feita" : index === level ? ", agora" : ""}`)
+  })
   document.getElementById("queue").innerHTML = Array.from({ length: QUEUE_LIMIT }, (_, index) =>
     `<li data-index="${index}" class="${queue[index] ? "full" : ""} ${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${queue[index] ? MOVES[queue[index]][2] : ""}</li>`).join("")
   document.getElementById("code").innerHTML = queue.map((key, index) =>
@@ -423,7 +433,9 @@ function win() {
   for (let index = 0; index < stars; index++) setTimeout(() => beep([1047 + index * 262]), 600 + index * 300)
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
+  Jogo.progresso.guardar(level + 1, stars)
   overlay.classList.add("show")
+  Jogo.ouvir.novaTela()
   window.Bit?.diz(stars === 3 ? "comemorando" : "feliz", stars === 3
     ? "Caminho mais curto! Isso é um algoritmo: os passos certos, na ordem certa."
     : "Cheguei na estrela! Será que dá para chegar com menos setas?", 5000)
@@ -446,7 +458,8 @@ function press(key) {
     if (key !== "Enter" && key !== " ") return
     if (level < LEVELS.length) return loadLevel(level)
     window.Bit?.diz("comemorando", "Você me programou em todas as fases! Agora você sabe o que é um algoritmo.", 7000)
-    return document.getElementById("final").classList.add("show")
+    document.getElementById("final").classList.add("show")
+    return Jogo.ouvir.novaTela()
   }
   if (MOVES[key] && queue.length < QUEUE_LIMIT) {
     queue.push(key)
@@ -476,7 +489,7 @@ function toggleMute() {
 // Kit de jogo do identidade-visual: casa para voltar ao menu da turma e tela cheia no topo, som guardado para todos
 // os jogos, e a tela final com Jogar de novo e Outros jogos
 document.querySelector("header").prepend(Jogo.botao("casa"))
-document.getElementById("mute").before(Jogo.botao("tela-cheia"))
+document.getElementById("mute").before(Jogo.botao("ouvir"), Jogo.botao("ler-sozinho"), Jogo.botao("tela-cheia"), Jogo.botao("telao"))
 Jogo.som.aoMudar(ligado => {
   muted = !ligado
   document.getElementById("mute").innerHTML = muted ? SILENT : SOUND
@@ -492,6 +505,8 @@ document.addEventListener("keydown", event => {
   // As teclas F1 a F12 ficam com o navegador, para o F11 da tela cheia funcionar
   if (/^F\d{1,2}$/.test(event.key)) return
   if (event.key === "Tab") return focoPeloTab = true
+  if (Jogo.modoProfessor.pausado) return
+  if (Jogo.modoProfessor.ligado && /^[asreASRE]$/.test(event.key)) return
   if ((event.key === "Enter" || event.key === " ") && focoPeloTab && document.activeElement?.matches("a, button")) return
   focoPeloTab = false
   event.preventDefault()
@@ -510,6 +525,61 @@ document.getElementById("queue").addEventListener("click", event => {
   draw()
 })
 addEventListener("resize", resize)
+
+// O que o Ouvir lê: a fase e o pedido, as setas já escolhidas, ou o que está na tela por cima
+const NOMES = { ArrowLeft: "esquerda", ArrowUp: "cima", ArrowDown: "baixo", ArrowRight: "direita" }
+Jogo.ouvir.textoDaTela(() => {
+  if (document.getElementById("final").classList.contains("show")) return document.querySelector("#final p").textContent
+  if (document.getElementById("win").classList.contains("show")) {
+    const estrelas = document.querySelectorAll("#stars svg:not(.off)").length
+    return `O robô chegou na estrela! ${estrelas === 1 ? "Uma estrela" : `${estrelas} estrelas`}. Toque para continuar.`
+  }
+  return [`Fase ${level + 1} de ${LEVELS.length}. Monte as setas para levar o robô até a estrela, sem bater nas pedras, e aperte play.`,
+    queue.length ? `Suas setas: ${queue.map(key => NOMES[key]).join(", ")}.` : "Ainda não há setas."]
+})
+
+// O caminho mais curto da fase, procurado casa por casa, para o Mostrar resposta do modo professor
+function shortestPath() {
+  const seen = new Map([[start.join(), null]]), line = [start]
+  while (line.length) {
+    const position = line.shift()
+    if (rows[position[0]][position[1]] === "*") {
+      const steps = []
+      for (let key = position.join(); seen.get(key); key = seen.get(key).from) steps.unshift(seen.get(key))
+      return steps
+    }
+    for (const [move, [dRow, dColumn]] of Object.entries(MOVES)) {
+      const next = [position[0] + dRow, position[1] + dColumn], symbol = rows[next[0]]?.[next[1]]
+      if (symbol === undefined || symbol === "#" || seen.has(next.join())) continue
+      seen.set(next.join(), { from: position.join(), move, cell: next })
+      line.push(next)
+    }
+  }
+  return []
+}
+
+// Modo professor (tecla P ou ?professor): escolher a fase, mostrar um caminho mais curto e pausar a música
+let musicWasOn = false
+Jogo.modoProfessor({
+  irParaFase: number => running || loadLevel(number - 1),
+  resposta() {
+    if (document.getElementById("final").classList.contains("show")) return window.Bit?.diz("pensando", "O jogo terminou. Escolha uma fase para jogar de novo.", 9000)
+    if (document.getElementById("win").classList.contains("show")) return window.Bit?.diz("pensando", "A fase terminou. Toque na tela para continuar.", 9000)
+    if (running) return
+    const steps = shortestPath(), cells = board.querySelectorAll(".cell")
+    Jogo.modoProfessor.destacar(steps.map(({ cell }) => cells[cell[0] * rows[0].length + cell[1]]))
+    window.Bit?.diz("pensando", `Um caminho mais curto, com ${steps.length} setas: ${steps.map(({ move }) => NOMES[move]).join(", ")}. Com ele, a fase vale 3 estrelas.`, 12000)
+  },
+  pausar() {
+    musicWasOn = Boolean(musicTimer)
+    clearInterval(musicTimer)
+    musicTimer = null
+  },
+  continuar() {
+    if (musicWasOn) startMusic()
+  },
+})
+
 loadLevel(0)
 </script>
 <script src="/identidade-visual/js/bit.js" data-canto="topo-esquerda" defer></script>
