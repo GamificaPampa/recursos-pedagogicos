@@ -201,7 +201,7 @@ p, li, blockquote {
           <ul>
             <li><b>No projetor:</b> antes de tocar, a turma fala a palavra devagar, batendo uma palma para cada sílaba. Uma criança vem e monta.</li>
             <li><b>No celular ou tablet:</b> em dupla, uma criança aperta "Ouvir a palavra" e a outra monta. Depois elas trocam.</li>
-            <li><b>Dica:</b> o primeiro toque fala a palavra em sílabas; o segundo faz pular a próxima sílaba. A dica que mostra a sílaba conta nas estrelas como um erro.</li>
+            <li><b>Dica:</b> o primeiro toque fala a palavra em sílabas; o segundo faz pular a próxima sílaba. A dica não tira estrela: as estrelas contam só os erros. No fim, a fase diz quantas dicas a turma usou.</li>
             <li><b>Depois:</b> recorte as sílabas em papel e peça para a turma trocar uma sílaba e formar palavras novas, como BOLA e BALA.</li>
             <li>No projetor, aperte P (ou abra com ?professor no fim do endereço) para escolher a fase, mostrar a resposta e pausar. A tecla T (ou ?telao) aumenta tudo e esconde esta parte.</li>
             <li>O botão Ouvir do topo lê o pedido e as sílabas em voz alta, para quem ainda não lê bem, e o botão ao lado liga o Ler sozinho. O Ouvir a palavra, perto do desenho, fala só a palavra.</li>
@@ -324,7 +324,7 @@ p, li, blockquote {
     cala() {},
   }
   let fase = 0, item = 0, passo = 0, erros = 0, errosAqui = 0, ocupado = false
-  let dicasAqui = 0, dicasFase = 0, revelacoes = 0
+  let dicasAqui = 0, dicasFase = 0
 
   // Short sounds made in the browser, no files to download
   let audio = null, comSom = true
@@ -431,7 +431,6 @@ p, li, blockquote {
         window.Bit?.diz("pensando", `Fale devagar comigo, batendo uma palma para cada sílaba: ${p.silabas.join(" - ")}.`, 6500)
         return falarSilabas(p.silabas)
       }
-      revelacoes++
       window.Bit?.diz("pensando", `A ${ORDINAL[passo]} sílaba é ${certa}. Procure a peça que está pulando!`, 5000)
       return mostrarDica(certa)
     }
@@ -440,7 +439,6 @@ p, li, blockquote {
       window.Bit?.diz("pensando", `Fale devagar: ${p.silabas.map((s, i) => i === p.falta ? "?" : s).join(" - ")}. Que sílaba entra no lugar do ponto de interrogação?`, 6500)
       return falarSilabas(p.silabas)
     }
-    revelacoes++
     window.Bit?.diz("pensando", `A sílaba que falta é ${certa}. Procure a peça que está pulando!`, 5000)
     mostrarDica(certa)
   }
@@ -516,8 +514,7 @@ p, li, blockquote {
 
   // Stars by how many mistakes the class made in the phase, and confetti
   function terminarFase() {
-    const pontos = erros + revelacoes
-    const estrelas = pontos === 0 ? 3 : pontos <= 2 ? 2 : 1
+    const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
     const ultima = fase === FASES.length - 1
     Jogo.progresso.guardar(fase + 1, estrelas)
     mostrarEstrelas()
@@ -558,7 +555,6 @@ p, li, blockquote {
     item = 0
     erros = 0
     dicasFase = 0
-    revelacoes = 0
     ocupado = false
     $("fim").hidden = true
     $("fases").querySelectorAll(".fase").forEach((botao, i) => botao.setAttribute("aria-pressed", String(i === fase)))
