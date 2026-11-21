@@ -345,7 +345,7 @@ p, li, blockquote {
     cala() {},
   }
 
-  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0
+  let fase = 0, rodada = 0, erros = 0, ocupado = false, dicas = 0, errosNoComeco = 0
   const atual = () => FASES[fase].rodadas[rodada]
   const tipo = () => FASES[fase].tipo
 
@@ -443,6 +443,7 @@ p, li, blockquote {
     $("acao").hidden = true
     $("opcoes").innerHTML = ""
     dicas = 0
+    errosNoComeco = erros
     desenharPlacar()
     $("topo").textContent = `${FASES[fase].nome} · ${FASES[fase].rotulo} ${rodada + 1} de ${FASES[fase].rodadas.length}`
     mostrarRodada()
@@ -524,7 +525,12 @@ p, li, blockquote {
 
   function dica() {
     const r = atual()
-    if (tipo() === "erro") return dicas === 1 ? "Procure um nome, um número ou uma data. É onde a IA mais inventa." : `O erro está no trecho ${r.erro + 1}.`
+    if (tipo() === "erro") {
+      if (dicas === 1) return "Procure um nome, um número ou uma data. É onde a IA mais inventa."
+      // A segunda dica entrega a resposta: só vem depois de uma tentativa errada nesta rodada, e a dica nunca tira estrela
+      if (erros === errosNoComeco) return "Escolha um trecho e tente. Se errar, eu mostro onde está o erro."
+      return `O erro está no trecho ${r.erro + 1}.`
+    }
     if (tipo() === "uso") return "Ideia pode ser ponto de partida. Número, data e frase de alguém precisam ser conferidos. Saúde e segurança são com uma pessoa."
     return "O melhor pedido diz o que você quer aprender e faz você pensar, sem copiar e sem dados pessoais."
   }
