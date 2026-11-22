@@ -358,12 +358,23 @@ p, li, blockquote {
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const opcaoNumero = i => $("opcoes").querySelector(`.opcao[data-i="${i}"]`)
+  // A rodada nova aparece no lugar do Próxima questão: o segundo toque de um toque duplo,
+  // logo depois que ela aparece, não vira resposta
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
   function mostrarOpcoes(lista, aoEscolher, classe = "") {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
-    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar(lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`)).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
-      if (!ocupado && !botao.disabled) aoEscolher(botao, Number(botao.dataset.i))
+      if (!ocupado && !botao.disabled && !toqueNaRodadaNova()) aoEscolher(botao, Number(botao.dataset.i))
     })
   }
   function errar(frase, botao, riscar = true) {
@@ -514,6 +525,7 @@ p, li, blockquote {
   $("acao").onclick = () => falar(textoDaRodada())
 
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     const r = atual()
     $("acao").innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h5l7-6v20l-7-6H5z" fill="#fff" stroke="#2f2a4a" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 11.5q3.5 4.5 0 9M24.5 8q7 8 0 16" fill="none" stroke="#2f2a4a" stroke-width="2.4" stroke-linecap="round"/></svg><span>Ouvir</span>'
     $("acao").hidden = !Jogo.ouvir.disponivel
@@ -531,7 +543,7 @@ p, li, blockquote {
         $("cena").innerHTML = campo + `<g transform="translate(130 110)">${forma(f, c).replace("<svg", '<svg width="140" height="140"')}</g>`
         acertou(`Isso! ${r.explica}`, botao)
       }, "opcoes--grade")
-      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("figura"); b.setAttribute("aria-label", nomeForma(...r.opcoes[i])) })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.classList.add("figura"); b.setAttribute("aria-label", nomeForma(...r.opcoes[b.dataset.i])) })
     } else if (tipo() === "contar") {
       contados = []
       $("texto").textContent = "Toque em cada bicho para contar."
@@ -560,7 +572,7 @@ p, li, blockquote {
         $("cena").querySelector("g").classList.remove("sombra")
         acertou(`Isso! É ${BICHOS[r.bicho][2] ? "a" : "o"} ${BICHOS[r.bicho][0]}! ${BICHOS[r.bicho][3]}`, botao)
       }, "opcoes--grade")
-      $("opcoes").querySelectorAll(".opcao").forEach((b, i) => { b.classList.add("figura"); b.setAttribute("aria-label", BICHOS[r.opcoes[i]][0]) })
+      $("opcoes").querySelectorAll(".opcao").forEach(b => { b.classList.add("figura"); b.setAttribute("aria-label", BICHOS[r.opcoes[b.dataset.i]][0]) })
     }
   }
 
@@ -661,17 +673,18 @@ p, li, blockquote {
     resposta() {
       if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.")
       if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.")
-      const r = atual(), botoes = [...$("opcoes").querySelectorAll(".opcao")]
+      // As opções estão embaralhadas: a certa se acha pelo data-i, não pela posição
+      const r = atual()
       if (tipo() === "formas") {
         const i = r.opcoes.findIndex(([f, c]) => (!r.alvo.forma || r.alvo.forma === f) && (!r.alvo.cor || r.alvo.cor === c))
-        Jogo.modoProfessor.destacar(botoes[i])
+        Jogo.modoProfessor.destacar(opcaoNumero(i))
         return window.Bit?.diz("pensando", `É ${FORMAS[r.opcoes[i][0]][1]} ${nomeForma(...r.opcoes[i])}. ${r.explica}`)
       }
       if (tipo() === "contar") {
-        Jogo.modoProfessor.destacar(botoes[r.opcoes.indexOf(r.n)])
+        Jogo.modoProfessor.destacar(opcaoNumero(r.opcoes.indexOf(r.n)))
         return window.Bit?.diz("pensando", `São ${NUMEROS[r.n]} ${BICHOS[r.bicho][1]}.`)
       }
-      Jogo.modoProfessor.destacar(botoes[r.opcoes.indexOf(r.bicho)])
+      Jogo.modoProfessor.destacar(opcaoNumero(r.opcoes.indexOf(r.bicho)))
       window.Bit?.diz("pensando", `A sombra é ${BICHOS[r.bicho][2] ? "da" : "do"} ${BICHOS[r.bicho][0]}.`)
     },
   })

@@ -384,7 +384,23 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].palavras.map((_, i) => `<li class="${i < item ? "feito" : i === item ? "agora" : ""}"></li>`).join("")
   }
 
+  // As peças mudam de lugar a cada palavra, e as sílabas certas nunca começam já na ordem da palavra, da esquerda para a direita.
+  // Na sílaba que falta, a família BA, BE, BI, BO, BU fica na ordem em que a criança aprende; a certa muda de palavra para palavra
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const jaNaOrdem = (pecas, silabas) => {
+    let k = 0
+    for (const peca of pecas) if (peca === silabas[k]) k++
+    return k === silabas.length
+  }
+  // A palavra nova aparece onde estava o Próxima questão: o segundo toque de um toque duplo não vale como resposta
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   function mostrarPalavra() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     const f = FASES[fase], p = atual()
@@ -396,7 +412,11 @@ p, li, blockquote {
     $("figura").setAttribute("aria-label", `Desenho: ${p.palavra.toLowerCase()}`)
     $("figura").classList.remove("pronta")
     $("pedido").textContent = f.tipo === "montar" ? "Monte a palavra do desenho." : "Qual sílaba falta na palavra?"
-    const pecas = f.tipo === "montar" ? p.pecas : ["BA", "BE", "BI", "BO", "BU"]
+    let pecas = ["BA", "BE", "BI", "BO", "BU"]
+    if (f.tipo === "montar") {
+      do pecas = embaralhar(p.pecas)
+      while (jaNaOrdem(pecas, p.silabas))
+    }
     $("silabas").innerHTML = pecas.map((peca, i) => `<button class="silaba" type="button" style="--c: ${CORES[(i + item) % CORES.length]}">${peca}</button>`).join("")
     $("silabas").querySelectorAll(".silaba").forEach(botao => botao.onclick = () => escolher(botao))
     desenharCaixas()
@@ -451,7 +471,7 @@ p, li, blockquote {
     return false
   }
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const f = FASES[fase], p = atual(), peca = botao.textContent
     if (f.tipo === "montar") {
       const certa = p.silabas[passo]

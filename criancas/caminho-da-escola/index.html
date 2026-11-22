@@ -487,7 +487,12 @@ p, li, blockquote {
     return frases
   }
 
+  // A rodada nova aparece quando o Próxima questão some: o segundo toque de um toque duplo,
+  // logo depois que ela aparece, não toca num lugar do mapa nem num comando
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     geracao++
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
@@ -550,7 +555,7 @@ p, li, blockquote {
   let lugaresErrados = new Set()
   async function tocarLugar(g) {
     const f = FASES[fase], r = f.rodadas[rodada]
-    if (ocupado || f.tipo === "guiar") return
+    if (ocupado || f.tipo === "guiar" || toqueNaRodadaNova()) return
     const l = +g.dataset.l, c = +g.dataset.c, letra = MAPA[l][c]
     if (lugaresErrados.has(`${l},${c}`)) return
     if (f.tipo === "tocar") {
@@ -604,7 +609,7 @@ p, li, blockquote {
 
   // Phase 2: the child builds the list of commands and Bit walks it
   document.querySelectorAll(".comando").forEach(botao => botao.onclick = () => {
-    if (ocupado || programa.length >= 14) return
+    if (ocupado || programa.length >= 14 || toqueNaRodadaNova()) return
     programa.push(botao.dataset.cmd)
     somPasso()
     desenharPrograma()
@@ -616,7 +621,7 @@ p, li, blockquote {
   }
   $("ir").onclick = async () => {
     const r = FASES[fase].rodadas[rodada]
-    if (ocupado) return
+    if (ocupado || toqueNaRodadaNova()) return
     if (!programa.length) return window.Bit?.diz("pensando", "Toque nos comandos para montar o caminho e depois aperte Andar.")
     ocupado = true
     const { passos, bateu } = andar(r.de, r.dir, programa), minha = geracao

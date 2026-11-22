@@ -418,8 +418,26 @@ p, li, blockquote {
     $("legenda").textContent = estado && comNome ? ETAPAS[estado].nome : ""
   }
 
+  // As etapas mudam de lugar a cada rodada, para a turma não decorar a posição da certa.
+  // Em "Em ordem", os botões nunca ficam na mesma ordem do caminho que a criança precisa tocar
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  function ordemDosBotoes() {
+    const f = FASES[fase], r = f.rodadas[rodada]
+    const caminho = f.tipo === "ordem" ? [0, 1, 2, 3].map(i => ORDEM[(r.inicio + i) % 4]).join() : ""
+    let ids
+    do ids = embaralhar(ORDEM)
+    while (ids.join() === caminho)
+    return ids
+  }
+  // A rodada nova aparece onde estava o Próxima questão: o segundo toque de um toque duplo não vale como resposta
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   function desenharOpcoes() {
-    $("opcoes").innerHTML = ORDEM.map(id => `<button class="opcao" type="button" data-etapa="${id}" style="--c: ${ETAPAS[id].cor}"><svg aria-hidden="true"><use href="#i-${id}"/></svg><span>${ETAPAS[id].nome}<small>${ETAPAS[id].sub}</small></span></button>`).join("")
+    $("opcoes").innerHTML = ordemDosBotoes().map(id => `<button class="opcao" type="button" data-etapa="${id}" style="--c: ${ETAPAS[id].cor}"><svg aria-hidden="true"><use href="#i-${id}"/></svg><span>${ETAPAS[id].nome}<small>${ETAPAS[id].sub}</small></span></button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
   }
   function desenharPlacar() {
@@ -427,6 +445,7 @@ p, li, blockquote {
   }
 
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     const f = FASES[fase], r = f.rodadas[rodada]
@@ -459,7 +478,7 @@ p, li, blockquote {
   }
 
   function responder(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const f = FASES[fase], r = f.rodadas[rodada], escolha = botao.dataset.etapa
     const certa = f.tipo === "ordem" ? ORDEM[(r.inicio + passo) % 4] : r.etapa
     const qual = id => `${ETAPAS[id].art} ${ETAPAS[id].nome.toLowerCase()}`

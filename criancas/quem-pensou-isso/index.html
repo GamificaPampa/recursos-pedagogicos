@@ -439,7 +439,11 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
 
+  // A rodada nova aparece onde estava o Próxima: o segundo toque de um toque duplo não vale como resposta
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     const r = atual(), total = FASES[fase].rodadas.length
     $("proxima").hidden = true
@@ -464,7 +468,10 @@ p, li, blockquote {
     } else if (tipo() === "linha") {
       $("texto").textContent = "Toque nos filósofos do mais antigo para o mais recente."
       $("nota").textContent = "Antiguidade: Grécia antiga. Modernidade: séculos XVI a XVIII. Contemporâneo: do século XIX até hoje."
-      cartas = embaralhar(r.ids)
+      // As cartas nunca começam já na ordem do tempo
+      const certa = [...r.ids].sort((x, y) => F[x].ini - F[y].ini).join()
+      do cartas = embaralhar(r.ids)
+      while (cartas.join() === certa)
       $("cartas").innerHTML = cartas.map(htmlCarta).join("")
       $("cartas").setAttribute("aria-label", "Filósofos para pôr em ordem")
       pintarAnos()
@@ -480,7 +487,7 @@ p, li, blockquote {
 
   // Fase 1: a ideia e as cartas. O erro explica o que aquele filósofo defendeu
   function escolherIdeia(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const r = atual(), id = botao.dataset.id
     if (id === r.certa) {
       botao.classList.add("certa")
@@ -498,7 +505,7 @@ p, li, blockquote {
 
   // Fase 2: tocar do mais antigo para o mais recente
   function escolherOrdem(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const r = atual(), id = botao.dataset.id
     const ordem = [...r.ids].sort((x, y) => F[x].ini - F[y].ini)
     if (id === ordem[colocados.length]) {
@@ -525,7 +532,7 @@ p, li, blockquote {
 
   // Fase 3: a situação e a ideia que ajuda a pensar nela
   function escolherDia(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const r = atual(), o = opcoes[botao.dataset.i]
     if (o.certo) {
       botao.classList.add("certa")

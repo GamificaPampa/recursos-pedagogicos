@@ -491,6 +491,12 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
   function mostrarRodada() {
     voo.rodada++
     Jogo.ouvir.novaTela()
@@ -513,7 +519,8 @@ p, li, blockquote {
       b = r.b
       $("texto").textContent = "Qual é a lei desta reta?"
       $("nota").textContent = "O ponto azul mostra o b. O degrau rosa mostra o a."
-      $("opcoes").innerHTML = r.opcoes.map(([oa, ob], i) => `<button class="opcao" type="button" data-i="${i}">${lei(oa, ob, "y", false)}</button>`).join("")
+      // As opções mudam de lugar a cada rodada; o data-i guarda o índice original, que decide o acerto
+      $("opcoes").innerHTML = embaralhar(r.opcoes.map(([oa, ob], i) => `<button class="opcao" type="button" data-i="${i}">${lei(oa, ob, "y", false)}</button>`)).join("")
       $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
     } else {
       a = 0
@@ -533,8 +540,9 @@ p, li, blockquote {
   }
 
   // Phase 1: choosing the law of the line. A wrong choice explains what to look at
+  // A rodada nova aparece onde estava o Próxima questão: o segundo toque de um toque duplo não vira resposta
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || performance.now() - rodadaNovaEm < 500) return
     const r = atual(), [oa, ob] = r.opcoes[botao.dataset.i]
     if (oa === r.a && ob === r.b) {
       botao.classList.add("certa")

@@ -390,6 +390,7 @@ p, li, blockquote {
   // Showing the order on the ticket and a new pizza in the oven
   function mostrarPedido() {
     Jogo.ouvir.novaTela()
+    pedidoNovoEm = performance.now()
     $("proxima").hidden = true
     $("entregar").hidden = false
     $("limpar").hidden = false
@@ -426,8 +427,11 @@ p, li, blockquote {
     else terminarFase()
   }
 
+  // O Entregar do pedido novo aparece onde estava o Próxima questão: o segundo toque de um toque duplo
+  // não entrega a pizza vazia nem troca a explicação do Bit pelo aviso de escolher os pedaços
+  let pedidoNovoEm = 0
   function entregar() {
-    if (ocupado) return
+    if (ocupado || performance.now() - pedidoNovoEm < 500) return
     const [a, b, n] = FASES[fase].pedidos[pedido], k = escolhidos()
     if (k === 0) return window.Bit?.diz("pensando", "Toque nos pedaços que vão para o cliente antes de entregar.")
     if (k * b === a * n) {

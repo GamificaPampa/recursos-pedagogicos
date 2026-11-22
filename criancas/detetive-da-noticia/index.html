@@ -467,6 +467,12 @@ p, li, blockquote {
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
+  // As respostas mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
   const escapar = texto => texto.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch])
   // The news page: in phase 1 every part is a button; otherwise it is just text
   function desenharNoticia(partes, clicavel) {
@@ -522,12 +528,15 @@ p, li, blockquote {
       $("texto").textContent = "Essa notícia parece confiável ou suspeita?"
       desenharNoticia([["site", n.site], ["data", n.data], ["titulo", n.titulo], ["texto", n.texto]], false)
       $("opcoes").className = "opcoes opcoes--duas"
-      $("opcoes").innerHTML = `<button class="opcao" type="button" data-v="1" style="--c: #c9f5e3">Parece confiável</button><button class="opcao" type="button" data-v="0" style="--c: #ffd6e2">Suspeita</button>`
+      // Os dois botões trocam de lado a cada notícia; a cor vai junto com a resposta
+      $("opcoes").innerHTML = embaralhar([`<button class="opcao" type="button" data-v="1" style="--c: #c9f5e3">Parece confiável</button>`, `<button class="opcao" type="button" data-v="0" style="--c: #ffd6e2">Suspeita</button>`]).join("")
     } else {
       const s = SITUACOES[rodada]
       $("texto").textContent = s.texto
       desenharNoticia(null)
-      $("opcoes").innerHTML = s.opcoes.map((opcao, i) => `<button class="opcao" type="button" data-v="${i}" style="--c: ${["#cfe6ff", "#fff1a8", "#e6dfff"][i]}">${escapar(opcao)}</button>`).join("")
+      // As atitudes mudam de lugar a cada situação; o data-v guarda o índice original e a cor segue a posição na tela
+      const ordem = embaralhar(s.opcoes.map((_, i) => i))
+      $("opcoes").innerHTML = ordem.map((i, lugar) => `<button class="opcao" type="button" data-v="${i}" style="--c: ${["#cfe6ff", "#fff1a8", "#e6dfff"][lugar]}">${escapar(s.opcoes[i])}</button>`).join("")
     }
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
   }

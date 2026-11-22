@@ -350,10 +350,17 @@ p, li, blockquote {
   $("som").before(Jogo.botao("tela-cheia", { classe: "btn btn--small" }), Jogo.botao("telao", { classe: "btn btn--small" }))
   document.querySelector('.topo > a.btn').replaceWith(Jogo.botao("casa", { classe: "btn btn--small", texto: true }))
 
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const opcaoNumero = i => $("opcoes").querySelector(`.opcao[data-i="${i}"]`)
   // Answer buttons. A wrong one is crossed out and the Bit explains; a right one waits for Próxima questão
   function mostrarOpcoes(lista, aoEscolher, classe = "") {
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
-    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar(lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`)).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
       if (!ocupado && !botao.disabled && !toqueDuplo()) aoEscolher(botao, Number(botao.dataset.i))
     })
@@ -546,9 +553,8 @@ p, li, blockquote {
         if ((i === 0) !== r.quente) return errar(`Olhe de novo. ${porque}`, botao)
         acertou(`Isso! ${porque}`, botao)
       }, "opcoes--duas")
-      const [quente, fria] = $("opcoes").querySelectorAll(".opcao")
-      quente.style.setProperty("--c", "#ffd0a8")
-      fria.style.setProperty("--c", "#cfe6ff")
+      opcaoNumero(0).style.setProperty("--c", "#ffd0a8")
+      opcaoNumero(1).style.setProperty("--c", "#cfe6ff")
     } else {
       $("pergunta").innerHTML = `Qual é a complementar do <b>${RODA[r][0]}</b>?`
       $("texto").textContent = "Toque na cor do círculo."
@@ -664,13 +670,13 @@ p, li, blockquote {
         const par = pares.find(([p, q]) => escolhidas.length && (p === escolhidas[0] || q === escolhidas[0])) || pares[0]
         const [p, q] = par
         const falta = escolhidas.length ? (p === escolhidas[0] ? q : p) : null
-        const botoes = [...$("opcoes").querySelectorAll(".opcao")]
-        Jogo.modoProfessor.destacar(falta ? botoes[nomes.indexOf(falta)] : [botoes[nomes.indexOf(p)], botoes[nomes.indexOf(q)]])
+        // Os potes estão embaralhados: acha cada um pelo data-i, não pela posição
+        const pote = nome => opcaoNumero(nomes.indexOf(nome))
+        Jogo.modoProfessor.destacar(falta ? pote(falta) : [pote(p), pote(q)])
         return window.Bit?.diz("pensando", `${maiuscula(p)} com ${q} dá ${r.alvo}. ${r.explica}`, 12000)
       }
       if (tipo() === "temperatura") {
-        const opcoes = [...$("opcoes").querySelectorAll(".opcao")]
-        Jogo.modoProfessor.destacar(opcoes[r.quente ? 0 : 1])
+        Jogo.modoProfessor.destacar(opcaoNumero(r.quente ? 0 : 1))
         return window.Bit?.diz("pensando", r.quente
           ? `${r.cor ? `O ${r.nome} é quente` : "É quente"}: lembra o sol, o fogo e o calor. Vermelho, laranja e amarelo são cores quentes.`
           : `${r.cor ? `O ${r.nome} é frio` : "É frio"}: lembra a água, a sombra e o frio. Azul, verde e roxo são cores frias.`, 12000)

@@ -418,11 +418,23 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa.
+  // A resposta é conferida pelo data-v de cada botão, nunca pela posição
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  // A rodada nova aparece no lugar do Próxima questão: o segundo toque de um toque duplo,
+  // logo depois que ela aparece, não vira resposta
+  let rodadaNovaEm = 0
+  const toqueNaRodadaNova = () => performance.now() - rodadaNovaEm < 500
   function mostrarOpcoes(lista) {
-    $("opcoes").innerHTML = lista.map(op => `<button class="opcao" type="button" data-v="${op}">${op}</button>`).join("")
+    $("opcoes").innerHTML = embaralhar(lista).map(op => `<button class="opcao" type="button" data-v="${op}">${op}</button>`).join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => responder(botao))
   }
   function mostrarRodada() {
+    rodadaNovaEm = performance.now()
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
@@ -489,7 +501,7 @@ p, li, blockquote {
 
   // Phases 1 and 3: answer buttons. A wrong answer explains the rule
   function responder(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || toqueNaRodadaNova()) return
     const r = atual(), t = traco(), v = botao.dataset.v
     let certo, porque
     if (tipo() === "conceito" && r.pergunta === "fenotipo") {

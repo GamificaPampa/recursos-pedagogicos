@@ -508,10 +508,17 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
   function mostrarRodada() {
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
     $("dica").hidden = false
+    bancadaNovaEm = performance.now()
     const r = atual(), contando = tipo() === "contar"
     desenharPlacar()
     $("topo").textContent = `${FASES[fase].nome} · ${contando ? "fórmula" : "reação"} ${rodada + 1} de ${FASES[fase].rodadas.length}`
@@ -526,7 +533,8 @@ p, li, blockquote {
       const elementos = Object.keys(contar(r.formula))
       $("bancada").className = "bancada grande"
       $("bancada").innerHTML = `<div class="subst"><p class="formula">${r.coef > 1 ? `<span class="coef">${r.coef}</span>` : ""}${html(r.formula)}</p>${desenhos(r.formula, r.coef)}<ul class="legenda">${elementos.map(el => `<li>${atomo(el)}${ELEMENTOS[el][0]}</li>`).join("")}</ul></div>`
-      $("opcoes").innerHTML = r.opcoes.map(n => `<button class="opcao" type="button" data-n="${n}">${n}</button>`).join("")
+      // As opções mudam de lugar a cada rodada; o acerto é pelo número (data-n), não pela posição
+      $("opcoes").innerHTML = embaralhar(r.opcoes).map(n => `<button class="opcao" type="button" data-n="${n}">${n}</button>`).join("")
       $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
       return
     }
@@ -535,14 +543,14 @@ p, li, blockquote {
     $("nota").textContent = tipo() === "dia" ? "Use os menores números inteiros possíveis." : "O coeficiente multiplica a molécula inteira."
     coefs = substancias().map(() => 1)
     conferidaErrada = ""
-    bancadaNovaEm = performance.now()
     montarBancada()
     atualizar()
   }
 
   // Phase 1: how many atoms of one element. A wrong answer explains how to read the formula
+  // A fórmula nova aparece onde estava o Próxima questão: o segundo toque de um toque duplo não vira resposta
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || performance.now() - bancadaNovaEm < 500) return
     const r = atual(), porFormula = contar(r.formula)[r.el], total = r.coef * porFormula
     if (Number(botao.dataset.n) === total) {
       botao.classList.add("certa")
@@ -561,6 +569,7 @@ p, li, blockquote {
 
   // Cada combinação errada conta um erro só, e o Conferir da reação nova aparece no lugar do Próxima questão:
   // o segundo toque de um toque duplo, logo depois que a bancada aparece, não confere nada
+  // (o bancadaNovaEm marca toda rodada nova, também as de contar átomos)
   let conferidaErrada = "", bancadaNovaEm = 0
   $("conferir").onclick = () => {
     if (ocupado || performance.now() - bancadaNovaEm < 500) return

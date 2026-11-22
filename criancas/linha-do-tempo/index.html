@@ -360,10 +360,21 @@ p, li, blockquote {
   // A rodada nova pode pôr um fato no lugar do Próxima questão: o segundo toque de um toque duplo,
   // logo depois que a rodada aparece, não responde nada
   let rodadaNovaEm = 0
-  function mostrarOpcoes(lista, aoEscolher, classe = "") {
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa.
+  // Com ordemCerta (os índices na ordem certa), embaralha de novo enquanto sair já na ordem
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
+  const opcaoNumero = i => $("opcoes").querySelector(`.opcao[data-i="${i}"]`)
+  function mostrarOpcoes(lista, aoEscolher, classe = "", ordemCerta = null) {
     rodadaNovaEm = performance.now()
+    let botoes
+    do botoes = embaralhar(lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`))
+    while (ordemCerta && lista.length > 1 && botoes.every((b, k) => b.includes(`data-i="${ordemCerta[k]}"`)))
     $("opcoes").className = "opcoes" + (classe ? " " + classe : "")
-    $("opcoes").innerHTML = lista.map((opcao, i) => `<button class="opcao" type="button" data-i="${i}">${opcao}</button>`).join("")
+    $("opcoes").innerHTML = botoes.join("")
     $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => {
       if (!ocupado && !botao.disabled && performance.now() - rodadaNovaEm >= 500) aoEscolher(botao, Number(botao.dataset.i))
     })
@@ -557,7 +568,7 @@ p, li, blockquote {
         $("cena").innerHTML = slots(r)
         if (colocados.length < r.length) return window.Bit?.diz("feliz", `${FATOS[id][0]}: ${FATOS[id][2]}. Qual vem depois?`)
         acertou(`Linha do tempo montada! ${ordem.map(o => FATOS[o][2].replace("cerca de ", "").replace("por volta de ", "")).join(", ")}.`)
-      })
+      }, "", ordem.map(id => r.indexOf(id)))
       $("opcoes").querySelectorAll(".opcao").forEach(b => b.classList.add("evento"))
     }
   }
@@ -660,10 +671,11 @@ p, li, blockquote {
     resposta() {
       if (!$("fim").hidden) return window.Bit?.diz("pensando", "A fase terminou. Escolha outra fase ou toque em Próxima fase.", 9000)
       if (ocupado) return window.Bit?.diz("pensando", "Esta rodada já foi respondida. Toque em Próxima questão.", 9000)
-      const r = atual(), opcoes = [...$("opcoes").querySelectorAll(".opcao")]
+      // As opções estão embaralhadas: a certa se acha pelo data-i, não pela posição
+      const r = atual()
       if (tipo() === "primeiro") {
         const [velho, novo] = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1])
-        Jogo.modoProfessor.destacar(opcoes[r.indexOf(velho)])
+        Jogo.modoProfessor.destacar(opcaoNumero(r.indexOf(velho)))
         const [av, an] = [FATOS[velho][1], FATOS[novo][1]]
         const porque = av < 0 && an < 0
           ? `Antes de Cristo, os anos contam para trás: ${-av} a.C. está mais longe do ano 1 do que ${-an} a.C.`
@@ -673,13 +685,13 @@ p, li, blockquote {
       }
       if (tipo() === "seculo") {
         const [id, lista] = r, ano = FATOS[id][1], n = seculo(ano)
-        Jogo.modoProfessor.destacar(opcoes[lista.indexOf(romano(n))])
+        Jogo.modoProfessor.destacar(opcaoNumero(lista.indexOf(romano(n))))
         return window.Bit?.diz("pensando", ano % 100 === 0
           ? `${ano} termina em 00, então é o último ano do século ${romano(n)}, que vai de ${ano - 99} a ${ano}.`
           : `Tire os dois últimos números de ${ano} e some 1: ${Math.floor(ano / 100)} + 1 = ${n}, que em romanos é ${romano(n)}.`, 14000)
       }
       const ordem = [...r].sort((p, q) => FATOS[p][1] - FATOS[q][1]), proximo = ordem[colocados.length]
-      Jogo.modoProfessor.destacar(opcoes[r.indexOf(proximo)])
+      Jogo.modoProfessor.destacar(opcaoNumero(r.indexOf(proximo)))
       window.Bit?.diz("pensando", `${colocados.length ? "Agora vem" : "O mais antigo é"}: ${FATOS[proximo][0]} (${FATOS[proximo][2]}). A ordem é: ${ordem.map(o => FATOS[o][2].replace("cerca de ", "").replace("por volta de ", "")).join(", ")}.`, 14000)
     },
   })

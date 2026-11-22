@@ -505,6 +505,12 @@ p, li, blockquote {
   function desenharPlacar() {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
+  // As opções mudam de lugar a cada rodada, para a turma não decorar a posição da certa
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
   function mostrarRodada() {
     Jogo.ouvir.novaTela()
     $("proxima").hidden = true
@@ -542,7 +548,8 @@ p, li, blockquote {
       $("nota").textContent = "Pense na lei de Ohm: U = R · I."
     }
     if (t !== "lampada") {
-      $("opcoes").innerHTML = r.opcoes.map(([texto], i) => `<button class="opcao" type="button" data-i="${i}">${texto}</button>`).join("")
+      // As opções mudam de lugar a cada rodada; o data-i guarda o índice original, que decide o acerto
+      $("opcoes").innerHTML = embaralhar(r.opcoes.map(([texto], i) => `<button class="opcao" type="button" data-i="${i}">${texto}</button>`)).join("")
       $("opcoes").querySelectorAll(".opcao").forEach(botao => botao.onclick = () => escolher(botao))
     }
     mostrarValor()
@@ -554,8 +561,9 @@ p, li, blockquote {
   }
 
   // Phases 2 and 3: a wrong choice explains the mistake, the right one shows the conta
+  // O desafio novo aparece onde estava o Próximo desafio: o segundo toque de um toque duplo não vira resposta
   function escolher(botao) {
-    if (ocupado || botao.disabled) return
+    if (ocupado || botao.disabled || performance.now() - desafioNovoEm < 500) return
     const r = atual(), [, res] = r.opcoes[botao.dataset.i]
     if (res === true) {
       botao.classList.add("certa")
@@ -650,7 +658,7 @@ p, li, blockquote {
   }
 
   // Stars by how many mistakes were made in the phase, and confetti
-  $("fim-acoes").append(Jogo.acoesDoFim(() => comecar(0)))
+  $("fim-acoes").append(Jogo.acoesDoFim(() => toqueDuplo() || comecar(0)))
   function terminarFase() {
     const estrelas = erros === 0 ? 3 : erros <= 2 ? 2 : 1
     const ultima = fase === FASES.length - 1

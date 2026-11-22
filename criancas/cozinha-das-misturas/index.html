@@ -695,11 +695,18 @@ p, li, blockquote {
     $("placar").innerHTML = FASES[fase].rodadas.map((_, i) => `<li class="${i < rodada ? "feito" : i === rodada ? "agora" : ""}"></li>`).join("")
   }
 
+  // As opções mudam de lugar a cada desafio, para a turma não decorar a posição da certa.
+  // A resposta é conferida pelo data-id, nunca pela posição
+  const embaralhar = lista => {
+    const v = [...lista]
+    for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]] }
+    return v
+  }
   function opcoes(itens, { classe = "", lado = "" } = {}) {
     const caixa = $("opcoes")
     caixa.className = `opcoes ${lado}`.trim()
     caixa.hidden = false
-    caixa.innerHTML = itens.map(({ id, rotulo, icone }) => `<button class="opcao ${classe}" type="button" data-id="${id}">${icone ?? ""}<span>${rotulo}</span></button>`).join("")
+    caixa.innerHTML = embaralhar(itens).map(({ id, rotulo, icone }) => `<button class="opcao ${classe}" type="button" data-id="${id}">${icone ?? ""}<span>${rotulo}</span></button>`).join("")
     return [...caixa.querySelectorAll(".opcao")]
   }
 
@@ -759,7 +766,7 @@ p, li, blockquote {
 
   // Fase 1: o nome da mudança. O erro diz o que aquele nome quer dizer
   function escolherMudanca(botao) {
-    if (travado || botao.disabled) return
+    if (travado || botao.disabled || toqueDuplo()) return
     const r = atual(), escolhida = MUDANCAS.find(m => m.id === botao.dataset.id)
     if (escolhida.id === r.certa) {
       botao.classList.add("certa")
@@ -770,7 +777,7 @@ p, li, blockquote {
 
   // Fase 2, parte 1: homogênea ou heterogênea
   function escolherTipoMistura(botao) {
-    if (travado || botao.disabled) return
+    if (travado || botao.disabled || toqueDuplo()) return
     const r = atual(), id = botao.dataset.id
     if (id === r.tipo) {
       somEstrela()
@@ -802,7 +809,7 @@ p, li, blockquote {
 
   // Fase 3, parte 1: física ou química
   function escolherTransformacao(botao) {
-    if (travado || botao.disabled) return
+    if (travado || botao.disabled || toqueDuplo()) return
     const r = atual(), id = botao.dataset.id
     if (id === r.tipo) {
       botao.classList.add("certa")
