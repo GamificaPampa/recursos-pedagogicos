@@ -54,6 +54,7 @@ Sem internet: o [kit sem internet](https://github.com/GamificaPampa/recursos-ped
 | Oficina de Prompts, quatro encontros para criar atividades, histórias e jogos com o ChatGPT | [página da oficina](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/), [curso online](https://gamificapampa.github.io/recursos-pedagogicos/professores/oficina-prompts/curso.html), [máquina de prompts](https://gamificapampa.github.io/maquina/) | [professores/oficina-prompts](professores/oficina-prompts) |
 | Medalhas do Bit, para imprimir e entregar na hora da conquista | [medalhas](https://gamificapampa.github.io/recursos-pedagogicos/professores/medalhas/) | [professores/medalhas](professores/medalhas) |
 | Tudo para imprimir, os papéis de todos os recursos num lugar só, com o número de folhas | [página](https://gamificapampa.github.io/recursos-pedagogicos/professores/imprimir/) | [professores/imprimir](professores/imprimir) |
+| Meu passaporte da Oficina, um carimbo para cada ferramenta da Oficina de Prompts já usada | [página](https://gamificapampa.github.io/recursos-pedagogicos/professores/passaporte/) | [professores/passaporte](professores/passaporte) |
 
 ## Como adicionar um recurso
 

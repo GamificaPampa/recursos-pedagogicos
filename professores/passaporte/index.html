@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meu passaporte da Oficina · GamificaPampa</title>
+  <meta name="description" content="Os carimbos das ferramentas da Oficina de Prompts que você já usou: Jogo do Prompt, Máquina, Raio-X, Conferir, Quiz na hora e mais. Fica só no seu aparelho.">
+  <meta property="og:title" content="Meu passaporte da Oficina · GamificaPampa">
+  <meta property="og:description" content="Um carimbo de Visto para cada ferramenta da Oficina de Prompts que você já usou.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    p, ul, h2, h3 { margin: 0; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    main { display: grid; gap: 32px; width: min(1100px, 100% - 32px); margin: 16px auto 64px; }
+    .abertura { display: grid; justify-items: center; gap: 18px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 22px; max-width: 720px; text-align: left; }
+    .bit img { flex: none; width: clamp(80px, 12vw, 110px); height: auto; }
+    .bit .bubble { min-width: 0; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.35; }
+    .icone { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -.22em; flex: none; }
+
+    /* Quantos carimbos: a barra enche e o número fica grande */
+    .conta { display: grid; justify-items: center; gap: 10px; }
+    .conta b { font-size: clamp(26px, 4vw, 36px); }
+    .barra-conta { width: min(520px, 100%); height: 22px; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; overflow: hidden; }
+    .barra-conta span { display: block; height: 100%; width: var(--feito, 0%); background: var(--mint); border-right: 4px solid var(--ink); transition: width .6s ease; }
+    .barra-conta span[style*="0%"] { border-right: 0; }
+
+    /* As páginas do passaporte: um quadro por ferramenta; o carimbo cai por cima do que já foi usado */
+    .paginas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 18px; padding: 0; list-style: none; }
+    .quadro { position: relative; display: grid; align-content: start; gap: 8px; min-height: 190px; padding: 18px; background: var(--white); border: 4px dashed #9a96b3; border-radius: 20px; }
+    .quadro.feito { border-style: solid; border-color: var(--ink); box-shadow: 0 5px 0 var(--ink); }
+    .quadro__icone { display: grid; place-items: center; width: 52px; height: 52px; background: var(--sky2); border: 3px solid var(--ink); border-radius: 50%; }
+    .quadro__icone .icone { width: 30px; height: 30px; }
+    .quadro:not(.feito) .quadro__icone { opacity: .55; }
+    .quadro h3 { font-size: 20px; line-height: 1.2; }
+    .quadro p { color: var(--soft); font-size: 16px; line-height: 1.35; }
+    .quadro .btn { justify-self: start; margin-top: 4px; }
+    .quadro .carimbo { position: absolute; top: 14px; right: 12px; --giro: -10deg; flex-direction: column; gap: 0; padding: 4px 12px; font-size: 18px; line-height: 1.05; text-align: center; }
+    .quadro .carimbo small { font-size: 13px; font-weight: 600; }
+    .quadro:nth-child(3n + 2) .carimbo { --giro: 7deg; }
+    .quadro:nth-child(3n) .carimbo { --giro: -3deg; }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+    .aviso { display: flex; align-items: center; gap: 12px; max-width: 720px; margin: 0 auto; font-weight: 600; }
+    .aviso svg { flex: none; width: 44px; height: 44px; }
+    .rodape { position: relative; padding: 24px; text-align: center; font-size: 15px; }
+
+    /* Impresso: só o passaporte, em papel branco, com os carimbos */
+    @media print {
+      .cenario, .acoes, .aviso, .bit, .rodape, .quadro .btn { display: none !important; }
+      body { background: #fff; }
+      main { width: 100%; margin: 0; gap: 16px; }
+      .paginas { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .quadro { min-height: 0; break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+  <script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body>
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 5%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 22%; --w: 230px; --t: 95s; --d: -70s"></span>
+    <span class="nuvem" style="top: 48%; --w: 140px; --t: 60s; --d: -26s"></span>
+    <span class="simbolo" style="left: 5%; top: 30%">&lt;/&gt;</span>
+    <span class="simbolo" style="right: 6%; top: 16%; --d: -2s">{ }</span>
+    <span class="morros"></span>
+  </div>
+
+  <main>
+    <section class="abertura">
+      <p class="pill" style="--c: var(--yellow)">OFICINA DE PROMPTS</p>
+      <h1 class="loud anima-letras"><span>Meu</span> <span class="yellow">passaporte</span></h1>
+      <div class="bit">
+        <img id="bit" class="anima-flutuar" src="/identidade-visual/mascote/bit-acenando.svg" width="100" height="100" alt="Bit">
+        <p class="bubble anima-balao" id="fala" style="--d: .5s">Cada ferramenta da Oficina que você abre ganha um carimbo. Veja o que já usou e o que falta conhecer.</p>
+      </div>
+      <div class="conta" aria-live="polite">
+        <b id="numero">0 de 12 carimbos</b>
+        <div class="barra-conta" aria-hidden="true"><span id="cheio" style="--feito: 0%"></span></div>
+      </div>
+    </section>
+
+    <ul class="paginas" id="paginas" aria-label="Carimbos do passaporte"></ul>
+
+    <div class="acoes">
+      <button class="btn btn--baixar" type="button" id="imprimir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Imprimir o passaporte</button>
+      <button class="btn btn--white" type="button" id="apagar">Apagar os carimbos</button>
+    </div>
+
+    <p class="aviso"><svg aria-hidden="true"><use href="#icone-quero-quero"/></svg>Os carimbos ficam só neste aparelho e neste navegador. Nada é enviado, nem para a equipe.</p>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <script src="/identidade-visual/js/icones.js" data-simbolos></script>
+  <script src="/identidade-visual/js/passaporte.js"></script>
+  <script>
+  (() => {
+    const $ = (id) => document.getElementById(id);
+    const icone = (nome) => (window.Icones ? Icones.svg(nome) : '');
+    const CARIMBOS = window.Passaporte ? Passaporte.CARIMBOS : [];
+    const data = (iso) => { const [, m, d] = iso.split('-'); return `${d}/${m}`; };
+
+    function desenhar() {
+      const ganhos = Passaporte.ler();
+      const feitos = CARIMBOS.filter((c) => ganhos[c.id]).length;
+      $('numero').textContent = `${feitos} de ${CARIMBOS.length} carimbos`;
+      $('cheio').style.setProperty('--feito', Math.round((feitos / CARIMBOS.length) * 100) + '%');
+      $('paginas').replaceChildren(...CARIMBOS.map((c) => {
+        const li = document.createElement('li');
+        li.className = 'quadro' + (ganhos[c.id] ? ' feito' : '');
+        li.innerHTML = `<span class="quadro__icone">${icone(c.icone)}</span><h3></h3><p></p>`;
+        li.querySelector('h3').textContent = c.nome;
+        li.querySelector('p').textContent = c.frase;
+        if (ganhos[c.id]) {
+          const carimbo = Object.assign(document.createElement('span'), { className: 'carimbo' });
+          carimbo.innerHTML = `Visto<small>${data(ganhos[c.id])}</small>`;
+          carimbo.setAttribute('aria-label', `Visto em ${data(ganhos[c.id])}`);
+          li.append(carimbo);
+        } else {
+          const ir = Object.assign(document.createElement('a'), { className: 'btn btn--conhecer btn--small', href: c.href });
+          ir.innerHTML = icone('lupa');
+          ir.append('Conhecer');
+          ir.setAttribute('aria-label', `Conhecer: ${c.nome}`);
+          li.append(ir);
+        }
+        return li;
+      }));
+      // O Bit muda com o passaporte: oi no começo, pensando no meio, comemorando no fim
+      const pose = feitos === CARIMBOS.length ? 'comemorando' : feitos ? 'pensando' : 'acenando';
+      $('bit').src = `/identidade-visual/mascote/bit-${pose}.svg`;
+      const falta = CARIMBOS.find((c) => !ganhos[c.id]);
+      $('fala').textContent = feitos === CARIMBOS.length
+        ? 'Passaporte completo! Você conhece todas as ferramentas da Oficina. Que tal levar a ideia para os colegas da escola?'
+        : feitos
+          ? `Faltam ${CARIMBOS.length - feitos}. Uma sugestão para hoje: ${falta.nome}. ${falta.frase}`
+          : 'Cada ferramenta da Oficina que você abre ganha um carimbo. Comece pela página da Oficina de Prompts.';
+    }
+    desenhar();
+    // Outra aba da Oficina deu um carimbo: o passaporte se atualiza sozinho
+    addEventListener('storage', (evento) => { if (evento.key === 'gp-lembrar:passaporte') desenhar(); });
+
+    $('imprimir').addEventListener('click', () => print());
+    // Apagar pede um segundo toque, sem janela de confirmação
+    let confirmar = 0;
+    $('apagar').addEventListener('click', () => {
+      const botao = $('apagar');
+      if (!confirmar) {
+        botao.textContent = 'Toque de novo para apagar';
+        confirmar = setTimeout(() => { confirmar = 0; botao.textContent = 'Apagar os carimbos'; }, 4000);
+        return;
+      }
+      clearTimeout(confirmar);
+      confirmar = 0;
+      Passaporte.esquecer();
+      botao.textContent = 'Apagar os carimbos';
+      desenhar();
+    });
+  })();
+  </script>
+</body>
+</html>
