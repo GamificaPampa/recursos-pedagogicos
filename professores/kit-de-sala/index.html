@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kit de sala · GamificaPampa</title>
+  <meta name="description" content="Ferramentas para o projetor na hora da aula: cronômetro, grupos sorteados pelo número da chamada, sorteio de quem responde e a placa do combinado. Sem nomes de estudantes.">
+  <meta property="og:title" content="Kit de sala · GamificaPampa">
+  <meta property="og:description" content="Cronômetro, grupos, sorteio e a placa do combinado, para o projetor.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    p, ul, h2, h3 { margin: 0; }
+    [hidden] { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+    main { display: grid; gap: 28px; width: min(1180px, 100% - 32px); margin: 16px auto 64px; }
+    .abertura { display: grid; justify-items: center; gap: 16px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 22px; max-width: 720px; text-align: left; }
+    .bit img { flex: none; width: clamp(76px, 11vw, 100px); height: auto; }
+    .bit .bubble { min-width: 0; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.35; }
+
+    /* Abas: uma ferramenta por vez, grande, para ler do fundo da sala */
+    .abas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .aba { min-height: 48px; padding: 4px 20px; background: var(--white); color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 4px 0 var(--ink); font: 600 18px/1 var(--font); cursor: pointer; }
+    .aba:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+    .aba[aria-selected="true"] { background: var(--yellow); }
+    .painel { display: grid; justify-items: center; gap: 22px; padding: clamp(20px, 4vw, 40px); background: var(--white); border: 4px solid var(--ink); border-radius: 28px; box-shadow: 0 8px 0 var(--ink); text-align: center; }
+    .painel h2 { font-size: clamp(26px, 3.6vw, 38px); }
+    .linha { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
+    .campo { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+    .campo input { width: 92px; min-height: 48px; padding: 4px 10px; border: 3px solid var(--ink); border-radius: 14px; font: 700 22px var(--font); text-align: center; }
+
+    /* Cronômetro */
+    .relogio { font: 700 clamp(84px, 18vw, 220px)/1 var(--font); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+    .relogio.acabou { color: #d23f57; animation: piscar 1s steps(2) infinite; }
+    @keyframes piscar { 50% { opacity: .35; } }
+    .barra-tempo { width: min(760px, 100%); height: 24px; background: #eef6ff; border: 4px solid var(--ink); border-radius: 999px; overflow: hidden; }
+    .barra-tempo span { display: block; height: 100%; width: 100%; background: var(--mint); transform-origin: left; transform: scaleX(var(--resta, 1)); transition: transform .3s linear; }
+
+    /* Grupos e sorteio: números grandes, como bolinhas */
+    .grupos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 16px; width: 100%; padding: 0; list-style: none; }
+    .grupo { display: grid; gap: 10px; padding: 16px; background: var(--c); border: 4px solid var(--ink); border-radius: 20px; }
+    .grupo b { font-size: 22px; }
+    .numeros { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .numeros span { display: grid; place-items: center; width: 52px; height: 52px; background: var(--white); border: 3px solid var(--ink); border-radius: 50%; font: 700 24px var(--font); }
+    .sorteado { display: grid; place-items: center; width: clamp(180px, 30vw, 300px); aspect-ratio: 1; background: var(--yellow); border: 6px solid var(--ink); border-radius: 50%; box-shadow: 0 8px 0 var(--ink); font: 700 clamp(90px, 16vw, 170px)/1 var(--font); }
+    .sorteado.gira { animation: girar .5s ease-out; }
+    @keyframes girar { from { transform: rotate(-200deg) scale(.6); } }
+    .saidos { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 760px; }
+    .saidos span { padding: 2px 10px; background: #eef6ff; border: 2px solid var(--ink); border-radius: 999px; font-weight: 700; }
+
+    /* Placa do combinado */
+    .placa { display: grid; place-items: center; gap: 12px; width: min(760px, 100%); padding: clamp(24px, 5vw, 50px); background: var(--c); border: 6px solid var(--ink); border-radius: 30px; font: 700 clamp(44px, 9vw, 110px)/1.05 var(--font); }
+    .placa small { font-size: clamp(18px, 2.4vw, 26px); font-weight: 600; }
+    .luzes { display: flex; gap: 14px; }
+    .luz { width: 64px; height: 64px; background: var(--c); border: 4px solid var(--ink); border-radius: 50%; box-shadow: 0 4px 0 var(--ink); cursor: pointer; }
+    .luz[aria-pressed="false"] { opacity: .35; }
+
+    .aviso { display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 600; }
+    .aviso svg { flex: none; width: 44px; height: 44px; }
+    .rodape { position: relative; padding: 24px; text-align: center; font-size: 15px; }
+    @media (prefers-reduced-motion: reduce) { .relogio.acabou, .sorteado.gira { animation: none; } .barra-tempo span { transition: none; } }
+    /* Em tela cheia, só o painel aberto, grande */
+    :fullscreen .abertura, :fullscreen .aviso { display: none; }
+    :fullscreen main { align-content: center; min-height: 100vh; margin-block: 0; }
+  </style>
+  <script src="/identidade-visual/js/barra.js" defer></script>
+</head>
+<body>
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 6%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 26%; --w: 150px; --t: 85s; --d: -40s"></span>
+    <span class="morros"></span>
+  </div>
+
+  <main id="principal">
+    <section class="abertura">
+      <p class="pill" style="--c: var(--mint)">PARA O PROJETOR</p>
+      <h1 class="loud anima-letras"><span>Kit</span> <span>de</span> <span class="yellow">sala</span></h1>
+      <div class="bit">
+        <img class="anima-flutuar" src="/identidade-visual/mascote/bit-acenando.svg" width="100" height="100" alt="Bit acenando">
+        <p class="bubble anima-balao" style="--d: .4s">Para a hora da aula: um cronômetro, os grupos pelo número da chamada, o sorteio de quem responde e a placa do combinado. Use a tela cheia no projetor.</p>
+      </div>
+    </section>
+
+    <div class="abas">
+     <div class="abas" role="tablist" aria-label="Ferramentas">
+      <button class="aba" role="tab" id="aba-tempo" aria-controls="tempo" aria-selected="true">Cronômetro</button>
+      <button class="aba" role="tab" id="aba-grupos" aria-controls="grupos" aria-selected="false">Grupos</button>
+      <button class="aba" role="tab" id="aba-sorteio" aria-controls="sorteio" aria-selected="false">Quem responde</button>
+      <button class="aba" role="tab" id="aba-placa" aria-controls="placa" aria-selected="false">Combinado</button>
+     </div>
+      <button class="btn btn--white btn--small" type="button" id="cheia">Tela cheia</button>
+    </div>
+
+    <section class="painel" role="tabpanel" id="tempo" aria-labelledby="aba-tempo">
+      <h2>Cronômetro</h2>
+      <div class="linha" id="prontos">
+        <button class="aba" type="button" data-min="1">1 min</button>
+        <button class="aba" type="button" data-min="3">3 min</button>
+        <button class="aba" type="button" data-min="5">5 min</button>
+        <button class="aba" type="button" data-min="10">10 min</button>
+        <button class="aba" type="button" data-min="15">15 min</button>
+      </div>
+      <p class="relogio" id="relogio" role="timer" aria-live="off">05:00</p>
+      <div class="barra-tempo" aria-hidden="true"><span id="resta"></span></div>
+      <p id="fim-tempo" aria-live="assertive" class="sr-only"></p>
+      <div class="linha">
+        <button class="btn btn--jogar" type="button" id="iniciar">Começar</button>
+        <button class="btn btn--white" type="button" id="zerar">Recomeçar</button>
+        <button class="btn btn--white" type="button" id="mais">+1 min</button>
+      </div>
+    </section>
+
+    <section class="painel" role="tabpanel" id="grupos" aria-labelledby="aba-grupos" hidden>
+      <h2>Grupos pelo número da chamada</h2>
+      <div class="linha">
+        <label class="campo">Estudantes <input type="number" id="g-total" min="2" max="60" value="28" inputmode="numeric"></label>
+        <label class="campo">Grupos <input type="number" id="g-grupos" min="2" max="15" value="5" inputmode="numeric"></label>
+        <button class="btn btn--jogar" type="button" id="sortear-grupos">Sortear os grupos</button>
+      </div>
+      <ul class="grupos" id="lista-grupos" aria-live="polite"></ul>
+    </section>
+
+    <section class="painel" role="tabpanel" id="sorteio" aria-labelledby="aba-sorteio" hidden>
+      <h2>Quem responde?</h2>
+      <div class="linha">
+        <label class="campo">Estudantes <input type="number" id="s-total" min="2" max="60" value="28" inputmode="numeric"></label>
+        <button class="btn btn--jogar" type="button" id="sortear">Sortear um número</button>
+        <button class="btn btn--white" type="button" id="s-zerar">Começar de novo</button>
+      </div>
+      <p class="sorteado" id="numero" aria-live="assertive">?</p>
+      <p id="s-conta">Nenhum número saiu ainda. Cada número só sai uma vez até todos saírem.</p>
+      <div class="saidos" id="saidos" aria-label="Números que já saíram"></div>
+    </section>
+
+    <section class="painel" role="tabpanel" id="placa" aria-labelledby="aba-placa" hidden>
+      <h2>O combinado de agora</h2>
+      <div class="luzes" role="group" aria-label="Escolher o combinado">
+        <button class="luz" type="button" data-placa="0" style="--c: #4fd6a6" aria-label="Pode conversar"></button>
+        <button class="luz" type="button" data-placa="1" style="--c: #ffd23f" aria-label="Falem baixo"></button>
+        <button class="luz" type="button" data-placa="2" style="--c: #ff5f8f" aria-label="Silêncio"></button>
+      </div>
+      <p class="placa" id="placa-texto" aria-live="polite"></p>
+    </section>
+
+    <p class="aviso"><svg aria-hidden="true"><use href="#icone-quero-quero"/></svg>Aqui não entra nome de estudante: os grupos e o sorteio usam só o número da chamada.</p>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <script src="/identidade-visual/js/icones.js" data-simbolos></script>
+  <script>
+  (() => {
+    const $ = (id) => document.getElementById(id);
+    const embaralhar = (lista) => { const v = [...lista]; for (let i = v.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [v[i], v[j]] = [v[j], v[i]]; } return v; };
+    const numeroDe = (campo, min, max) => Math.max(min, Math.min(max, Math.round(Number(campo.value) || min)));
+
+    // Abas: setas trocam de ferramenta, como no teclado de um site comum
+    const abas = [...document.querySelectorAll('[role="tab"]')];
+    const abrir = (aba) => {
+      abas.forEach((a) => { const sim = a === aba; a.setAttribute('aria-selected', String(sim)); a.tabIndex = sim ? 0 : -1; $(a.getAttribute('aria-controls')).hidden = !sim; });
+    };
+    abas.forEach((aba, i) => {
+      aba.addEventListener('click', () => abrir(aba));
+      aba.addEventListener('keydown', (e) => {
+        const passo = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (passo) { const outra = abas[(i + passo + abas.length) % abas.length]; abrir(outra); outra.focus(); }
+      });
+    });
+    abrir(abas[0]);
+    $('cheia').addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      else document.documentElement.requestFullscreen?.().catch(() => {});
+    });
+
+    // Um toque curto quando o tempo acaba (sem arquivo de som: o próprio navegador toca)
+    let audio = null;
+    const tocar = () => {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        [0, .35, .7].forEach((t) => {
+          const o = audio.createOscillator(), g = audio.createGain();
+          o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+          g.gain.setValueAtTime(.0001, audio.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(.25, audio.currentTime + t + .02);
+          g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .3);
+          o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .32);
+        });
+      } catch {}
+    };
+
+    // Cronômetro: conta pelo relógio do aparelho, então não atrasa se a aba ficar escondida
+    let total = 300, resta = 300, fimEm = 0, laco = 0;
+    const mostrar = () => {
+      const s = Math.max(0, Math.ceil(resta));
+      $('relogio').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      $('resta').style.setProperty('--resta', total ? Math.max(0, resta / total) : 0);
+      $('relogio').classList.toggle('acabou', s === 0);
+    };
+    const parar = () => { clearInterval(laco); laco = 0; $('iniciar').textContent = resta > 0 ? 'Continuar' : 'Começar'; };
+    const passar = () => {
+      resta = (fimEm - Date.now()) / 1000;
+      if (resta <= 0) { resta = 0; parar(); tocar(); $('fim-tempo').textContent = 'O tempo acabou.'; }
+      mostrar();
+    };
+    const definir = (segundos) => { parar(); total = resta = segundos; $('fim-tempo').textContent = ''; $('iniciar').textContent = 'Começar'; mostrar(); };
+    $('prontos').addEventListener('click', (e) => { const b = e.target.closest('[data-min]'); if (b) definir(Number(b.dataset.min) * 60); });
+    $('iniciar').addEventListener('click', () => {
+      if (laco) { parar(); $('iniciar').textContent = 'Continuar'; return; }
+      if (resta <= 0) resta = total;
+      fimEm = Date.now() + resta * 1000;
+      laco = setInterval(passar, 250);
+      $('iniciar').textContent = 'Pausar';
+      $('fim-tempo').textContent = '';
+    });
+    $('zerar').addEventListener('click', () => definir(total));
+    $('mais').addEventListener('click', () => {
+      total += 60; resta += 60;
+      if (laco) fimEm += 60000;
+      mostrar();
+    });
+    mostrar();
+
+    // Grupos: os números da chamada embaralhados e distribuídos em grupos do mesmo tamanho (sobra vai um por grupo)
+    const CORES = ['#cfe6ff', '#c9f5e3', '#fff1a8', '#ffd6e2', '#e2dbff', '#ffdcc4'];
+    $('sortear-grupos').addEventListener('click', () => {
+      const n = numeroDe($('g-total'), 2, 60), g = Math.min(numeroDe($('g-grupos'), 2, 15), n);
+      $('g-total').value = n; $('g-grupos').value = g;
+      const grupos = Array.from({ length: g }, () => []);
+      embaralhar(Array.from({ length: n }, (_, i) => i + 1)).forEach((num, i) => grupos[i % g].push(num));
+      $('lista-grupos').replaceChildren(...grupos.map((nums, i) => {
+        const li = document.createElement('li');
+        li.className = 'grupo';
+        li.style.setProperty('--c', CORES[i % CORES.length]);
+        li.innerHTML = `<b>Grupo ${i + 1}</b><span class="numeros">${nums.sort((a, b) => a - b).map((x) => `<span>${x}</span>`).join('')}</span>`;
+        return li;
+      }));
+    });
+
+    // Quem responde: um número por vez, sem repetir até todos saírem
+    let saco = [], saidos = [];
+    const zerarSorteio = () => {
+      saidos = []; saco = [];
+      $('numero').textContent = '?';
+      $('saidos').replaceChildren();
+      $('s-conta').textContent = 'Nenhum número saiu ainda. Cada número só sai uma vez até todos saírem.';
+    };
+    $('s-total').addEventListener('change', zerarSorteio);
+    $('s-zerar').addEventListener('click', zerarSorteio);
+    $('sortear').addEventListener('click', () => {
+      const n = numeroDe($('s-total'), 2, 60);
+      $('s-total').value = n;
+      if (!saco.length) { saco = embaralhar(Array.from({ length: n }, (_, i) => i + 1)); if (saidos.length >= n) { saidos = []; $('saidos').replaceChildren(); } }
+      const num = saco.pop();
+      saidos.push(num);
+      const bola = $('numero');
+      bola.textContent = num;
+      bola.classList.remove('gira'); void bola.offsetWidth; bola.classList.add('gira');
+      $('saidos').append(Object.assign(document.createElement('span'), { textContent: num }));
+      $('s-conta').textContent = saco.length ? `Já saíram ${saidos.length} de ${n}. Faltam ${saco.length}.` : `Todos os ${n} números saíram. O próximo toque começa uma rodada nova.`;
+    });
+
+    // Placa do combinado
+    const PLACAS = [['Pode conversar', 'com o grupo, sobre a atividade', '#4fd6a6'], ['Falem baixo', 'só com quem está do lado', '#ffd23f'], ['Silêncio', 'agora é hora de ouvir', '#ff5f8f']];
+    const placa = (i) => {
+      const [titulo, sub, cor] = PLACAS[i];
+      $('placa-texto').style.setProperty('--c', cor);
+      $('placa-texto').innerHTML = `${titulo}<small>${sub}</small>`;
+      document.querySelectorAll('.luz').forEach((l) => l.setAttribute('aria-pressed', String(Number(l.dataset.placa) === i)));
+    };
+    document.querySelectorAll('.luz').forEach((l) => l.addEventListener('click', () => placa(Number(l.dataset.placa))));
+    placa(0);
+  })();
+  </script>
+</body>
+</html>

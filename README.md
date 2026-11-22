@@ -55,6 +55,7 @@ Sem internet: o [kit sem internet](https://github.com/GamificaPampa/recursos-ped
 | Medalhas do Bit, para imprimir e entregar na hora da conquista | [medalhas](https://gamificapampa.github.io/recursos-pedagogicos/professores/medalhas/) | [professores/medalhas](professores/medalhas) |
 | Tudo para imprimir, os papéis de todos os recursos num lugar só, com o número de folhas | [página](https://gamificapampa.github.io/recursos-pedagogicos/professores/imprimir/) | [professores/imprimir](professores/imprimir) |
 | Meu passaporte da Oficina, um carimbo para cada ferramenta da Oficina de Prompts já usada | [página](https://gamificapampa.github.io/recursos-pedagogicos/professores/passaporte/) | [professores/passaporte](professores/passaporte) |
+| Kit de sala, cronômetro, grupos pelo número da chamada, sorteio de quem responde e a placa do combinado, para o projetor | [página](https://gamificapampa.github.io/recursos-pedagogicos/professores/kit-de-sala/) | [professores/kit-de-sala](professores/kit-de-sala) |
 
 ## Como adicionar um recurso
 
