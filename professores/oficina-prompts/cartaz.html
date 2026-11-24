@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cartaz da Oficina · Oficina de Prompts</title>
+  <meta name="description" content="Uma folha A4 com os QR Codes das ferramentas da Oficina de Prompts, para colar na sala dos professores: Máquina, Jogo do Prompt, Biblioteca, Raio-X, Conferir, Quiz na hora, Assistentes do Bit, Publicar meu jogo e o curso.">
+  <meta property="og:title" content="Cartaz da Oficina de Prompts · GamificaPampa">
+  <meta property="og:description" content="Os QR Codes das ferramentas da Oficina numa folha A4, para a sala dos professores.">
+  <meta property="og:image" content="https://gamificapampa.github.io/identidade-visual/logos/gamificapampa-github-avatar.png">
+  <link rel="icon" type="image/svg+xml" href="/identidade-visual/logos/gamificapampa-icone.svg">
+  <link rel="stylesheet" href="/identidade-visual/css/fontes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cores.css">
+  <link rel="stylesheet" href="/identidade-visual/css/componentes.css">
+  <link rel="stylesheet" href="/identidade-visual/css/cenario.css">
+  <link rel="stylesheet" href="/identidade-visual/css/animacoes.css">
+  <style>
+    p, h1, h2, ul { margin: 0; }
+    main { display: grid; justify-items: center; gap: 24px; width: min(900px, 100% - 32px); margin: 16px auto 64px; }
+    .abertura { display: grid; justify-items: center; gap: 14px; text-align: center; }
+    .bit { display: flex; align-items: center; justify-content: center; gap: 20px; max-width: 700px; text-align: left; }
+    .bit img { flex: none; width: clamp(76px, 11vw, 100px); height: auto; }
+    .bit .bubble { min-width: 0; font-size: clamp(16px, 1.8vw, 19px); line-height: 1.35; }
+
+    /* A folha A4: tudo medido pela largura da folha (cqw), igual na tela e no papel */
+    .sheet { container-type: inline-size; display: grid; grid-template-rows: auto 1fr auto; width: min(100%, 794px); aspect-ratio: 210 / 297; padding: 5cqw 5.5cqw 4cqw; background: #fff; color: var(--ink); border: 4px solid var(--ink); border-radius: 8px; box-shadow: var(--drop); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .topo { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 3cqw; padding-bottom: 2.4cqw; border-bottom: .7cqw solid var(--ink); }
+    .topo img { width: 14cqw; height: auto; }
+    .topo h1 { font-size: 7.2cqw; line-height: 1; }
+    .topo h1 span { color: #8c73ff; }
+    .topo p { margin-top: 1cqw; font-size: 2.5cqw; font-weight: 600; }
+    .qrs { display: grid; grid-template-columns: repeat(3, 1fr); align-content: center; gap: 2.6cqw 3cqw; padding: 3cqw 0; list-style: none; }
+    .qr { display: grid; justify-items: center; gap: .6cqw; padding: 1.8cqw 1.2cqw 1.4cqw; border: .5cqw solid var(--ink); border-top-width: 1.6cqw; border-top-color: var(--c); border-radius: 2.4cqw; text-align: center; }
+    .qr img { width: 19cqw; height: 19cqw; image-rendering: pixelated; }
+    .qr b { font-size: 2.7cqw; line-height: 1.1; }
+    .qr small { font-size: 1.9cqw; font-weight: 600; color: #5d5880; }
+    .qr code { font: 700 2cqw var(--font); color: #8c73ff; overflow-wrap: anywhere; }
+    .pe { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; padding-top: 2cqw; border-top: .5cqw dashed #9a96b3; font-size: 2.1cqw; font-weight: 600; }
+    .pe img { width: 22cqw; height: auto; }
+
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+    .rodape { position: relative; padding: 24px; text-align: center; font-size: 15px; }
+
+    @page { size: A4; margin: 0; }
+    @media print {
+      .cenario, .abertura, .acoes, .rodape { display: none !important; }
+      body { background: #fff; }
+      main { display: block; width: auto; margin: 0; }
+      .sheet { width: 210mm; height: 297mm; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; }
+    }
+  </style>
+  <script src="/identidade-visual/js/barra.js" data-impressao="propria" defer></script>
+</head>
+<body>
+  <div class="cenario cenario--fixo" aria-hidden="true">
+    <span class="nuvem" style="top: 6%; --w: 190px; --t: 70s; --d: -10s"></span>
+    <span class="nuvem" style="top: 30%; --w: 150px; --t: 85s; --d: -40s"></span>
+    <span class="morros"></span>
+  </div>
+
+  <main>
+    <section class="abertura">
+      <p class="pill" style="--c: var(--orange)">PARA IMPRIMIR</p>
+      <h1 class="loud anima-letras"><span>Cartaz</span> <span>da</span> <span class="yellow">Oficina</span></h1>
+      <div class="bit">
+        <img class="anima-flutuar" src="/identidade-visual/mascote/bit-feliz.svg" width="100" height="100" alt="Bit feliz">
+        <p class="bubble anima-balao" style="--d: .4s">Uma folha A4 com o QR de cada ferramenta da Oficina. Cole na sala dos professores: quem passa aponta o celular e já abre.</p>
+      </div>
+    </section>
+
+    <div class="acoes">
+      <button class="btn btn--baixar" type="button" id="imprimir"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="3" y="9" width="18" height="9" rx="2.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/><rect x="7" y="14" width="10" height="7" rx="1.5" fill="#fff" stroke="#2f2a4a" stroke-width="2.4"/></svg>Imprimir o cartaz</button>
+    </div>
+
+    <article class="sheet" aria-label="Cartaz da Oficina de Prompts">
+      <header class="topo">
+        <img src="/identidade-visual/mascote/bit-acenando.svg" alt="">
+        <div>
+          <h1>Oficina de <span>Prompts</span></h1>
+          <p>Aponte a câmera do celular para o código e abra a ferramenta.</p>
+        </div>
+      </header>
+      <ul class="qrs" id="qrs"></ul>
+      <footer class="pe">
+        <span>Tudo grátis, sem cadastro, em gamificapampa.github.io</span>
+        <img src="/identidade-visual/logos/gamificapampa-horizontal.svg" alt="GamificaPampa">
+      </footer>
+    </article>
+  </main>
+
+  <footer class="rodape">GamificaPampa · UNIPAMPA, Campus Alegrete</footer>
+
+  <script>
+  (() => {
+    // As ferramentas do cartaz: o link curto (o QR sai de /atalhos/qr/<link>.svg, conferido pelo teste do site)
+    const FERRAMENTAS = [
+      ['maquina', 'Máquina de prompts', 'o prompt pronto para a sua turma', 'var(--yellow)'],
+      ['jogo-do-prompt', 'Jogo do Prompt', 'aprender as quatro partes', 'var(--mint)'],
+      ['biblioteca', 'Biblioteca', 'prompts de partida', 'var(--orange)'],
+      ['raio-x', 'Raio-X do prompt', 'o que falta no seu prompt', 'var(--purple)'],
+      ['conferir', 'Conferir a resposta', 'os erros do que a IA fez', 'var(--mint)'],
+      ['quiz', 'Quiz na hora', 'perguntas viram jogo', 'var(--pink)'],
+      ['gems', 'Assistentes do Bit', 'um assistente pronto', 'var(--blue)'],
+      ['publicar', 'Publicar meu jogo', 'link e QR para a turma', 'var(--pink)'],
+      ['curso', 'Curso online', 'a oficina no seu tempo', 'var(--yellow)'],
+    ];
+    const lista = document.getElementById('qrs');
+    FERRAMENTAS.forEach(([link, nome, frase, cor]) => {
+      const li = document.createElement('li');
+      li.className = 'qr';
+      li.style.setProperty('--c', cor);
+      li.innerHTML = `<img src="/atalhos/qr/${link}.svg" alt=""><b></b><small></small><code></code>`;
+      li.querySelector('img').alt = `QR code de gamificapampa.github.io/${link}`;
+      li.querySelector('b').textContent = nome;
+      li.querySelector('small').textContent = frase;
+      li.querySelector('code').textContent = '/' + link;
+      lista.append(li);
+    });
+    document.getElementById('imprimir').addEventListener('click', () => print());
+  })();
+  </script>
+</body>
+</html>

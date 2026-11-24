@@ -254,6 +254,8 @@ $("guarda").innerHTML = Icones.svg("quero-quero")
 let estrelasAntes = -1, falaDepois
 function mostrar() {
   const texto = $("texto").value
+  // A conquista do Passaporte da Oficina: um prompt de verdade passou pelo Raio-X
+  if (texto.trim().length >= 40) window.Passaporte?.marcar("raio-x-feito")
   if (!texto.trim()) {
     $("estrelas").innerHTML = ESTRELA.repeat(3).replace(/<svg/g, '<svg class="apagada"')
     $("estrelas").setAttribute("aria-label", "0 de 3 estrelas")

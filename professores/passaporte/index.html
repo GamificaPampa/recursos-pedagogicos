@@ -40,6 +40,8 @@
     .quadro__icone .icone { width: 30px; height: 30px; }
     .quadro:not(.feito) .quadro__icone { opacity: .55; }
     .quadro h3 { font-size: 20px; line-height: 1.2; }
+    /* Conquista: um carimbo que vem de fazer a coisa, e não só de abrir a página. Etiqueta sem sombra */
+    .quadro__tipo { justify-self: start; padding: 1px 10px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 999px; font-size: 13px; font-weight: 700; }
     .quadro p { color: var(--soft); font-size: 16px; line-height: 1.35; }
     .quadro .btn { justify-self: start; margin-top: 4px; }
     .quadro .carimbo { position: absolute; top: 14px; right: 12px; --giro: -10deg; flex-direction: column; gap: 0; padding: 4px 12px; font-size: 18px; line-height: 1.05; text-align: center; }
@@ -82,7 +84,7 @@
         <p class="bubble anima-balao" id="fala" style="--d: .5s">Cada ferramenta da Oficina que você abre ganha um carimbo. Veja o que já usou e o que falta conhecer.</p>
       </div>
       <div class="conta" aria-live="polite">
-        <b id="numero">0 de 12 carimbos</b>
+        <b id="numero">0 carimbos</b>
         <div class="barra-conta" aria-hidden="true"><span id="cheio" style="--feito: 0%"></span></div>
       </div>
     </section>
@@ -118,6 +120,7 @@
         li.className = 'quadro' + (ganhos[c.id] ? ' feito' : '');
         li.innerHTML = `<span class="quadro__icone">${icone(c.icone)}</span><h3></h3><p></p>`;
         li.querySelector('h3').textContent = c.nome;
+        if (c.conquista) li.querySelector('h3').before(Object.assign(document.createElement('span'), { className: 'quadro__tipo', textContent: 'Conquista' }));
         li.querySelector('p').textContent = c.frase;
         if (ganhos[c.id]) {
           const carimbo = Object.assign(document.createElement('span'), { className: 'carimbo' });
@@ -127,8 +130,8 @@
         } else {
           const ir = Object.assign(document.createElement('a'), { className: 'btn btn--conhecer btn--small', href: c.href });
           ir.innerHTML = icone('lupa');
-          ir.append('Conhecer');
-          ir.setAttribute('aria-label', `Conhecer: ${c.nome}`);
+          ir.append(c.conquista ? 'Fazer agora' : 'Conhecer');
+          ir.setAttribute('aria-label', `${c.conquista ? 'Fazer agora' : 'Conhecer'}: ${c.nome}`);
           li.append(ir);
         }
         return li;
